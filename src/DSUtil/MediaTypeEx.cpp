@@ -438,12 +438,14 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 
 	static CAtlMap<GUID, CString> names;
 	if (names.IsEmpty()) {
-		names[MEDIASUBTYPE_UTF8]	= _T("UTF-8");
-		names[MEDIASUBTYPE_SSA]		= _T("SubStation Alpha");
-		names[MEDIASUBTYPE_ASS]		= _T("Advanced SubStation Alpha");
-		names[MEDIASUBTYPE_ASS2]	= _T("Advanced SubStation Alpha");
-		names[MEDIASUBTYPE_USF]		= _T("Universal Subtitle Format");
-		names[MEDIASUBTYPE_VOBSUB]	= _T("VobSub");
+		names[MEDIASUBTYPE_UTF8]			= _T("UTF-8");
+		names[MEDIASUBTYPE_SSA]				= _T("SubStation Alpha");
+		names[MEDIASUBTYPE_ASS]				= _T("Advanced SubStation Alpha");
+		names[MEDIASUBTYPE_ASS2]			= _T("Advanced SubStation Alpha");
+		names[MEDIASUBTYPE_USF]				= _T("Universal Subtitle Format");
+		names[MEDIASUBTYPE_VOBSUB]			= _T("VobSub");
+		names[MEDIASUBTYPE_DVB_SUBTITLES]	= _T("DVB");
+		names[MEDIASUBTYPE_HDMVSUB]			= _T("PGS");
 	}
 
 	if (names.Lookup(subtype, str)) {

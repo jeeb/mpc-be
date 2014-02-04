@@ -239,7 +239,8 @@ LRESULT CPPageFileInfoDetails::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 
 void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG)
 {
-	CAtlList<CString> sl;
+	CAtlList<CString> videoStreams;
+	CAtlList<CString> otherStreams;
 
 	BeginEnumFilters(pFG, pEF, pBF) {
 		CComPtr<IBaseFilter> pUSBF = GetUpStreamFilter(pBF);
@@ -262,42 +263,68 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG)
 			}
 		}
 
-		BeginEnumPins(pBF, pEP, pPin) {
-			CMediaTypeEx mt;
-			PIN_DIRECTION dir;
-			if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT
-					|| FAILED(pPin->ConnectionMediaType(&mt))) {
-				continue;
+		BOOL bUsePins = TRUE;
+		if (CComQIPtr<IAMStreamSelect> pSS = pBF) {
+			DWORD nCount;
+			if (FAILED(pSS->Count(&nCount))) {
+				nCount = 0;
 			}
 
-			CString str = mt.ToString();
-
-			if (!str.IsEmpty()) {
-				if (mt.majortype == MEDIATYPE_Video) { // Sort streams, set Video streams at head
-					bool found_video = false;
-					for (POSITION pos = sl.GetTailPosition(); pos; sl.GetPrev(pos)) {
-						CString Item = sl.GetAt(pos);
-						if (!Item.Find(_T("Video:"))) {
-							sl.InsertAfter(pos, str + CString(L" [" + GetPinName(pPin) + L"]"));
-							found_video = true;
-							break;
+			for (DWORD i = 0; i < nCount; i++) {
+				AM_MEDIA_TYPE* pmt = NULL;
+				WCHAR* pszName = NULL;
+				if (SUCCEEDED(pSS->Info(i, &pmt, NULL, NULL, NULL, &pszName, NULL, NULL)) && pmt) {
+					CMediaTypeEx mt(*pmt);
+					CString str = mt.ToString();
+					if (!str.IsEmpty()) {
+						if (pszName && wcslen(pszName)) {
+							str.AppendFormat(_T(" [%s]"), pszName);
 						}
+						if (mt.majortype == MEDIATYPE_Video) {
+							videoStreams.AddTail(str);
+						} else {
+							otherStreams.AddTail(str);
+						}
+
+						bUsePins = FALSE;
 					}
-					if (!found_video) {
-						sl.AddHead(str + CString(L" [" + GetPinName(pPin) + L"]"));
-					}
-				} else {
-					sl.AddTail(str + CString(L" [" + GetPinName(pPin) + L"]"));
 				}
+				DeleteMediaType(pmt);
+				CoTaskMemFree(pszName);
 			}
 		}
-		EndEnumPins;
+
+		if (bUsePins) {
+			BeginEnumPins(pBF, pEP, pPin) {
+				CMediaTypeEx mt;
+				PIN_DIRECTION dir;
+				if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT
+						|| FAILED(pPin->ConnectionMediaType(&mt))) {
+					continue;
+				}
+
+				CString str = mt.ToString();
+				if (!str.IsEmpty()) {
+					str.AppendFormat(L" [%s]", GetPinName(pPin));
+					if (mt.majortype == MEDIATYPE_Video) {
+						videoStreams.AddTail(str);
+					} else {
+						otherStreams.AddTail(str);
+					}
+				}
+
+				FreeMediaType(mt);
+			}
+			EndEnumPins;
+		}
 	}
 	EndEnumFilters;
 
-	m_encodingText = Implode(sl, '\n');
-	m_encodingText.Replace(_T("\n"), _T("\r\n"));
-	//m_encoding.SetWindowText(text);
+	m_encodingText = Implode(videoStreams, L"\r\n");
+	if (!m_encodingText.IsEmpty()) {
+		m_encodingText += L"\r\n";
+	}
+	m_encodingText += Implode(otherStreams, L"\r\n");
 }
 
 void CPPageFileInfoDetails::OnSize(UINT nType, int cx, int cy)
