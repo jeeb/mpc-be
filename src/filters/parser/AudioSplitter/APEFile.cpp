@@ -248,7 +248,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	const __int64 file_size = m_pFile->GetLength();
 	int final_size = 0;
 	if (file_size > 0) {
-		int final_size = file_size - m_frames[ape.totalframes - 1].pos - ape.wavtaillength;
+		final_size = file_size - m_frames[ape.totalframes - 1].pos - ape.wavtaillength;
 		final_size -= final_size & 3;
 	}
 	if (file_size <= 0 || final_size <= 0) {
