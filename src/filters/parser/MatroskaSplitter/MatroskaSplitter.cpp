@@ -357,19 +357,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
-				} else if (CodecID.Find("V_REAL/RV") == 0) {
-					mt.subtype = FOURCCMap('00VR' + ((CodecID[9]-0x30)<<16));
-					mt.formattype = FORMAT_VideoInfo;
-					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
-					memset(mt.Format(), 0, mt.FormatLength());
-					memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
-					pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
-					pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-					pvih->bmiHeader.biCompression = mt.subtype.Data1;
-					if (!bHasVideo)
-						mts.Add(mt);
-					bHasVideo = true;
 				} else if (CodecID == "V_DIRAC") {
 					mt.subtype = MEDIASUBTYPE_DiracVideo;
 					mt.formattype = FORMAT_DiracVideoInfo;
@@ -480,6 +467,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else {
 							fourcc = *(DWORD*)(pTE->CodecPrivate.GetData() + 4);
 						}
+					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() == 11) {
+						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
 					}
 
 					if (fourcc) {
