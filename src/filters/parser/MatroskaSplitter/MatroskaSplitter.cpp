@@ -341,7 +341,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
-				} else if (CodecID.Find("V_MPEG4/") == 0) {
+				} else if (CodecID.Left(12) == "V_MPEG4/ISO/") {
 					BITMAPINFOHEADER pbmi;
 					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
 					pbmi.biSize			= sizeof(pbmi);
@@ -454,6 +454,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					DWORD fourcc = 0;
 					if (CodecID == "V_MJPEG") {
 						fourcc = FCC('MJPG');
+					} else if (CodecID == "V_MPEG4/MS/V3") {
+						fourcc = FCC('MP43');
 					} else if (CodecID == "V_PRORES") {
 						fourcc = FCC('icpf');
 						mt.subtype = MEDIASUBTYPE_icpf;
