@@ -457,6 +457,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					} else if (CodecID == "V_PRORES") {
 						fourcc = FCC('icpf');
 						mt.subtype = MEDIASUBTYPE_icpf;
+					} else if (CodecID == "V_SNOW") {
+						fourcc = FCC('SNOW');
 					} else if (CodecID == "V_VP8") {
 						fourcc = FCC('VP80');
 					} else if (CodecID == "V_VP9") {
