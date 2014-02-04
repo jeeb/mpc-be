@@ -517,7 +517,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
-					MatroskaReader::QWORD lastCueClusterPosition = (MatroskaReader::QWORD)-1;
+					QWORD lastCueClusterPosition = (QWORD)-1;
 
 					CAtlArray<INT64> timecodes;
 					bool readmore = true;
@@ -1339,7 +1339,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	if (rt > 0) {
 		rt += m_pFile->m_rtOffset;
 
-		MatroskaReader::QWORD lastCueClusterPosition = (MatroskaReader::QWORD)-1;
+		QWORD lastCueClusterPosition = (QWORD)-1;
 
 		Segment& s = m_pFile->m_segment;
 

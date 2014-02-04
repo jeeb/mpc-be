@@ -225,7 +225,7 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 		return S_OK;
 	}
 
-	while (MatroskaReader::QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
+	while (QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
 		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) > pMN->GetLength()) {
 			break; // a broken file
@@ -758,9 +758,9 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 		return S_OK;
 	}
 
-	CAtlList<MatroskaReader::QWORD> lens;
-	MatroskaReader::QWORD tlen = 0;
-	MatroskaReader::QWORD FrameSize;
+	CAtlList<QWORD> lens;
+	QWORD tlen = 0;
+	QWORD FrameSize;
 	BYTE FramesInLaceLessOne;
 
 	switch ((Lacing & 0x06) >> 1) {
@@ -774,7 +774,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			pMN->Read(n);
 			while (n-- > 0) {
 				BYTE b;
-				MatroskaReader::QWORD len = 0;
+				QWORD len = 0;
 				do {
 					pMN->Read(b);
 					len += b;
@@ -817,7 +817,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 
 	POSITION pos = lens.GetHeadPosition();
 	while (pos) {
-		MatroskaReader::QWORD len = lens.GetNext(pos);
+		QWORD len = lens.GetNext(pos);
 		if ((__int64)len < 0) {
 			continue;
 		}
@@ -1179,7 +1179,7 @@ HRESULT CANSI::Parse(CMatroskaNode* pMN)
 {
 	Empty();
 
-	MatroskaReader::QWORD len = pMN->m_len;
+	QWORD len = pMN->m_len;
 	CHAR c;
 	while (len-- > 0 && SUCCEEDED(pMN->Read(c))) {
 		*this += c;
@@ -1338,7 +1338,7 @@ HRESULT CLength::Parse(CMatroskaNode* pMN)
 
 	//int nMoreBytesTmp = nMoreBytes;
 
-	MatroskaReader::QWORD UnknownSize = (1i64<<(7*(nMoreBytes+1)))-1;
+	QWORD UnknownSize = (1i64<<(7*(nMoreBytes+1)))-1;
 
 	while (nMoreBytes-- > 0) {
 		m_val <<= 8;
@@ -1387,7 +1387,7 @@ HRESULT CSignedLength::Parse(CMatroskaNode* pMN)
 
 	//int nMoreBytesTmp = nMoreBytes;
 
-	MatroskaReader::QWORD UnknownSize = (1i64<<(7*(nMoreBytes+1)))-1;
+	QWORD UnknownSize = (1i64<<(7*(nMoreBytes+1)))-1;
 
 	while (nMoreBytes-- > 0)
 	{
@@ -1518,9 +1518,9 @@ bool CMatroskaNode::Next(bool fSame)
 
 bool CMatroskaNode::Find(DWORD id, bool fSearch)
 {
-	MatroskaReader::QWORD pos = m_pParent && m_pParent->m_id == MATROSKA_ID_SEGMENT
-								? FindPos(id)
-								: 0;
+	QWORD pos = m_pParent && m_pParent->m_id == MATROSKA_ID_SEGMENT
+				? FindPos(id)
+				: 0;
 
 	if (pos) {
 		SeekTo(pos);
@@ -1534,17 +1534,17 @@ bool CMatroskaNode::Find(DWORD id, bool fSearch)
 	return (m_id == id);
 }
 
-void CMatroskaNode::SeekTo(MatroskaReader::QWORD pos)
+void CMatroskaNode::SeekTo(QWORD pos)
 {
 	m_pMF->Seek(pos);
 }
 
-MatroskaReader::QWORD CMatroskaNode::GetPos()
+QWORD CMatroskaNode::GetPos()
 {
 	return m_pMF->GetPos();
 }
 
-MatroskaReader::QWORD CMatroskaNode::GetLength()
+QWORD CMatroskaNode::GetLength()
 {
 	return m_pMF->GetLength();
 }
@@ -1555,12 +1555,12 @@ HRESULT CMatroskaNode::Read(T& var)
 	return m_pMF->Read(var);
 }
 
-HRESULT CMatroskaNode::Read(BYTE* pData, MatroskaReader::QWORD len)
+HRESULT CMatroskaNode::Read(BYTE* pData, QWORD len)
 {
 	return m_pMF->ByteRead(pData, len);
 }
 
-MatroskaReader::QWORD CMatroskaNode::FindPos(DWORD id, MatroskaReader::QWORD start)
+QWORD CMatroskaNode::FindPos(DWORD id, QWORD start)
 {
 	Segment& sm = m_pMF->m_segment;
 
