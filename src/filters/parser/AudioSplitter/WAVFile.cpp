@@ -348,7 +348,7 @@ HRESULT CWAVFile::ReadRIFFINFO(const __int64 info_pos, const int info_size)
 	__int64 end = info_pos + info_size;
 	chunk_t Chunk;
 
-	while (m_pFile->GetPos() + sizeof(Chunk) < end && SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && m_pFile->GetPos() + Chunk.size <= end) {
+	while (m_pFile->GetPos() + 8 < end && SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && m_pFile->GetPos() + Chunk.size <= end) {
 		__int64 pos = m_pFile->GetPos();
 
 		if (Chunk.size > 0 && (Chunk.id == FCC('INAM') || Chunk.id == FCC('IART') || Chunk.id == FCC('ICOP') || Chunk.id == FCC('ISBJ'))) {
