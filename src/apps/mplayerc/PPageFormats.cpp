@@ -510,7 +510,7 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 		key.Close();
 
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE,
-										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\Handlers\\MPCPlay") + handlers[i].verb + "OnArrival"))) {
+										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\Handlers\\MPCBEPlay") + handlers[i].verb + "OnArrival"))) {
 			return;
 		}
 		key.SetStringValue(_T("Action"), ResStr(handlers[i].action));
@@ -524,14 +524,14 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers\\Play") + handlers[i].verb + "OnArrival"))) {
 			return;
 		}
-		key.SetStringValue(CString(CStringA("MPCPlay") + handlers[i].verb + "OnArrival"), _T(""));
+		key.SetStringValue(CString(CStringA("MPCBEPlay") + handlers[i].verb + "OnArrival"), _T(""));
 		key.Close();
 	} else {
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE,
 										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers\\Play") + handlers[i].verb + "OnArrival"))) {
 			return;
 		}
-		key.DeleteValue(CString(CStringA("MPCPlay") + handlers[i].verb + "OnArrival"));
+		key.DeleteValue(CString(CStringA("MPCBEPlay") + handlers[i].verb + "OnArrival"));
 		key.Close();
 	}
 }
@@ -556,7 +556,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 	}
 	len = _countof(buff);
 	if (ERROR_SUCCESS != key.QueryStringValue(
-				CString(_T("MPCPlay")) + handlers[i].verb + _T("OnArrival"),
+				CString(_T("MPCBEPlay")) + handlers[i].verb + _T("OnArrival"),
 				buff, &len)) {
 		return false;
 	}
