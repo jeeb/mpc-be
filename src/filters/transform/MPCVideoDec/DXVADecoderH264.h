@@ -36,6 +36,8 @@ public:
 	virtual void	CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void	Flush();
 
+	virtual HRESULT	get_buffer_dxva();
+
 protected :
 	virtual int		FindOldestFrame();
 
@@ -61,4 +63,6 @@ private:
 	void					ClearUnusedRefFrames();
 
 	int						m_nPictStruct;
+	int						m_nSurfaceIndex;
+	CComPtr<IMediaSample>	m_pSampleToDeliver;
 };

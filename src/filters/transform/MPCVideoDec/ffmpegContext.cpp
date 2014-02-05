@@ -243,30 +243,29 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 
 HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
 						  int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart,
-						  UINT* SecondFieldOffset, int* Sync, int* NALLength)
+						  UINT* SecondFieldOffset, int* Sync, int* NALLength, int* got_picture)
 {
-	HRESULT hr = E_FAIL;
+	HRESULT hr		= E_FAIL;
 	if (pBuffer != NULL) {
 		H264Context* h	= (H264Context*)pAVCtx->priv_data;
-		int				got_picture	= 0;
 		AVPacket		avpkt;
 		av_init_packet(&avpkt);
 		avpkt.data		= pBuffer;
 		avpkt.size		= nSize;
 		avpkt.pts		= rtStart;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
-		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
 		
 #if defined(_DEBUG) && 0
-		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : %d, %d\n", used_bytes, got_picture);
+		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : %d, %d\n", used_bytes, *got_picture);
 #endif
 
 		if (used_bytes < 0) {
 			return hr;
 		}
 
-		hr = S_OK;
 		if (h->cur_pic_ptr) {
+			hr = S_OK;
 			if (pOutPOC) {
 				*pOutPOC = pFrame->h264_poc_outputed;
 			}
@@ -293,6 +292,7 @@ HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 			}
 		}
 	}
+
 	return hr;
 }
 

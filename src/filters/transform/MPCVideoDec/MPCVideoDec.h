@@ -169,17 +169,17 @@ protected:
 
 	HRESULT				InitDecoder(const CMediaType *pmt);
 
+	static int			av_get_buffer_dxva(struct AVCodecContext *c, AVFrame *pic, int flags);
+
 public:
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CMPCVideoDecFilter();
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP			NonDelegatingQueryInterface(REFIID riid, void** ppv);
-	virtual bool			IsVideoInterlaced();
+	virtual bool			IsVideoInterlaced() { return true; };
 	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight);
-	CTransformOutputPin*	GetOutputPin() {
-		return m_pOutput;
-	}
+	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 
 	REFERENCE_TIME	GetDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool pulldown_flag = false);

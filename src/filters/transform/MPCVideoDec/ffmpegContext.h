@@ -47,7 +47,7 @@ bool			IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 // === H264 functions
 HRESULT			FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
 								  int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart,
-								  UINT* SecondFieldOffset, int* Sync, int* NALLength);
+								  UINT* SecondFieldOffset, int* Sync, int* NALLength, int* got_picture);
 HRESULT			FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice,
 									 DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix,
 									 int* nPictStruct);
