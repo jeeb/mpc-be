@@ -6160,24 +6160,24 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 	//
 
-	CSize video, wh(0, 0), arxy(0, 0);
+	CSize framesize, dar;
 
 	if (m_pMFVDC) {
-		m_pMFVDC->GetNativeVideoSize(&wh, &arxy);
+		m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
 	} else if (m_pCAP) {
-		wh = m_pCAP->GetVideoSize(false);
-		arxy = m_pCAP->GetVideoSize(true);
+		framesize = m_pCAP->GetVideoSize(false);
+		dar = m_pCAP->GetVideoSize(true);
 	} else {
-		m_pBV->GetVideoSize(&wh.cx, &wh.cy);
+		m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
 
 		long arx = 0, ary = 0;
 		CComQIPtr<IBasicVideo2> pBV2 = m_pBV;
 		if (pBV2 && SUCCEEDED(pBV2->GetPreferredAspectRatio(&arx, &ary)) && arx > 0 && ary > 0) {
-			arxy.SetSize(arx, ary);
+			dar.SetSize(arx, ary);
 		}
 	}
 
-	if (wh.cx <= 0 || wh.cy <= 0) {
+	if (framesize.cx <= 0 || framesize.cy <= 0) {
 		AfxMessageBox(ResStr(IDS_MAINFRM_55));
 		return;
 	}
@@ -6185,23 +6185,27 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 	// with the overlay mixer IBasicVideo2 won't tell the new AR when changed dynamically
 	DVD_VideoAttributes VATR;
 	if (GetPlaybackMode() == PM_DVD && SUCCEEDED(m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
-		arxy.SetSize(VATR.ulAspectX, VATR.ulAspectY);
+		dar.SetSize(VATR.ulAspectX, VATR.ulAspectY);
 	}
 
-	video = (arxy.cx <= 0 || arxy.cy <= 0) ? wh : CSize(MulDiv(wh.cy, arxy.cx, arxy.cy), wh.cy);
-
-	//
+	if (dar.cx > 0 && dar.cy > 0) {
+		framesize.cx = MulDiv(framesize.cy, dar.cx, dar.cy);
+	}
 
 	AppSettings& s = AfxGetAppSettings();
 
-	int cols = max (1, min (10, s.iThumbCols)), rows = max(1, min (20, s.iThumbRows));
+	const int infoheight = 70;
+	const int margin	= 10;
+	const int width		= min(max(s.iThumbWidth, 256), 2560);
+	const int cols		= min(max(s.iThumbCols, 1), 10);
+	const int rows		= min(max(s.iThumbRows, 1), 20);
+	
+	CSize thumbsize;
+	thumbsize.cx		= (width - margin) / cols - margin;
+	thumbsize.cy		= MulDiv(thumbsize.cx, framesize.cy, framesize.cx);
 
-	int margin = 5;
-	int infoheight = 70;
-	int width = max (256, min (2560, s.iThumbWidth));
-	int height = width * video.cy / video.cx * rows / cols + infoheight;
-
-	int dibsize = sizeof(BITMAPINFOHEADER) + width*height*4;
+	const int height	= infoheight + margin + (thumbsize.cy + margin) * rows;
+	const int dibsize	= sizeof(BITMAPINFOHEADER) + width * height * 4;
 
 	CAutoVectorPtr<BYTE> dib;
 	if (!dib.Allocate(dibsize)) {
@@ -6211,22 +6215,22 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)(BYTE*)dib;
 	memset(bih, 0, sizeof(BITMAPINFOHEADER));
-	bih->biSize = sizeof(BITMAPINFOHEADER);
-	bih->biWidth = width;
-	bih->biHeight = height;
-	bih->biPlanes = 1;
-	bih->biBitCount = 32;
-	bih->biCompression = BI_RGB;
-	bih->biSizeImage = width*height*4;
+	bih->biSize			= sizeof(BITMAPINFOHEADER);
+	bih->biWidth		= width;
+	bih->biHeight		= height;
+	bih->biPlanes		= 1;
+	bih->biBitCount		= 32;
+	bih->biCompression	= BI_RGB;
+	bih->biSizeImage	= width * height * 4;
 	memsetd(bih + 1, 0xffffff, bih->biSizeImage);
 
 	SubPicDesc spd;
-	spd.w = width;
-	spd.h = height;
-	spd.bpp = 32;
-	spd.pitch = -width*4;
-	spd.vidrect = CRect(0, 0, width, height);
-	spd.bits = (BYTE*)(bih + 1) + (width*4)*(height-1);
+	spd.w		= width;
+	spd.h		= height;
+	spd.bpp		= 32;
+	spd.pitch	= -width * 4;
+	spd.vidrect	= CRect(0, 0, width, height);
+	spd.bits	= (BYTE*)(bih + 1) + (width * 4) * (height - 1);
 
 	{
 		BYTE* p = (BYTE*)spd.bits;
@@ -6277,10 +6281,8 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		int col = (i-1)%cols;
 		int row = (i-1)/cols;
 
-		CSize s((width-margin*2)/cols, (height-margin*2-infoheight)/rows);
-		CPoint p(margin+col*s.cx, margin+row*s.cy+infoheight);
-		CRect r(p, s);
-		r.DeflateRect(margin, margin);
+		CPoint p(margin + col * (thumbsize.cx + margin), infoheight + margin + row * (thumbsize.cy + margin));
+		CRect r(p, thumbsize);
 
 		CRenderedTextSubtitle rts(&csSubLock);
 		rts.CreateDefaultStyle(0);
@@ -6369,7 +6371,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		rts.CreateDefaultStyle(0);
 		rts.m_dstScreenSize.SetSize(width, height);
 		STSStyle* style = DNew STSStyle();
-		style->marginRect.SetRect(margin*2, margin*2, margin*2, height-infoheight-margin);
+		style->marginRect.SetRect(margin, margin, margin, height-infoheight-margin);
 		rts.AddStyle(_T("thumbs"), style);
 
 		CStringW str;
@@ -6403,12 +6405,12 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		}
 
 		CStringW ar;
-		if (arxy.cx > 0 && arxy.cy > 0 && arxy.cx != wh.cx && arxy.cy != wh.cy) {
-			ar.Format(L"(%d:%d)", arxy.cx, arxy.cy);
+		if (dar.cx > 0 && dar.cy > 0 && dar.cx != framesize.cx && dar.cy != framesize.cy) {
+			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
 		}
 
 		str.Format(ResStr(IDS_MAINFRM_59),
-				   fn, fs, wh.cx, wh.cy, ar, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+				   fn, fs, framesize.cx, framesize.cy, ar, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 		rts.Add(str, true, 0, 1, _T("thumbs"));
 
 		rts.Render(spd, 0, 25, bbox);
