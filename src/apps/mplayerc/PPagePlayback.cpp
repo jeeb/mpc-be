@@ -22,8 +22,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPagePlayback.h"
-#include "MultiMonitor.h"
-
 
 // CPPagePlayback dialog
 

@@ -4,7 +4,6 @@
 //
 #define IDR_MAINFRAME                   128
 #define IDR_POPUP                       130
-#define IDS_STRING129                   131
 #define IDR_POPUPMAIN                   133
 #define IDB_PLAYERFLYBAR_PNG            196
 #define IDB_W7_AUDIO                    197
@@ -68,6 +67,7 @@
 #define IDF_SHADER_RESIZER              700
 #define IDF_SHADER_EMPTY                701
 #define IDF_SHADER_FINAL                702
+// commands
 #define ID_FILE_OPENMEDIA               800
 #define ID_FILE_OPENDVD                 801
 #define ID_FILE_OPENDEVICE              802
@@ -269,6 +269,10 @@
 #define IDS_AG_MENU_SUBTITLELANG        1004
 #define IDS_AG_MENU_JUMPTO              1005
 #define ID_MENU_RECENT_FILES            1006
+#define ID_START                        1007
+#define ID_SAVE                         1008
+#define ID_SUB_DELAY_DOWN               1010
+#define ID_SUB_DELAY_UP                 1011
 #define ID_FILTERS_SUBITEM_START        2000
 #define ID_FILTERS_SUBITEM_END          2099
 #define ID_FILTERSTREAMS_SUBITEM_START  2100
@@ -297,7 +301,8 @@
 #define ID_SHADERS_END                  4299
 #define ID_NAVIGATE_CHAP_SUBITEM_START  4300
 #define ID_NAVIGATE_CHAP_SUBITEM_END    4499
-// filters
+////////////////////////////////////////////
+// strings for built-in filters
 #define IDS_FILTER_SETTINGS_CAPTION     7000
 #define IDS_FILTER_RESET_SETTINGS       7010
 // avi splitter
@@ -381,6 +386,7 @@
 #define IDS_ARS_SYSTEM_LAYOUT_CHANNELS  7610
 // matroska splitter
 #define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
+////////////////////////////////////////////
 // dialogs
 #define IDD_OPEN_DLG                    10000
 #define IDD_OPENCAPDEVICE_DLG           10001
@@ -435,6 +441,10 @@
 #define IDD_PPAGEYOUTUBE                10059
 #define IDD_PPAGEFILTERSPERFORMANCE     10060
 #define IDD_PPAGEFILTERSPRIORITY        10061
+#define IDD_TUNER_SCAN                  10062
+#define IDD_NAVIGATION_DLG              10063
+#define IDD_PPAGESUBRENDERING           10064
+#define IDD_UPDATE_DIALOG               10065
 // controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202
@@ -530,15 +540,16 @@
 #define IDC_TREE2                       10362
 //
 #define IDC_SLI_BRIGHTNESS              10501
-#define IDC_SLI_HUE                     10502
-#define IDC_SLI_SATURATION              10503
-#define IDC_WINHOTKEY1                  10504
-#define IDC_RESET_SETTINGS              10505
-#define IDC_EXPORT_SETTINGS             10506
-#define IDC_TAB1                        10507
-#define IDC_ANIMATE1                    10508
-#define IDC_PROGRESS1                   10509
-#define IDC_STATIC_BALANCE              10510
+#define IDC_SLI_CONTRAST                10502
+#define IDC_SLI_HUE                     10503
+#define IDC_SLI_SATURATION              10504
+#define IDC_WINHOTKEY1                  10505
+#define IDC_RESET_SETTINGS              10506
+#define IDC_EXPORT_SETTINGS             10507
+#define IDC_TAB1                        10508
+#define IDC_ANIMATE1                    10509
+#define IDC_PROGRESS1                   10510
+#define IDC_STATIC_BALANCE              10511
 #define IDC_DVDPATH                     10600
 #define IDC_SUBRESYNCLIST               10601
 #define IDC_PLAYLIST                    10602
@@ -693,19 +704,12 @@
 #define IDS_STATSBAR_JITTER             14196
 #define IDS_STATSBAR_BITRATE            14197
 #define IDS_STATSBAR_BITRATE_AVG_CUR    14198
-#define IDD_TUNER_SCAN                  20002
 #define IDS_AG_RESET_STATS              20005
-#define IDD_NAVIGATION_DLG              20005
-#define IDD_PPAGESUBRENDERING           20006
 #define IDS_VIEW_BORDERLESS             20007
 #define IDS_VIEW_FRAMEONLY              20008
 #define IDS_VIEW_CAPTIONMENU            20009
 #define IDS_VIEW_HIDEMENU               20010
-#define IDD_UPDATE_DIALOG               20011
-#define IDC_FULLSCR_COMBO               22000
-#define IDC_AUTO_REFRESHRATE_CHECK      22001
 #define IDC_FULLSCREEN_MONITOR_CHECK    22002
-#define IDC_SLI_CONTRAST                22003
 #define IDC_RESET                       22004
 #define IDC_DVD_POS                     22005
 #define IDC_FILE_POS                    22006
@@ -726,12 +730,10 @@
 #define IDC_BANDWIDTH                   22022
 #define IDC_FREQ_END                    22023
 #define IDC_CHANNEL_LIST                22024
-#define ID_START                        22025
 #define IDC_RADIO_ANALOG                22026
 #define IDC_RADIO_DVBC                  22027
 #define IDC_RADIO_DVBS                  22028
 #define IDC_RADIO_DVBT                  22029
-#define ID_SAVE                         22030
 #define IDC_STRENGTH                    22031
 #define IDC_SYNCVIDEO                   22032
 #define IDC_SYNCDISPLAY                 22033
@@ -769,8 +771,6 @@
 #define IDC_CHECK_CHM                   22066
 #define IDC_COMBOSPEEDSTEP              22067
 #define IDC_CHECK_FLYBAR                22068
-#define ID_SUB_DELAY_DOWN               24000
-#define ID_SUB_DELAY_UP                 24001
 #define IDS_MPLAYERC_104                24002
 #define IDS_MPLAYERC_105                24003
 #define IDS_FILE_SAVE_THUMBNAILS        24005
@@ -1081,6 +1081,7 @@
 #define IDS_USAGE                       33133
 #define IDS_UNKNOWN_SWITCH              33134
 #define IDS_AG_SETTINGS                 33143
+#define IDS_ZOOM_AUTOFIT                33158
 #define IDS_ADD_TO_PLAYLIST             33161
 #define IDS_OPEN_WITH_MPC               33162
 #define IDS_CANNOT_CHANGE_FORMAT        33163
