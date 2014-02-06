@@ -64,6 +64,10 @@
 #define IDF_CONTROLVOLUMEGRIP_PNG       537
 #define IDR_HTML_VARIABLES              538
 #define IDF_FAVICON                     539
+#define IDR_TB_PLAY                     540
+#define IDR_TB_PAUSE                    541
+#define IDR_TB_STOP                     542
+#define IDB_DXVA_ON                     543
 #define IDF_SHADER_RESIZER              700
 #define IDF_SHADER_EMPTY                701
 #define IDF_SHADER_FINAL                702
@@ -635,6 +639,12 @@
 //
 #define IDC_TREE1                       10361
 #define IDC_TREE2                       10362
+//
+#define IDTB_BUTTON1                    10371
+#define IDTB_BUTTON2                    10372
+#define IDTB_BUTTON3                    10373
+#define IDTB_BUTTON4                    10374
+#define IDTB_BUTTON5                    10375
 //
 #define IDC_SLI_BRIGHTNESS              10501
 #define IDC_SLI_CONTRAST                10502
@@ -1283,39 +1293,6 @@
 #define IDS_MFMT_BDPLS                  39902
 #define IDS_MFMT_CUE                    39903
 //
-#define IDTB_BUTTON1                    40001
-#define IDTB_BUTTON2                    40002
-#define IDTB_BUTTON3                    40003
-#define IDTB_BUTTON4                    40004
-#define IDTB_BUTTON5                    40005
-#define IDR_FB_EXIT_A                   40101
-#define IDR_FB_EXIT                     40102
-#define IDR_FB_INFO_A                   40103
-#define IDR_FB_INFO                     40104
-#define IDR_FB_MINIMIZE_A               40105
-#define IDR_FB_MINIMIZE                 40106
-#define IDR_FB_MAXIMIZE_A               40107
-#define IDR_FB_MAXIMIZE                 40108
-#define IDR_FB_RESTORE_A                40109
-#define IDR_FB_RESTORE                  40110
-#define IDR_FB_SETTINGS_A               40111
-#define IDR_FB_SETTINGS                 40112
-#define IDR_FB_FULLSCREEN_A             40113
-#define IDR_FB_FULLSCREEN               40114
-#define IDR_FB_WINDOW_A                 40115
-#define IDR_FB_WINDOW                   40116
-#define IDR_FB_LOCK_A                   40117
-#define IDR_FB_LOCK                     40118
-#define IDR_FB_UNLOCK_A                 40119
-#define IDR_FB_UNLOCK                   40120
-#define IDR_FB_EXIT2_A                  40121
-#define IDR_FB_EXIT2                    40122
-#define IDR_FB_FULLSCREEN_NA            40123
-#define IDR_FB_MAXIMIZE_NA              40124
-#define IDR_FB_INFO_NA                  40125
-#define IDR_TB_PLAY                     41001
-#define IDR_TB_PAUSE                    41002
-#define IDR_TB_STOP                     41003
 #define IDS_INTERLACED                  41004
 #define IDS_HZ                          41005
 #define IDS_FRONT_LEFT                  41006
@@ -1341,7 +1318,6 @@
 #define IDS_NO_MORE_MEDIA               41026
 #define IDS_FIRST_IN_FOLDER             41027
 #define IDS_LAST_IN_FOLDER              41028
-#define IDB_DXVA_ON                     41030
 #define IDS_FAVORITES_QUICKADDFAVORITE  41105
 #define IDS_DVB_CHANNEL_NUMBER          41109
 #define IDS_DVB_CHANNEL_NAME            41110
