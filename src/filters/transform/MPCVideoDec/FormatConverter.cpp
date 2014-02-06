@@ -408,7 +408,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	// Check if we have proper pixel alignment and the dst memory is actually aligned
 	if (FFALIGN(m_dstStride, 16) != m_dstStride || ((uintptr_t)dst % 16u)) {
 		outStride = FFALIGN(outStride, 16);
-		size_t requiredSize = (outStride * m_planeHeight * swof.bpp) << 3;
+		size_t requiredSize = (outStride * m_planeHeight * swof.bpp) >> 3;
 		if (requiredSize > m_nAlignedBufferSize) {
 			av_freep(&m_pAlignedBuffer);
 			m_nAlignedBufferSize = requiredSize;
