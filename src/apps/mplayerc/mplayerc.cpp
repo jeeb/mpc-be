@@ -2055,7 +2055,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				if (ContentLength) {
 					nMaxSize = min(ContentLength, nMaxSize);
 				}
-				
+
 				while (body.GetLength() < nMaxSize) { // should be enough for a playlist...
 					CStringA str;
 					s.SetTimeOut(1500);

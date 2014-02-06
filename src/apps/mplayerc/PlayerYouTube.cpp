@@ -31,6 +31,7 @@
 #define MATCH_END				"\""
 
 static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A"), _T(""), false};
+
 static YOUTUBE_PROFILES getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)
 		if (iTag == youtubeProfiles[i].iTag) {
@@ -98,7 +99,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		LOG2FILE(_T("------"));
 		LOG2FILE(_T("Youtube parser"));
 #endif
-		
+
 		CString str, Author;
 
 		char* final = NULL;
@@ -376,7 +377,7 @@ again:
 				YOUTUBE_PROFILES youtubePtofile = getProfile(itagValue);
 				if (youtubePtofile.Visible == false
 					|| youtubePtofile.iTag == 0
-					|| ((youtubePtofile.Container == _T("WebM") && !match_itag))
+					|| (youtubePtofile.Container == _T("WebM") && !match_itag)
 					|| youtubePtofile.Profile == _T("3D")) {
 					continue;
 				}

@@ -144,7 +144,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 						gb.Reset(DecompData.GetData(), min(_countof(Buff), DecompData.GetCount()));
 					}
 				}
-	
+
 			} else if (memcmp(Buff, "FWS", 3) == 0) {
 				DWORD dwRead = ReadBuffer(m_hFile, Buff, min(_countof(Buff), size.QuadPart));
 				if (dwRead) {

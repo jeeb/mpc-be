@@ -96,29 +96,29 @@ static UINT s_uTaskbarRestart	= RegisterWindowMessage(_T("TaskbarCreated"));
 static UINT s_uTBBC				= RegisterWindowMessage(_T("TaskbarButtonCreated"));
 static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 
-class __declspec(uuid("5933BB4F-EC4D-454E-8E11-B74DDA92E6F9")) ChaptersSouce : public CSource, public IDSMChapterBagImpl 
-{ 
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv); 
+class __declspec(uuid("5933BB4F-EC4D-454E-8E11-B74DDA92E6F9")) ChaptersSouce : public CSource, public IDSMChapterBagImpl
+{
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-public: 
-	ChaptersSouce(); 
-	virtual ~ChaptersSouce() {} 
+public:
+	ChaptersSouce();
+	virtual ~ChaptersSouce() {}
 
-	DECLARE_IUNKNOWN; 
-}; 
+	DECLARE_IUNKNOWN;
+};
 
-ChaptersSouce::ChaptersSouce() : CSource(NAME("Chapters Source"), NULL, __uuidof(this)) 
-{ 
-} 
+ChaptersSouce::ChaptersSouce() : CSource(NAME("Chapters Source"), NULL, __uuidof(this))
+{
+}
 
-STDMETHODIMP ChaptersSouce::NonDelegatingQueryInterface(REFIID riid, void** ppv) 
-{ 
-	CheckPointer(ppv, E_POINTER); 
+STDMETHODIMP ChaptersSouce::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+{
+	CheckPointer(ppv, E_POINTER);
 
-	return 
-		QI(IDSMChapterBag) 
-		__super::NonDelegatingQueryInterface(riid, ppv); 
-} 
+	return
+		QI(IDSMChapterBag)
+		__super::NonDelegatingQueryInterface(riid, ppv);
+}
 
 class CSubClock : public CUnknown, public ISubClock
 {
@@ -2987,7 +2987,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 					}
 				}
 				break;
-			case EC_DVD_TITLE_CHANGE: 
+			case EC_DVD_TITLE_CHANGE:
 				if (m_pDVDC) {
 					// Save current chapter
 					DVD_POSITION* DvdPos = s.CurrentDVDPosition();
@@ -6199,7 +6199,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 	const int width		= min(max(s.iThumbWidth, 256), 2560);
 	const int cols		= min(max(s.iThumbCols, 1), 10);
 	const int rows		= min(max(s.iThumbRows, 1), 20);
-	
+
 	CSize thumbsize;
 	thumbsize.cx		= (width - margin) / cols - margin;
 	thumbsize.cy		= MulDiv(thumbsize.cx, framesize.cy, framesize.cx);
@@ -10436,7 +10436,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		if (pSS) {
 			DWORD cStreams = 0;
 			if (!FAILED(pSS->Count(&cStreams))) {
-				
+
 				BOOL bIsHaali = FALSE;
 				CComQIPtr<IBaseFilter> pBF = pSS;
 				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
@@ -13299,7 +13299,7 @@ void CMainFrame::SetupChapters()
 			ULONG VTSN, TTN;
 			if (::PathFileExists(path) && CVobFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
 				path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
-				
+
 				CAtlList<CString> files;
 				CVobFile vob;
 				if (::PathFileExists(path) && vob.Open(path, files, TTN) && ulNumOfChapters + 1 == vob.GetChaptersCount()) {
@@ -14045,7 +14045,7 @@ void CMainFrame::OpenSetupAudioStream()
 	}
 
 	if (GetPlaybackMode() == PM_FILE) {
-			
+
 		CAtlList<CString> extAudioList;
 		CPlaylistItem pli;
 		if (m_wndPlaylistBar.GetCur(pli)) {
@@ -17152,7 +17152,7 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 
 					return true;
 				}
-			
+
 				return false;
 			}
 		}
@@ -17343,7 +17343,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 		m_iSubtitleSel = iSubtitleSel;
 		if (pSubStream) {
 			int i = 0;
-			
+
 			POSITION pos = m_pSubStreams.GetHeadPosition();
 			while (pos) {
 				CComPtr<ISubStream> pSubStream2 = m_pSubStreams.GetNext(pos);
@@ -18240,7 +18240,7 @@ void CMainFrame::CloseMedia()
 				MessageBeep(MB_ICONEXCLAMATION);
 				TRACE(_T("CRITICAL ERROR: !!! Must kill opener thread !!!\n"));
 				TerminateThread(m_pGraphThread->m_hThread, 0xDEAD);
-				
+
 				m_pGraphThread = (CGraphThread*)AfxBeginThread(RUNTIME_CLASS(CGraphThread));
 				if (m_pGraphThread) {
 					m_pGraphThread->SetMainFrame(this);

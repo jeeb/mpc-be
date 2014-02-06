@@ -66,7 +66,7 @@ CVMROSD::CVMROSD()
 	m_debugPenBorder.CreatePen(PS_SOLID, 1, m_Color[OSD_BORDER]);
 
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
-	
+
 	m_MainWndRect = m_MainWndRectCashed = CRect(0,0,0,0);
 
 	int fp = m_bm.FileExists(CString(_T("flybar")));

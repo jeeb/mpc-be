@@ -103,7 +103,7 @@ class CPlaylistItem
 public:
 	UINT m_id;
 	CString m_label;
-	
+
 	CFileItemList m_fns;
 	CAtlList<CString> m_subs;
 
