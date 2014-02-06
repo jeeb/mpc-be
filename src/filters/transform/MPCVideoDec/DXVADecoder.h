@@ -45,15 +45,6 @@ class CDXVADecoder
 		REFERENCE_TIME				rtStop;
 		int							nCodecSpecific;
 		DWORD						dwDisplayCount;
-
-		PICTURE_STORE() {
-			bRefPicture		= false;
-			bInUse			= false;
-			bDisplayed		= false;
-			pSample			= NULL;
-			nCodecSpecific	= -1;
-			dwDisplayCount	= 0;
-		}
 	};
 
 public :
@@ -80,7 +71,6 @@ public :
 
 	void						EndOfStream();
 
-	virtual HRESULT				get_buffer_dxva() { return S_OK; };
 protected :
 	CDXVADecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber);
 	CDXVADecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
@@ -137,7 +127,7 @@ private :
 	DXVA2_ConfigPictureDecode		m_DXVA2Config;
 	DXVA2_DecodeExecuteParams		m_ExecuteParams;
 
-	void							Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
-	void							FreePictureSlot(int nSurfaceIndex);
-	void							SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
+	void						Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
+	void						FreePictureSlot(int nSurfaceIndex);
+	void						SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
 };

@@ -918,6 +918,14 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nFrameType(PICT_FRAME)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 {
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (i == PixFmt_AYUV) {
+			m_fPixFmts[i] = false;
+		} else {
+			m_fPixFmts[i] = true;
+		}
+	}
+
 	if (phr) {
 		*phr = S_OK;
 	}
@@ -928,15 +936,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_pOutput = DNew CVideoDecOutputPin(NAME("CVideoDecOutputPin"), this, phr, L"Output");
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
-		return;
-	}
-
-	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV) {
-			m_fPixFmts[i] = false;
-		} else {
-			m_fPixFmts[i] = true;
-		}
 	}
 
 	memset(&m_DDPixelFormat, 0, sizeof(m_DDPixelFormat));
@@ -1072,6 +1071,12 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 		pD3D9->Release();
 	}
 }
+
+bool CMPCVideoDecFilter::IsVideoInterlaced()
+{
+	// NOT A BUG : always tell DirectShow it's interlaced - progressive flags set in SetTypeSpecificFlags() function
+	return true;
+};
 
 REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
 {
@@ -1668,8 +1673,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx->idct_algo             = FF_IDCT_AUTO;
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->refcounted_frames		= 1;
-	m_pAVCtx->opaque				= this;
-	m_pAVCtx->get_buffer2			= av_get_buffer_dxva;
+
+	if (m_nCodecId == AV_CODEC_ID_H264 && IsDXVASupported()) {
+		m_pAVCtx->flags2			|= CODEC_FLAG2_SHOW_ALL;
+	}
 
 	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
 		m_pAVCtx->codec_tag = MAKEFOURCC('M','P','E','G');
@@ -2538,6 +2545,9 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 		m_bUseDXVA = false;
 		avcodec_close(m_pAVCtx);
 		m_pAVCtx->using_dxva = false;
+		if (m_nCodecId == AV_CODEC_ID_H264) {
+			m_pAVCtx->flags2 &= ~CODEC_FLAG2_SHOW_ALL;
+		}
 		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
 		m_pAVCtx->thread_count = max(1, min(m_nCodecId == AV_CODEC_ID_MPEG4 ? 1 : nThreadNumber, MAX_AUTO_THREADS));
 		
@@ -3501,15 +3511,4 @@ void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts)
 		SUPPORTED_FORMATS fmt = {sudPinTypesIn[i].clsMajorType, ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode, ffCodecs[i].DXVACode};
 		fmts.AddTail(fmt);
 	}
-}
-
-int CMPCVideoDecFilter::av_get_buffer_dxva(struct AVCodecContext *c, AVFrame *pic, int flags)
-{
-	CMPCVideoDecFilter* pFilter = (CMPCVideoDecFilter*)(c->opaque);
-
-	if (pFilter->m_pDXVADecoder) {
-		pFilter->m_pDXVADecoder->get_buffer_dxva();
-	}
-
-	return avcodec_default_get_buffer2(c, pic, flags);
 }

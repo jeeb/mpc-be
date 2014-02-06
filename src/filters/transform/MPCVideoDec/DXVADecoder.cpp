@@ -103,7 +103,7 @@ void CDXVADecoder::Flush()
 		m_pPictureStore[i].bRefPicture		= false;
 		m_pPictureStore[i].bInUse			= false;
 		m_pPictureStore[i].bDisplayed		= false;
-		m_pPictureStore[i].pSample.Release();
+		m_pPictureStore[i].pSample			= NULL;
 		m_pPictureStore[i].nCodecSpecific	= -1;
 		m_pPictureStore[i].dwDisplayCount	= 0;
 	}
@@ -276,7 +276,7 @@ HRESULT CDXVADecoder::GetDeliveryBuffer(REFERENCE_TIME rtStart, REFERENCE_TIME r
 		m_pFilter->UpdateAspectRatio();
 		m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight(), true, false, m_pFilter->GetDuration());
 	}
-	hr = m_pFilter->GetOutputPin()->GetDeliveryBuffer(&pNewSample, NULL, NULL, 0);
+	hr = m_pFilter->GetOutputPin()->GetDeliveryBuffer(&pNewSample, 0, 0, 0);
 
 	if (SUCCEEDED(hr)) {
 		pNewSample->SetTime(&rtStart, &rtStop);
@@ -469,11 +469,6 @@ bool CDXVADecoder::AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRe
 							  REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField,
 							  int nCodecSpecific)
 {
-	if (nSurfaceIndex == -1 || pSample == NULL) {
-		return false;
-	}
-	ASSERT(nSurfaceIndex < m_nPicEntryNumber);
-
 	if (bIsField && m_nFieldSurface == -1) {
 		m_nFieldSurface = nSurfaceIndex;
 		m_pFieldSample	= pSample;
@@ -482,6 +477,15 @@ bool CDXVADecoder::AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRe
 		m_pPictureStore[nSurfaceIndex].nCodecSpecific	= nCodecSpecific;
 		return false;
 	} else {
+		ASSERT(nSurfaceIndex < m_nPicEntryNumber);
+
+		//TRACE ("Add Stor: [%10I64d - %10I64d], Ind = %d, Codec=%d\n", rtStart, rtStop, nSurfaceIndex, nCodecSpecific);
+		/*
+		ASSERT(m_pPictureStore[nSurfaceIndex].pSample == NULL);
+		ASSERT(!m_pPictureStore[nSurfaceIndex].bInUse);
+		ASSERT((nSurfaceIndex < m_nPicEntryNumber) && (m_pPictureStore[nSurfaceIndex].pSample == NULL));
+		*/
+
 		m_pPictureStore[nSurfaceIndex].bRefPicture		= bRefPicture;
 		m_pPictureStore[nSurfaceIndex].bInUse			= true;
 		m_pPictureStore[nSurfaceIndex].bDisplayed		= false;
@@ -611,7 +615,7 @@ HRESULT CDXVADecoder::DisplayNextFrame()
 
 		m_pPictureStore[nPicIndex].bDisplayed = true;
 		if (!m_pPictureStore[nPicIndex].bRefPicture) {
-			FreePictureSlot(nPicIndex);
+			FreePictureSlot (nPicIndex);
 		}
 	}
 
@@ -620,8 +624,9 @@ HRESULT CDXVADecoder::DisplayNextFrame()
 
 HRESULT CDXVADecoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	int			nPos	= -1;
-	HRESULT		hr		= E_UNEXPECTED;
+	HRESULT		hr			 = E_UNEXPECTED;
+	int			nPos		 = -1;
+	DWORD		dwMinDisplay = MAXDWORD;
 
 	if (m_nFieldSurface != -1) {
 		nSurfaceIndex		= m_nFieldSurface;
@@ -630,47 +635,33 @@ HRESULT CDXVADecoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppS
 	}
 
 	switch (m_nEngine) {
-		case ENGINE_DXVA1 : {
-				DWORD dwMinDisplay = MAXDWORD;
-				for (int i = 0; i < m_nPicEntryNumber; i++) {
-					if (!m_pPictureStore[i].bInUse && m_pPictureStore[i].dwDisplayCount < dwMinDisplay) {
-						dwMinDisplay = m_pPictureStore[i].dwDisplayCount;
-						nPos  = i;
-					}
-				}
-
-				if (nPos != -1) {
-					nSurfaceIndex = nPos;
-					return S_OK;
+		case ENGINE_DXVA1 :
+			for (int i = 0; i < m_nPicEntryNumber; i++) {
+				if (!m_pPictureStore[i].bInUse && m_pPictureStore[i].dwDisplayCount < dwMinDisplay) {
+					dwMinDisplay = m_pPictureStore[i].dwDisplayCount;
+					nPos  = i;
 				}
 			}
-			break;
-		case ENGINE_DXVA2 : {
-				for (int i = 0; i < m_nPicEntryNumber; i++) {
-					if (!m_pPictureStore[i].bInUse) {
-						nPos = i;
-						break;
-					}
-				}
 
-				if (nPos != -1) {
-					CComPtr<IMediaSample>		pNewSample;
-					CComQIPtr<IMPCDXVA2Sample>	pMPCDXVA2Sample;
-					// TODO : test  IDirect3DDeviceManager9::TestDevice !!!
-					if (SUCCEEDED(hr = GetDeliveryBuffer(rtStart, rtStop, &pNewSample))) {
-						pMPCDXVA2Sample		= pNewSample;
-						nSurfaceIndex		= pMPCDXVA2Sample ? pMPCDXVA2Sample->GetDXSurfaceId() : 0;
-						*ppSampleToDeliver	= pNewSample.Detach();
-					}
-				}
+			if (nPos != -1) {
+				nSurfaceIndex = nPos;
+				return S_OK;
+			}
+
+			// Ho ho...
+			ASSERT(FALSE);
+			Flush();
+			break;
+		case ENGINE_DXVA2 :
+			CComPtr<IMediaSample>		pNewSample;
+			CComQIPtr<IMPCDXVA2Sample>	pMPCDXVA2Sample;
+			// TODO : test  IDirect3DDeviceManager9::TestDevice !!!
+			if (SUCCEEDED(hr = GetDeliveryBuffer(rtStart, rtStop, &pNewSample))) {
+				pMPCDXVA2Sample	 = pNewSample;
+				nSurfaceIndex    = pMPCDXVA2Sample ? pMPCDXVA2Sample->GetDXSurfaceId() : 0;
+				*ppSampleToDeliver = pNewSample.Detach();
 			}
 			break;
-	}
-
-	if (nPos == -1) {
-		// Ho ho...
-		//ASSERT(FALSE);
-		Flush();
 	}
 
 	return hr;
@@ -683,7 +674,7 @@ void CDXVADecoder::FreePictureSlot(int nSurfaceIndex)
 	m_pPictureStore[nSurfaceIndex].dwDisplayCount	= m_dwDisplayCount++;
 	m_pPictureStore[nSurfaceIndex].bInUse			= false;
 	m_pPictureStore[nSurfaceIndex].bDisplayed		= false;
-	m_pPictureStore[nSurfaceIndex].pSample.Release();
+	m_pPictureStore[nSurfaceIndex].pSample			= NULL;
 	m_pPictureStore[nSurfaceIndex].nCodecSpecific	= -1;
 	m_nWaitingPics--;
 }
