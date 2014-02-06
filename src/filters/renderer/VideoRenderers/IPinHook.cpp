@@ -1071,7 +1071,7 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 	// unhook previous VTables 
 	
 	if (g_pIAMVideoAcceleratorCVtbl) {
-		res = VirtualProtect(g_pIAMVideoAcceleratorCVtbl, sizeof(g_pIAMVideoAcceleratorCVtbl), PAGE_WRITECOPY, &flOldProtect);
+		res = VirtualProtect(g_pIAMVideoAcceleratorCVtbl, sizeof(IAMVideoAcceleratorCVtbl), PAGE_WRITECOPY, &flOldProtect);
 #ifdef _DEBUG
 		if (g_pIAMVideoAcceleratorCVtbl->GetVideoAcceleratorGUIDs == GetVideoAcceleratorGUIDsMine) {
 			g_pIAMVideoAcceleratorCVtbl->GetVideoAcceleratorGUIDs = GetVideoAcceleratorGUIDsOrg;
@@ -1112,7 +1112,7 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 			g_pIAMVideoAcceleratorCVtbl->DisplayFrame = DisplayFrameOrg;
 		}
 #endif
-		res = VirtualProtect(g_pIAMVideoAcceleratorCVtbl, sizeof(g_pIAMVideoAcceleratorCVtbl), flOldProtect, &flOldProtect);
+		res = VirtualProtect(g_pIAMVideoAcceleratorCVtbl, sizeof(IAMVideoAcceleratorCVtbl), flOldProtect, &flOldProtect);
 
 #ifdef _DEBUG
 		GetVideoAcceleratorGUIDsOrg		= NULL;
@@ -1143,7 +1143,7 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 
 	if (!g_pIAMVideoAcceleratorCVtbl && pAMVideoAcceleratorC) {
 
-		res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorC), PAGE_WRITECOPY, &flOldProtect);
+		res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorCVtbl), PAGE_WRITECOPY, &flOldProtect);
 
 #ifdef _DEBUG
 		GetVideoAcceleratorGUIDsOrg = pAMVideoAcceleratorC->lpVtbl->GetVideoAcceleratorGUIDs;
@@ -1175,7 +1175,7 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 		pAMVideoAcceleratorC->lpVtbl->QueryRenderStatus = QueryRenderStatusMine;
 		pAMVideoAcceleratorC->lpVtbl->DisplayFrame = DisplayFrameMine;
 #endif
-		res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorC), /*PAGE_EXECUTE*/flOldProtect, &flOldProtect);
+		res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorCVtbl), /*PAGE_EXECUTE*/flOldProtect, &flOldProtect);
 
 		g_pIAMVideoAcceleratorCVtbl = pAMVideoAcceleratorC->lpVtbl;
 	}
