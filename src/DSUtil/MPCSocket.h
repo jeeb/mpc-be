@@ -37,7 +37,7 @@ protected:
 
 	CUrl		m_url;
 	CStringA	m_sUserAgent;
-	
+
 	CStringA	m_RequestHdr;
 	CStringA	m_Hdr;
 

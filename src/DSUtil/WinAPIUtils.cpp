@@ -405,7 +405,7 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 															}
 
 															return true;
-														}														
+														}
 														return false;
 													}
 													RegCloseKey(hKey3);

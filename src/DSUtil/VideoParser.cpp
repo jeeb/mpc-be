@@ -488,7 +488,7 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 {
 	// Recommendation H.265 (04/13) ( http://www.itu.int/rec/T-REC-H.265-201304-I )
 	// 7.3.2.2  Sequence parameter set RBSP syntax
-	// 7.3.3  Profile, tier and level syntax 
+	// 7.3.3  Profile, tier and level syntax
 
 	if (size < 20) { // 8 + 12
 		return false;
@@ -600,7 +600,7 @@ bool ParseSequenceParameterSetHM91(BYTE* data, int size, vc_params_t& params)
 			int sub_layer_profile_present_flag, sub_layer_level_present_flag;
 			sub_layer_profile_present_flag = (int)bs.GetWord(1);	// sub_layer_profile_present_flag[i]
 			sub_layer_level_present_flag = (int)bs.GetWord(1);		// sub_layer_level_present_flag[i]
-		
+
 			if (sub_layer_profile_present_flag) {
 				bs.GetWord(2);			// XXX_profile_space[]
 				bs.GetWord(1);			// XXX_tier_flag[]
@@ -652,7 +652,7 @@ bool ParseAVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& param
 	for (int i = 0; i < numOfSequenceParameterSets; i++) {
 		int sps_len = gb.BitRead(16);	// sequenceParameterSetLength
 
-		// 
+		//
 		if (flv_hm >= 90 && sps_len > 2) {
 			BYTE* sps_data = gb.GetBufferPos();
 			if ((*sps_data >> 1 & 0x3f) == (BYTE)NAL_UNIT_SPS) {
@@ -693,7 +693,7 @@ bool ParseAVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& param
 bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, bool parseSPS)
 {
 	// ISO/IEC 14496-15 Third edition (2013-xx-xx)
-	// 8.3.3.1  HEVC decoder configuration record 
+	// 8.3.3.1  HEVC decoder configuration record
 
 	params.clear();
 	if (size < 23) {

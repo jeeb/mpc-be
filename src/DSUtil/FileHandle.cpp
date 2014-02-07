@@ -110,7 +110,7 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 
 		strFileName = lpszFilePath;
 		strFileName.Replace(_T(".tmp"), strExtension);
-		
+
 		DeleteFile(strFileName);
 	} while (_taccess(strFileName, 00) != -1);
 

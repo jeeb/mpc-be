@@ -103,8 +103,8 @@ bool BitBltFromI420ToI420(int w, int h, BYTE* dsty, BYTE* dstu, BYTE* dstv, int 
 	return VDPixmapBlt(dstpxm, srcbm);
 }
 
-bool BitBltFromI420ToNV12(int w, int h, BYTE* dsty, BYTE* dstu, BYTE* dstv, int dstpitch, BYTE* srcy, BYTE* srcu, BYTE* srcv, int srcpitch) 
-{ 
+bool BitBltFromI420ToNV12(int w, int h, BYTE* dsty, BYTE* dstu, BYTE* dstv, int dstpitch, BYTE* srcy, BYTE* srcu, BYTE* srcv, int srcpitch)
+{
 	VDPixmap srcbm = {0};
 
 	srcbm.data		= srcy;
@@ -129,8 +129,8 @@ bool BitBltFromI420ToNV12(int w, int h, BYTE* dsty, BYTE* dstu, BYTE* dstv, int 
 	dstpxm.data3	= dstv;
 	dstpxm.pitch3	= dstpitch;
 
-	return VDPixmapBlt(dstpxm, srcbm); 
-} 
+	return VDPixmapBlt(dstpxm, srcbm);
+}
 
 bool BitBltFromYUY2ToYUY2(int w, int h, BYTE* dst, int dstpitch, BYTE* src, int srcpitch)
 {
@@ -200,7 +200,7 @@ bool BitBltFromI420ToYUY2(int w, int h, BYTE* dst, int dstpitch, BYTE* srcy, BYT
 
 #ifndef _WIN64
 	if((g_cpuid.m_flags & CCpuID::sse2)
-		&& !((DWORD_PTR)srcy&15) && !((DWORD_PTR)srcu&15) && !((DWORD_PTR)srcv&15) && !(srcpitch&31) 
+		&& !((DWORD_PTR)srcy&15) && !((DWORD_PTR)srcu&15) && !((DWORD_PTR)srcv&15) && !(srcpitch&31)
 		&& !((DWORD_PTR)dst&15) && !(dstpitch&15))
 	{
 		if(w<=0 || h<=0 || (w&1) || (h&1))
@@ -360,7 +360,7 @@ bool BitBltFromI420ToYUY2Interlaced(int w, int h, BYTE* dst, int dstpitch, BYTE*
 
 #ifndef _WIN64
 	if((g_cpuid.m_flags & CCpuID::sse2)
-		&& !((DWORD_PTR)srcy&15) && !((DWORD_PTR)srcu&15) && !((DWORD_PTR)srcv&15) && !(srcpitch&31) 
+		&& !((DWORD_PTR)srcy&15) && !((DWORD_PTR)srcu&15) && !((DWORD_PTR)srcv&15) && !(srcpitch&31)
 		&& !((DWORD_PTR)dst&15) && !(dstpitch&15))
 	{
 		yv12_yuy2_sse2_interlaced(srcy, srcu, srcv, srcpitch/2, w/2, h, dst, dstpitch);

@@ -3105,7 +3105,7 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 	delete[] dst;
 
 	return dstSize ? S_OK : E_FAIL;
-} 
+}
 
 CStringA VobSubDefHeader(int w, int h, CStringA palette)
 {

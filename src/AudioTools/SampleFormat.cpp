@@ -13,7 +13,7 @@ static const SampleFmtProp sample_fmt_info[SAMPLE_FMT_NB] = {
     { 32, false }, // SAMPLE_FMT_S32
     { 32, false }, // SAMPLE_FMT_FLT
     { 64, false }, // SAMPLE_FMT_DBL
-    {  8,  true }, // SAMPLE_FMT_U8P 
+    {  8,  true }, // SAMPLE_FMT_U8P
     { 16,  true }, // SAMPLE_FMT_S16P
     { 32,  true }, // SAMPLE_FMT_S32P
     { 32,  true }, // SAMPLE_FMT_FLTP

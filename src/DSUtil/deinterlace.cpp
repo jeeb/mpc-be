@@ -1786,7 +1786,7 @@ mainRowLoop:
 			pop			esi
 			pop			edi
 			pop			ebp
-			ret	
+			ret
 		}
 	}
 
@@ -1842,7 +1842,7 @@ mainRowLoop:
 			pop			esi
 			pop			edi
 			pop			ebp
-			ret	
+			ret
 		}
 	}
 #endif

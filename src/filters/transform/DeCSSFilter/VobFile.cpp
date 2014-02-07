@@ -597,7 +597,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ULON
 		DWORD chainOffset = ReadDword();
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
 		/*BYTE programChainPrograms = */ReadByte();
-		
+
 		BYTE bytes[4];
 		ReadBuffer(bytes, 4);
 
@@ -607,7 +607,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ULON
 			BYTE tmp	= ReadByte();
 			BYTE avail	= tmp >> 7;		// stream available
 			BYTE ID		= tmp & ~0x80;	// Stream number (MPEG audio) or Substream number (all others)
-			
+
 			if (avail && audio_streams[i].ToAdd) {
 				m_pStream_Lang[audio_streams[i].ToAdd + ID] = audio_streams[i].Lang;
 			}
@@ -637,7 +637,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ULON
 		DWORD chainOffset = ReadDword();
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
 		BYTE programChainPrograms = ReadByte();
-		
+
 		BYTE bytes[4];
 		ReadBuffer(bytes, 4);
 

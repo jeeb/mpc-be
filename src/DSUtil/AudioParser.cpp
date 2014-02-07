@@ -81,7 +81,6 @@ static bool ReadAudioConfig(CGolombBuffer gb, int& samplingFrequency, int& chann
 		audioObjectType = 32 + gb.BitRead(6);
 	}
 	int samplingFrequencyIndex = gb.BitRead(4);
-	samplingFrequency = 0;
 	samplingFrequency = freq[samplingFrequencyIndex];
 	if (samplingFrequencyIndex == 0x0f) {
 		samplingFrequency = gb.BitRead(24);
@@ -823,7 +822,7 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 		return 0;
 	}
 
-	if ((buf[1] & 0x06) !=  0) { // Layer: always 0 
+	if ((buf[1] & 0x06) !=  0) { // Layer: always 0
 		return 0;
 	}
 

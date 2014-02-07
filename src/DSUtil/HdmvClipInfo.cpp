@@ -274,7 +274,7 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(CAtlArray<SyncPoint>* sps)
 	}
 
 	ClpiEpMapList.RemoveAll();
-	
+
 	return S_OK;
 }
 
