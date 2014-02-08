@@ -242,43 +242,29 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 }
 
 HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
-						  int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart,
-						  UINT* SecondFieldOffset, int* Sync, int* NALLength)
+						  UINT* SecondFieldOffset, int* Sync, int* NALLength, int* got_picture)
 {
-	HRESULT hr = E_FAIL;
+	HRESULT hr		= E_FAIL;
 	if (pBuffer != NULL) {
 		H264Context* h	= (H264Context*)pAVCtx->priv_data;
-		int				got_picture	= 0;
 		AVPacket		avpkt;
 		av_init_packet(&avpkt);
 		avpkt.data		= pBuffer;
 		avpkt.size		= nSize;
 		avpkt.pts		= rtStart;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
-		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
 		
 #if defined(_DEBUG) && 0
-		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : %d, %d\n", used_bytes, got_picture);
+		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : %d, %d\n", used_bytes, *got_picture);
 #endif
 
 		if (used_bytes < 0) {
 			return hr;
 		}
 
-		hr = S_OK;
 		if (h->cur_pic_ptr) {
-			if (pOutPOC) {
-				*pOutPOC = pFrame->h264_poc_outputed;
-			}
-			if (pOutrtStart) {
-				*pOutrtStart = pFrame->pkt_pts;
-			}
-			if (pFramePOC) {
-				*pFramePOC = h->cur_pic_ptr->poc;
-				if (*pFramePOC == INT_MIN) {
-					return E_FAIL;
-				}
-			}
+			hr = S_OK;
 			if (SecondFieldOffset) {
 				*SecondFieldOffset = 0;
 				if (h->second_field_offset && (h->second_field_offset < nSize)) {
@@ -293,6 +279,7 @@ HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 			}
 		}
 	}
+
 	return hr;
 }
 
@@ -449,7 +436,7 @@ USHORT FFH264FindRefFrameIndex(USHORT num_frame, DXVA_PicParams_H264* pDXVAPicPa
 	return 127;
 }
 
-HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nPictStruct)
+HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix)
 {
 	H264Context*	h = (H264Context*)pAVCtx->priv_data;
 	SPS*			cur_sps;
@@ -464,8 +451,6 @@ HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DW
 	cur_pps = &h->pps;
 
 	if (cur_sps && cur_pps) {
-		*nPictStruct = h->picture_structure;
-
 		if (!cur_sps->mb_width || !cur_sps->mb_height) {
 			return VFW_E_INVALID_FILE_FORMAT;
 		}
@@ -646,21 +631,21 @@ void FFH264SetDxvaSliceLong(struct AVCodecContext* pAVCtx, void* pSliceLong)
 
 HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
 						 BYTE* pBuffer, UINT nSize,
-						 BOOL* b_repeat_pict, UINT* nFrameSize, BOOL b_SecondField)
+						 UINT* nFrameSize, BOOL b_SecondField, int* got_picture)
 {
 	HRESULT	hr			= E_FAIL;
 	VC1Context* vc1		= (VC1Context*)pAVCtx->priv_data;
 	int out_nFrameSize	= 0;
 
 	if (pBuffer && !b_SecondField) {
-		int				got_picture	= 0;
+		int				_got_picture = 0;
 		AVPacket		avpkt;
 		av_init_packet(&avpkt);
 		avpkt.data		= pBuffer;
 		avpkt.size		= nSize;
 		avpkt.pts		= rtStart;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
-		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &_got_picture, &avpkt);
 		
 #if defined(_DEBUG) && 0
 		av_log(pAVCtx, AV_LOG_INFO, "FFVC1DecodeFrame() : %d, %d\n", used_bytes, got_picture);
@@ -668,6 +653,10 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 
 		if (used_bytes < 0) {
 			return hr;
+		}
+
+		if (got_picture) {
+			*got_picture = _got_picture;
 		}
 	}
 
@@ -760,10 +749,6 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 	pPicParams->bPicDeblocked	= ((vc1->overlap == 1 && pPicParams->bPicBackwardPrediction == 0)	<< 6) |
 								  ((vc1->profile != PROFILE_ADVANCED && vc1->rangeredfrm)			<< 5) |
 								  (vc1->s.loop_filter												<< 1);
-
-	if (vc1->profile == PROFILE_ADVANCED && (vc1->rff || vc1->rptfrm)) {
-		*b_repeat_pict = TRUE;
-	}
 
 	return S_OK;
 }

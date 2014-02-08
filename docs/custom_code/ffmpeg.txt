@@ -24,7 +24,6 @@
 * libavutil/common.h
 * libavutil/eval.c
 * libavutil/file_open.c
-* libavutil/frame.h
 * libavutil/internal.h
 * libavutil/mathematics.h
 

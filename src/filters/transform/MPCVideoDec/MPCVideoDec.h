@@ -169,17 +169,17 @@ protected:
 
 	HRESULT				InitDecoder(const CMediaType *pmt);
 
+	static int			av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
+
 public:
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CMPCVideoDecFilter();
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP			NonDelegatingQueryInterface(REFIID riid, void** ppv);
-	virtual bool			IsVideoInterlaced();
+	virtual bool			IsVideoInterlaced() { return true; };
 	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight);
-	CTransformOutputPin*	GetOutputPin() {
-		return m_pOutput;
-	}
+	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 
 	REFERENCE_TIME	GetDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool pulldown_flag = false);
@@ -262,12 +262,7 @@ public:
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
 	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	void						FlushDXVADecoder()	{
-		if (m_pDXVADecoder) {
-			m_pDXVADecoder->Flush();
-		}
-	}
-
+	void						FlushDXVADecoder();
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
 
 	// === DXVA1 functions
@@ -299,11 +294,12 @@ public:
 
 private:
 	friend class CVideoDecDXVAAllocator;
-	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 
 	// *** from LAV
 	// *** Re-Commit the allocator (creates surfaces and new decoder)
 	HRESULT						RecommitAllocator();
+public:
+	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 };
 
 class CMPCVideoDecFilter;

@@ -67,7 +67,6 @@ void CDXVADecoderMpeg2::Init()
 	m_PictureParams.bBPPminus1				= 7;
 	m_PictureParams.bChromaFormat			= 1;
 
-	m_nMaxWaiting			= 5;
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 	m_nSliceCount			= 0;

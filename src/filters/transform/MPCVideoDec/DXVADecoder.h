@@ -24,7 +24,19 @@
 #include <videoacc.h>
 #include "../../../DSUtil/DSUtil.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4005)
+#include <stdint.h>
+#pragma warning(pop)
+
 class CMPCVideoDecFilter;
+struct AVFrame;
+
+struct SurfaceWrapper {
+	void* opaque;
+	int nSurfaceIndex;
+	CComPtr<IMediaSample> pSample;
+};
 
 class CDXVADecoder
 {
@@ -45,6 +57,15 @@ class CDXVADecoder
 		REFERENCE_TIME				rtStop;
 		int							nCodecSpecific;
 		DWORD						dwDisplayCount;
+
+		PICTURE_STORE() {
+			bRefPicture		= false;
+			bInUse			= false;
+			bDisplayed		= false;
+			pSample			= NULL;
+			nCodecSpecific	= -1;
+			dwDisplayCount	= 0;
+		}
 	};
 
 public :
@@ -70,6 +91,11 @@ public :
 	static CDXVADecoder*		CreateDecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
 	void						EndOfStream();
+
+	void						FreePictureSlot(int nSurfaceIndex);
+
+	virtual HRESULT				get_buffer_dxva(struct AVFrame *pic) { return S_OK; };
+	static void					release_buffer_dxva(void *opaque, uint8_t *data);
 
 protected :
 	CDXVADecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber);
@@ -98,12 +124,12 @@ protected :
 	DXVA2_ConfigPictureDecode*	GetDXVA2Config() { return &m_DXVA2Config; }
 
 	// === Picture store functions
-	bool						AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField, int nCodecSpecific);
+	bool						AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField = false, int nCodecSpecific = -1);
 	void						UpdateStore(int nSurfaceIndex, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	void						RemoveRefFrame(int nSurfaceIndex);
 	HRESULT						DisplayNextFrame();
 	HRESULT						GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual int					FindOldestFrame();
+	virtual int					FindOldestFrame() PURE;
 
 private :
 	DXVAMode						m_nMode;
@@ -127,7 +153,6 @@ private :
 	DXVA2_ConfigPictureDecode		m_DXVA2Config;
 	DXVA2_DecodeExecuteParams		m_ExecuteParams;
 
-	void						Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
-	void						FreePictureSlot(int nSurfaceIndex);
-	void						SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
+	void							Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
+	void							SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
 };

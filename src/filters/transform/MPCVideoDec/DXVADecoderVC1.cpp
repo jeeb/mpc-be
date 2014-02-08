@@ -22,7 +22,9 @@
 #include "DXVADecoderVC1.h"
 #include "MPCVideoDec.h"
 #include "FfmpegContext.h"
-#include <ffmpeg/libavcodec/avcodec.h>
+extern "C" {
+	#include <ffmpeg/libavcodec/avcodec.h>
+}
 
 #if 0
 	#define TRACE_VC1 TRACE
@@ -66,7 +68,6 @@ void CDXVADecoderVC1::Init()
 						(GetConfigIntraResidUnsigned()   << 6) |	// i9IRU
 						(GetConfigResidDiffAccelerator() << 5);		// iOHIT
 
-	m_nMaxWaiting		  = 5;
 	m_wRefPictureIndex[0] = NO_REF_FRAME;
 	m_wRefPictureIndex[1] = NO_REF_FRAME;
 
@@ -78,8 +79,6 @@ void CDXVADecoderVC1::Init()
 			ASSERT(FALSE);
 	}
 
-	m_bFrame_repeat_pict = FALSE;
-
 	Flush();
 }
 
@@ -87,29 +86,25 @@ void CDXVADecoderVC1::Init()
 HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT						hr				= S_FALSE;
-	int							nSurfaceIndex	= -1;
 	UINT						nFrameSize		= 0;
 	UINT						nSize_Result	= 0;
-	CComPtr<IMediaSample>		pSampleToDeliver;
+	int							got_picture		= 0;
 
 	CHECK_HR_FALSE (FFVC1DecodeFrame(&m_PictureParams, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), rtStart, 
 									 pDataIn, nSize, 
-									 &m_bFrame_repeat_pict, &nFrameSize, FALSE));
+									 &nFrameSize, FALSE, &got_picture));
 
-	// Wait I frame after a flush
-	if (m_bFlushed && ! m_PictureParams.bPicIntra) {
+	if (m_nSurfaceIndex == -1) {
 		return S_FALSE;
 	}
 
 	BYTE bPicBackwardPrediction = m_PictureParams.bPicBackwardPrediction;
-
-	CHECK_HR (GetFreeSurfaceIndex(nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
-
-	CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
+	
+	CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
 	TRACE_VC1 ("CDXVADecoderVC1::DecodeFrame() : PictureType = %d, rtStart = %I64d, Surf = %d\n", nSliceType, rtStart, nSurfaceIndex);
 
-	m_PictureParams.wDecodedPictureIndex	= nSurfaceIndex;
+	m_PictureParams.wDecodedPictureIndex	= m_nSurfaceIndex;
 	m_PictureParams.wDeblockedPictureIndex	= m_PictureParams.wDecodedPictureIndex;
 
 	// Manage reference picture list
@@ -118,7 +113,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 			RemoveRefFrame(m_wRefPictureIndex[0]);
 		}
 		m_wRefPictureIndex[0] = m_wRefPictureIndex[1];
-		m_wRefPictureIndex[1] = nSurfaceIndex;
+		m_wRefPictureIndex[1] = m_nSurfaceIndex;
 	}
 	m_PictureParams.wForwardRefPictureIndex		= (m_PictureParams.bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
 	m_PictureParams.wBackwardRefPictureIndex	= (m_PictureParams.bPicBackwardPrediction == 1) ? m_wRefPictureIndex[1] : NO_REF_FRAME;
@@ -142,15 +137,15 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 
 	// Decode frame
 	CHECK_HR (Execute());
-	CHECK_HR (EndFrame(nSurfaceIndex));
+	CHECK_HR (EndFrame(m_nSurfaceIndex));
 
 	// ***************
 	if (nFrameSize) { // Decoding Second Field
 		FFVC1DecodeFrame(&m_PictureParams, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), rtStart,
 						 pDataIn, nSize,
-						 &m_bFrame_repeat_pict, NULL, TRUE);
+						 NULL, TRUE, NULL);
 
-		CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
+		CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
 		TRACE_VC1 ("CDXVADecoderVC1::DecodeFrame() : PictureType = %d\n", nSliceType);
 
@@ -165,7 +160,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 
 		// Decode frame
 		CHECK_HR (Execute());
-		CHECK_HR (EndFrame(nSurfaceIndex));
+		CHECK_HR (EndFrame(m_nSurfaceIndex));
 	}
 	// ***************
 
@@ -173,42 +168,24 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	DisplayStatus();
 #endif
 
-	// Update timestamp & Re-order B frames
-	m_pFilter->UpdateFrameTime(rtStart, rtStop, !!m_bFrame_repeat_pict);
-
-	if (m_pFilter->IsReorderBFrame() || m_pFilter->IsEvo()) {
-		if (bPicBackwardPrediction == 1) {
-			std::swap(rtStart, m_rtStartDelayed);
-			std::swap(rtStop, m_rtStopDelayed);
-		} else {
-			// Save I or P reference time (swap later)
-			if (!m_bFlushed) {
-				if (m_nDelayedSurfaceIndex != -1) {
-					UpdateStore(m_nDelayedSurfaceIndex, m_rtStartDelayed, m_rtStopDelayed);
-				}
-				m_rtStartDelayed = m_rtStopDelayed = _I64_MAX;
-				std::swap(rtStart, m_rtStartDelayed);
-				std::swap(rtStop, m_rtStopDelayed);
-				m_nDelayedSurfaceIndex = nSurfaceIndex;
-			}
-		}
+	if (got_picture) {
+		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop);
 	}
-
-	AddToStore(nSurfaceIndex, pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop, false, 0);
 
 	m_bFlushed = false;
 
 	return DisplayNextFrame();
 }
 
-BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
+//BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
+static BYTE* FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
 {
 	BYTE*	pStart	= pBuffer;
 	BYTE	bCode	= 0;
-	for (UINT i = 0; i < nSize-4; i++) {
-		if (((*((DWORD*)(pBuffer+i)) & 0x00FFFFFF) == 0x00010000) || (i >= nSize-5)) {
+	for (UINT i = 0; i < nSize - 4; i++) {
+		if (((*((DWORD*)(pBuffer + i)) & 0x00FFFFFF) == 0x00010000) || (i >= nSize - 5)) {
 			if (bCode == 0) {
-				bCode = pBuffer[i+3];
+				bCode = pBuffer[i + 3];
 				if ((nSize == 5) && (bCode == 0x0D)) {
 					nPacketSize = nSize;
 					return pBuffer;
@@ -216,12 +193,12 @@ BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacke
 			} else {
 				if (bCode == 0x0D) {
 					// Start code found!
-					nPacketSize = i - (pStart - pBuffer) + (i >= nSize-5 ? 5 : 1);
+					nPacketSize = i - (pStart - pBuffer) + (i >= nSize - 5 ? 5 : 1);
 					return pStart;
 				} else {
 					// Other stuff, ignore it
 					pStart	= pBuffer + i;
-					bCode	= pBuffer[i+3];
+					bCode	= pBuffer[i + 3];
 				}
 			}
 		}
@@ -235,7 +212,7 @@ BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacke
 void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 {
 	if (m_PictureParams.bSecondField) {
-		memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
+		memcpy_sse(pDXVABuffer, (BYTE*)pBuffer, nSize);
 	} else {
 		if ((*((DWORD*)pBuffer) & 0x00FFFFFF) != 0x00010000) {
 			if (m_pFilter->GetCodec() == AV_CODEC_ID_WMV3) {
@@ -245,7 +222,7 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 				pDXVABuffer[2] = 1;
 				pDXVABuffer[3] = 0x0D;
 				memcpy_sse(pDXVABuffer + 4, (BYTE*)pBuffer, nSize);
-				nSize +=4;
+				nSize += 4;
 			}
 		} else {
 			BYTE*	pStart;
@@ -272,19 +249,11 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 
 void CDXVADecoderVC1::Flush()
 {
-	m_nDelayedSurfaceIndex	= -1;
-	m_rtStartDelayed		= _I64_MAX;
-	m_rtStopDelayed			= _I64_MAX;
-
-	if (m_wRefPictureIndex[0] != NO_REF_FRAME) {
-		RemoveRefFrame(m_wRefPictureIndex[0]);
-	}
-	if (m_wRefPictureIndex[1] != NO_REF_FRAME) {
-		RemoveRefFrame(m_wRefPictureIndex[1]);
-	}
-
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;
+
+	m_nSurfaceIndex			= -1;
+	m_pSampleToDeliver.Release();
 
 	__super::Flush();
 }
@@ -294,7 +263,7 @@ HRESULT CDXVADecoderVC1::DisplayStatus()
 	HRESULT			hr = E_INVALIDARG;
 	DXVA_Status_VC1 Status;
 
-	memset (&Status, 0, sizeof(Status));
+	memset(&Status, 0, sizeof(Status));
 
 	if (SUCCEEDED (hr = CDXVADecoder::QueryStatus(&Status, sizeof(Status)))) {
 		Status.StatusReportFeedbackNumber = 0x00FF & Status.StatusReportFeedbackNumber;
@@ -306,5 +275,42 @@ HRESULT CDXVADecoderVC1::DisplayStatus()
 				   Status.wNumMbsAffected);
 	}
 
+	return hr;
+}
+
+int CDXVADecoderVC1::FindOldestFrame()
+{
+	int		nPos	= -1;
+	AVFrame	*pic	= m_pFilter->GetFrame();
+
+	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)pic->data[3];
+	if (pSurfaceWrapper) {
+		int nSurfaceIndex = pSurfaceWrapper->nSurfaceIndex;
+		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].pSample) {
+			nPos = nSurfaceIndex;
+			m_pPictureStore[nPos].rtStart = m_pFilter->GetFrame()->pkt_pts;
+			m_pFilter->ReorderBFrames(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
+			m_pFilter->UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
+		}
+	}
+
+	return nPos;
+}
+
+HRESULT CDXVADecoderVC1::get_buffer_dxva(AVFrame *pic)
+{
+	m_pSampleToDeliver.Release();
+	m_nSurfaceIndex = -1;
+	HRESULT hr = S_OK;
+	CHECK_HR(GetFreeSurfaceIndex(m_nSurfaceIndex, &m_pSampleToDeliver, 0, 0));
+	
+	SurfaceWrapper* pSurfaceWrapper = DNew SurfaceWrapper();
+	pSurfaceWrapper->opaque			= (void*)this;
+	pSurfaceWrapper->nSurfaceIndex	= m_nSurfaceIndex;
+	pSurfaceWrapper->pSample		= m_pSampleToDeliver;
+
+	pic->data[3]	= (uint8_t *)pSurfaceWrapper;
+	pic->buf[3]		= av_buffer_create(NULL, 0, release_buffer_dxva, pSurfaceWrapper, 0);
+	
 	return hr;
 }

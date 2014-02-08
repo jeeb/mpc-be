@@ -35,19 +35,19 @@ public:
 	virtual void	CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void	Flush();
 
+	virtual HRESULT	get_buffer_dxva(AVFrame *pic);
+
+protected:
+	virtual int					FindOldestFrame();
+
 private:
 	DXVA_PictureParameters		m_PictureParams;
 	DXVA_SliceInfo				m_SliceInfo;
 	WORD						m_wRefPictureIndex[2];
 
-	int							m_nDelayedSurfaceIndex;
-	REFERENCE_TIME				m_rtStartDelayed;
-	REFERENCE_TIME				m_rtStopDelayed;
+	int							m_nSurfaceIndex;
+	CComPtr<IMediaSample>		m_pSampleToDeliver;
 
-	BOOL 						m_bFrame_repeat_pict;
-
-	// Private functions
 	void						Init();
 	HRESULT						DisplayStatus();
-	BYTE*						FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize);
 };
