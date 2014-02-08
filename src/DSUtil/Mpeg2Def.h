@@ -53,7 +53,10 @@ enum PES_STREAM_TYPE {
 	TEXT								= 0x1D,	// ISO/IEC 14496-17 Text
 	AUXILIARY_VIDEO_STREAM				= 0x1E,	// Auxiliary video stream as defined in ISO/IEC 23002-3
 	SVC_H264							= 0x1F,	// SVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex G of ITU-T Rec. H.264 | ISO/IEC 14496-10
-	MVC_H264							= 0x20,	// MVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex H of ITU-T Rec. H.264 | ISO/IEC 14496-10
+	MVC_H264							= 0x20, // MVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex H of ITU-T Rec. H.264 | ISO/IEC 14496-10
+	VIDEO_STREAM_MPEG2_ADDITIONAL_VIEW	= 0x22,	// Additional view Rec. ITU-T H.262 - ISO/IEC 13818-2 video stream for service-compatible stereoscopic 3D services
+	VIDEO_STREAM_H264_ADDITIONAL_VIEW	= 0x23,	// Additional view Rec. ITU-T H.264 - ISO/IEC 14496-10 video stream for service-compatible stereoscopic 3D services
+	VIDEO_STREAM_HEVC					= 0x24,
 	AUDIO_STREAM_LPCM					= 0x80,
 	AUDIO_STREAM_AC3					= 0x81,
 	AUDIO_STREAM_DTS					= 0x82,
@@ -68,7 +71,6 @@ enum PES_STREAM_TYPE {
 	SECONDARY_AUDIO_DTS_HD				= 0xA2,
 	VIDEO_STREAM_DIRAC					= 0xD1,
 	VIDEO_STREAM_VC1					= 0xEA,
-	VIDEO_STREAM_HEVC					= 0x24
 };
 
 enum MPEG2_PID {
