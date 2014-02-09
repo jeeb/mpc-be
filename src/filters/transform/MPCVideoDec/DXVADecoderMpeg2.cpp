@@ -348,7 +348,9 @@ void CDXVADecoderMpeg2::PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERE
 
 void CDXVADecoderMpeg2::ResetBuffer()
 {
-	av_freep(&m_pMPEG2Buffer);
+	if (m_pMPEG2Buffer) {
+		av_free(&m_pMPEG2Buffer);
+	}
 	
 	m_nMPEG2BufferSize	= 0;
 	m_nMPEG2BufferPos	= 0;
