@@ -66,7 +66,7 @@ HRESULT			FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecCon
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
 HRESULT			FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* m_QMatrixData, DXVA_SliceInfo* pSliceInfo,
 									struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-									int* nSliceCount, int* nNextCodecIndex, bool* bIsField);
+									int* nSliceCount, bool* bIsField, int* got_picture);
 
 // === Common functions
 int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);

@@ -22,15 +22,7 @@
 #include "DXVADecoderVC1.h"
 #include "MPCVideoDec.h"
 #include "FfmpegContext.h"
-extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
-}
-
-#if 0
-	#define TRACE_VC1 TRACE
-#else
-	#define TRACE_VC1(...)
-#endif
+#include <ffmpeg/libavcodec/avcodec.h>
 
 CDXVADecoderVC1::CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
 	: CDXVADecoder(pFilter, pAMVideoAccelerator, nMode, nPicEntryNumber)
@@ -98,11 +90,17 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 		return S_FALSE;
 	}
 
+	if (m_bWaitingForKeyFrame && got_picture) {
+		if (m_pFilter->GetFrame()->key_frame) {
+			m_bWaitingForKeyFrame = FALSE;
+		} else {
+			got_picture = 0;
+		}
+	}
+
 	BYTE bPicBackwardPrediction = m_PictureParams.bPicBackwardPrediction;
 	
 	CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
-
-	TRACE_VC1 ("CDXVADecoderVC1::DecodeFrame() : PictureType = %d, rtStart = %I64d, Surf = %d\n", nSliceType, rtStart, nSurfaceIndex);
 
 	m_PictureParams.wDecodedPictureIndex	= m_nSurfaceIndex;
 	m_PictureParams.wDeblockedPictureIndex	= m_PictureParams.wDecodedPictureIndex;
@@ -110,7 +108,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	// Manage reference picture list
 	if (!m_PictureParams.bPicBackwardPrediction) {
 		if (m_wRefPictureIndex[0] != NO_REF_FRAME) {
-			RemoveRefFrame(m_wRefPictureIndex[0]);
+			FreePictureSlot(m_wRefPictureIndex[0]);
 		}
 		m_wRefPictureIndex[0] = m_wRefPictureIndex[1];
 		m_wRefPictureIndex[1] = m_nSurfaceIndex;
@@ -122,8 +120,6 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	m_PictureParams.bPicDeblockConfined		   |= (m_PictureParams.wBackwardRefPictureIndex == NO_REF_FRAME) ? 0x04 : 0;
 
 	m_PictureParams.bPicScanMethod++;			// Use for status reporting sections 3.8.1 and 3.8.2
-
-	TRACE_VC1 ("CDXVADecoderVC1::DecodeFrame() : Decode frame %i\n", m_PictureParams.bPicScanMethod);
 
 	// Send picture params to accelerator
 	CHECK_HR (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
@@ -147,8 +143,6 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 
 		CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
-		TRACE_VC1 ("CDXVADecoderVC1::DecodeFrame() : PictureType = %d\n", nSliceType);
-
 		CHECK_HR (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
 
 		// Send bitstream to accelerator
@@ -164,17 +158,12 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	}
 	// ***************
 
-#ifdef _DEBUG
-	DisplayStatus();
-#endif
-
 	if (got_picture) {
-		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop);
+		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, rtStart, rtStop);
+		hr = DisplayNextFrame();
 	}
 
-	m_bFlushed = false;
-
-	return DisplayNextFrame();
+	return hr;
 }
 
 //BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
@@ -252,65 +241,5 @@ void CDXVADecoderVC1::Flush()
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 
-	m_nSurfaceIndex			= -1;
-	m_pSampleToDeliver.Release();
-
 	__super::Flush();
-}
-
-HRESULT CDXVADecoderVC1::DisplayStatus()
-{
-	HRESULT			hr = E_INVALIDARG;
-	DXVA_Status_VC1 Status;
-
-	memset(&Status, 0, sizeof(Status));
-
-	if (SUCCEEDED (hr = CDXVADecoder::QueryStatus(&Status, sizeof(Status)))) {
-		Status.StatusReportFeedbackNumber = 0x00FF & Status.StatusReportFeedbackNumber;
-
-		TRACE_VC1 ("CDXVADecoderVC1::DisplayStatus() : Status for the frame %u : bBufType = %u, bStatus = %u, wNumMbsAffected = %u\n",
-				   Status.StatusReportFeedbackNumber,
-				   Status.bBufType,
-				   Status.bStatus,
-				   Status.wNumMbsAffected);
-	}
-
-	return hr;
-}
-
-int CDXVADecoderVC1::FindOldestFrame()
-{
-	int		nPos	= -1;
-	AVFrame	*pic	= m_pFilter->GetFrame();
-
-	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)pic->data[3];
-	if (pSurfaceWrapper) {
-		int nSurfaceIndex = pSurfaceWrapper->nSurfaceIndex;
-		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].pSample) {
-			nPos = nSurfaceIndex;
-			m_pPictureStore[nPos].rtStart = m_pFilter->GetFrame()->pkt_pts;
-			m_pFilter->ReorderBFrames(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
-			m_pFilter->UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
-		}
-	}
-
-	return nPos;
-}
-
-HRESULT CDXVADecoderVC1::get_buffer_dxva(AVFrame *pic)
-{
-	m_pSampleToDeliver.Release();
-	m_nSurfaceIndex = -1;
-	HRESULT hr = S_OK;
-	CHECK_HR(GetFreeSurfaceIndex(m_nSurfaceIndex, &m_pSampleToDeliver, 0, 0));
-	
-	SurfaceWrapper* pSurfaceWrapper = DNew SurfaceWrapper();
-	pSurfaceWrapper->opaque			= (void*)this;
-	pSurfaceWrapper->nSurfaceIndex	= m_nSurfaceIndex;
-	pSurfaceWrapper->pSample		= m_pSampleToDeliver;
-
-	pic->data[3]	= (uint8_t *)pSurfaceWrapper;
-	pic->buf[3]		= av_buffer_create(NULL, 0, release_buffer_dxva, pSurfaceWrapper, 0);
-	
-	return hr;
 }

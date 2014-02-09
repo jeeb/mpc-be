@@ -49,21 +49,17 @@ class CDXVADecoder
 		ENGINE_DXVA2
 	};
 	struct PICTURE_STORE {
-		bool						bRefPicture;	// True if reference picture
 		bool						bInUse;			// Slot in use
-		bool						bDisplayed;		// True if picture have been presented
 		CComPtr<IMediaSample>		pSample;		// Only for DXVA2 !
 		REFERENCE_TIME				rtStart;
 		REFERENCE_TIME				rtStop;
-		int							nCodecSpecific;
 		DWORD						dwDisplayCount;
 
 		PICTURE_STORE() {
-			bRefPicture		= false;
 			bInUse			= false;
-			bDisplayed		= false;
 			pSample			= NULL;
-			nCodecSpecific	= -1;
+			rtStart			= INVALID_TIME;
+			rtStop			= INVALID_TIME;
 			dwDisplayCount	= 0;
 		}
 	};
@@ -94,7 +90,7 @@ public :
 
 	void						FreePictureSlot(int nSurfaceIndex);
 
-	virtual HRESULT				get_buffer_dxva(struct AVFrame *pic) { return S_OK; };
+	HRESULT						get_buffer_dxva(struct AVFrame *pic);
 	static void					release_buffer_dxva(void *opaque, uint8_t *data);
 
 protected :
@@ -102,12 +98,13 @@ protected :
 	CDXVADecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
 	CMPCVideoDecFilter*			m_pFilter;
-	bool						m_bFlushed;
-	int							m_nMaxWaiting;
+	BOOL						m_bWaitingForKeyFrame;
 
 	PICTURE_STORE*				m_pPictureStore;		// Store reference picture, and delayed B-frames
 	int							m_nPicEntryNumber;		// Total number of picture in store
-	int							m_nWaitingPics;			// Number of picture not yet displayed
+
+	int							m_nSurfaceIndex;
+	CComPtr<IMediaSample>		m_pSampleToDeliver;
 
 	// === DXVA functions
 	HRESULT						AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, void* pBuffer, UINT* pRealSize = NULL);
@@ -124,19 +121,14 @@ protected :
 	DXVA2_ConfigPictureDecode*	GetDXVA2Config() { return &m_DXVA2Config; }
 
 	// === Picture store functions
-	bool						AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField = false, int nCodecSpecific = -1);
-	void						UpdateStore(int nSurfaceIndex, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	void						RemoveRefFrame(int nSurfaceIndex);
+	bool						AddToStore(int nSurfaceIndex, IMediaSample* pSample, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	HRESULT						DisplayNextFrame();
 	HRESULT						GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual int					FindOldestFrame() PURE;
+	virtual int					FindOldestFrame();
 
 private :
 	DXVAMode						m_nMode;
 	DXVA_ENGINE						m_nEngine;
-
-	CComPtr<IMediaSample>			m_pFieldSample;
-	int								m_nFieldSurface;
 
 	// === DXVA1 variables
 	CComQIPtr<IAMVideoAccelerator>	m_pAMVideoAccelerator;

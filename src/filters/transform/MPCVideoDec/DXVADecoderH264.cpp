@@ -24,15 +24,7 @@
 #include "MPCVideoDec.h"
 #include "DXVAAllocator.h"
 #include "FfmpegContext.h"
-extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
-}
-
-#if 0
-	#define TRACE_H264 TRACE
-#else
-	#define TRACE_H264(...)
-#endif
+#include <ffmpeg/libavcodec/avcodec.h>
 
 CDXVADecoderH264::CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
 	: CDXVADecoder(pFilter, pAMVideoAccelerator, nMode, nPicEntryNumber)
@@ -143,8 +135,6 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 void CDXVADecoderH264::Flush()
 {
 	m_DXVAPicParams.UsedForReferenceFlags	= 0;
-	m_nSurfaceIndex							= -1;
-	m_pSampleToDeliver						= NULL;
 
 	__super::Flush();
 }
@@ -241,74 +231,12 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 
 	}
 
-	if (got_picture) {
-		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, m_DXVAPicParams.RefPicFlag, rtStart, rtStop);
-	}
-
-#if defined(_DEBUG) && 0
-	DisplayStatus();
-#endif
-
 	FFH264UpdateRefFramesList(&m_DXVAPicParams, m_pFilter->GetAVCtx());
 
 	if (got_picture) {
+		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, rtStart, rtStop);
 		hr = DisplayNextFrame();
 	}
 
-	m_bFlushed = false;
-	return hr;
-}
-
-HRESULT CDXVADecoderH264::DisplayStatus()
-{
-	HRESULT 			hr = E_INVALIDARG;
-	DXVA_Status_H264 	Status;
-
-	memset(&Status, 0, sizeof(Status));
-	CHECK_HR (CDXVADecoder::QueryStatus(&Status, sizeof(Status)));
-
-	TRACE_H264 ("CDXVADecoderH264::DisplayStatus() : Status for the frame %u : bBufType = %u, bStatus = %u, wNumMbsAffected = %u\n",
-				Status.StatusReportFeedbackNumber,
-				Status.bBufType,
-				Status.bStatus,
-				Status.wNumMbsAffected);
-
-	return hr;
-}
-
-int CDXVADecoderH264::FindOldestFrame()
-{
-	int		nPos	= -1;
-	AVFrame	*pic	= m_pFilter->GetFrame();
-
-	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)pic->data[3];
-	if (pSurfaceWrapper) {
-		int nSurfaceIndex = pSurfaceWrapper->nSurfaceIndex;
-		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].pSample) {
-			nPos = nSurfaceIndex;
-			m_pPictureStore[nPos].rtStart = m_pFilter->GetFrame()->pkt_pts;
-			m_pFilter->ReorderBFrames(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
-			m_pFilter->UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
-		}
-	}
-
-	return nPos;
-}
-
-HRESULT CDXVADecoderH264::get_buffer_dxva(AVFrame *pic)
-{
-	m_pSampleToDeliver.Release();
-	m_nSurfaceIndex = -1;
-	HRESULT hr = S_OK;
-	CHECK_HR(GetFreeSurfaceIndex(m_nSurfaceIndex, &m_pSampleToDeliver, 0, 0));
-	
-	SurfaceWrapper* pSurfaceWrapper = DNew SurfaceWrapper();
-	pSurfaceWrapper->opaque			= (void*)this;
-	pSurfaceWrapper->nSurfaceIndex	= m_nSurfaceIndex;
-	pSurfaceWrapper->pSample		= m_pSampleToDeliver;
-
-	pic->data[3]	= (uint8_t *)pSurfaceWrapper;
-	pic->buf[3]		= av_buffer_create(NULL, 0, release_buffer_dxva, pSurfaceWrapper, 0);
-	
 	return hr;
 }

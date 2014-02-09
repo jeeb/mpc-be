@@ -766,7 +766,7 @@ int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 
 HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo,
 						   struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-						   int* nSliceCount, int* nNextCodecIndex, bool* bIsField)
+						   int* nSliceCount, bool* bIsField, int* got_picture)
 {
 	HRESULT			hr = E_FAIL;
 	int				i;
@@ -774,7 +774,6 @@ HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData*
 	MpegEncContext*	s			= (MpegEncContext*)&s1->mpeg_enc_ctx;
 	int				is_field	= 0;
 	unsigned		mb_count	= 0;
-	int				got_picture	= 0;
 
 	if (pBuffer) {
 		s1->pSliceInfo	= pSliceInfo;
@@ -784,7 +783,7 @@ HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData*
 		avpkt.data		= pBuffer;
 		avpkt.size		= nSize;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
-		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
 
 #if defined(_DEBUG) && 0
 		av_log(pAVCtx, AV_LOG_INFO, "FFMpeg2DecodeFrame() : %d, %d\n", used_bytes, got_picture);
@@ -870,10 +869,6 @@ HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData*
 		} else {
 			slice->wNumberMBsInSlice = mb_count - slice[0].wNumberMBsInSlice;
 		}
-	}
-
-	if (got_picture) {
-		*nNextCodecIndex = pFrame->coded_picture_number;
 	}
 
 	return S_OK;

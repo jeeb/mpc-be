@@ -36,11 +36,6 @@ public:
 	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void			Flush();
 
-	virtual HRESULT			get_buffer_dxva(AVFrame *pic);
-
-protected :
-	virtual int				FindOldestFrame();
-
 private:
 	DXVA_PicParams_H264		m_DXVAPicParams;
 	DXVA_Qmatrix_H264		m_DXVAScalingMatrix;
@@ -52,9 +47,5 @@ private:
 
 	UINT					m_nSlices;
 
-	int						m_nSurfaceIndex;
-	CComPtr<IMediaSample>	m_pSampleToDeliver;
-
 	void					Init();
-	HRESULT					DisplayStatus();
 };

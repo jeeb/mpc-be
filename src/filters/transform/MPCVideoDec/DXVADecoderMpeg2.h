@@ -33,24 +33,16 @@ public:
 	CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual ~CDXVADecoderMpeg2();
 
-	// === Public functions
-	virtual HRESULT DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void	CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
-	virtual void	Flush();
+	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual void			Flush();
 
-protected :
-
-	HRESULT			DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual int		FindOldestFrame();
-	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 private:
 	DXVA_PictureParameters	m_PictureParams;
 	DXVA_QmatrixData		m_QMatrixData;
 	WORD					m_wRefPictureIndex[2];
 	DXVA_SliceInfo			m_SliceInfo[MAX_SLICE];
 	int						m_nSliceCount;
-
-	int						m_nNextCodecIndex;
 
 	REFERENCE_TIME			m_rtLastStart;
 
@@ -59,8 +51,8 @@ private:
 	void					UpdatePictureParams(int nSurfaceIndex);
 
 protected:
-	BYTE*			m_pMPEG2Buffer;
-	int				m_nMPEG2BufferSize;
+	BYTE*					m_pMPEG2Buffer;
+	int						m_nMPEG2BufferSize;
 
 	struct BUFFER_TIME {
 		REFERENCE_TIME	rtStart;
@@ -68,14 +60,18 @@ protected:
 		int				nBuffPos;
 	};
 
-	int				m_nMPEG2BufferPos;
-	int				m_nMPEG2PicEnd;
-	BUFFER_TIME		m_MPEG2BufferTime[MAX_BUFF_TIME];
+	int						m_nMPEG2BufferPos;
+	int						m_nMPEG2PicEnd;
+	BUFFER_TIME				m_MPEG2BufferTime[MAX_BUFF_TIME];
 
-	bool			FindPicture(int nIndex, int nStartCode);
-	bool			AppendBuffer(BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	void			PopBufferTime(int nPos);
-	void			PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	void			ResetBuffer();
-	bool			ShrinkBuffer();
+	bool					FindPicture(int nIndex, int nStartCode);
+	bool					AppendBuffer(BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	void					PopBufferTime(int nPos);
+	void					PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	void					ResetBuffer();
+	bool					ShrinkBuffer();
+
+	HRESULT					DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual int				FindOldestFrame();
+	void					UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 };

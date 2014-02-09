@@ -30,24 +30,14 @@ public:
 	CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual ~CDXVADecoderVC1();
 
-	// === Public functions
-	virtual HRESULT DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void	CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
-	virtual void	Flush();
-
-	virtual HRESULT	get_buffer_dxva(AVFrame *pic);
-
-protected:
-	virtual int					FindOldestFrame();
+	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual void			Flush();
 
 private:
-	DXVA_PictureParameters		m_PictureParams;
-	DXVA_SliceInfo				m_SliceInfo;
-	WORD						m_wRefPictureIndex[2];
+	DXVA_PictureParameters	m_PictureParams;
+	DXVA_SliceInfo			m_SliceInfo;
+	WORD					m_wRefPictureIndex[2];
 
-	int							m_nSurfaceIndex;
-	CComPtr<IMediaSample>		m_pSampleToDeliver;
-
-	void						Init();
-	HRESULT						DisplayStatus();
+	void					Init();
 };

@@ -22,18 +22,9 @@
 #include "DXVADecoderMpeg2.h"
 #include "MPCVideoDec.h"
 #include "FfmpegContext.h"
-
-#pragma warning(disable: 4005)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 }
-#pragma warning(default: 4005)
-
-#if 0
-	#define TRACE_MPEG2 TRACE
-#else
-	#define TRACE_MPEG2(...)
-#endif
 
 CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
 	: CDXVADecoder(pFilter, pAMVideoAccelerator, nMode, nPicEntryNumber)
@@ -67,8 +58,6 @@ void CDXVADecoderMpeg2::Init()
 	m_PictureParams.bBPPminus1				= 7;
 	m_PictureParams.bChromaFormat			= 1;
 
-	m_wRefPictureIndex[0]	= NO_REF_FRAME;
-	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 	m_nSliceCount			= 0;
 
 	switch (GetMode()) {
@@ -121,32 +110,31 @@ static CString FrameType(bool bIsField, BYTE bSecondField)
 HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT					hr					= S_FALSE;
-	int						nSurfaceIndex		= -1;
 	bool					bIsField			= false;
-	CComPtr<IMediaSample>	pSampleToDeliver;
+	int						got_picture			= 0;
 
 	CHECK_HR_FALSE (FFMpeg2DecodeFrame(&m_PictureParams, &m_QMatrixData, m_SliceInfo,
 									   m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
-									   &m_nSliceCount, &m_nNextCodecIndex,
-									   &bIsField));
+									   &m_nSliceCount, &bIsField, &got_picture));
 
-	// Wait I frame after a flush
-	if (m_bFlushed && (!m_PictureParams.bPicIntra || (bIsField && m_PictureParams.bSecondField))) {
-		TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Flush - wait I frame, %s\n", FrameType(bIsField, m_PictureParams.bSecondField));
+	if (m_nSurfaceIndex == -1) {
 		return S_FALSE;
 	}
 
-	CHECK_HR (GetFreeSurfaceIndex(nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
-
-	if (!bIsField || (bIsField && !m_PictureParams.bSecondField)) {
-		UpdatePictureParams(nSurfaceIndex);	
+	if (m_bWaitingForKeyFrame && got_picture) {
+		if (m_pFilter->GetFrame()->key_frame) {
+			m_bWaitingForKeyFrame = FALSE;
+		} else {
+			got_picture = 0;
+		}
 	}
 
-	TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Surf = %d, %ws, m_nNextCodecIndex = %d, rtStart = [%I64d]\n",
-				 nSurfaceIndex, FrameType(bIsField, m_PictureParams.bSecondField), m_nNextCodecIndex, rtStart);
+	if (!bIsField || (bIsField && !m_PictureParams.bSecondField)) {
+		UpdatePictureParams(m_nSurfaceIndex);	
+	}
 
 	{
-		CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
+		CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 		// Send picture parameters
 		CHECK_HR (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
 		// Add quantization matrix
@@ -157,17 +145,14 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERE
 		CHECK_HR (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize, pDataIn, &nSize));
 		// Decode frame
 		CHECK_HR (Execute());
-		CHECK_HR (EndFrame(nSurfaceIndex));
+		CHECK_HR (EndFrame(m_nSurfaceIndex));
 	}
 
-	bool bAdded = AddToStore(nSurfaceIndex, pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), rtStart, rtStop,
-							 bIsField, FFGetCodedPicture(m_pFilter->GetAVCtx()));
-
-	if (bAdded) {
+	if (got_picture) {
+		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, rtStart, rtStop);
 		hr = DisplayNextFrame();
 	}
 		
-	m_bFlushed = false;
 	return hr;
 }
 
@@ -180,7 +165,7 @@ void CDXVADecoderMpeg2::UpdatePictureParams(int nSurfaceIndex)
 	// Manage reference picture list
 	if (!m_PictureParams.bPicBackwardPrediction) {
 		if (m_wRefPictureIndex[0] != NO_REF_FRAME) {
-			RemoveRefFrame (m_wRefPictureIndex[0]);
+			FreePictureSlot(m_wRefPictureIndex[0]);
 		}
 		m_wRefPictureIndex[0] = m_wRefPictureIndex[1];
 		m_wRefPictureIndex[1] = nSurfaceIndex;
@@ -237,7 +222,6 @@ void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 
 void CDXVADecoderMpeg2::Flush()
 {
-	m_nNextCodecIndex		= INT_MIN;
 	m_rtLastStart			= 0;
 
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
@@ -250,18 +234,16 @@ void CDXVADecoderMpeg2::Flush()
 
 int CDXVADecoderMpeg2::FindOldestFrame()
 {
-	int nPos = -1;
+	int		nPos	= -1;
+	AVFrame	*pic	= m_pFilter->GetFrame();
 
-	for (int i = 0; i < m_nPicEntryNumber; i++) {
-		if (!m_pPictureStore[i].bDisplayed && m_pPictureStore[i].bInUse &&
-				(m_pPictureStore[i].nCodecSpecific == m_nNextCodecIndex)) {
-			m_nNextCodecIndex	= INT_MIN;
-			nPos				= i;
+	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)pic->data[3];
+	if (pSurfaceWrapper) {
+		int nSurfaceIndex = pSurfaceWrapper->nSurfaceIndex;
+		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].pSample) {
+			nPos = nSurfaceIndex;
+			UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 		}
-	}
-
-	if (nPos != -1) {
-		UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 	}
 
 	return nPos;
