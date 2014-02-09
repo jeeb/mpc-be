@@ -84,6 +84,7 @@ clean:
 # Objects
 SRCS_C = \
 	config.c \
+	libavcodec/8bps.c \
 	libavcodec/aac_ac3_parser.c \
 	libavcodec/aac_parser.c \
 	libavcodec/aacadtsdec.c \
