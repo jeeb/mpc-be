@@ -1627,14 +1627,14 @@ bool CMatroskaNode::NextBlock()
 	return false;
 }
 
-#define MAXFAILEDCOUNT (1024*1024*10)
+#define MAXFAILEDCOUNT (15*1024*1024)
 bool CMatroskaNode::Resync()
 {
 	if (m_pParent->m_id == MATROSKA_ID_SEGMENT) {
 		SeekTo(m_filepos);
 
 		int failedCount = 0;
-		for (BYTE b = 0; S_OK == Read(b) && failedCount < MAXFAILEDCOUNT; b = 0, failedCount++) {
+		for (BYTE b = 0; S_OK == Read(b) && failedCount < 2*MAXFAILEDCOUNT; b = 0, failedCount++) {
 			if ((b&0xf0) != 0x10) {
 				continue;
 			}
