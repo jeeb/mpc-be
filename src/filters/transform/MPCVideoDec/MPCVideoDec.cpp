@@ -169,7 +169,7 @@ DXVA_PARAMS		DXVA_VC1 = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
-	{ &DXVA2_ModeVC1_D, &GUID_NULL },
+	{ &DXVA2_ModeVC1_D2010, &DXVA2_ModeVC1_D, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_VC1_D, 0}
 };
 
@@ -2676,12 +2676,12 @@ void CMPCVideoDecFilter::FlushDXVADecoder()	{
 	}
 }
 
-void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
+void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMAT Format/* = D3DFMT_A8R8G8B8*/)
 {
 	memset(pDesc, 0, sizeof(DXVA2_VideoDesc));
 	pDesc->SampleWidth			= PictWidthRounded();
 	pDesc->SampleHeight			= PictHeightRounded();
-	pDesc->Format				= D3DFMT_A8R8G8B8;
+	pDesc->Format				= Format;
 	pDesc->UABProtectionLevel	= 1;
 }
 
@@ -2731,8 +2731,8 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 		for (UINT iFormat = 0; iFormat < cFormats;  iFormat++) {
 
 			// Fill in the video description. Set the width, height, format, and frame rate.
-			FillInVideoDescription(&m_VideoDesc); // Private helper function.
-			m_VideoDesc.Format = pFormats[iFormat];
+			DXVA2_VideoDesc VideoDesc;
+			FillInVideoDescription(&VideoDesc, pFormats[iFormat]);
 
 			// Get the available configurations.
 			hr = pDecoderService->GetDecoderConfigurations(guidDecoder, &m_VideoDesc, NULL, &cConfigurations, &pConfig);
@@ -2748,6 +2748,8 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 					if (bIsPrefered || !*pbFoundDXVA2Configuration) {
 						*pbFoundDXVA2Configuration = TRUE;
 						*pSelectedConfig = pConfig[iConfig];
+
+						FillInVideoDescription(&m_VideoDesc, pFormats[iFormat]);
 					}
 
 					if (bIsPrefered) {

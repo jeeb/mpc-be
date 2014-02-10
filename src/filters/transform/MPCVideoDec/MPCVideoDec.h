@@ -272,7 +272,7 @@ public:
 
 
 	// === DXVA2 functions
-	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc);
+	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMAT Format = D3DFMT_A8R8G8B8);
 	HRESULT						ConfigureDXVA2(IPin *pPin);
 	HRESULT						SetEVRForDXVA2(IPin *pPin);
 	HRESULT						FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,

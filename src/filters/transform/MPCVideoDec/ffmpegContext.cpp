@@ -629,12 +629,15 @@ void FFH264SetDxvaSliceLong(struct AVCodecContext* pAVCtx, void* pSliceLong)
 	((H264Context*)pAVCtx->priv_data)->dxva_slice_long = pSliceLong;
 }
 
-HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
-						 BYTE* pBuffer, UINT nSize,
+HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_SliceInfo *pSliceInfo,
+						 struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
+						 BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
 						 UINT* nFrameSize, BOOL b_SecondField, int* got_picture)
 {
-	HRESULT	hr			= E_FAIL;
-	VC1Context* vc1		= (VC1Context*)pAVCtx->priv_data;
+	HRESULT	hr				= E_FAIL;
+	VC1Context* vc1			= (VC1Context*)pAVCtx->priv_data;
+	const MpegEncContext *s	= &vc1->s;
+
 	int out_nFrameSize	= 0;
 
 	if (pBuffer && !b_SecondField) {
@@ -666,13 +669,32 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 		vc1->second_field = 1;
 		vc1->s.picture_structure = PICT_TOP_FIELD + vc1->tff;
 		vc1->s.pict_type = (vc1->fptype & 1) ? AV_PICTURE_TYPE_P : AV_PICTURE_TYPE_I;
-		if (vc1->fptype & 4)
+		if (vc1->fptype & 4) {
 			vc1->s.pict_type = (vc1->fptype & 1) ? AV_PICTURE_TYPE_BI : AV_PICTURE_TYPE_B;
+		}
 	}
 
 	if (nFrameSize) {
 		*nFrameSize = vc1->second_field_offset;
 	}
+
+	int intcomp = 0;
+
+	// determine if intensity compensation is needed
+	if (s->pict_type == AV_PICTURE_TYPE_P) {
+		if ((vc1->fcm == ILACE_FRAME && vc1->intcomp) || (vc1->fcm != ILACE_FRAME && vc1->mv_mode == MV_PMODE_INTENSITY_COMP)) {
+			if (vc1->lumscale != 32 || vc1->lumshift != 0 || (s->picture_structure != PICT_FRAME && (vc1->lumscale2 != 32 || vc1->lumshift2 != 0))) {
+				intcomp = 1;
+			}
+		}
+	}
+
+	pPicParams->bMacroblockWidthMinus1		= 15;
+	pPicParams->bMacroblockHeightMinus1		= 15;
+	pPicParams->bBlockWidthMinus1			= 7;
+	pPicParams->bBlockHeightMinus1			= 7;
+	pPicParams->bBPPminus1					= 7;
+	pPicParams->bChromaFormat				= vc1->chromaformat;
 
 	if (vc1->profile == PROFILE_ADVANCED) {
 		/* It is the cropped width/height -1 of the frame */
@@ -680,38 +702,10 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 		pPicParams->wPicHeightInMBminus1	= pAVCtx->height - 1;
 	} else {
 		/* It is the coded width/height in macroblock -1 of the frame */
-		pPicParams->wPicWidthInMBminus1		= vc1->s.mb_width  - 1;
-		pPicParams->wPicHeightInMBminus1	= vc1->s.mb_height - 1;
+		pPicParams->wPicWidthInMBminus1		= s->mb_width  - 1;
+		pPicParams->wPicHeightInMBminus1	= s->mb_height - 1;
 	}
 
-	pPicParams->bSecondField			= (vc1->interlace && vc1->fcm == ILACE_FIELD && vc1->second_field);
-	pPicParams->bPicIntra               = vc1->s.pict_type == AV_PICTURE_TYPE_I;
-	pPicParams->bPicBackwardPrediction  = vc1->s.pict_type == AV_PICTURE_TYPE_B;
-
-	// Init    Init    Init    Todo
-	// iWMV9 - i9IRU - iOHIT - iINSO - iWMVA - 0 - 0 - 0		| Section 3.2.5
-	pPicParams->bBidirectionalAveragingMode	= (pPicParams->bBidirectionalAveragingMode & 0xE0) |	// init in Init()
-										   ((vc1->lumshift!=0 || vc1->lumscale!=32) ? 0x10 : 0)|	// iINSO
-										   ((vc1->profile == PROFILE_ADVANCED)	 <<3 );				// iWMVA
-
-	// Section 3.2.20.3
-	pPicParams->bPicSpatialResid8	= (vc1->panscanflag   << 7) | (vc1->refdist_flag << 6) |
-									  (vc1->s.loop_filter << 5) | (vc1->fastuvmc     << 4) |
-									  (vc1->extended_mv   << 3) | (vc1->dquant       << 1) |
-									  (vc1->vstransform);
-
-	// Section 3.2.20.4
-	pPicParams->bPicOverflowBlocks  = (vc1->quantizer_mode  << 6) | (vc1->multires << 5) |
-									  (vc1->resync_marker << 4) | (vc1->rangered << 3) |
-									  (vc1->s.max_b_frames);
-
-	// Section 3.2.20.2
-	pPicParams->bPicDeblockConfined	= (vc1->postprocflag << 7) | (vc1->broadcast  << 6) |
-									  (vc1->interlace    << 5) | (vc1->tfcntrflag << 4) |
-									  (vc1->finterpflag  << 3) | // (refpic << 2) set in DecodeFrame !
-									  (vc1->psf << 1)		   | vc1->extended_dmv;
-
-	pPicParams->bPicStructure = 0;
 	if (vc1->s.picture_structure & PICT_TOP_FIELD) {
 		pPicParams->bPicStructure |= 0x01;
 	}
@@ -719,36 +713,78 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 		pPicParams->bPicStructure |= 0x02;
 	}
 
-	pPicParams->bMVprecisionAndChromaRelation =	((vc1->mv_mode == MV_PMODE_1MV_HPEL_BILIN) << 3) |
-												  (1                                       << 2) |
-												  (0                                       << 1) |
-												  (!vc1->s.quarter_sample					   );
+	pPicParams->bSecondField			= (vc1->interlace && vc1->fcm == ILACE_FIELD && vc1->second_field);
+	pPicParams->bPicIntra               = s->pict_type == AV_PICTURE_TYPE_I || vc1->bi_type;
+	pPicParams->bPicBackwardPrediction  = s->pict_type == AV_PICTURE_TYPE_B && !vc1->bi_type;
 
-	// Cf page 17 : 2 for interlaced, 0 for progressive
-	pPicParams->bPicExtrapolation = (!vc1->interlace || vc1->fcm == PROGRESSIVE) ? 1 : 2;
+	pPicParams->bBidirectionalAveragingMode		= (pPicParams->bBidirectionalAveragingMode & 0xE0) |
+												  (intcomp                                   << 4) |
+												  ((vc1->profile == PROFILE_ADVANCED)        <<3 );
 
-	if (vc1->s.picture_structure == PICT_FRAME) {
-		pPicParams->wBitstreamFcodes        = vc1->lumscale;
-		pPicParams->wBitstreamPCEelements   = vc1->lumshift;
-	} else {
-		/* Syntax: (top_field_param << 8) | bottom_field_param */
-		pPicParams->wBitstreamFcodes        = (vc1->lumscale << 8) | vc1->lumscale;
-		pPicParams->wBitstreamPCEelements   = (vc1->lumshift << 8) | vc1->lumshift;
+	pPicParams->bMVprecisionAndChromaRelation	= ((vc1->mv_mode == MV_PMODE_1MV_HPEL_BILIN) << 3) |
+												  (1                                         << 2) |
+												  (0                                         << 1) |
+												  (!s->quarter_sample                            );
+
+	pPicParams->bRcontrol			= vc1->rnd;
+
+	pPicParams->bPicSpatialResid8	= (vc1->panscanflag   << 7) | (vc1->refdist_flag << 6) |
+									  (vc1->s.loop_filter << 5) | (vc1->fastuvmc     << 4) |
+									  (vc1->extended_mv   << 3) | (vc1->dquant       << 1) |
+									  (vc1->vstransform);
+	
+	pPicParams->bPicOverflowBlocks  = (vc1->quantizer_mode << 6) | (vc1->multires << 5) |
+									  (vc1->resync_marker  << 4) | (vc1->rangered << 3) |
+									  (s->max_b_frames);
+
+	pPicParams->bPicExtrapolation	= (!vc1->interlace || vc1->fcm == PROGRESSIVE) ? 1 : 2;
+	pPicParams->bPicDeblocked		= ((!pPicParams->bPicBackwardPrediction && vc1->overlap)  << 6) |
+									  ((vc1->profile != PROFILE_ADVANCED && vc1->rangeredfrm) << 5) |
+									  (s->loop_filter                                         << 1);
+
+	pPicParams->bPicDeblockConfined	= (vc1->postprocflag << 7) | (vc1->broadcast  << 6) |
+									  (vc1->interlace    << 5) | (vc1->tfcntrflag << 4) |
+									  (vc1->finterpflag  << 3) | ((s->pict_type != AV_PICTURE_TYPE_B) << 2) |
+									  (vc1->psf << 1)		   | vc1->extended_dmv;
+
+	if (vc1->s.pict_type != AV_PICTURE_TYPE_I) {
+		pPicParams->bPic4MVallowed	= vc1->mv_mode == MV_PMODE_MIXED_MV ||
+									  (vc1->mv_mode == MV_PMODE_INTENSITY_COMP &&
+									   vc1->mv_mode2 == MV_PMODE_MIXED_MV);
 	}
 
 	if (vc1->profile == PROFILE_ADVANCED) {
-		pPicParams->bPicOBMC = (vc1->range_mapy_flag  << 7) |
-							   (vc1->range_mapy       << 4) |
-							   (vc1->range_mapuv_flag << 3) |
-							   (vc1->range_mapuv          );
+		pPicParams->bPicOBMC		= (vc1->range_mapy_flag  << 7) |
+									  (vc1->range_mapy       << 4) |
+									  (vc1->range_mapuv_flag << 3) |
+									  (vc1->range_mapuv          );
+	}
+	pPicParams->bPicBinPB			= 0;
+	pPicParams->bMV_RPS				= (vc1->fcm == ILACE_FIELD && pPicParams->bPicBackwardPrediction) ? vc1->refdist + 9 : 0;
+	pPicParams->bReservedBits		= vc1->pq;
+
+	if (vc1->s.picture_structure == PICT_FRAME) {
+		if (intcomp) {
+			pPicParams->wBitstreamFcodes		= vc1->lumscale;
+			pPicParams->wBitstreamPCEelements	= vc1->lumshift;
+		} else {
+			pPicParams->wBitstreamFcodes		= 32;
+			pPicParams->wBitstreamPCEelements	= 0;
+		}
+	} else {
+		/* Syntax: (top_field_param << 8) | bottom_field_param */
+		if (intcomp) {
+			pPicParams->wBitstreamFcodes		= (vc1->lumscale << 8) | vc1->lumscale2;
+			pPicParams->wBitstreamPCEelements	= (vc1->lumshift << 8) | vc1->lumshift2;
+		} else {
+			pPicParams->wBitstreamFcodes		= (32 << 8) | 32;
+			pPicParams->wBitstreamPCEelements	= 0;
+		}
 	}
 
-	// Cf section 7.1.1.25 in VC1 specification, section 3.2.14.3 in DXVA spec
-	pPicParams->bRcontrol	= vc1->rnd;
+	pPicParams->bPicScanMethod++;
 
-	pPicParams->bPicDeblocked	= ((vc1->overlap == 1 && pPicParams->bPicBackwardPrediction == 0)	<< 6) |
-								  ((vc1->profile != PROFILE_ADVANCED && vc1->rangeredfrm)			<< 5) |
-								  (vc1->s.loop_filter												<< 1);
+	memcpy(pSliceInfo, &vc1->pSliceInfo, sizeof(DXVA_SliceInfo));
 
 	return S_OK;
 }

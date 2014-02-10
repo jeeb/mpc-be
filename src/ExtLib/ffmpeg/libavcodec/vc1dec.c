@@ -5768,6 +5768,25 @@ av_cold int ff_vc1_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
+// ==> Start patch MPC
+static void fill_slice(AVCodecContext *avctx, unsigned position, unsigned size)
+{
+    VC1Context *v = avctx->priv_data;
+    const MpegEncContext *s = &v->s;
+
+    memset(&v->pSliceInfo, 0, sizeof(v->pSliceInfo));
+    v->pSliceInfo.wHorizontalPosition = 0;
+    v->pSliceInfo.wVerticalPosition   = s->mb_y;
+    v->pSliceInfo.dwSliceBitsInBuffer = 8 * size;
+    v->pSliceInfo.dwSliceDataLocation = position;
+    v->pSliceInfo.bStartCodeBitOffset = 0;
+    v->pSliceInfo.bReservedBits       = (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type) ? v->bfraction_lut_index + 9 : 0;
+    v->pSliceInfo.wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb);
+    v->pSliceInfo.wNumberMBsInSlice   = s->mb_width * s->mb_height; /* XXX We assume 1 slice */
+    v->pSliceInfo.wQuantizerScaleCode = v->pq;
+    v->pSliceInfo.wBadSliceChopping   = 0;
+}
+// <== End patch MPC
 
 /** Decode a VC1/WMV3 frame
  * @todo TODO: Handle VC-1 IDUs (Transport level?)
@@ -6095,7 +6114,13 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         }
     } else
         // ==> Start patch MPC
-        if (!avctx->using_dxva)
+        if (avctx->using_dxva) {
+            if (v->field_mode && buf_start_second_field) {
+                fill_slice(avctx, 0, buf_start_second_field - buf_start);
+			} else {
+                fill_slice(avctx, 0, (buf + buf_size) - buf_start);
+            }
+        } else
         // <== End patch MPC
         {
         int header_ret = 0;
