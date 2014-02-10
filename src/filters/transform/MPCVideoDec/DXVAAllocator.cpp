@@ -120,6 +120,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 	if (SUCCEEDED(hr)) {
 		// Free the old resources.
+		m_pVideoDecFilter->FlushDXVADecoder();
 		Free();
 
 		m_nSurfaceArrayCount = m_lCount;
@@ -183,8 +184,6 @@ void CVideoDecDXVAAllocator::Free()
 {
 	CMediaSample *pSample = NULL;
 	CAutoLock lock(this);
-
-	m_pVideoDecFilter->FlushDXVADecoder();
 
 	do {
 		pSample = m_lFree.RemoveHead();
