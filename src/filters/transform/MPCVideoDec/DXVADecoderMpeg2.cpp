@@ -134,18 +134,18 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERE
 	}
 
 	{
-		CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
+		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 		// Send picture parameters
-		CHECK_HR (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
 		// Add quantization matrix
-		CHECK_HR (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(m_QMatrixData), &m_QMatrixData));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(m_QMatrixData), &m_QMatrixData));
 		// Add slice control
-		CHECK_HR (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo) * m_nSliceCount, &m_SliceInfo));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo) * m_nSliceCount, &m_SliceInfo));
 		// Add bitstream
-		CHECK_HR (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize, pDataIn, &nSize));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize, pDataIn, &nSize));
 		// Decode frame
-		CHECK_HR (Execute());
-		CHECK_HR (EndFrame(m_nSurfaceIndex));
+		CHECK_HR_FRAME (Execute());
+		CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
 	}
 
 	if (got_picture) {

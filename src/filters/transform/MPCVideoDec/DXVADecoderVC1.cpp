@@ -100,7 +100,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 
 	BYTE bPicBackwardPrediction = m_PictureParams.bPicBackwardPrediction;
 	
-	CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
+	CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
 	m_PictureParams.wDecodedPictureIndex	= m_nSurfaceIndex;
 	m_PictureParams.wDeblockedPictureIndex	= m_PictureParams.wDecodedPictureIndex;
@@ -122,18 +122,18 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	m_PictureParams.bPicScanMethod++;			// Use for status reporting sections 3.8.1 and 3.8.2
 
 	// Send picture params to accelerator
-	CHECK_HR (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
+	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
 
 	// Send bitstream to accelerator
-	CHECK_HR (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nFrameSize ? nFrameSize : nSize, pDataIn, &nSize_Result));
+	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nFrameSize ? nFrameSize : nSize, pDataIn, &nSize_Result));
 
 	m_SliceInfo.wQuantizerScaleCode	= 1;		// TODO : 1->31 ???
 	m_SliceInfo.dwSliceBitsInBuffer	= nSize_Result * 8;
-	CHECK_HR (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(m_SliceInfo), &m_SliceInfo));
+	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(m_SliceInfo), &m_SliceInfo));
 
 	// Decode frame
-	CHECK_HR (Execute());
-	CHECK_HR (EndFrame(m_nSurfaceIndex));
+	CHECK_HR_FRAME (Execute());
+	CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
 
 	// ***************
 	if (nFrameSize) { // Decoding Second Field
@@ -141,20 +141,20 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 						 pDataIn, nSize,
 						 NULL, TRUE, NULL);
 
-		CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
+		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
-		CHECK_HR (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
 
 		// Send bitstream to accelerator
-		CHECK_HR (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize - nFrameSize, pDataIn + nFrameSize, &nSize_Result));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize - nFrameSize, pDataIn + nFrameSize, &nSize_Result));
 
 		m_SliceInfo.wQuantizerScaleCode	= 1;		// TODO : 1->31 ???
 		m_SliceInfo.dwSliceBitsInBuffer	= nSize_Result * 8;
-		CHECK_HR (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(m_SliceInfo), &m_SliceInfo));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(m_SliceInfo), &m_SliceInfo));
 
 		// Decode frame
-		CHECK_HR (Execute());
-		CHECK_HR (EndFrame(m_nSurfaceIndex));
+		CHECK_HR_FRAME (Execute());
+		CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
 	}
 	// ***************
 
@@ -166,7 +166,6 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	return hr;
 }
 
-//BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
 static BYTE* FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
 {
 	BYTE*	pStart	= pBuffer;

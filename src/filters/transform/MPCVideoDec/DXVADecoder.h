@@ -29,6 +29,9 @@
 #include <stdint.h>
 #pragma warning(pop)
 
+#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return S_FALSE; }
+#define CHECK_HR_FRAME(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex)); return S_FALSE; }
+
 class CMPCVideoDecFilter;
 struct AVFrame;
 

@@ -101,10 +101,13 @@ void CDXVADecoder::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 void CDXVADecoder::Flush()
 {
 	DbgLog((LOG_TRACE, 3, L"CDXVADecoder::Flush()"));
-	for (int i = 0; i < m_nPicEntryNumber; i++) {
-		m_pPictureStore[i].bInUse			= false;
-		m_pPictureStore[i].pSample.Release();
-		m_pPictureStore[i].dwDisplayCount	= 0;
+
+	if (m_pPictureStore) {
+		for (int i = 0; i < m_nPicEntryNumber; i++) {
+			m_pPictureStore[i].bInUse			= false;
+			m_pPictureStore[i].pSample.Release();
+			m_pPictureStore[i].dwDisplayCount	= 0;
+		}
 	}
 
 	m_nSurfaceIndex			= -1;
@@ -696,7 +699,7 @@ HRESULT CDXVADecoder::get_buffer_dxva(AVFrame *pic)
 	m_pSampleToDeliver.Release();
 	m_nSurfaceIndex = -1;
 	HRESULT hr = S_OK;
-	CHECK_HR(GetFreeSurfaceIndex(m_nSurfaceIndex, &m_pSampleToDeliver, 0, 0));
+	CHECK_HR_FALSE (GetFreeSurfaceIndex(m_nSurfaceIndex, &m_pSampleToDeliver, 0, 0));
 	
 	SurfaceWrapper* pSurfaceWrapper = DNew SurfaceWrapper();
 	pSurfaceWrapper->opaque			= (void*)this;
