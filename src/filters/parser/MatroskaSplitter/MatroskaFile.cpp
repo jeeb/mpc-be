@@ -1644,20 +1644,19 @@ bool CMatroskaNode::Resync()
 			bswap((BYTE*)&dw, 4);
 
 			switch (dw) {
-				case MATROSKA_ID_INFO:			// SegmentInfo
-				case MATROSKA_ID_SEEKHEAD:		// MetaSeekInfo
-				case MATROSKA_ID_TRACKS:		// Tracks
-				case MATROSKA_ID_CLUSTER:		// Clusters
-				case MATROSKA_ID_CUES:			// Cues
-				case MATROSKA_ID_ATTACHMENTS:	// Attachments
-				case MATROSKA_ID_CHAPTERS:		// Chapters
-				case MATROSKA_ID_TAGS:			// Tags
-					SeekTo(GetPos()-4);
-					return SUCCEEDED(Parse());
-				default:
-					SeekTo(GetPos()-3);
-					break;
+			case MATROSKA_ID_INFO:			// SegmentInfo
+			case MATROSKA_ID_SEEKHEAD:		// MetaSeekInfo
+			case MATROSKA_ID_TRACKS:		// Tracks
+			case MATROSKA_ID_CLUSTER:		// Clusters
+			case MATROSKA_ID_CUES:			// Cues
+			case MATROSKA_ID_ATTACHMENTS:	// Attachments
+			case MATROSKA_ID_CHAPTERS:		// Chapters
+			case MATROSKA_ID_TAGS:			// Tags
+				SeekTo(GetPos()-4);
+				return SUCCEEDED(Parse());
 			}
+
+			SeekTo(GetPos()-3);
 		}
 	}
 
