@@ -2720,8 +2720,8 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 	UINT cConfigurations = 0;
 	bool bIsPrefered = false;
 
-	D3DFORMAT                   *pFormats = NULL;			// size = cFormats
-	DXVA2_ConfigPictureDecode   *pConfig = NULL;			// size = cConfigurations
+	D3DFORMAT                   *pFormats	= NULL;			// size = cFormats
+	DXVA2_ConfigPictureDecode   *pConfig	= NULL;			// size = cConfigurations
 
 	// Find the valid render target formats for this decoder GUID.
 	hr = pDecoderService->GetDecoderRenderTargets(guidDecoder, &cFormats, &pFormats);
@@ -2735,7 +2735,7 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 			FillInVideoDescription(&VideoDesc, pFormats[iFormat]);
 
 			// Get the available configurations.
-			hr = pDecoderService->GetDecoderConfigurations(guidDecoder, &m_VideoDesc, NULL, &cConfigurations, &pConfig);
+			hr = pDecoderService->GetDecoderConfigurations(guidDecoder, &VideoDesc, NULL, &cConfigurations, &pConfig);
 
 			if (FAILED(hr)) {
 				continue;
@@ -2746,8 +2746,8 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 				if (IsSupportedDecoderConfig(pFormats[iFormat], pConfig[iConfig], bIsPrefered)) {
 					// This configuration is good.
 					if (bIsPrefered || !*pbFoundDXVA2Configuration) {
-						*pbFoundDXVA2Configuration = TRUE;
-						*pSelectedConfig = pConfig[iConfig];
+						*pbFoundDXVA2Configuration	= TRUE;
+						*pSelectedConfig			= pConfig[iConfig];
 
 						FillInVideoDescription(&m_VideoDesc, pFormats[iFormat]);
 					}
