@@ -2567,6 +2567,7 @@ static const DXVA2_DECODER DXVA2Decoder[] = {
 	{&DXVA_ModeVC1_B,					_T("VC-1 B, motion compensation")},
 	{&DXVA_ModeVC1_C,					_T("VC-1 C, IDCT")},
 	{&DXVA_ModeVC1_D,					_T("VC-1 D, bitstream decoder")},
+	{&DXVA2_ModeVC1_D2010,				_T("VC-1 D, bitstream decoder (2010)")},
 	{&DXVA_NoEncrypt,					_T("No encryption")},
 	{&DXVA2_ModeMPEG2_MoComp,			_T("MPEG-2 motion compensation")},
 	{&DXVA2_ModeMPEG2_IDCT,				_T("MPEG-2 IDCT")},
