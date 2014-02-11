@@ -800,17 +800,16 @@ void ff_MPV_frame_end(MpegEncContext *s);
 int ff_MPV_encode_init(AVCodecContext *avctx);
 int ff_MPV_encode_end(AVCodecContext *avctx);
 int ff_MPV_encode_picture(AVCodecContext *avctx, AVPacket *pkt,
-                          AVFrame *frame, int *got_packet);
+                          const AVFrame *frame, int *got_packet);
 void ff_dct_encode_init_x86(MpegEncContext *s);
 void ff_MPV_common_init_x86(MpegEncContext *s);
 void ff_MPV_common_init_axp(MpegEncContext *s);
 void ff_MPV_common_init_arm(MpegEncContext *s);
 void ff_MPV_common_init_ppc(MpegEncContext *s);
 void ff_clean_intra_table_entries(MpegEncContext *s);
-void ff_draw_horiz_band(AVCodecContext *avctx, DSPContext *dsp, Picture *cur,
-                        Picture *last, int y, int h, int picture_structure,
-                        int first_field, int low_delay,
-                        int v_edge_pos, int h_edge_pos);
+void ff_draw_horiz_band(AVCodecContext *avctx, Picture *cur, Picture *last,
+                        int y, int h, int picture_structure, int first_field,
+                        int low_delay);
 void ff_mpeg_draw_horiz_band(MpegEncContext *s, int y, int h);
 void ff_mpeg_flush(AVCodecContext *avctx);
 

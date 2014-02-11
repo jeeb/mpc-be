@@ -1100,6 +1100,7 @@ static void shift_output(MJpegDecodeContext *s, uint8_t *ptr, int linesize)
 
 static int mjpeg_decode_scan(MJpegDecodeContext *s, int nb_components, int Ah,
                              int Al, const uint8_t *mb_bitmask,
+                             int mb_bitmask_size,
                              const AVFrame *reference)
 {
     int i, mb_x, mb_y;
@@ -1109,8 +1110,13 @@ static int mjpeg_decode_scan(MJpegDecodeContext *s, int nb_components, int Ah,
     GetBitContext mb_bitmask_gb;
     int bytes_per_pixel = 1 + (s->bits > 8);
 
-    if (mb_bitmask)
+    if (mb_bitmask) {
+        if (mb_bitmask_size != (s->mb_width * s->mb_height + 7)>>3) {
+            av_log(s->avctx, AV_LOG_ERROR, "mb_bitmask_size mismatches\n");
+            return AVERROR_INVALIDDATA;
+        }
         init_get_bits(&mb_bitmask_gb, mb_bitmask, s->mb_width * s->mb_height);
+    }
 
     s->restart_count = 0;
 
@@ -1265,7 +1271,7 @@ static int mjpeg_decode_scan_progressive_ac(MJpegDecodeContext *s, int ss,
 }
 
 int ff_mjpeg_decode_sos(MJpegDecodeContext *s, const uint8_t *mb_bitmask,
-                        const AVFrame *reference)
+                        int mb_bitmask_size, const AVFrame *reference)
 {
     int len, nb_components, i, h, v, predictor, point_transform;
     int index, id, ret;
@@ -1397,7 +1403,7 @@ next_field:
         } else {
             if ((ret = mjpeg_decode_scan(s, nb_components,
                                          prev_shift, point_transform,
-                                         mb_bitmask, reference)) < 0)
+                                         mb_bitmask, mb_bitmask_size, reference)) < 0)
                 return ret;
         }
     }
@@ -1551,6 +1557,45 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
         if (s->avctx->debug & FF_DEBUG_PICT_INFO)
             av_log(s->avctx, AV_LOG_INFO, "XFRM %d\n", s->xfrm);
         len --;
+        goto out;
+    }
+
+    /* JPS extension by VRex */
+    if (s->start_code == APP3 && id == AV_RB32("_JPS") && len >= 10) {
+        int flags, layout, type;
+        if (s->avctx->debug & FF_DEBUG_PICT_INFO)
+            av_log(s->avctx, AV_LOG_INFO, "_JPSJPS_\n");
+
+        skip_bits(&s->gb, 32); len -= 4;  /* JPS_ */
+        skip_bits(&s->gb, 16); len -= 2;  /* block length */
+        skip_bits(&s->gb, 8);             /* reserved */
+        flags  = get_bits(&s->gb, 8);
+        layout = get_bits(&s->gb, 8);
+        type   = get_bits(&s->gb, 8);
+        len -= 4;
+
+        s->stereo3d = av_stereo3d_alloc();
+        if (!s->stereo3d) {
+            goto out;
+        }
+        if (type == 0) {
+            s->stereo3d->type = AV_STEREO3D_2D;
+        } else if (type == 1) {
+            switch (layout) {
+            case 0x01:
+                s->stereo3d->type = AV_STEREO3D_LINES;
+                break;
+            case 0x02:
+                s->stereo3d->type = AV_STEREO3D_SIDEBYSIDE;
+                break;
+            case 0x03:
+                s->stereo3d->type = AV_STEREO3D_TOPBOTTOM;
+                break;
+            }
+            if (!(flags & 0x04)) {
+                s->stereo3d->flags = AV_STEREO3D_FLAG_INVERT;
+            }
+        }
         goto out;
     }
 
@@ -1787,6 +1832,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     int ret = 0;
 
     av_dict_free(&s->exif_metadata);
+    av_freep(&s->stereo3d);
 
     buf_ptr = buf;
     buf_end = buf + buf_size;
@@ -1923,7 +1969,7 @@ eoi_parser:
             goto the_end;
         case SOS:
             s->cur_scan++;
-            if ((ret = ff_mjpeg_decode_sos(s, NULL, NULL)) < 0 &&
+            if ((ret = ff_mjpeg_decode_sos(s, NULL, 0, NULL)) < 0 &&
                 (avctx->err_recognition & AV_EF_EXPLODE))
                 goto fail;
             break;
@@ -2006,15 +2052,24 @@ the_end:
                 h = FF_CEIL_RSHIFT(h, vshift);
             }
             if(dst){
-                uint8_t *dst2 = dst + s->linesize[index]*(h-1);
+                uint8_t *dst2 = dst + s->picture_ptr->linesize[index]*(h-1);
                 for (i=0; i<h/2; i++) {
                     for (j=0; j<w; j++)
                         FFSWAP(int, dst[j], dst2[j]);
-                    dst  += s->linesize[index];
-                    dst2 -= s->linesize[index];
+                    dst  += s->picture_ptr->linesize[index];
+                    dst2 -= s->picture_ptr->linesize[index];
                 }
             }
         }
+    }
+
+    if (s->stereo3d) {
+        AVStereo3D *stereo = av_stereo3d_create_side_data(data);
+        if (stereo) {
+            stereo->type  = s->stereo3d->type;
+            stereo->flags = s->stereo3d->flags;
+        }
+        av_freep(&s->stereo3d);
     }
 
     av_dict_copy(avpriv_frame_get_metadatap(data), s->exif_metadata, 0);
@@ -2041,7 +2096,8 @@ av_cold int ff_mjpeg_decode_end(AVCodecContext *avctx)
     } else if (s->picture_ptr)
         av_frame_unref(s->picture_ptr);
 
-    av_free(s->buffer);
+    av_freep(&s->buffer);
+    av_freep(&s->stereo3d);
     av_freep(&s->ljpeg_buffer);
     s->ljpeg_buffer_size = 0;
 

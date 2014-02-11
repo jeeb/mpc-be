@@ -1319,6 +1319,8 @@ static void init_dequant_tables(H264Context *h)
 {
     int i, x;
     init_dequant4_coeff_table(h);
+    memset(h->dequant8_coeff, 0, sizeof(h->dequant8_coeff));
+
     if (h->pps.transform_8x8_mode)
         init_dequant8_coeff_table(h);
     if (h->sps.transform_bypass) {
@@ -1861,7 +1863,6 @@ static int decode_update_thread_context(AVCodecContext *dst,
     h->picture_structure    = h1->picture_structure;
     h->qscale               = h1->qscale;
     h->droppable            = h1->droppable;
-    h->data_partitioning    = h1->data_partitioning;
     h->low_delay            = h1->low_delay;
 
     for (i = 0; h->DPB && i < MAX_PICTURE_COUNT; i++) {
@@ -3617,6 +3618,12 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                pps_id);
         return AVERROR_INVALIDDATA;
     }
+    if (h0->au_pps_id >= 0 && pps_id != h0->au_pps_id) {
+        av_log(h->avctx, AV_LOG_ERROR,
+               "PPS change from %d to %d forbidden\n",
+               h0->au_pps_id, pps_id);
+        return AVERROR_INVALIDDATA;
+    }
     h->pps = *h0->pps_buffers[pps_id];
 
     if (!h0->sps_buffers[h->pps.sps_id]) {
@@ -3628,9 +3635,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
 
     if (h->pps.sps_id != h->current_sps_id ||
         h0->sps_buffers[h->pps.sps_id]->new) {
-        h0->sps_buffers[h->pps.sps_id]->new = 0;
 
-        h->current_sps_id = h->pps.sps_id;
         h->sps            = *h0->sps_buffers[h->pps.sps_id];
 
         if (h->mb_width  != h->sps.mb_width ||
@@ -4224,6 +4229,10 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     if (h->ref_count[0]) h->er.last_pic = &h->ref_list[0][0];
     if (h->ref_count[1]) h->er.next_pic = &h->ref_list[1][0];
     h->er.ref_count = h->ref_count[0];
+    h0->au_pps_id = pps_id;
+    h->sps.new =
+    h0->sps_buffers[h->pps.sps_id]->new = 0;
+    h->current_sps_id = h->pps.sps_id;
 
     // ==> Start patch MPC
     if (h->avctx->using_dxva) {
@@ -5009,6 +5018,9 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
                 continue;
 
 again:
+            if (   !(avctx->active_thread_type & FF_THREAD_FRAME)
+                || nals_needed >= nal_index)
+                h->au_pps_id = -1;
             /* Ignore per frame NAL unit type during extradata
              * parsing. Decoding slices is not possible in codec init
              * with frame-mt */
@@ -5131,6 +5143,13 @@ again:
                 }
                 break;
             case NAL_DPA:
+                if (h->avctx->flags & CODEC_FLAG2_CHUNKS) {
+                    av_log(h->avctx, AV_LOG_ERROR,
+                           "Decoding in chunks is not supported for "
+                           "partitioned slices.\n");
+                    return AVERROR(ENOSYS);
+                }
+
                 init_get_bits(&hx->gb, ptr, bit_length);
                 hx->intra_gb_ptr =
                 hx->inter_gb_ptr = NULL;
@@ -5292,6 +5311,9 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
     int ret;
 
     h->flags = avctx->flags;
+    /* reset data partitioning here, to ensure GetBitContexts from previous
+     * packets do not get used. */
+    h->data_partitioning = 0;
 
     /* end of stream, output what is still in the buffers */
     if (buf_size == 0) {

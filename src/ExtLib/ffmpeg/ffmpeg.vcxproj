@@ -21,12 +21,14 @@
   <ItemGroup>
     <None Include="config.asm" />
     <None Include="libavcodec\x86\ac3dsp.asm" />
+    <None Include="libavcodec\x86\dcadsp.asm" />
     <None Include="libavcodec\x86\dct32.asm" />
     <None Include="libavcodec\x86\deinterlace.asm" />
     <None Include="libavcodec\x86\diracdsp_yasm.asm" />
     <None Include="libavcodec\x86\dsputil.asm" />
     <None Include="libavcodec\x86\dwt_yasm.asm" />
     <None Include="libavcodec\x86\fft.asm" />
+    <None Include="libavcodec\x86\flacdsp.asm" />
     <None Include="libavcodec\x86\fmtconvert.asm" />
     <None Include="libavcodec\x86\fpel.asm" />
     <None Include="libavcodec\x86\h263_loopfilter.asm" />
@@ -322,6 +324,7 @@
     <ClInclude Include="libavcodec\wmv2dsp.h" />
     <ClInclude Include="libavcodec\x86\cabac.h" />
     <ClInclude Include="libavcodec\x86\constants.h" />
+    <ClInclude Include="libavcodec\x86\dca.h" />
     <ClInclude Include="libavcodec\x86\diracdsp_mmx.h" />
     <ClInclude Include="libavcodec\x86\dirac_dwt.h" />
     <ClInclude Include="libavcodec\x86\dsputil_x86.h" />
@@ -744,6 +747,7 @@
     <ClCompile Include="libavcodec\wmv2dsp.c" />
     <ClCompile Include="libavcodec\x86\ac3dsp_init.c" />
     <ClCompile Include="libavcodec\x86\constants.c" />
+    <ClCompile Include="libavcodec\x86\dcadsp_init.c" />
     <ClCompile Include="libavcodec\x86\dct_init.c" />
     <ClCompile Include="libavcodec\x86\diracdsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\dirac_dwt.c" />

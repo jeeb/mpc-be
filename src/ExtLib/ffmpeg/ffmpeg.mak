@@ -382,6 +382,7 @@ SRCS_C = \
 	libavcodec/xiph.c \
 	libavcodec/x86/ac3dsp_init.c \
 	libavcodec/x86/constants.c \
+	libavcodec/x86/dcadsp_init.c \
 	libavcodec/x86/dct_init.c \
 	libavcodec/x86/dirac_dwt.c \
 	libavcodec/x86/diracdsp_mmx.c \
@@ -390,6 +391,7 @@ SRCS_C = \
 	libavcodec/x86/dsputil_x86.c \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fft_init.c \
+	libavcodec/x86/flacdsp_init.c \
 	libavcodec/x86/fmtconvert_init.c \
 	libavcodec/x86/fpel_mmx.c \
 	libavcodec/x86/h263dsp_init.c \
@@ -497,12 +499,14 @@ SRCS_C = \
 # Yasm objects
 SRCS_YASM = \
 	libavcodec/x86/ac3dsp.asm \
+	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
 	libavcodec/x86/deinterlace.asm \
 	libavcodec/x86/diracdsp_yasm.asm \
 	libavcodec/x86/dsputil.asm \
 	libavcodec/x86/dwt_yasm.asm \
 	libavcodec/x86/fft.asm \
+	libavcodec/x86/flacdsp.asm \
 	libavcodec/x86/fmtconvert.asm \
 	libavcodec/x86/fpel.asm \
 	libavcodec/x86/h263_loopfilter.asm \
