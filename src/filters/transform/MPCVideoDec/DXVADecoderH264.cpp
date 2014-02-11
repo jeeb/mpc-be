@@ -49,7 +49,7 @@ void CDXVADecoderH264::Init()
 {
 	DbgLog((LOG_TRACE, 3, L"CDXVADecoderH264::Init()"));
 
-	memset(&m_DXVAPicParams, 0, sizeof(DXVA_PicParams_H264));
+	memset(&m_DXVAPicParams, 0, sizeof(m_DXVAPicParams));
 	memset(&m_pSliceLong, 0, sizeof(m_pSliceLong));
 	memset(&m_pSliceShort, 0, sizeof(m_pSliceShort));
 

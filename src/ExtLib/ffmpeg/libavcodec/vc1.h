@@ -31,22 +31,6 @@
 
 #define AC_VLC_BITS 9
 
-// ==> Start patch MPC
-// copy from <dxva.h>
-typedef struct _ff_DXVA_SliceInfo {
-    unsigned short wHorizontalPosition;
-    unsigned short wVerticalPosition;
-    unsigned long  dwSliceBitsInBuffer;
-    unsigned long  dwSliceDataLocation;
-    unsigned char  bStartCodeBitOffset;
-    unsigned char  bReservedBits;
-    unsigned short wMBbitOffset;
-    unsigned short wNumberMBsInSlice;
-    unsigned short wQuantizerScaleCode;
-    unsigned short wBadSliceChopping;
-} ff_DXVA_SliceInfo;
-// <== End patch MPC
-
 /** Markers used in VC-1 AP frame data */
 //@{
 enum VC1Code {
@@ -433,7 +417,8 @@ typedef struct VC1Context{
     int resync_marker;           ///< could this stream contain resync markers
     // ==> Start patch MPC
     int second_field_offset;
-    ff_DXVA_SliceInfo pSliceInfo;
+    void* pPictureParameters;
+    void* pSliceInfo;
     // <== End patch MPC
 } VC1Context;
 

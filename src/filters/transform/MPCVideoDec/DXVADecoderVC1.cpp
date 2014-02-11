@@ -48,9 +48,6 @@ void CDXVADecoderVC1::Init()
 	memset(&m_PictureParams, 0, sizeof(m_PictureParams));
 	memset(&m_SliceInfo, 0, sizeof(m_SliceInfo));
 
-	m_wRefPictureIndex[0] = NO_REF_FRAME;
-	m_wRefPictureIndex[1] = NO_REF_FRAME;
-
 	switch (GetMode()) {
 		case VC1_VLD :
 			AllocExecuteParams (3);
@@ -58,6 +55,8 @@ void CDXVADecoderVC1::Init()
 		default :
 			ASSERT(FALSE);
 	}
+
+	FFHVC1SetDxvaParams(m_pFilter->GetAVCtx(), m_PictureParams, m_SliceInfo);
 
 	Flush();
 }
@@ -71,14 +70,14 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	int							got_picture		= 0;
 
 	memset(&m_PictureParams, 0, sizeof(m_PictureParams));
-	m_PictureParams.bBidirectionalAveragingMode		= (1 << 7) |
-						(GetConfigIntraResidUnsigned()   << 6) |	// i9IRU
-						(GetConfigResidDiffAccelerator() << 5);		// iOHIT
+	m_PictureParams[0].bBidirectionalAveragingMode = (1                               << 7) |
+													 (GetConfigIntraResidUnsigned()   << 6) |
+													 (GetConfigResidDiffAccelerator() << 5);
+	m_PictureParams[1].bBidirectionalAveragingMode = m_PictureParams[0].bBidirectionalAveragingMode;
 
-	CHECK_HR_FALSE (FFVC1DecodeFrame(&m_PictureParams, &m_SliceInfo,
-									 m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
+	CHECK_HR_FALSE (FFVC1DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
 									 pDataIn, nSize, rtStart,
-									 &nFrameSize, FALSE, &got_picture));
+									 &nFrameSize, &got_picture));
 
 	if (m_nSurfaceIndex == -1) {
 		return S_FALSE;
@@ -93,33 +92,29 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	}
 
 	{
-		m_PictureParams.wDecodedPictureIndex	= m_nSurfaceIndex;
-		m_PictureParams.wDeblockedPictureIndex	= m_PictureParams.wDecodedPictureIndex;
+		m_PictureParams[0].wDecodedPictureIndex = m_PictureParams[0].wDeblockedPictureIndex = m_nSurfaceIndex;
 
 		// Manage reference picture list
-		if (!m_PictureParams.bPicBackwardPrediction) {
-			/*
-			if (m_wRefPictureIndex[0] != NO_REF_FRAME) {
-				FreePictureSlot(m_wRefPictureIndex[0]);
-			}
-			*/
+		if (!m_PictureParams[0].bPicBackwardPrediction) {
 			m_wRefPictureIndex[0] = m_wRefPictureIndex[1];
 			m_wRefPictureIndex[1] = m_nSurfaceIndex;
 		}
-		m_PictureParams.wForwardRefPictureIndex		= (m_PictureParams.bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
-		m_PictureParams.wBackwardRefPictureIndex	= (m_PictureParams.bPicBackwardPrediction == 1) ? m_wRefPictureIndex[1] : NO_REF_FRAME;
+		m_PictureParams[0].wForwardRefPictureIndex	= (m_PictureParams[0].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
+		m_PictureParams[0].wBackwardRefPictureIndex	= (m_PictureParams[0].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
 	}
+
+	bSecondField = FALSE;
 
 	CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
 	// Send picture params to accelerator
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
+	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PictureParameters), &m_PictureParams[0]));
 
 	// Send bitstream to accelerator
 	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nFrameSize ? nFrameSize : nSize, pDataIn, &nSize_Result));
 
-	m_SliceInfo.dwSliceBitsInBuffer	= nSize_Result << 3;
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(m_SliceInfo), &m_SliceInfo));
+	m_SliceInfo[0].dwSliceBitsInBuffer = nSize_Result * 8;
+	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo), &m_SliceInfo[0]));
 
 	// Decode frame
 	CHECK_HR_FRAME (Execute());
@@ -127,20 +122,23 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 
 	// ***************
 	if (nFrameSize) { // Decoding Second Field
-		FFVC1DecodeFrame(&m_PictureParams, &m_SliceInfo,
-						 m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
-						 pDataIn, nSize, rtStart,
-						 NULL, TRUE, NULL);
+		m_PictureParams[1].bBidirectionalAveragingMode	= m_PictureParams[0].bBidirectionalAveragingMode;
+		m_PictureParams[1].wDecodedPictureIndex			= m_PictureParams[0].wDecodedPictureIndex;
+		m_PictureParams[1].wDeblockedPictureIndex		= m_PictureParams[0].wDeblockedPictureIndex;
+		m_PictureParams[1].wForwardRefPictureIndex		= m_PictureParams[0].wForwardRefPictureIndex;
+		m_PictureParams[1].wBackwardRefPictureIndex		= m_PictureParams[0].wBackwardRefPictureIndex;
+
+		bSecondField = TRUE;
 
 		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
-		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PictureParameters), &m_PictureParams[1]));
 
 		// Send bitstream to accelerator
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize - nFrameSize, pDataIn + nFrameSize, &nSize_Result));
 
-		m_SliceInfo.dwSliceBitsInBuffer	= nSize_Result << 3;
-		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(m_SliceInfo), &m_SliceInfo));
+		m_SliceInfo[1].dwSliceBitsInBuffer = nSize_Result * 8;
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo), &m_SliceInfo[1]));
 
 		// Decode frame
 		CHECK_HR_FRAME (Execute());
@@ -183,13 +181,12 @@ static BYTE* FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
 	}
 
 	ASSERT(FALSE);		// Should never happen!
-
 	return NULL;
 }
 
 void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 {
-	if (m_PictureParams.bSecondField) {
+	if (bSecondField) {
 		memcpy_sse(pDXVABuffer, (BYTE*)pBuffer, nSize);
 	} else {
 		if ((*((DWORD*)pBuffer) & 0x00FFFFFF) != 0x00010000) {
@@ -229,6 +226,8 @@ void CDXVADecoderVC1::Flush()
 {
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;
+
+	bSecondField			= FALSE;
 
 	__super::Flush();
 }
