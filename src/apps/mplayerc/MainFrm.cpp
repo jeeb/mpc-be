@@ -721,7 +721,11 @@ CMainFrame::CMainFrame() :
 	m_hRefreshNotifyRenderThreadEvent(NULL),
 	m_nMainFilterId(NULL),
 	m_hGraphThreadEventOpen(FALSE, TRUE),
-	m_hGraphThreadEventClose(FALSE, TRUE)
+	m_hGraphThreadEventClose(FALSE, TRUE),
+	m_DwmSetWindowAttributeFnc(NULL),
+	m_DwmSetIconicThumbnailFnc(NULL),
+	m_DwmSetIconicLivePreviewBitmapFnc(NULL),
+	m_DwmInvalidateIconicBitmapsFnc(NULL)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
