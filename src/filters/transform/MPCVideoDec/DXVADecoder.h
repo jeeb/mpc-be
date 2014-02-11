@@ -35,12 +35,6 @@
 class CMPCVideoDecFilter;
 struct AVFrame;
 
-struct SurfaceWrapper {
-	void* opaque;
-	int nSurfaceIndex;
-	CComPtr<IMediaSample> pSample;
-};
-
 class CDXVADecoder
 {
 	#define MAX_COM_BUFFER			6				// Max uncompressed buffer for an Execute command (DXVA1)
@@ -74,7 +68,6 @@ public :
 		MPEG2_VLD
 	};
 
-	// === Public functions
 	virtual						~CDXVADecoder();
 	DXVAMode					GetMode() const { return m_nMode; }
 	DXVA_ENGINE					GetEngine() const { return m_nEngine; }
@@ -108,6 +101,12 @@ protected :
 
 	int							m_nSurfaceIndex;
 	CComPtr<IMediaSample>		m_pSampleToDeliver;
+
+	struct SurfaceWrapper {
+		void* opaque;
+		int nSurfaceIndex;
+		CComPtr<IMediaSample> pSample;
+	};
 
 	// === DXVA functions
 	HRESULT						AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, void* pBuffer, UINT* pRealSize = NULL);

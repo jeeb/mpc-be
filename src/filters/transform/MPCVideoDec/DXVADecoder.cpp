@@ -83,7 +83,6 @@ void CDXVADecoder::Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEnt
 	memset(&m_ExecuteParams, 0, sizeof(m_ExecuteParams));
 }
 
-// === Public functions
 void CDXVADecoder::AllocExecuteParams(int nSize)
 {
 	m_ExecuteParams.pCompressedBuffers = DNew DXVA2_DecodeBufferDesc[nSize];

@@ -61,7 +61,6 @@ void CDXVADecoderVC1::Init()
 	Flush();
 }
 
-// === Public functions
 HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT						hr				= S_FALSE;
@@ -122,13 +121,11 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 
 	// ***************
 	if (nFrameSize) { // Decoding Second Field
-		m_PictureParams[1].bBidirectionalAveragingMode	= m_PictureParams[0].bBidirectionalAveragingMode;
-		m_PictureParams[1].wDecodedPictureIndex			= m_PictureParams[0].wDecodedPictureIndex;
-		m_PictureParams[1].wDeblockedPictureIndex		= m_PictureParams[0].wDeblockedPictureIndex;
-		m_PictureParams[1].wForwardRefPictureIndex		= m_PictureParams[0].wForwardRefPictureIndex;
-		m_PictureParams[1].wBackwardRefPictureIndex		= m_PictureParams[0].wBackwardRefPictureIndex;
-
 		bSecondField = TRUE;
+
+		m_PictureParams[1].wDecodedPictureIndex		= m_PictureParams[1].wDeblockedPictureIndex			= m_nSurfaceIndex;
+		m_PictureParams[1].wForwardRefPictureIndex	= (m_PictureParams[1].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
+		m_PictureParams[1].wBackwardRefPictureIndex	= (m_PictureParams[1].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
 
 		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 
