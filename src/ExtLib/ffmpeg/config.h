@@ -487,6 +487,7 @@ Note: when adding a new codec, you have to:
 	line to libavcodec/allcodecs.c
 */
 
+#define CONFIG_8BPS_DECODER 1
 #define CONFIG_AASC_DECODER 0
 #define CONFIG_AIC_DECODER 1
 #define CONFIG_AMV_DECODER 1

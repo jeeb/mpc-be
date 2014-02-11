@@ -48,6 +48,7 @@ void avcodec_register_all(void)
     initialized = 1;
 
     /* video codecs */
+    REGISTER_DECODER (8BPS, eightbps);
     REGISTER_DECODER (AIC, aic);
     REGISTER_DECODER (AMV, amv);
     REGISTER_DECODER (BINK, bink);

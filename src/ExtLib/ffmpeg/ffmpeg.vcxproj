@@ -422,6 +422,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.c" />
+    <ClCompile Include="libavcodec\8bps.c" />
     <ClCompile Include="libavcodec\aacadtsdec.c" />
     <ClCompile Include="libavcodec\aacdec.c" />
     <ClCompile Include="libavcodec\aacps.c" />

@@ -34,7 +34,7 @@
 #define MPC_VERSION_MAJOR  1
 #define MPC_VERSION_MINOR  3
 #define MPC_VERSION_PATCH  1
-#define MPC_VERSION_STATUS 0
+#define MPC_VERSION_STATUS 1
 
 // MPC_VERSION_STATUS: 0 - alfa; 1 - beta; 2 - RC; 3 - stable
 

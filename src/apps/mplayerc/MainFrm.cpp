@@ -721,7 +721,11 @@ CMainFrame::CMainFrame() :
 	m_hRefreshNotifyRenderThreadEvent(NULL),
 	m_nMainFilterId(NULL),
 	m_hGraphThreadEventOpen(FALSE, TRUE),
-	m_hGraphThreadEventClose(FALSE, TRUE)
+	m_hGraphThreadEventClose(FALSE, TRUE),
+	m_DwmSetWindowAttributeFnc(NULL),
+	m_DwmSetIconicThumbnailFnc(NULL),
+	m_DwmSetIconicLivePreviewBitmapFnc(NULL),
+	m_DwmInvalidateIconicBitmapsFnc(NULL)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -916,7 +920,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			m_strTitle.AppendFormat(_T(" svn %d -alpha"), MPC_VERSION_REV);
 			break;
 		case 1:
-			m_strTitle.Append(_T(" -beta"));
+			m_strTitle.AppendFormat(_T(" svn %d -beta"), MPC_VERSION_REV);
 			break;
 		case 2:
 			m_strTitle.Append(_T(" -rc"));
