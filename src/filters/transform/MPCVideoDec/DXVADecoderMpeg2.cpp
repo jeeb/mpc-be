@@ -240,7 +240,7 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)pic->data[3];
 	if (pSurfaceWrapper) {
 		int nSurfaceIndex = pSurfaceWrapper->nSurfaceIndex;
-		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].pSample) {
+		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].bInUse) {
 			nPos = nSurfaceIndex;
 			UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 		}

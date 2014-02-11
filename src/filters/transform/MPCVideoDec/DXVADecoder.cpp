@@ -468,7 +468,7 @@ HRESULT CDXVADecoder::EndFrame(int nSurfaceIndex)
 // === Picture store functions
 bool CDXVADecoder::AddToStore(int nSurfaceIndex, IMediaSample* pSample, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	if (nSurfaceIndex == -1 || pSample == NULL) {
+	if (nSurfaceIndex == -1) {
 		return false;
 	}
 	ASSERT(nSurfaceIndex < m_nPicEntryNumber);
@@ -608,7 +608,7 @@ int CDXVADecoder::FindOldestFrame()
 	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)pic->data[3];
 	if (pSurfaceWrapper) {
 		int nSurfaceIndex = pSurfaceWrapper->nSurfaceIndex;
-		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].pSample) {
+		if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber && m_pPictureStore[nSurfaceIndex].bInUse) {
 			nPos = nSurfaceIndex;
 			m_pPictureStore[nPos].rtStart = m_pFilter->GetFrame()->pkt_pts;
 			m_pFilter->ReorderBFrames(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
