@@ -36,14 +36,20 @@ extern "C" {
 #define WEBP_ANDROID_NEON  // Android targets that might support NEON
 #endif
 
-#if defined(__ARM_NEON__) || defined(WEBP_ANDROID_NEON)
+#if (defined(__ARM_NEON__) && !defined(__aarch64__)) || \
+    defined(WEBP_ANDROID_NEON)
 #define WEBP_USE_NEON
+#endif
+
+#if defined(__mips__)
+#define WEBP_USE_MIPS32
 #endif
 
 typedef enum {
   kSSE2,
   kSSE3,
-  kNEON
+  kNEON,
+  kMIPS32
 } CPUFeature;
 // returns true if the CPU supports the feature.
 typedef int (*VP8CPUInfo)(CPUFeature feature);
@@ -180,7 +186,11 @@ typedef void (*WebPSampleLinePairFunc)(
     const uint8_t* u, const uint8_t* v,
     uint8_t* top_dst, uint8_t* bottom_dst, int len);
 
-extern const WebPSampleLinePairFunc WebPSamplers[/* MODE_LAST */];
+// Sampling functions to convert YUV to RGB(A) modes
+extern WebPSampleLinePairFunc WebPSamplers[/* MODE_LAST */];
+
+// Initializes MIPS version of the samplers.
+void WebPInitSamplersMIPS32(void);
 
 // General function for converting two lines of ARGB or RGBA.
 // 'alpha_is_last' should be true if 0xff000000 is stored in memory as
@@ -196,6 +206,7 @@ extern const WebPYUV444Converter WebPYUV444Converters[/* MODE_LAST */];
 
 // Main function to be called
 void WebPInitUpsamplers(void);
+void WebPInitSamplers(void);
 
 //------------------------------------------------------------------------------
 // Pre-multiply planes with alpha values
