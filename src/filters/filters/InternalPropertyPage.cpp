@@ -95,7 +95,11 @@ BOOL CInternalPropertyPageWnd::OnWndMsg(UINT message, WPARAM wParam, LPARAM lPar
 {
 	if (message == WM_COMMAND || message == WM_HSCROLL || message == WM_VSCROLL) {
 		WORD notify = HIWORD(wParam);
-		if (notify == BN_CLICKED || notify == CBN_SELCHANGE || notify == EN_CHANGE) {
+		// check only notifications that change the state of a control, otherwise false positives are possible.
+		if (notify == BN_CLICKED
+				|| notify == CBN_SELCHANGE
+				|| notify == EN_CHANGE
+				|| notify == CLBN_CHKCHANGE) {
 			SetDirty(true);
 		}
 	}
