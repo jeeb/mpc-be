@@ -4782,7 +4782,47 @@ Version 1.7.0beta28 [January 20, 2014]
   Updated scripts/makefile.* to use CPPFLAGS (Cosmin).
   Added clang attribute support (Cosmin).
 
-Version 1.7.0beta29 [January 20, 2014]
+Version 1.7.0beta29 [January 30, 2014]
+  Quiet an uninitialized memory warning from VS2013 in png_get_png().
+
+Version 1.7.0beta30 [February 2, 2014]
+  Fixed a large number of instances where PNGCBAPI was omitted from
+    function definitions.
+  Added pngimage test program for png_read_png and png_write_png. This
+    is a work-in-progress; no tests are run automatically at present and
+    the program by virtue of exhaustively testing all the transforms is
+    very slow.
+
+Version 1.7.0beta31 [February 6, 2014]
+  Make png_read_png() and png_write_png() prototypes in png.h depend
+    upon PNG_READ_SUPPORTED and PNG_WRITE_SUPPORTED.
+  Removed dependence on !PNG_READ_EXPAND_SUPPORTED for calling
+    png_set_packing() in png_read_png().
+  Completed full working pngimage test program and added two test scripts.
+  Fixed combination of ~alpha with shift. On read invert alpha, processing
+    occurred after shift processing, which causes the final values to be
+    outside the range that should be produced by the shift. Reversing the
+    order on read makes the two transforms work together correctly and mirrors
+    the order used on write.
+  Do not read invalid sBIT chunks. Previously libpng only checked sBIT
+    values on write, so a malicious PNG writer could therefore cause
+    the read code to return an invalid sBIT chunk, which might lead to
+    application errors or crashes.  Such chunks are now skipped (with
+    chunk_benign_error).
+  Restored a line, "c = b;", that was inadvertently deleted from the
+    PAETH filtering code from libpng-1.7.0beta24/pngrutil.c. Deleted
+    the other instance of "c = b;" which is the one that triggered a
+    scan-build warning.
+  Support builds with unsupported PNG_TRANSFORM_* values.  All of the
+    PNG_TRANSFORM_* values are always defined in png.h and, because they
+    are used for both read and write in some cases, it is not reliable
+    to #if out ones that are totally unsupported. This change adds error
+    detection in png_read_image() and png_write_image() to do a
+    png_app_error() if the app requests something that cannot be done
+    and it adds corresponding code to pngimage.c to handle such options
+    by not attempting to test them.
+
+Version 1.7.0beta32 [February 6, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
