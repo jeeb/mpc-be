@@ -91,7 +91,7 @@ vcodecs[] = {
 	{_T("theora"),		CODEC_THEORA	},
 	{_T("mjpeg"),		CODEC_MJPEG		},
 	{_T("dv"),			CODEC_DV		},
-	{_T("lagarith"),	CODEC_LAGARITH	},
+	{_T("lossless"),	CODEC_LOSSLESS	},
 	{_T("prores"),		CODEC_PRORES	},
 	{_T("cllc"),		CODEC_CLLC		},
 	{_T("screc"),		CODEC_SCREC		},
@@ -1241,7 +1241,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					bCodecActivated = (m_nActiveCodecs & CODEC_AMVV) != 0;
 					break;
 				case AV_CODEC_ID_LAGARITH :
-					bCodecActivated = (m_nActiveCodecs & CODEC_LAGARITH) != 0;
+					bCodecActivated = (m_nActiveCodecs & CODEC_LOSSLESS) != 0;
 					break;
 				case AV_CODEC_ID_VP3  :
 				case AV_CODEC_ID_VP5  :
