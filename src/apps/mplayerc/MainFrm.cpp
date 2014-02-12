@@ -4385,8 +4385,16 @@ void CMainFrame::OnFilePostCloseMedia()
 		if (WaitForSingleObject(m_YoutubeThread->m_hThread, 3000) == WAIT_TIMEOUT) {
 			TerminateThread(m_YoutubeThread->m_hThread, 0xDEAD);
 		}
+		m_YoutubeThread = NULL;
+
+		// delete the temporary file because we do not use it anymore
+		if (::PathFileExists(m_YoutubeFile) && DeleteFile(m_YoutubeFile)) {
+			POSITION pos = AfxGetAppSettings().slTMPFilesList.Find(m_YoutubeFile);
+			if (pos) {
+				AfxGetAppSettings().slTMPFilesList.RemoveAt(pos);
+			}
+		}
 	}
-	m_YoutubeThread		= NULL;
 	m_YoutubeTotal		= 0;
 	m_YoutubeCurrent	= 0;
 
