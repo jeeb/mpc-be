@@ -46,6 +46,8 @@ private:
 	bool					m_bUseLongSlice;
 
 	UINT					m_nSlices;
+	UINT					StatusReportFeedbackNumber;
+	USHORT					Reserved16Bits;
 
 	void					Init();
 };

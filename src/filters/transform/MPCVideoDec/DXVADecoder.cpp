@@ -180,6 +180,10 @@ CDXVADecoder* CDXVADecoder::CreateDecoder(CMPCVideoDecFilter* pFilter, IAMVideoA
 		ASSERT(FALSE);    // Unknown decoder !!
 	}
 
+	if (pDecoder) {
+		pDecoder->m_guidDecoder = *guidDecoder;
+	}
+
 	return pDecoder;
 }
 
@@ -195,6 +199,10 @@ CDXVADecoder* CDXVADecoder::CreateDecoder(CMPCVideoDecFilter* pFilter, IDirectXV
 		pDecoder	= DNew CDXVADecoderMpeg2(pFilter, pDirectXVideoDec, MPEG2_VLD, nPicEntryNumber, pDXVA2Config);
 	} else {
 		ASSERT(FALSE);    // Unknown decoder !!
+	}
+
+	if (pDecoder) {
+		pDecoder->m_guidDecoder = *guidDecoder;
 	}
 
 	return pDecoder;
@@ -705,6 +713,7 @@ HRESULT CDXVADecoder::get_buffer_dxva(AVFrame *pic)
 	pSurfaceWrapper->pSample		= m_pSampleToDeliver;
 
 	pic->data[3]	= (uint8_t *)pSurfaceWrapper;
+	pic->data[4]	= (uint8_t *)m_nSurfaceIndex;
 	pic->buf[3]		= av_buffer_create(NULL, 0, release_buffer_dxva, pSurfaceWrapper, 0);
 	
 	return hr;

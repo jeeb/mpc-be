@@ -93,6 +93,8 @@ protected :
 	CDXVADecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber);
 	CDXVADecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
+	GUID						m_guidDecoder;
+
 	CMPCVideoDecFilter*			m_pFilter;
 	BOOL						m_bWaitingForKeyFrame;
 

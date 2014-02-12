@@ -4086,10 +4086,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     }
 
     h->last_qscale_diff = 0;
-    // ==> Start patch MPC
-    h->slice_qp_delta = get_se_golomb(&h->gb);
-    tmp = h->pps.init_qp + h->slice_qp_delta;
-    // <== End patch MPC
+    tmp = h->pps.init_qp + get_se_golomb(&h->gb);
     if (tmp > 51 + 6 * (h->sps.bit_depth_luma - 8)) {
         av_log(h->avctx, AV_LOG_ERROR, "QP %u out of range\n", tmp);
         return AVERROR_INVALIDDATA;
@@ -4102,9 +4099,8 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
         get_bits1(&h->gb); /* sp_for_switch_flag */
     if (h->slice_type == AV_PICTURE_TYPE_SP ||
         h->slice_type == AV_PICTURE_TYPE_SI)
-        // ==> Start patch MPC
-        h->slice_qs_delta = get_se_golomb(&h->gb); /* slice_qs_delta */
-        // <== End patch MPC
+        get_se_golomb(&h->gb); /* slice_qs_delta */
+
     h->deblocking_filter     = 1;
     h->slice_alpha_c0_offset = 52;
     h->slice_beta_offset     = 52;
@@ -4853,6 +4849,114 @@ static int execute_decode_slices(H264Context *h, int context_count)
     return 0;
 }
 
+// ==> Start patch MPC
+static void fill_picture_parameters(const H264Context *h,
+                                    DXVA_PicParams_H264 *pp)
+{
+    const Picture *current_picture = h->cur_pic_ptr;
+    int i, j;
+
+    memset(pp, 0, sizeof(*pp));
+    /* Configure current picture */
+    pp->CurrPic.AssociatedFlag = h->picture_structure == PICT_BOTTOM_FIELD;
+    pp->CurrPic.Index7Bits     = (UCHAR)h->cur_pic_ptr->f.data[4];
+    /* Configure the set of references */
+    pp->UsedForReferenceFlags  = 0;
+    pp->NonExistingFrameFlags  = 0;
+    for (i = 0, j = 0; i < FF_ARRAY_ELEMS(pp->RefFrameList); i++) {
+        const Picture *r;
+        if (j < h->short_ref_count) {
+            r = h->short_ref[j++];
+        } else {
+            r = NULL;
+            while (!r && j < h->short_ref_count + 16)
+                r = h->long_ref[j++ - h->short_ref_count];
+        }
+        if (r) {
+			pp->RefFrameList[i].AssociatedFlag = r->long_ref != 0;
+			pp->RefFrameList[i].Index7Bits     = (UCHAR)r->f.data[4];
+
+            if ((r->reference & PICT_TOP_FIELD) && r->field_poc[0] != INT_MAX)
+                pp->FieldOrderCntList[i][0] = r->field_poc[0];
+            if ((r->reference & PICT_BOTTOM_FIELD) && r->field_poc[1] != INT_MAX)
+                pp->FieldOrderCntList[i][1] = r->field_poc[1];
+
+            pp->FrameNumList[i] = r->long_ref ? r->pic_id : r->frame_num;
+            if (r->reference & PICT_TOP_FIELD)
+                pp->UsedForReferenceFlags |= 1 << (2*i + 0);
+            if (r->reference & PICT_BOTTOM_FIELD)
+                pp->UsedForReferenceFlags |= 1 << (2*i + 1);
+        } else {
+            pp->RefFrameList[i].bPicEntry = 0xff;
+            pp->FieldOrderCntList[i][0]   = 0;
+            pp->FieldOrderCntList[i][1]   = 0;
+            pp->FrameNumList[i]           = 0;
+        }
+    }
+
+    pp->wFrameWidthInMbsMinus1        = h->mb_width  - 1;
+    pp->wFrameHeightInMbsMinus1       = h->mb_height - 1;
+    pp->num_ref_frames                = h->sps.ref_frame_count;
+
+    pp->wBitFields                    = ((h->picture_structure != PICT_FRAME) <<  0) |
+                                        ((h->sps.mb_aff &&
+                                        (h->picture_structure == PICT_FRAME)) <<  1) |
+                                        (h->sps.residual_color_transform_flag <<  2) |
+                                        /* sp_for_switch_flag (not implemented by FFmpeg) */
+                                        (0                                    <<  3) |
+                                        (h->sps.chroma_format_idc             <<  4) |
+                                        ((h->nal_ref_idc != 0)                <<  6) |
+                                        (h->pps.constrained_intra_pred        <<  7) |
+                                        (h->pps.weighted_pred                 <<  8) |
+                                        (h->pps.weighted_bipred_idc           <<  9) |
+                                        /* MbsConsecutiveFlag */
+                                        (1                                    << 11) |
+                                        (h->sps.frame_mbs_only_flag           << 12) |
+                                        (h->pps.transform_8x8_mode            << 13) |
+                                        ((h->sps.level_idc >= 31)             << 14) |
+                                        /* IntraPicFlag (Modified if we detect a non
+                                         * intra slice in dxva2_h264_decode_slice) */
+                                        (1                                    << 15);
+
+    pp->bit_depth_luma_minus8         = h->sps.bit_depth_luma - 8;
+    pp->bit_depth_chroma_minus8       = h->sps.bit_depth_chroma - 8;
+
+    pp->CurrFieldOrderCnt[0] = 0;
+    if ((h->picture_structure & PICT_TOP_FIELD) &&
+        current_picture->field_poc[0] != INT_MAX)
+        pp->CurrFieldOrderCnt[0] = current_picture->field_poc[0];
+    pp->CurrFieldOrderCnt[1] = 0;
+    if ((h->picture_structure & PICT_BOTTOM_FIELD) &&
+        current_picture->field_poc[1] != INT_MAX)
+        pp->CurrFieldOrderCnt[1] = current_picture->field_poc[1];
+    pp->pic_init_qs_minus26           = h->pps.init_qs - 26;
+    pp->chroma_qp_index_offset        = h->pps.chroma_qp_index_offset[0];
+    pp->second_chroma_qp_index_offset = h->pps.chroma_qp_index_offset[1];
+    pp->ContinuationFlag              = 1;
+    pp->pic_init_qp_minus26           = h->pps.init_qp - 26;
+    pp->num_ref_idx_l0_active_minus1  = h->pps.ref_count[0] - 1;
+    pp->num_ref_idx_l1_active_minus1  = h->pps.ref_count[1] - 1;
+    pp->Reserved8BitsA                = 0;
+    pp->frame_num                     = h->frame_num;
+    pp->log2_max_frame_num_minus4     = h->sps.log2_max_frame_num - 4;
+    pp->pic_order_cnt_type            = h->sps.poc_type;
+    if (h->sps.poc_type == 0)
+        pp->log2_max_pic_order_cnt_lsb_minus4 = h->sps.log2_max_poc_lsb - 4;
+    else if (h->sps.poc_type == 1)
+        pp->delta_pic_order_always_zero_flag = h->sps.delta_pic_order_always_zero_flag;
+    pp->direct_8x8_inference_flag     = h->sps.direct_8x8_inference_flag;
+    pp->entropy_coding_mode_flag      = h->pps.cabac;
+    pp->pic_order_present_flag        = h->pps.pic_order_present;
+    pp->num_slice_groups_minus1       = h->pps.slice_group_count - 1;
+    pp->slice_group_map_type          = h->pps.mb_slice_group_map_type;
+    pp->deblocking_filter_control_present_flag = h->pps.deblocking_filter_parameters_present;
+    pp->redundant_pic_cnt_present_flag= h->pps.redundant_pic_cnt_present;
+    pp->Reserved8BitsB                = 0;
+    pp->slice_group_change_rate_minus1= 0;  /* XXX not implemented by FFmpeg */
+    //pp->SliceGroupMap[810];               /* XXX not implemented by FFmpeg */
+}
+// <== End patch MPC
+
 static const uint8_t start_code[] = { 0x00, 0x00, 0x01 };
 
 static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
@@ -5047,9 +5151,6 @@ again:
                 hx->inter_gb_ptr      = &hx->gb;
                 hx->data_partitioning = 0;
 
-                // ==> Start patch MPC
-                hx->ref_pic_flag = (h->nal_ref_idc != 0);
-                // <== End patch MPC
                 if ((err = decode_slice_header(hx, h)))
                     break;
 
@@ -5095,6 +5196,13 @@ again:
                     // <== End patch MPC
                     if (!(avctx->flags2 & CODEC_FLAG2_CHUNKS))
                         decode_postinit(h, nal_index >= nals_needed);
+
+					// ==> Start patch MPC
+					if (h->avctx->using_dxva) {
+						DXVA_PicParams_H264 *pp = (DXVA_PicParams_H264*)h->pPicParams_H264;
+						fill_picture_parameters(h->avctx->priv_data, pp);
+					}
+					// <== End patch MPC
 
                     if (h->avctx->hwaccel &&
                         (ret = h->avctx->hwaccel->start_frame(h->avctx, NULL, 0)) < 0)

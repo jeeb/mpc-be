@@ -56,7 +56,7 @@ void CDXVADecoderVC1::Init()
 			ASSERT(FALSE);
 	}
 
-	FFHVC1SetDxvaParams(m_pFilter->GetAVCtx(), m_PictureParams, m_SliceInfo);
+	FFVC1SetDxvaParams(m_pFilter->GetAVCtx(), m_PictureParams, m_SliceInfo);
 
 	Flush();
 }

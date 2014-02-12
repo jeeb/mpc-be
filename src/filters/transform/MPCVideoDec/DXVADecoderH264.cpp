@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "DXVADecoderH264.h"
 #include "MPCVideoDec.h"
@@ -53,20 +54,13 @@ void CDXVADecoderH264::Init()
 	memset(&m_pSliceLong, 0, sizeof(m_pSliceLong));
 	memset(&m_pSliceShort, 0, sizeof(m_pSliceShort));
 
-	m_DXVAPicParams.MbsConsecutiveFlag					= 1;
-	m_DXVAPicParams.Reserved16Bits						= 3;
-	if (m_pFilter->GetPCIVendor() == PCIV_Intel) {
-		m_DXVAPicParams.Reserved16Bits					= 0x534c;
+	Reserved16Bits		= 3;
+	if (m_pFilter->GetPCIVendor() == PCIV_Intel && m_guidDecoder == DXVA_Intel_H264_ClearVideo) {
+		Reserved16Bits	= 0x534c;
 	} else if (IsATIUVD(m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice())) {
-		m_DXVAPicParams.Reserved16Bits					= 0;
+		Reserved16Bits	= 0;
 	}
-	m_DXVAPicParams.ContinuationFlag					= 1;
-	m_DXVAPicParams.MinLumaBipredSize8x8Flag			= 1;	// Improve accelerator performances
-	m_DXVAPicParams.StatusReportFeedbackNumber			= 0;	// Use to report status
 
-	for (int i = 0; i < _countof(m_DXVAPicParams.RefFrameList); i++) {
-		m_DXVAPicParams.RefFrameList[i].bPicEntry		= 255;
-	}
 
 	m_nNALLength	= 4;
 	m_nMaxSlices	= 0;
@@ -80,7 +74,7 @@ void CDXVADecoderH264::Init()
 			ASSERT(FALSE);
 	}
 
-	FFH264SetDxvaSliceLong(m_pFilter->GetAVCtx(), m_pSliceLong);
+	FFH264SetDxvaParams(m_pFilter->GetAVCtx(), m_pSliceLong, &m_DXVAPicParams);
 
 	Flush();
 }
@@ -134,7 +128,7 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 
 void CDXVADecoderH264::Flush()
 {
-	m_DXVAPicParams.UsedForReferenceFlags	= 0;
+	StatusReportFeedbackNumber = 0;
 
 	__super::Flush();
 }
@@ -186,19 +180,19 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	}
 
 	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
-	CHECK_HR_FALSE (FFH264BuildPicParams(m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice(), &m_DXVAPicParams, &m_DXVAScalingMatrix));
-	FFH264SetCurrentPicture(m_nSurfaceIndex, &m_DXVAPicParams, m_pFilter->GetAVCtx());
+	CHECK_HR_FALSE (FFH264UpdatePicParams(m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice(), &m_DXVAPicParams, &m_DXVAScalingMatrix));
+	m_DXVAPicParams.Reserved16Bits = Reserved16Bits;
 
 	{
-		m_DXVAPicParams.StatusReportFeedbackNumber++;
+		m_DXVAPicParams.StatusReportFeedbackNumber = ++StatusReportFeedbackNumber;
 		
 		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 		// Send picture parameters
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_DXVAPicParams), &m_DXVAPicParams));
+		// Add quantization matrix
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_H264), &m_DXVAScalingMatrix));
 		// Add bitstream
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, SecondFieldOffset ? SecondFieldOffset : nSize, pDataIn, &nSize_Result));
-		// Add quantization matrix
-		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_H264), (void*)&m_DXVAScalingMatrix));
 		// Add slice control
 		if (m_bUseLongSlice) {
 			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_Slice_H264_Long) * m_nSlices, m_pSliceLong));
@@ -214,10 +208,10 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 			CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
 			// Send picture parameters
 			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_DXVAPicParams), &m_DXVAPicParams));
+			// Add quantization matrix
+			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_H264), &m_DXVAScalingMatrix));
 			// Add bitstream
 			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize - SecondFieldOffset, pDataIn + SecondFieldOffset, &nSize_Result));
-			// Add quantization matrix
-			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_H264), (void*)&m_DXVAScalingMatrix));
 			// Add slice control
 			if (m_bUseLongSlice) {
 				CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_Slice_H264_Long) * m_nSlices, m_pSliceLong));
@@ -230,8 +224,6 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		}
 
 	}
-
-	FFH264UpdateRefFramesList(&m_DXVAPicParams, m_pFilter->GetAVCtx());
 
 	if (got_picture) {
 		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, rtStart, rtStop);

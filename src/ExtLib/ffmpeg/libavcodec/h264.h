@@ -702,16 +702,13 @@ typedef struct H264Context {
     AVBufferPool *ref_index_pool;
 
     // ==> Start patch MPC
-    int				slice_qs_delta;
-    int				slice_qp_delta;
-    unsigned int	first_mb_in_slice;
-    int				bit_offset_to_slice_data;
-    int				raw_slice_type;
+    unsigned int first_mb_in_slice;
+    int          bit_offset_to_slice_data;
+    int          raw_slice_type;
 
-    void*			dxva_slice_long;
-    int				ref_pic_flag;
-
-    int				second_field_offset;
+    int          second_field_offset;
+    void*        dxva_slice_long;
+    void*        pPicParams_H264;
     // <== End patch MPC
 }H264Context;
 
