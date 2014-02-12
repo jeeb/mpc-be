@@ -73,6 +73,32 @@ void CDXVADecoderMpeg2::Init()
 	Flush();
 }
 
+void CDXVADecoderMpeg2::Flush()
+{
+	m_rtLastStart			= 0;
+
+	m_wRefPictureIndex[0]	= NO_REF_FRAME;
+	m_wRefPictureIndex[1]	= NO_REF_FRAME;
+
+	ResetBuffer();
+
+	__super::Flush();
+}
+
+void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
+{
+	while (*((DWORD*)pBuffer) != 0x01010000) {
+		pBuffer++;
+		nSize--;
+
+		if (nSize == 0) {
+			return;
+		}
+	}
+
+	memcpy_sse(pDXVABuffer, pBuffer, nSize);
+}
+
 HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	AppendBuffer(pDataIn, nSize, rtStart, rtStop);
@@ -93,18 +119,6 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	}
 
 	return hr;
-}
-
-static CString FrameType(bool bIsField, BYTE bSecondField)
-{
-	CString str;
-	if (bIsField) {
-		str.Format(L"Field [%d]", bSecondField);
-	} else {
-		str = L"Frame";
-	}
-
-	return str;
 }
 
 HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
@@ -204,32 +218,6 @@ void CDXVADecoderMpeg2::UpdatePictureParams(int nSurfaceIndex)
 			m_PictureParams.bPicScanMethod	= 0;    // 01 = Alternate-vertical (MPEG-2 Figure 7-3),
 		}
 	}
-}
-
-void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
-{
-	while (*((DWORD*)pBuffer) != 0x01010000) {
-		pBuffer++;
-		nSize--;
-
-		if (nSize == 0) {
-			return;
-		}
-	}
-
-	memcpy_sse(pDXVABuffer, pBuffer, nSize);
-}
-
-void CDXVADecoderMpeg2::Flush()
-{
-	m_rtLastStart			= 0;
-
-	m_wRefPictureIndex[0]	= NO_REF_FRAME;
-	m_wRefPictureIndex[1]	= NO_REF_FRAME;
-
-	ResetBuffer();
-
-	__super::Flush();
 }
 
 int CDXVADecoderMpeg2::FindOldestFrame()

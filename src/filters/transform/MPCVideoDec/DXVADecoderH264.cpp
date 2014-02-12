@@ -74,9 +74,16 @@ void CDXVADecoderH264::Init()
 			ASSERT(FALSE);
 	}
 
-	FFH264SetDxvaParams(m_pFilter->GetAVCtx(), m_pSliceLong, &m_DXVAPicParams);
+	FFH264SetDxvaParams(m_pFilter->GetAVCtx(), m_pSliceLong, m_DXVAPicParams);
 
 	Flush();
+}
+
+void CDXVADecoderH264::Flush()
+{
+	StatusReportFeedbackNumber = 1;
+
+	__super::Flush();
 }
 
 void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
@@ -126,13 +133,6 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 	}
 }
 
-void CDXVADecoderH264::Flush()
-{
-	StatusReportFeedbackNumber = 0;
-
-	__super::Flush();
-}
-
 HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT						hr					= S_FALSE;
@@ -160,7 +160,7 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 					m_pSliceLong[nSlices].BSNALunitDataLocation	= nNalOffset;
 					m_pSliceLong[nSlices].SliceBytesInBuffer	= Nalu.GetDataLength() + 3;
 					m_pSliceLong[nSlices].slice_id				= nSlices;
-					FF264UpdateRefFrameSliceLong(&m_DXVAPicParams, &m_pSliceLong[nSlices], m_pFilter->GetAVCtx());
+					FF264UpdateRefFrameSliceLong(&m_DXVAPicParams[0], &m_pSliceLong[nSlices], m_pFilter->GetAVCtx());
 
 					if (nSlices) {
 						m_pSliceLong[nSlices - 1].NumMbsForSlice = m_pSliceLong[nSlices].NumMbsForSlice = m_pSliceLong[nSlices].first_mb_in_slice - m_pSliceLong[nSlices - 1].first_mb_in_slice;
@@ -179,16 +179,15 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		return S_FALSE;
 	}
 
-	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
-	CHECK_HR_FALSE (FFH264UpdatePicParams(m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice(), &m_DXVAPicParams, &m_DXVAScalingMatrix));
-	m_DXVAPicParams.Reserved16Bits = Reserved16Bits;
-
 	{
-		m_DXVAPicParams.StatusReportFeedbackNumber = ++StatusReportFeedbackNumber;
+		CHECK_HR_FALSE (FFH264UpdatePicParams(m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice(), &m_DXVAPicParams[0], &m_DXVAScalingMatrix));
+		m_DXVAPicParams[0].Reserved16Bits				= Reserved16Bits;
+		m_DXVAPicParams[0].StatusReportFeedbackNumber	= StatusReportFeedbackNumber++;
 		
+		// Begin frame
 		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
-		// Send picture parameters
-		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_DXVAPicParams), &m_DXVAPicParams));
+		// Add picture parameters
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PicParams_H264), &m_DXVAPicParams[0]));
 		// Add quantization matrix
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_H264), &m_DXVAScalingMatrix));
 		// Add bitstream
@@ -204,10 +203,16 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
 
 		if (SecondFieldOffset) {
+			// Decoding Second Field
+
+			CHECK_HR_FALSE (FFH264UpdatePicParams(m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice(), &m_DXVAPicParams[1], &m_DXVAScalingMatrix));
+			m_DXVAPicParams[1].Reserved16Bits				= Reserved16Bits;
+			m_DXVAPicParams[1].StatusReportFeedbackNumber	= StatusReportFeedbackNumber++;
 			
+			// Begin frame
 			CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
-			// Send picture parameters
-			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_DXVAPicParams), &m_DXVAPicParams));
+			// Add picture parameters
+			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PicParams_H264), &m_DXVAPicParams[1]));
 			// Add quantization matrix
 			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_H264), &m_DXVAScalingMatrix));
 			// Add bitstream

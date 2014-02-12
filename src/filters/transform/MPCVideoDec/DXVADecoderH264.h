@@ -32,12 +32,12 @@ public:
 	CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual ~CDXVADecoderH264();
 
-	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void			Flush();
+	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 private:
-	DXVA_PicParams_H264		m_DXVAPicParams;
+	DXVA_PicParams_H264		m_DXVAPicParams[2];
 	DXVA_Qmatrix_H264		m_DXVAScalingMatrix;
 	DXVA_Slice_H264_Short	m_pSliceShort[MAX_SLICES];
 	DXVA_Slice_H264_Long	m_pSliceLong[MAX_SLICES];

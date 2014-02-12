@@ -61,94 +61,15 @@ void CDXVADecoderVC1::Init()
 	Flush();
 }
 
-HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+void CDXVADecoderVC1::Flush()
 {
-	HRESULT						hr				= S_FALSE;
-	UINT						nFrameSize		= 0;
-	UINT						nSize_Result	= 0;
-	int							got_picture		= 0;
+	m_wRefPictureIndex[0]		= NO_REF_FRAME;
+	m_wRefPictureIndex[1]		= NO_REF_FRAME;
 
-	memset(&m_PictureParams, 0, sizeof(m_PictureParams));
-	m_PictureParams[0].bBidirectionalAveragingMode = (1                               << 7) |
-													 (GetConfigIntraResidUnsigned()   << 6) |
-													 (GetConfigResidDiffAccelerator() << 5);
-	m_PictureParams[1].bBidirectionalAveragingMode = m_PictureParams[0].bBidirectionalAveragingMode;
+	bSecondField				= FALSE;
+	StatusReportFeedbackNumber	= 0;
 
-	CHECK_HR_FALSE (FFVC1DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
-									 pDataIn, nSize, rtStart,
-									 &nFrameSize, &got_picture));
-
-	if (m_nSurfaceIndex == -1) {
-		return S_FALSE;
-	}
-
-	if (m_bWaitingForKeyFrame && got_picture) {
-		if (m_pFilter->GetFrame()->key_frame) {
-			m_bWaitingForKeyFrame = FALSE;
-		} else {
-			got_picture = 0;
-		}
-	}
-
-	{
-		m_PictureParams[0].wDecodedPictureIndex = m_PictureParams[0].wDeblockedPictureIndex = m_nSurfaceIndex;
-
-		// Manage reference picture list
-		if (!m_PictureParams[0].bPicBackwardPrediction) {
-			m_wRefPictureIndex[0] = m_wRefPictureIndex[1];
-			m_wRefPictureIndex[1] = m_nSurfaceIndex;
-		}
-		m_PictureParams[0].wForwardRefPictureIndex	= (m_PictureParams[0].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
-		m_PictureParams[0].wBackwardRefPictureIndex	= (m_PictureParams[0].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
-	}
-
-	bSecondField = FALSE;
-
-	CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
-
-	// Send picture params to accelerator
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PictureParameters), &m_PictureParams[0]));
-
-	// Send bitstream to accelerator
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nFrameSize ? nFrameSize : nSize, pDataIn, &nSize_Result));
-
-	m_SliceInfo[0].dwSliceBitsInBuffer = nSize_Result * 8;
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo), &m_SliceInfo[0]));
-
-	// Decode frame
-	CHECK_HR_FRAME (Execute());
-	CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
-
-	// ***************
-	if (nFrameSize) { // Decoding Second Field
-		bSecondField = TRUE;
-
-		m_PictureParams[1].wDecodedPictureIndex		= m_PictureParams[1].wDeblockedPictureIndex			= m_nSurfaceIndex;
-		m_PictureParams[1].wForwardRefPictureIndex	= (m_PictureParams[1].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
-		m_PictureParams[1].wBackwardRefPictureIndex	= (m_PictureParams[1].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
-
-		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
-
-		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PictureParameters), &m_PictureParams[1]));
-
-		// Send bitstream to accelerator
-		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize - nFrameSize, pDataIn + nFrameSize, &nSize_Result));
-
-		m_SliceInfo[1].dwSliceBitsInBuffer = nSize_Result * 8;
-		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo), &m_SliceInfo[1]));
-
-		// Decode frame
-		CHECK_HR_FRAME (Execute());
-		CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
-	}
-	// ***************
-
-	if (got_picture) {
-		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, rtStart, rtStop);
-		hr = DisplayNextFrame();
-	}
-
-	return hr;
+	__super::Flush();
 }
 
 static BYTE* FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
@@ -219,12 +140,102 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 	}
 }
 
-void CDXVADecoderVC1::Flush()
+HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	m_wRefPictureIndex[0]	= NO_REF_FRAME;
-	m_wRefPictureIndex[1]	= NO_REF_FRAME;
+	HRESULT						hr				= S_FALSE;
+	UINT						nFrameSize		= 0;
+	UINT						nSize_Result	= 0;
+	int							got_picture		= 0;
 
-	bSecondField			= FALSE;
+	memset(&m_PictureParams, 0, sizeof(m_PictureParams));
+	m_PictureParams[0].bBidirectionalAveragingMode = (1                               << 7) |
+													 (GetConfigIntraResidUnsigned()   << 6) |
+													 (GetConfigResidDiffAccelerator() << 5);
+	m_PictureParams[1].bBidirectionalAveragingMode = m_PictureParams[0].bBidirectionalAveragingMode;
 
-	__super::Flush();
+	CHECK_HR_FALSE (FFVC1DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
+									 pDataIn, nSize, rtStart,
+									 &nFrameSize, &got_picture));
+
+	if (m_nSurfaceIndex == -1) {
+		return S_FALSE;
+	}
+
+	if (m_bWaitingForKeyFrame && got_picture) {
+		if (m_pFilter->GetFrame()->key_frame) {
+			m_bWaitingForKeyFrame = FALSE;
+		} else {
+			got_picture = 0;
+		}
+	}
+
+	{
+		bSecondField = FALSE;
+
+		m_PictureParams[0].wDecodedPictureIndex = m_PictureParams[0].wDeblockedPictureIndex = m_nSurfaceIndex;
+
+		// Manage reference picture list
+		if (!m_PictureParams[0].bPicBackwardPrediction) {
+			m_wRefPictureIndex[0] = m_wRefPictureIndex[1];
+			m_wRefPictureIndex[1] = m_nSurfaceIndex;
+		}
+		m_PictureParams[0].wForwardRefPictureIndex	= (m_PictureParams[0].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
+		m_PictureParams[0].wBackwardRefPictureIndex	= (m_PictureParams[0].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
+
+		StatusReportFeedbackNumber++;
+		if (StatusReportFeedbackNumber >= (1 << 16)) {
+			StatusReportFeedbackNumber = 1;
+		}
+		m_PictureParams[0].bPicScanFixed	= StatusReportFeedbackNumber >> 8;
+		m_PictureParams[0].bPicScanMethod	= StatusReportFeedbackNumber & 0xff;
+
+		// Begin frame
+		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
+		// Add picture parameters
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PictureParameters), &m_PictureParams[0]));
+		// Add bitstream
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nFrameSize ? nFrameSize : nSize, pDataIn, &nSize_Result));
+		// Add slice control
+		m_SliceInfo[0].dwSliceBitsInBuffer = nSize_Result * 8;
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo), &m_SliceInfo[0]));
+		// Decode frame
+		CHECK_HR_FRAME (Execute());
+		CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
+
+		if (nFrameSize) {
+			 // Decoding Second Field
+			bSecondField = TRUE;
+
+			m_PictureParams[1].wDecodedPictureIndex		= m_PictureParams[1].wDeblockedPictureIndex			= m_nSurfaceIndex;
+			m_PictureParams[1].wForwardRefPictureIndex	= (m_PictureParams[1].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
+			m_PictureParams[1].wBackwardRefPictureIndex	= (m_PictureParams[1].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
+
+			StatusReportFeedbackNumber++;
+			if (StatusReportFeedbackNumber >= (1 << 16)) {
+				StatusReportFeedbackNumber = 1;
+			}
+			m_PictureParams[1].bPicScanFixed	= StatusReportFeedbackNumber >> 8;
+			m_PictureParams[1].bPicScanMethod	= StatusReportFeedbackNumber & 0xff;
+
+			// Begin frame
+			CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
+			// Add picture parameters
+			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PictureParameters), &m_PictureParams[1]));
+			// Add bitstream
+			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize - nFrameSize, pDataIn + nFrameSize, &nSize_Result));
+			// Add slice control
+			m_SliceInfo[1].dwSliceBitsInBuffer = nSize_Result * 8;
+			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo), &m_SliceInfo[1]));
+			// Decode frame
+			CHECK_HR_FRAME (Execute());
+			CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
+		}
+	}
+
+	if (got_picture) {
+		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, rtStart, rtStop);
+		hr = DisplayNextFrame();
+	}
+
+	return hr;
 }

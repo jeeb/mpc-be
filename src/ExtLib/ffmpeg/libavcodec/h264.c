@@ -5189,19 +5189,17 @@ again:
 #endif
 
                 if (h->current_slice == 1) {
-                    // ==> Start patch MPC
-                    nal_pass++;
-                    if (nal_pass == 1)
-                        h->second_field_offset = buf_index;
-                    // <== End patch MPC
                     if (!(avctx->flags2 & CODEC_FLAG2_CHUNKS))
                         decode_postinit(h, nal_index >= nals_needed);
 
 					// ==> Start patch MPC
-					if (h->avctx->using_dxva) {
-						DXVA_PicParams_H264 *pp = (DXVA_PicParams_H264*)h->pPicParams_H264;
-						fill_picture_parameters(h->avctx->priv_data, pp);
+					if (h->avctx->using_dxva && nal_pass < 2) {
+                        DXVA_PicParams_H264* pp = &((DXVA_PicParams_H264*)h->pPicParams_H264)[nal_pass];
+                        fill_picture_parameters(h, pp);
 					}
+                    nal_pass++;
+                    if (nal_pass == 1)
+                        h->second_field_offset = buf_index;
 					// <== End patch MPC
 
                     if (h->avctx->hwaccel &&
