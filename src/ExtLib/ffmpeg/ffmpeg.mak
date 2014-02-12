@@ -3,7 +3,6 @@ ZLIB_DIR = ../zlib
 OPENJPEG_DIR = ../openjpeg
 OPUS_DIR = ../opus
 SPEEX_DIR = ../speex
-VPX_DIR = ../vpx
 
 ifeq ($(64BIT),yes)
 	MY_ARCH = x64
@@ -30,7 +29,7 @@ TARGET_LIB_DIR = $(BIN_DIR)/lib/$(MY_DIR_PREFIX)_$(MY_ARCH)
 TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
 
 # Compiler and yasm flags
-CFLAGS	= -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(OPUS_DIR) -I$(SPEEX_DIR) -I$(VPX_DIR)\
+CFLAGS	= -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(OPUS_DIR) -I$(SPEEX_DIR)\
 		-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
 		-O2 -ffast-math -fomit-frame-pointer \
@@ -234,8 +233,6 @@ SRCS_C = \
 	libavcodec/libopus.c \
 	libavcodec/libopusdec.c \
 	libavcodec/libspeexdec.c \
-	libavcodec/libvpx.c \
-	libavcodec/libvpxdec.c \
 	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \
@@ -369,6 +366,8 @@ SRCS_C = \
 	libavcodec/vp6dsp.c \
 	libavcodec/vp8.c \
 	libavcodec/vp8dsp.c \
+	libavcodec/vp9.c \
+	libavcodec/vp9dsp.c \
 	libavcodec/wavpack.c \
 	libavcodec/wma.c \
 	libavcodec/wma_common.c \
@@ -424,6 +423,7 @@ SRCS_C = \
 	libavcodec/x86/vp3dsp_init.c \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
+	libavcodec/x86/vp9dsp_init.c \
 	libavfilter/af_atempo.c \
 	libavfilter/af_biquads.c \
 	libavfilter/audio.c \
@@ -540,6 +540,9 @@ SRCS_YASM = \
 	libavcodec/x86/vp6dsp.asm \
 	libavcodec/x86/vp8dsp.asm \
 	libavcodec/x86/vp8dsp_loopfilter.asm \
+	libavcodec/x86/vp9itxfm.asm \
+	libavcodec/x86/vp9lpf.asm \
+	libavcodec/x86/vp9mc.asm \
 	libavresample/x86/audio_convert.asm \
 	libavresample/x86/audio_mix.asm \
 	libavresample/x86/dither.asm \

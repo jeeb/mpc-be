@@ -107,7 +107,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (VP6A, vp6a);
     REGISTER_DECODER (VP6F, vp6f);
     REGISTER_DECODER (VP8, vp8);
-/*  REGISTER_DECODER (VP9, vp9); */
+    REGISTER_DECODER (VP9, vp9);
     REGISTER_DECODER (WMV1, wmv1);
     REGISTER_DECODER (WMV2, wmv2);
     REGISTER_DECODER (WMV3, wmv3);
@@ -195,5 +195,5 @@ void avcodec_register_all(void)
     REGISTER_DECODER (LIBOPENJPEG, libopenjpeg);
     REGISTER_DECODER (LIBOPUS, libopus);
     REGISTER_DECODER (LIBSPEEX, libspeex);
-    REGISTER_DECODER (LIBVPX_VP9, libvpx_vp9);
+/*  REGISTER_DECODER (LIBVPX_VP9, libvpx_vp9); */
 }
