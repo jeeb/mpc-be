@@ -36,4 +36,4 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 ======
 Следующие файлы остаются как есть, без последних изменений из ffmpeg:
 
-* vc1dec.c
+*
