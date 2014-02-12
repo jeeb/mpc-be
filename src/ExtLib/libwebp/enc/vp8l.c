@@ -1042,7 +1042,8 @@ WebPEncodingError VP8LEncodeStream(const WebPConfig* const config,
 
   if (enc->cache_bits_ > 0) {
     if (!VP8LCalculateEstimateForCacheSize(enc->argb_, enc->current_width_,
-                                           height, &enc->cache_bits_)) {
+                                           height, quality,
+                                           &enc->cache_bits_)) {
       err = VP8_ENC_ERROR_INVALID_CONFIGURATION;
       goto Error;
     }
@@ -1095,7 +1096,8 @@ int VP8LEncodeImage(const WebPConfig* const config,
 
   width = picture->width;
   height = picture->height;
-  if (!VP8LBitWriterInit(&bw, (width * height) >> 1)) {
+  // Initialize BitWriter with size corresponding to 8bpp.
+  if (!VP8LBitWriterInit(&bw, width * height)) {
     err = VP8_ENC_ERROR_OUT_OF_MEMORY;
     goto Error;
   }

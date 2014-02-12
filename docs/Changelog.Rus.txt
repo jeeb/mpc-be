@@ -21,7 +21,7 @@
 	* Обновлен Китайский (Simplified) перевод (автор insolo);
 	* Обновлен Корейский перевод (автор kuh3h3);
 	* ffmpeg 2.1.x git-b6c0f07d;
-	* libwebp 0.4.0 git-393f89b7;
+	* libwebp 0.4.0 git-6e37cb94;
 	* libvpx 1.2 git-47d482cb;
 	* libopus 1.1 git-253e15f7;
 	* libpng 1.7.0 b32 git-50a09830;
