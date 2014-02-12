@@ -149,6 +149,8 @@ protected:
 
 	REFERENCE_TIME							m_rtStartCache;
 
+	DWORD									m_fSYNC;
+
 	// === Private functions
 	void				Cleanup();
 	void				ffmpegCleanup();

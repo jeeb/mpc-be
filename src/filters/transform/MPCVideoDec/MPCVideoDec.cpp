@@ -920,6 +920,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bIsEVO(FALSE)
 	, m_nFrameType(PICT_FRAME)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
+	, m_fSYNC(0)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1391,10 +1392,9 @@ HRESULT CMPCVideoDecFilter::CheckTransform(const CMediaType* mtIn, const CMediaT
 
 bool CMPCVideoDecFilter::IsAVI()
 {
-	static DWORD SYNC = 0;
-	if (SYNC == MAKEFOURCC('R','I','F','F')) {
+	if (m_fSYNC == MAKEFOURCC('R','I','F','F')) {
 		return true;
-	} else if (SYNC != 0) {
+	} else if (m_fSYNC != 0) {
 		return false;
 	}
 
@@ -1422,12 +1422,12 @@ bool CMPCVideoDecFilter::IsAVI()
 			return false;
 		}
 
-		if (f.Read(&SYNC, sizeof(SYNC)) != sizeof(SYNC)) {
+		if (f.Read(&m_fSYNC, sizeof(m_fSYNC)) != sizeof(m_fSYNC)) {
 			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : Can't read SYNC from file '%s'"), fname));
 			return false;
 		}
 
-		if (SYNC == MAKEFOURCC('R','I','F','F')) {
+		if (m_fSYNC == MAKEFOURCC('R','I','F','F')) {
 			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file"), fname));
 			return true;
 		}
@@ -1574,9 +1574,21 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_nCodecNb	= nNewCodec;
 	m_nCodecId	= ffCodecs[nNewCodec].nFFCodec;
 
-	m_bReorderBFrame	= true;
 	m_pAVCodec			= avcodec_find_decoder(m_nCodecId);
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
+
+	bool bH264_HEVCIsAVI = ((m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC) && IsAVI());
+	// code from LAV ... thanks to it's author
+	// Use ffmpegs logic to reorder timestamps
+	// This is required for H264 content (except AVI), and generally all codecs that use frame threading
+	m_bReorderBFrame = bH264_HEVCIsAVI ||
+						!((m_pAVCodec->capabilities & CODEC_CAP_FRAME_THREADS)
+							|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
+							|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
+							|| m_nCodecId == AV_CODEC_ID_DIRAC
+							|| m_nCodecId == AV_CODEC_ID_VC1
+							|| m_nCodecId == AV_CODEC_ID_RV10
+							|| m_nCodecId == AV_CODEC_ID_RV20);
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 	CheckPointer(m_pAVCtx, E_POINTER);
@@ -1616,6 +1628,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpg2v->hdr.bmiHeader;
 
+		if (m_nCodecId == AV_CODEC_ID_MPEG4) {
+			m_bReorderBFrame = false;
+		}
+
 		switch (m_nCodecId) {
 			case AV_CODEC_ID_H264:
 				m_bReorderBFrame = IsAVI() ? true : false;
@@ -1626,25 +1642,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		}
 	} else {
 		return VFW_E_INVALIDMEDIATYPE;
-	}
-
-	if (m_nCodecId == AV_CODEC_ID_RV10
-			|| m_nCodecId == AV_CODEC_ID_RV20
-			|| m_nCodecId == AV_CODEC_ID_RV30
-			|| m_nCodecId == AV_CODEC_ID_RV40
-			|| m_nCodecId == AV_CODEC_ID_VP3
-			|| m_nCodecId == AV_CODEC_ID_VP8
-			|| m_nCodecId == AV_CODEC_ID_VP9
-			|| m_nCodecId == AV_CODEC_ID_THEORA
-			|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
-			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
-			|| m_nCodecId == AV_CODEC_ID_DIRAC
-			|| m_nCodecId == AV_CODEC_ID_UTVIDEO
-			|| m_nCodecId == AV_CODEC_ID_HUFFYUV
-			|| m_nCodecId == AV_CODEC_ID_FFVHUFF
-			|| m_nCodecId == AV_CODEC_ID_HEVC
-			|| m_nCodecId == AV_CODEC_ID_DNXHD) {
-		m_bReorderBFrame = false;
 	}
 
 	m_bWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
