@@ -361,8 +361,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 35		"預設軌道"
 37		"速度步進幅度"
 40		"重設"
-41		"Audio open settings"
-42		"Prefer external audio files over embedded audio track"
+41		"「開啟音訊」設定"
+42		"外部音訊檔案優先於內部音軌"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
