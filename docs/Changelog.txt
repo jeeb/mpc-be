@@ -21,7 +21,7 @@ Changes (*):
 	* Updated Chinese (Simplified) translation (authors: insolo;
 	* Updated Italian translation (author: Lord Maius);
 	* Updated Korean translation (author: kuh3h3);
-	* ffmpeg 2.1.x git-b6c0f07d;
+	* ffmpeg 2.1.x git-842b6c14;
 	* libwebp 0.4.0 git-6e37cb94;
 	* libvpx 1.2 git-47d482cb;
 	* libopus 1.1 git-253e15f7;

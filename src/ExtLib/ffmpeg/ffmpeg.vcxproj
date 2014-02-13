@@ -293,6 +293,7 @@
     <ClInclude Include="libavcodec\truespeech_data.h" />
     <ClInclude Include="libavcodec\tscc2data.h" />
     <ClInclude Include="libavcodec\ttadata.h" />
+    <ClInclude Include="libavcodec\ttadsp.h" />
     <ClInclude Include="libavcodec\twinvq.h" />
     <ClInclude Include="libavcodec\unary.h" />
     <ClInclude Include="libavcodec\utvideo.h" />
@@ -710,6 +711,7 @@
     <ClCompile Include="libavcodec\tscc2.c" />
     <ClCompile Include="libavcodec\tta.c" />
     <ClCompile Include="libavcodec\ttadata.c" />
+    <ClCompile Include="libavcodec\ttadsp.c" />
     <ClCompile Include="libavcodec\twinvq.c" />
     <ClCompile Include="libavcodec\utils.c" />
     <ClCompile Include="libavcodec\utvideo.c" />

@@ -339,6 +339,7 @@ SRCS_C = \
 	libavcodec/tscc2.c \
 	libavcodec/tta.c \
 	libavcodec/ttadata.c \
+	libavcodec/ttadsp.c \
 	libavcodec/twinvq.c \
 	libavcodec/utvideo.c \
 	libavcodec/utvideodec.c \
