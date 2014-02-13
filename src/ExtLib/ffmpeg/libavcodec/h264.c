@@ -4850,6 +4850,46 @@ static int execute_decode_slices(H264Context *h, int context_count)
 }
 
 // ==> Start patch MPC
+#define FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG 1 ///< Work around for DXVA2 and old UVD/UVD+ ATI video cards
+#define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO    2 ///< Work around for DXVA2 and old Intel GPUs with ClearVideo interface
+
+typedef struct DXVA_Context {
+    DXVA_PicParams_H264   pp;
+    DXVA_Qmatrix_H264     qm;
+    unsigned              slice_count;
+    DXVA_Slice_H264_Short slice_short[MAX_SLICES];
+    DXVA_Slice_H264_Long  slice_long[MAX_SLICES];
+    const uint8_t         *bitstream;
+    unsigned              bitstream_size;
+    uint64_t              workaround;
+} DXVA_Context;
+
+static void fill_scaling_lists(struct DXVA_Context *ctx, const H264Context *h)
+{
+    unsigned i, j;
+    DXVA_Qmatrix_H264 *qm = &ctx->qm;
+    memset(qm, 0, sizeof(*qm));
+    if (ctx->workaround & FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG) {
+        for (i = 0; i < 6; i++)
+            for (j = 0; j < 16; j++)
+                qm->bScalingLists4x4[i][j] = h->pps.scaling_matrix4[i][j];
+
+        for (i = 0; i < 64; i++) {
+            qm->bScalingLists8x8[0][i] = h->pps.scaling_matrix8[0][i];
+            qm->bScalingLists8x8[1][i] = h->pps.scaling_matrix8[3][i];
+        }
+    } else {
+        for (i = 0; i < 6; i++)
+            for (j = 0; j < 16; j++)
+                qm->bScalingLists4x4[i][j] = h->pps.scaling_matrix4[i][zigzag_scan[j]];
+
+        for (i = 0; i < 64; i++) {
+            qm->bScalingLists8x8[0][i] = h->pps.scaling_matrix8[0][ff_zigzag_direct[i]];
+            qm->bScalingLists8x8[1][i] = h->pps.scaling_matrix8[3][ff_zigzag_direct[i]];
+        }
+    }
+}
+
 static void fill_picture_parameters(const H264Context *h,
                                     DXVA_PicParams_H264 *pp)
 {
@@ -4915,7 +4955,7 @@ static void fill_picture_parameters(const H264Context *h,
                                         (h->pps.transform_8x8_mode            << 13) |
                                         ((h->sps.level_idc >= 31)             << 14) |
                                         /* IntraPicFlag (Modified if we detect a non
-                                         * intra slice in dxva2_h264_decode_slice) */
+                                         * intra slice in dxva_decode_slice) */
                                         (1                                    << 15);
 
     pp->bit_depth_luma_minus8         = h->sps.bit_depth_luma - 8;
@@ -4954,6 +4994,56 @@ static void fill_picture_parameters(const H264Context *h,
     pp->Reserved8BitsB                = 0;
     pp->slice_group_change_rate_minus1= 0;  /* XXX not implemented by FFmpeg */
     //pp->SliceGroupMap[810];               /* XXX not implemented by FFmpeg */
+    //pp->MinLumaBipredSize8x8Flag      = 1;  /* Improve accelerator performances */
+}
+
+static int dxva_start_frame(AVCodecContext *avctx,
+                            struct DXVA_Context *ctx)
+{
+    const H264Context *h = avctx->priv_data;
+
+	/* Fill up DXVA_PicParams_H264 */
+    fill_picture_parameters(h, &ctx->pp);
+
+    /* Fill up DXVA_Qmatrix_H264 */
+    fill_scaling_lists(ctx, h);
+
+    return 0;
+}
+
+static void fill_slice_short(DXVA_Slice_H264_Short *slice,
+                             unsigned position, unsigned size)
+{
+    memset(slice, 0, sizeof(*slice));
+    slice->BSNALunitDataLocation = position;
+    slice->SliceBytesInBuffer    = size;
+    slice->wBadSliceChopping     = 0;
+}
+
+static int dxva_decode_slice(AVCodecContext *avctx,
+                             DXVA_Context *ctx_pic,
+                             const uint8_t *buffer,
+                             uint32_t size)
+{
+    const H264Context *h = avctx->priv_data;
+    const Picture *current_picture = h->cur_pic_ptr;
+    unsigned position;
+
+    if (ctx_pic->slice_count >= MAX_SLICES)
+        return -1;
+
+    if (!ctx_pic->bitstream)
+        ctx_pic->bitstream = buffer;
+    ctx_pic->bitstream_size += size;
+
+    position = buffer - ctx_pic->bitstream;
+    fill_slice_short(&ctx_pic->slice_short[ctx_pic->slice_count],
+                     position, size);
+    ctx_pic->slice_count++;
+
+    if (h->slice_type != AV_PICTURE_TYPE_I && h->slice_type != AV_PICTURE_TYPE_SI)
+        ctx_pic->pp.wBitFields &= ~(1 << 15); /* Set IntraPicFlag to 0 */
+    return 0;
 }
 // <== End patch MPC
 
@@ -5193,10 +5283,10 @@ again:
                         decode_postinit(h, nal_index >= nals_needed);
 
 					// ==> Start patch MPC
-					if (h->avctx->using_dxva && nal_pass < 2) {
-                        DXVA_PicParams_H264* pp = &((DXVA_PicParams_H264*)h->pPicParams_H264)[nal_pass];
-                        fill_picture_parameters(h, pp);
-					}
+                    if (h->avctx->using_dxva && nal_pass < 2) {
+                        DXVA_Context* ctx = &((DXVA_Context*)h->dxva_context)[nal_pass];
+                        dxva_start_frame(avctx, ctx);
+                    }
                     nal_pass++;
                     if (nal_pass == 1)
                         h->second_field_offset = buf_index;
@@ -5218,6 +5308,12 @@ again:
                     (avctx->skip_frame < AVDISCARD_NONKEY ||
                      hx->slice_type_nos == AV_PICTURE_TYPE_I) &&
                     avctx->skip_frame < AVDISCARD_ALL) {
+                    // ==> Start patch MPC
+                    if (h->avctx->using_dxva && nal_pass <= 2) {
+                        DXVA_Context* ctx = &((DXVA_Context*)h->dxva_context)[nal_pass - 1];
+                        dxva_decode_slice(avctx, ctx, &buf[buf_index - consumed], consumed);
+                    }
+                    // <== End patch MPC
                     if (avctx->hwaccel) {
                         ret = avctx->hwaccel->decode_slice(avctx,
                                                            &buf[buf_index - consumed],

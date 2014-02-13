@@ -75,7 +75,7 @@ public :
 	void						SetDirectXVideoDec(IDirectXVideoDecoder* pDirectXVideoDec) { m_pDirectXVideoDec = pDirectXVideoDec; }
 
 	virtual void				Flush();
-	virtual void				CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual void				CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize) PURE;
 	virtual HRESULT				DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) PURE;
 
 	HRESULT						ConfigureDXVA1();
@@ -112,7 +112,7 @@ protected :
 	};
 
 	// === DXVA functions
-	HRESULT						AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, void* pBuffer, UINT* pRealSize = NULL);
+	HRESULT						AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize = 0, void* pBuffer = NULL, UINT* pRealSize = NULL);
 	HRESULT						GetDeliveryBuffer(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, IMediaSample** ppSampleToDeliver);
 	HRESULT						Execute();
 	DWORD						GetDXVA1CompressedType(DWORD dwDXVA2CompressedType);

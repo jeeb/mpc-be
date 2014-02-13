@@ -23,7 +23,10 @@
 #include <dxva.h>
 #include "DXVADecoder.h"
 
-#define MAX_SLICES 16	// Also define in ffmpeg!
+// Also define in ffmpeg!
+#define MAX_SLICES 16
+#define FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG 1 ///< Work around for DXVA2 and old UVD/UVD+ ATI video cards
+#define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO    2 ///< Work around for DXVA2 and old Intel GPUs with ClearVideo interface
 
 class CDXVADecoderH264 : public CDXVADecoder
 {
@@ -37,17 +40,24 @@ public:
 	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 private:
-	DXVA_PicParams_H264		m_DXVAPicParams[2];
-	DXVA_Qmatrix_H264		m_DXVAScalingMatrix;
-	DXVA_Slice_H264_Short	m_pSliceShort[MAX_SLICES];
-	DXVA_Slice_H264_Long	m_pSliceLong[MAX_SLICES];
-	UINT					m_nMaxSlices;
-	int						m_nNALLength;
+	struct DXVA_Context {
+		DXVA_PicParams_H264		DXVAPicParams;
+		DXVA_Qmatrix_H264		DXVAScalingMatrix;
+		unsigned				slice_count;
+		DXVA_Slice_H264_Short	SliceShort[MAX_SLICES];
+		DXVA_Slice_H264_Long	SliceLong[MAX_SLICES];
+		const uint8_t			*bitstream;
+		unsigned				bitstream_size;
+		uint64_t				workaround;
+	};
+
+	DXVA_Context			m_DXVA_Context[2];
 	bool					m_bUseLongSlice;
 
-	UINT					m_nSlices;
+	UINT					m_nFieldNum;
 	UINT					StatusReportFeedbackNumber;
 	USHORT					Reserved16Bits;
 
 	void					Init();
+	void					InitDXVAContent();
 };

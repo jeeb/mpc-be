@@ -46,13 +46,11 @@ bool			IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 
 // === H264 functions
 HRESULT			FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
-								  UINT* SecondFieldOffset, int* Sync, int* NALLength, int* got_picture);
-HRESULT			FFH264UpdatePicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice,
-									 DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix);
+								  UINT* SecondFieldOffset, int* got_picture);
 int				FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 										 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
 void			FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx);
-void			FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pSliceLong, void* pDXVA_PicParams);
+void			FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pSliceLong, void* pDXVA_Context);
 
 // === VC1 functions
 HRESULT			FFVC1DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,

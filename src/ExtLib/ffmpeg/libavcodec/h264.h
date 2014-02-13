@@ -708,7 +708,7 @@ typedef struct H264Context {
 
     int          second_field_offset;
     void*        dxva_slice_long;
-    void*        pPicParams_H264;
+    void*        dxva_context;
     // <== End patch MPC
 }H264Context;
 

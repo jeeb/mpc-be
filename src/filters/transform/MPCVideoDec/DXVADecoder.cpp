@@ -92,11 +92,6 @@ void CDXVADecoder::AllocExecuteParams(int nSize)
 	}
 }
 
-void CDXVADecoder::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
-{
-	memcpy_sse(pDXVABuffer, (BYTE*)pBuffer, nSize);
-}
-
 void CDXVADecoder::Flush()
 {
 	DbgLog((LOG_TRACE, 3, L"CDXVADecoder::Flush()"));
@@ -583,6 +578,7 @@ HRESULT CDXVADecoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppS
 				}
 
 				if (nPos != -1) {
+					//m_pPictureStore[nPos].bInUse = true;
 					nSurfaceIndex = nPos;
 					return S_OK;
 				}
