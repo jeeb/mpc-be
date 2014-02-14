@@ -36,7 +36,7 @@
 #define MPC_VERSION_PATCH  1
 #define MPC_VERSION_STATUS 1
 
-// MPC_VERSION_STATUS: 0 - alfa; 1 - beta; 2 - RC; 3 - stable
+// MPC_VERSION_STATUS: 0 - alpha; 1 - beta; 2 - RC; 3 - stable
 
 #define MPC_WND_CLASS_NAME   "MPC-BE"
 #define MPC_YEAR_COMMENTS    "2002-2013"
