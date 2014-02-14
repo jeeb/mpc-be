@@ -1575,18 +1575,18 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCodec = avcodec_find_decoder(m_nCodecId);
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
-	bool bH264_HEVCIsAVI = ((m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC) && IsAVI());
+	bool bH264_HEVCIsAVI	= ((m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC) && IsAVI());
+	bool bMPEG4BFrames		= (m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video);
 	// code from LAV ... thanks to it's author
 	// Use ffmpegs logic to reorder timestamps
 	// This is required for H264 content (except AVI), and generally all codecs that use frame threading
-	m_bReorderBFrame = bH264_HEVCIsAVI ||
-						!((m_pAVCodec->capabilities & CODEC_CAP_FRAME_THREADS)
-							|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
-							|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
-							|| m_nCodecId == AV_CODEC_ID_DIRAC
-							|| m_nCodecId == AV_CODEC_ID_RV10
-							|| m_nCodecId == AV_CODEC_ID_RV20
-							|| (m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video));
+	m_bReorderBFrame = bH264_HEVCIsAVI || bMPEG4BFrames
+						|| !((m_pAVCodec->capabilities & CODEC_CAP_FRAME_THREADS)
+								|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
+								|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
+								|| m_nCodecId == AV_CODEC_ID_DIRAC
+								|| m_nCodecId == AV_CODEC_ID_RV10
+								|| m_nCodecId == AV_CODEC_ID_RV20);
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 	CheckPointer(m_pAVCtx, E_POINTER);
