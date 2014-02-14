@@ -3786,7 +3786,10 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     } else {
         /* Shorten frame num gaps so we don't have to allocate reference
          * frames just to throw them away */
-        if (h->frame_num != h->prev_frame_num) {
+        // ==> Start patch MPC
+        if (h->frame_num != h->prev_frame_num && h->prev_frame_num >= 0) {
+        // if (h->frame_num != h->prev_frame_num) {
+        // <== End patch MPC
             int unwrap_prev_frame_num = h->prev_frame_num;
             int max_frame_num         = 1 << h->sps.log2_max_frame_num;
 
@@ -3859,7 +3862,10 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
             }
         }
 
-        while (h->frame_num != h->prev_frame_num && !h0->first_field &&
+        // ==> Start patch MPC
+        while (h->frame_num != h->prev_frame_num && h->prev_frame_num >= 0 && !h0->first_field &&
+        // while (h->frame_num != h->prev_frame_num && !h0->first_field &&
+        // <== End patch MPC
                h->frame_num != (h->prev_frame_num + 1) % (1 << h->sps.log2_max_frame_num)) {
             Picture *prev = h->short_ref_count ? h->short_ref[0] : NULL;
             av_log(h->avctx, AV_LOG_DEBUG, "Frame num gap %d %d\n",
