@@ -1559,7 +1559,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	ffmpegCleanup();
 
 	int nNewCodec = FindCodec(pmt, bReinit);
-
 	if (nNewCodec == -1) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
@@ -1571,10 +1570,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		}
 	}
 
-	m_nCodecNb	= nNewCodec;
-	m_nCodecId	= ffCodecs[nNewCodec].nFFCodec;
-
-	m_pAVCodec			= avcodec_find_decoder(m_nCodecId);
+	m_nCodecNb = nNewCodec;
+	m_nCodecId = ffCodecs[nNewCodec].nFFCodec;
+	m_pAVCodec = avcodec_find_decoder(m_nCodecId);
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
 	bool bH264_HEVCIsAVI = ((m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC) && IsAVI());
@@ -1587,7 +1585,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 							|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
 							|| m_nCodecId == AV_CODEC_ID_DIRAC
 							|| m_nCodecId == AV_CODEC_ID_RV10
-							|| m_nCodecId == AV_CODEC_ID_RV20);
+							|| m_nCodecId == AV_CODEC_ID_RV20
+							|| (m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video));
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 	CheckPointer(m_pAVCtx, E_POINTER);
@@ -1626,10 +1625,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	} else if (pmt->formattype == FORMAT_MPEG2Video) {
 		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpg2v->hdr.bmiHeader;
-
-		if (m_nCodecId == AV_CODEC_ID_MPEG4) {
-			m_bReorderBFrame = false;
-		}
 	} else {
 		return VFW_E_INVALIDMEDIATYPE;
 	}
