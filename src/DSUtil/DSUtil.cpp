@@ -2534,9 +2534,9 @@ typedef struct {
 static const DXVA2_DECODER DXVA2Decoder[] = {
 	{&GUID_NULL,						_T("Unknown")},
 	{&GUID_NULL,						_T("Not using DXVA")},
-	{&DXVA_Intel_H264_ClearVideo,		_T("H.264 bitstream decoder, ClearVideo(tm)")},  // Intel ClearVideo H264 bitstream decoder
-	{&DXVA_Intel_VC1_ClearVideo,		_T("VC-1 bitstream decoder, ClearVideo(tm)")},   // Intel ClearVideo VC-1 bitstream decoder
-	{&DXVA_Intel_VC1_ClearVideo_2,		_T("VC-1 bitstream decoder 2, ClearVideo(tm)")}, // Intel ClearVideo VC-1 bitstream decoder 2
+	{&DXVA_Intel_H264_ClearVideo,		_T("H.264 bitstream decoder, ClearVideo\x2122")},  // Intel ClearVideo H264 bitstream decoder
+	{&DXVA_Intel_VC1_ClearVideo,		_T("VC-1 bitstream decoder, ClearVideo\x2122")},   // Intel ClearVideo VC-1 bitstream decoder
+	{&DXVA_Intel_VC1_ClearVideo_2,		_T("VC-1 bitstream decoder 2, ClearVideo\x2122")}, // Intel ClearVideo VC-1 bitstream decoder 2
 	{&DXVA_MPEG4_ASP,					_T("MPEG-4 ASP bitstream decoder")},             // Nvidia MPEG-4 ASP bitstream decoder
 	{&DXVA_ModeNone,					_T("Mode none")},
 	{&DXVA_ModeH261_A,					_T("H.261 A, post processing")},
@@ -2576,7 +2576,7 @@ static const DXVA2_DECODER DXVA2Decoder[] = {
 	{&DXVA2_ModeH264_C,					_T("H.264 C, IDCT, no FGT")},
 	{&DXVA2_ModeH264_D,					_T("H.264 D, IDCT, FGT")},
 	{&DXVA2_ModeH264_E,					_T("H.264 E, bitstream decoder, no FGT")},
-	{&DXVA2_ModeH264_Flash,				_T("H.264 Flash,  bitstream decoder, FGT")},
+	{&DXVA2_ModeH264_Flash,				_T("H.264 Flash, bitstream decoder, FGT")},
 	{&DXVA2_ModeH264_F,					_T("H.264 F, bitstream decoder, FGT")},
 	{&DXVA2_ModeWMV8_A,					_T("WMV8 A, post processing")},
 	{&DXVA2_ModeWMV8_B,					_T("WMV8 B, motion compensation")},
