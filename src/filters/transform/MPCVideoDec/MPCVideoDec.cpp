@@ -1586,7 +1586,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 							|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 							|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
 							|| m_nCodecId == AV_CODEC_ID_DIRAC
-							|| m_nCodecId == AV_CODEC_ID_VC1
 							|| m_nCodecId == AV_CODEC_ID_RV10
 							|| m_nCodecId == AV_CODEC_ID_RV20);
 
@@ -1630,15 +1629,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 		if (m_nCodecId == AV_CODEC_ID_MPEG4) {
 			m_bReorderBFrame = false;
-		}
-
-		switch (m_nCodecId) {
-			case AV_CODEC_ID_H264:
-				m_bReorderBFrame = IsAVI() ? true : false;
-				break;
-			case AV_CODEC_ID_MPEG4:
-				m_bReorderBFrame = false;
-				break;
 		}
 	} else {
 		return VFW_E_INVALIDMEDIATYPE;
