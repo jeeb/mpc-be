@@ -30,6 +30,9 @@ ffplay:
 ffprobe:
   ffprobe.c                             Stefano Sabatini
 
+ffserver:
+  ffserver.c                            Reynaldo H. Verdejo Pinochet
+
 Commandline utility code:
   cmdutils.c, cmdutils.h                Michael Niedermayer
 
@@ -198,6 +201,7 @@ Codecs:
   libvorbis.c                           David Conrad
   libvpx*                               James Zern
   libx264.c                             Mans Rullgard, Jason Garrett-Glaser
+  libx265.c                             Derek Buitenhuis
   libxavs.c                             Stefan Gehrer
   libzvbi-teletextdec.c                 Marton Balint
   loco.c                                Kostya Shishkov

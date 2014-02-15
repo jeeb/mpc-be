@@ -123,7 +123,7 @@ enum {
  * SEI message types
  */
 typedef enum {
-    SEI_BUFFERING_PERIOD            = 0,   ///< buffering period (H.264, D.1.1)
+    SEI_TYPE_BUFFERING_PERIOD       = 0,   ///< buffering period (H.264, D.1.1)
     SEI_TYPE_PIC_TIMING             = 1,   ///< picture timing
     SEI_TYPE_USER_DATA_ITU_T_T35    = 4,   ///< user data registered by ITU-T Recommendation T.35
     SEI_TYPE_USER_DATA_UNREGISTERED = 5,   ///< unregistered user data
@@ -163,6 +163,7 @@ typedef enum {
  * Sequence parameter set
  */
 typedef struct SPS {
+    unsigned int sps_id;
     int profile_idc;
     int level_idc;
     int chroma_format_idc;
@@ -384,11 +385,7 @@ typedef struct H264Context {
 
     unsigned current_sps_id; ///< id of the current SPS
     SPS sps; ///< current sps
-
-    /**
-     * current pps
-     */
-    PPS pps; // FIXME move to Picture perhaps? (->no) do we need that?
+    PPS pps; ///< current pps
 
     int au_pps_id; ///< pps_id of current access unit
 
