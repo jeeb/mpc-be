@@ -26,14 +26,14 @@ extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 }
 
-CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
-	: CDXVADecoder(pFilter, pAMVideoAccelerator, nMode, nPicEntryNumber)
+CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber)
+	: CDXVADecoder(pFilter, pAMVideoAccelerator, guidDecoder, nMode, nPicEntryNumber)
 {
 	Init();
 }
 
-CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
-	: CDXVADecoder(pFilter, pDirectXVideoDec, nMode, nPicEntryNumber, pDXVA2Config)
+CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
+	: CDXVADecoder(pFilter, pDirectXVideoDec, guidDecoder, nMode, nPicEntryNumber, pDXVA2Config)
 {
 	Init();
 }
@@ -58,11 +58,11 @@ void CDXVADecoderMpeg2::Init()
 	m_PictureParams.bBPPminus1				= 7;
 	m_PictureParams.bChromaFormat			= 1;
 
-	m_nSliceCount			= 0;
+	m_nSliceCount = 0;
 
 	switch (GetMode()) {
 		case MPEG2_VLD :
-			AllocExecuteParams (4);
+			AllocExecuteParams(4);
 			break;
 		default :
 			ASSERT(FALSE);

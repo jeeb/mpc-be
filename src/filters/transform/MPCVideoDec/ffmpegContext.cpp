@@ -241,10 +241,10 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 	return s;
 }
 
-HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
-						  UINT* SecondFieldOffset, int* got_picture)
+HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
+						  REFERENCE_TIME rtStart, int* got_picture)
 {
-	HRESULT hr		= E_FAIL;
+	HRESULT hr = E_FAIL;
 	if (pBuffer != NULL) {
 		H264Context* h	= (H264Context*)pAVCtx->priv_data;
 		AVPacket		avpkt;
@@ -263,15 +263,7 @@ HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 			return hr;
 		}
 
-		if (h->cur_pic_ptr) {
-			hr = S_OK;
-			if (SecondFieldOffset) {
-				*SecondFieldOffset = 0;
-				if (h->second_field_offset && (h->second_field_offset < nSize)) {
-					*SecondFieldOffset = h->second_field_offset;
-				}
-			}
-		}
+		hr = S_OK;
 	}
 
 	return hr;
@@ -390,46 +382,10 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	return Flags;
 }
 
-USHORT FFH264FindRefFrameIndex(USHORT num_frame, DXVA_PicParams_H264* pDXVAPicParams)
+void FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* DXVA_Context)
 {
-	for (unsigned i = 0; i < pDXVAPicParams->num_ref_frames; i++) {
-		if (pDXVAPicParams->FrameNumList[i] == num_frame) {
-			return pDXVAPicParams->RefFrameList[i].Index7Bits;
-		}
-	}
-
-#ifdef _DEBUG
-	//	DebugBreak();		// Ref frame not found !
-#endif
-
-	return 127;
-}
-
-void FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
-{
-	H264Context* h = (H264Context*)pAVCtx->priv_data;
-
-	for (unsigned i = 0; i < _countof(pSlice->RefPicList[0]); i++) {
-		pSlice->RefPicList[0][i].bPicEntry = 255;
-		pSlice->RefPicList[1][i].bPicEntry = 255;
-	}
-
-	for (unsigned list = 0; list < 2; list++) {
-		for (unsigned i = 0; i < _countof(pSlice->RefPicList[list]); i++) {
-			if (list < h->list_count && i < h->ref_count[list]) {
-				const Picture *r = &h->ref_list[list][i];
-				pSlice->RefPicList[list][i].Index7Bits		= FFH264FindRefFrameIndex(h->ref_list[list][i].frame_num, pDXVAPicParams);
-				pSlice->RefPicList[list][i].AssociatedFlag	= r->f.reference == PICT_BOTTOM_FIELD;
-			}
-		}
-	}
-}
-
-void FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pSliceLong, void* DXVA_Context)
-{
-	H264Context* h		= (H264Context*)pAVCtx->priv_data;
-	h->dxva_slice_long	= pSliceLong;
-	h->dxva_context		= DXVA_Context;
+	H264Context* h			= (H264Context*)pAVCtx->priv_data;
+	h->dxva_context			= DXVA_Context;
 }
 
 HRESULT FFVC1DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,

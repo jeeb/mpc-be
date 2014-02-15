@@ -24,14 +24,14 @@
 #include "FfmpegContext.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
-CDXVADecoderVC1::CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
-	: CDXVADecoder(pFilter, pAMVideoAccelerator, nMode, nPicEntryNumber)
+CDXVADecoderVC1::CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber)
+	: CDXVADecoder(pFilter, pAMVideoAccelerator, guidDecoder, nMode, nPicEntryNumber)
 {
 	Init();
 }
 
-CDXVADecoderVC1::CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
-	: CDXVADecoder(pFilter, pDirectXVideoDec, nMode, nPicEntryNumber, pDXVA2Config)
+CDXVADecoderVC1::CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
+	: CDXVADecoder(pFilter, pDirectXVideoDec, guidDecoder, nMode, nPicEntryNumber, pDXVA2Config)
 {
 	Init();
 }
@@ -50,7 +50,7 @@ void CDXVADecoderVC1::Init()
 
 	switch (GetMode()) {
 		case VC1_VLD :
-			AllocExecuteParams (3);
+			AllocExecuteParams(3);
 			break;
 		default :
 			ASSERT(FALSE);

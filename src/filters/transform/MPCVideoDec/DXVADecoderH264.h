@@ -31,8 +31,8 @@
 class CDXVADecoderH264 : public CDXVADecoder
 {
 public:
-	CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber);
-	CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
+	CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber);
+	CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual ~CDXVADecoderH264();
 
 	virtual void			Flush();
@@ -40,7 +40,7 @@ public:
 	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 private:
-	struct DXVA_Context {
+	struct DXVA_H264_Context {
 		DXVA_PicParams_H264		DXVAPicParams;
 		DXVA_Qmatrix_H264		DXVAScalingMatrix;
 		unsigned				slice_count;
@@ -48,10 +48,13 @@ private:
 		DXVA_Slice_H264_Long	SliceLong[MAX_SLICES];
 		const uint8_t			*bitstream;
 		unsigned				bitstream_size;
-		uint64_t				workaround;
 	};
+	struct DXVA_Context {
+		uint64_t				workaround;
+		int						longSlice;
+		DXVA_H264_Context		DXVA_H264Context[2];	
+	} m_DXVA_Context;
 
-	DXVA_Context			m_DXVA_Context[2];
 	bool					m_bUseLongSlice;
 
 	UINT					m_nFieldNum;
@@ -59,5 +62,4 @@ private:
 	USHORT					Reserved16Bits;
 
 	void					Init();
-	void					InitDXVAContent();
 };

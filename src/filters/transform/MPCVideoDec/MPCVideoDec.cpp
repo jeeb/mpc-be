@@ -1486,19 +1486,11 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		GUID* pDecoderGuids				= NULL;
 		GUID guidDecoder				= GUID_NULL;
 		BOOL bFoundDXVA2Configuration	= FALSE;
-		BOOL bHasIntelGuid				= FALSE;
 		DXVA2_ConfigPictureDecode config;
 		ZeroMemory(&config, sizeof(config));
 
 		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids))) {
-
-			//Intel patch for Ivy Bridge and Sandy Bridge
-			if (m_nPCIVendor == PCIV_Intel) {
-				for (UINT iCnt = 0; iCnt < cDecoderGuids; iCnt++) {
-					if (pDecoderGuids[iCnt] == DXVA_Intel_H264_ClearVideo)
-						bHasIntelGuid = TRUE;
-				}
-			}
+			
 			// Look for the decoder GUIDs we want.
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 				// Do we support this mode?
@@ -1513,18 +1505,11 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					break;
 				}
 
-				// Patch for the Sandy Bridge (prevent crash on Mode_E, fixme later)
-				if (m_nPCIVendor == PCIV_Intel && pDecoderGuids[iGuid] == DXVA2_ModeH264_E && bHasIntelGuid) {
-					continue;
-				}
-
 				if (bFoundDXVA2Configuration) {
 					// Found a good configuration. Save the GUID.
 					guidDecoder = pDecoderGuids[iGuid];
 					DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetDXVAMode(&guidDecoder)));
-					if (!bHasIntelGuid) {
-						break;
-					}
+					break;
 				}
 			}
 		}

@@ -3121,79 +3121,6 @@ int ff_h264_get_profile(SPS *sps)
     return profile;
 }
 
-// ==> Start patch MPC
-static void fill_dxva_slice_long(H264Context *h)
-{
-    DXVA_Slice_H264_Long* pSlice = &((DXVA_Slice_H264_Long*)h->dxva_slice_long)[h->current_slice-1];
-    unsigned list;
-
-    memset(pSlice, 0, sizeof(DXVA_Slice_H264_Long));
-
-    pSlice->slice_id                     = h->current_slice-1;
-    pSlice->first_mb_in_slice            = h->first_mb_in_slice;
-    pSlice->NumMbsForSlice               = 0;
-    pSlice->BitOffsetToSliceData         = h->bit_offset_to_slice_data;
-    pSlice->slice_type                   = h->raw_slice_type; 
-    pSlice->luma_log2_weight_denom       = h->luma_log2_weight_denom;
-    pSlice->chroma_log2_weight_denom     = h->chroma_log2_weight_denom;
-    pSlice->slice_alpha_c0_offset_div2   = h->slice_alpha_c0_offset / 2 - 26;
-    pSlice->slice_beta_offset_div2       = h->slice_beta_offset     / 2 - 26;
-
-    pSlice->num_ref_idx_l0_active_minus1 = 0;
-    pSlice->num_ref_idx_l1_active_minus1 = 0;
-    if (h->list_count > 0) {
-        pSlice->num_ref_idx_l0_active_minus1 = h->ref_count[0] - 1;
-    }
-    if (h->list_count > 1) {
-        pSlice->num_ref_idx_l1_active_minus1 = h->ref_count[1] - 1;
-    }
-
-    // Fill prediction weights
-    for (list = 0; list < 2; list++) {
-        unsigned i;
-        for (i = 0; i < FF_ARRAY_ELEMS(pSlice->RefPicList[list]); i++) {
-            if (list < h->list_count && i < h->ref_count[list]) {
-                const Picture *r = &h->ref_list[list][i];
-                unsigned plane;
-                for (plane = 0; plane < 3; plane++) {
-                    int w, o;
-                    if (plane == 0 && h->luma_weight_flag[list]) {
-                        w = h->luma_weight[i][list][0];
-                        o = h->luma_weight[i][list][1];
-                    } else if (plane >= 1 && h->chroma_weight_flag[list]) {
-                        w = h->chroma_weight[i][list][plane-1][0];
-                        o = h->chroma_weight[i][list][plane-1][1];
-                    } else {
-                        w = 1 << (plane == 0 ? h->luma_log2_weight_denom :
-                                           h->chroma_log2_weight_denom);
-                        o = 0;
-                    }
-                    pSlice->Weights[list][i][plane][0] = w;
-                    pSlice->Weights[list][i][plane][1] = o;
-                }
-            } else {
-                unsigned plane;
-                for (plane = 0; plane < 3; plane++) {
-                    pSlice->Weights[list][i][plane][0] = 0;
-                    pSlice->Weights[list][i][plane][1] = 0;
-                }
-            }
-        }
-    }
-
-    pSlice->slice_qs_delta    = 0;
-    pSlice->slice_qp_delta    = h->qscale - h->pps.init_qp;;
-    pSlice->redundant_pic_cnt = h->redundant_pic_count;
-    if (h->slice_type == AV_PICTURE_TYPE_B)
-        pSlice->direct_spatial_mv_pred_flag = h->direct_spatial_mv_pred;
-    pSlice->cabac_init_idc = h->pps.cabac ? h->cabac_init_idc : 0;
-    if (h->deblocking_filter < 2)
-        pSlice->disable_deblocking_filter_idc = 1 - h->deblocking_filter;
-    else
-        pSlice->disable_deblocking_filter_idc = h->deblocking_filter;
-}
-// <== End patch MPC
-
 static int h264_set_parameter_from_sps(H264Context *h)
 {
     if (h->flags & CODEC_FLAG_LOW_DELAY ||
@@ -3590,9 +3517,6 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     } else
         h->slice_type_fixed = 0;
 
-    // ==> Start patch MPC
-    h->raw_slice_type = slice_type;
-    // <== End patch MPC
     slice_type = golomb_to_pict_type[slice_type];
     h->slice_type     = slice_type;
     h->slice_type_nos = slice_type & 3;
@@ -4169,14 +4093,6 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                           h->pps.chroma_qp_index_offset[1]) +
                    6 * (h->sps.bit_depth_luma - 8);
 
-    // ==> Start patch MPC
-    // If entropy_coding_mode, align to 8 bits
-    if (h->avctx->using_dxva) {
-        if (h->pps.cabac) align_get_bits(&h->gb);
-        h->bit_offset_to_slice_data = h->gb.index;
-    }
-    // <== End patch MPC
-
     h0->last_slice_type = slice_type;
     memcpy(h0->last_ref_count, h0->ref_count, sizeof(h0->last_ref_count));
     h->slice_num        = ++h0->current_slice;
@@ -4226,13 +4142,6 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     if (h->ref_count[0]) h->er.last_pic = &h->ref_list[0][0];
     if (h->ref_count[1]) h->er.next_pic = &h->ref_list[1][0];
     h->er.ref_count = h->ref_count[0];
-
-    // ==> Start patch MPC
-    if (h->avctx->using_dxva) {
-        h->first_mb_in_slice = first_mb_in_slice;
-        fill_dxva_slice_long(h);
-    }
-    // ==> End patch MPC
 
     if (h->avctx->debug & FF_DEBUG_PICT_INFO) {
         av_log(h->avctx, AV_LOG_DEBUG,
@@ -4859,7 +4768,7 @@ static int execute_decode_slices(H264Context *h, int context_count)
 #define FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG 1 ///< Work around for DXVA2 and old UVD/UVD+ ATI video cards
 #define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO    2 ///< Work around for DXVA2 and old Intel GPUs with ClearVideo interface
 
-typedef struct DXVA_Context {
+typedef struct DXVA_H264_Context {
     DXVA_PicParams_H264   pp;
     DXVA_Qmatrix_H264     qm;
     unsigned              slice_count;
@@ -4867,13 +4776,17 @@ typedef struct DXVA_Context {
     DXVA_Slice_H264_Long  slice_long[MAX_SLICES];
     const uint8_t         *bitstream;
     unsigned              bitstream_size;
+} DXVA_H264_Context;
+typedef struct DXVA_Context {
     uint64_t              workaround;
+    int                   longslice;
+    DXVA_H264_Context     ctx_pic[2];
 } DXVA_Context;
 
-static void fill_scaling_lists(struct DXVA_Context *ctx, const H264Context *h)
+static void fill_scaling_lists(struct DXVA_Context *ctx, struct DXVA_H264_Context *ctx_pic, const H264Context *h)
 {
     unsigned i, j;
-    DXVA_Qmatrix_H264 *qm = &ctx->qm;
+    DXVA_Qmatrix_H264 *qm = &ctx_pic->qm;
     memset(qm, 0, sizeof(*qm));
     if (ctx->workaround & FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG) {
         for (i = 0; i < 6; i++)
@@ -4896,6 +4809,13 @@ static void fill_scaling_lists(struct DXVA_Context *ctx, const H264Context *h)
     }
 }
 
+static void fill_picture_entry(DXVA_PicEntry_H264 *pic,
+                               unsigned index, unsigned flag)
+{
+    assert((index&0x7f) == index && (flag&0x01) == flag);
+    pic->bPicEntry = index | (flag << 7);
+}
+
 static void fill_picture_parameters(const H264Context *h,
                                     DXVA_PicParams_H264 *pp)
 {
@@ -4904,8 +4824,9 @@ static void fill_picture_parameters(const H264Context *h,
 
     memset(pp, 0, sizeof(*pp));
     /* Configure current picture */
-    pp->CurrPic.AssociatedFlag = h->picture_structure == PICT_BOTTOM_FIELD;
-    pp->CurrPic.Index7Bits     = (UCHAR)h->cur_pic_ptr->f.data[4];
+    fill_picture_entry(&pp->CurrPic,
+                       (unsigned)h->cur_pic_ptr->f.data[4],
+                       h->picture_structure == PICT_BOTTOM_FIELD);
     /* Configure the set of references */
     pp->UsedForReferenceFlags  = 0;
     pp->NonExistingFrameFlags  = 0;
@@ -4919,8 +4840,9 @@ static void fill_picture_parameters(const H264Context *h,
                 r = h->long_ref[j++ - h->short_ref_count];
         }
         if (r) {
-			pp->RefFrameList[i].AssociatedFlag = r->long_ref != 0;
-			pp->RefFrameList[i].Index7Bits     = (UCHAR)r->f.data[4];
+            fill_picture_entry(&pp->RefFrameList[i],
+                               (unsigned)r->f.data[4],
+                               r->long_ref != 0);
 
             if ((r->reference & PICT_TOP_FIELD) && r->field_poc[0] != INT_MAX)
                 pp->FieldOrderCntList[i][0] = r->field_poc[0];
@@ -5000,21 +4922,113 @@ static void fill_picture_parameters(const H264Context *h,
     pp->Reserved8BitsB                = 0;
     pp->slice_group_change_rate_minus1= 0;  /* XXX not implemented by FFmpeg */
     //pp->SliceGroupMap[810];               /* XXX not implemented by FFmpeg */
-    //pp->MinLumaBipredSize8x8Flag      = 1;  /* Improve accelerator performances */
+    pp->MinLumaBipredSize8x8Flag      = 1;  /* Improve accelerator performances */
 }
 
 static int dxva_start_frame(AVCodecContext *avctx,
-                            struct DXVA_Context *ctx)
+                            struct DXVA_Context *ctx,
+                            struct DXVA_H264_Context *ctx_pic)
 {
     const H264Context *h = avctx->priv_data;
 
+	memset(ctx_pic, 0, sizeof(*ctx_pic));
+
 	/* Fill up DXVA_PicParams_H264 */
-    fill_picture_parameters(h, &ctx->pp);
+    fill_picture_parameters(h, &ctx_pic->pp);
 
     /* Fill up DXVA_Qmatrix_H264 */
-    fill_scaling_lists(ctx, h);
+    fill_scaling_lists(ctx, ctx_pic, h);
 
     return 0;
+}
+
+static int get_refpic_index(const DXVA_PicParams_H264 *pp, int surface_index)
+{
+    int i;
+    for (i = 0; i < FF_ARRAY_ELEMS(pp->RefFrameList); i++) {
+        if ((pp->RefFrameList[i].bPicEntry & 0x7f) == surface_index)
+          return i;
+    }
+    return 0x7f;
+}
+
+static void fill_slice_long(AVCodecContext *avctx, struct DXVA_Context *ctx, DXVA_Slice_H264_Long *slice,
+                            const DXVA_PicParams_H264 *pp, unsigned position, unsigned size)
+{
+    const H264Context *h = avctx->priv_data;
+    unsigned list;
+
+    memset(slice, 0, sizeof(*slice));
+    slice->BSNALunitDataLocation = position;
+    slice->SliceBytesInBuffer    = size;
+    slice->wBadSliceChopping     = 0;
+
+    slice->first_mb_in_slice     = (h->mb_y >> FIELD_OR_MBAFF_PICTURE(h)) * h->mb_width + h->mb_x;
+    slice->NumMbsForSlice        = 0; /* XXX it is set once we have all slices */
+    slice->BitOffsetToSliceData  = get_bits_count(&h->gb);
+    slice->slice_type            = ff_h264_get_slice_type(h);
+    if (h->slice_type_fixed)
+        slice->slice_type += 5;
+    slice->luma_log2_weight_denom       = h->luma_log2_weight_denom;
+    slice->chroma_log2_weight_denom     = h->chroma_log2_weight_denom;
+    if (h->list_count > 0)
+        slice->num_ref_idx_l0_active_minus1 = h->ref_count[0] - 1;
+    if (h->list_count > 1)
+        slice->num_ref_idx_l1_active_minus1 = h->ref_count[1] - 1;
+    slice->slice_alpha_c0_offset_div2   = h->slice_alpha_c0_offset / 2 - 26;
+    slice->slice_beta_offset_div2       = h->slice_beta_offset     / 2 - 26;
+    slice->Reserved8Bits                = 0;
+
+    for (list = 0; list < 2; list++) {
+        unsigned i;
+        for (i = 0; i < FF_ARRAY_ELEMS(slice->RefPicList[list]); i++) {
+            if (list < h->list_count && i < h->ref_count[list]) {
+                const Picture *r = &h->ref_list[list][i];
+                unsigned plane;
+                unsigned index;
+                if (ctx->workaround & FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO)
+                    index = (unsigned)r->f.data[4];
+                else
+                    index = get_refpic_index(pp, (unsigned)r->f.data[4]);
+                fill_picture_entry(&slice->RefPicList[list][i], index,
+                                   r->reference == PICT_BOTTOM_FIELD);
+                for (plane = 0; plane < 3; plane++) {
+                    int w, o;
+                    if (plane == 0 && h->luma_weight_flag[list]) {
+                        w = h->luma_weight[i][list][0];
+                        o = h->luma_weight[i][list][1];
+                    } else if (plane >= 1 && h->chroma_weight_flag[list]) {
+                        w = h->chroma_weight[i][list][plane-1][0];
+                        o = h->chroma_weight[i][list][plane-1][1];
+                    } else {
+                        w = 1 << (plane == 0 ? h->luma_log2_weight_denom :
+                                               h->chroma_log2_weight_denom);
+                        o = 0;
+                    }
+                    slice->Weights[list][i][plane][0] = w;
+                    slice->Weights[list][i][plane][1] = o;
+                }
+            } else {
+                unsigned plane;
+                slice->RefPicList[list][i].bPicEntry = 0xff;
+                for (plane = 0; plane < 3; plane++) {
+                    slice->Weights[list][i][plane][0] = 0;
+                    slice->Weights[list][i][plane][1] = 0;
+                }
+            }
+        }
+    }
+    slice->slice_qs_delta    = 0; /* XXX not implemented by FFmpeg */
+    slice->slice_qp_delta    = h->qscale - h->pps.init_qp;
+    slice->redundant_pic_cnt = h->redundant_pic_count;
+    if (h->slice_type == AV_PICTURE_TYPE_B)
+        slice->direct_spatial_mv_pred_flag = h->direct_spatial_mv_pred;
+    slice->cabac_init_idc = h->pps.cabac ? h->cabac_init_idc : 0;
+    if (h->deblocking_filter < 2)
+        slice->disable_deblocking_filter_idc = 1 - h->deblocking_filter;
+    else
+        slice->disable_deblocking_filter_idc = h->deblocking_filter;
+    slice->slice_id = h->current_slice - 1;
 }
 
 static void fill_slice_short(DXVA_Slice_H264_Short *slice,
@@ -5027,7 +5041,8 @@ static void fill_slice_short(DXVA_Slice_H264_Short *slice,
 }
 
 static int dxva_decode_slice(AVCodecContext *avctx,
-                             DXVA_Context *ctx_pic,
+                             DXVA_Context *ctx,
+                             DXVA_H264_Context *ctx_pic,
                              const uint8_t *buffer,
                              uint32_t size)
 {
@@ -5043,8 +5058,12 @@ static int dxva_decode_slice(AVCodecContext *avctx,
     ctx_pic->bitstream_size += size;
 
     position = buffer - ctx_pic->bitstream;
-    fill_slice_short(&ctx_pic->slice_short[ctx_pic->slice_count],
-                     position, size);
+    if (!ctx->longslice)
+        fill_slice_short(&ctx_pic->slice_short[ctx_pic->slice_count],
+                         position, size);
+    else
+        fill_slice_long(avctx, ctx, &ctx_pic->slice_long[ctx_pic->slice_count],
+                        &ctx_pic->pp, position, size);
     ctx_pic->slice_count++;
 
     if (h->slice_type != AV_PICTURE_TYPE_I && h->slice_type != AV_PICTURE_TYPE_SI)
@@ -5074,9 +5093,6 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
     // <== End patch MPC
 
     h->nal_unit_type= 0;
-    // ==> Start patch MPC
-    h->second_field_offset = 0;
-    // <== End patch MPC
 
     if(!h->slice_context_count)
          h->slice_context_count= 1;
@@ -5290,12 +5306,11 @@ again:
 
 					// ==> Start patch MPC
                     if (h->avctx->using_dxva && nal_pass < 2) {
-                        DXVA_Context* ctx = &((DXVA_Context*)h->dxva_context)[nal_pass];
-                        dxva_start_frame(avctx, ctx);
+                        DXVA_Context* ctx = (DXVA_Context*)h->dxva_context;
+                        DXVA_H264_Context* ctx_pic = &ctx->ctx_pic[nal_pass];
+                        dxva_start_frame(avctx, ctx, ctx_pic);
                     }
                     nal_pass++;
-                    if (nal_pass == 1)
-                        h->second_field_offset = buf_index;
 					// <== End patch MPC
 
                     if (h->avctx->hwaccel &&
@@ -5316,8 +5331,9 @@ again:
                     avctx->skip_frame < AVDISCARD_ALL) {
                     // ==> Start patch MPC
                     if (h->avctx->using_dxva && nal_pass <= 2) {
-                        DXVA_Context* ctx = &((DXVA_Context*)h->dxva_context)[nal_pass - 1];
-                        dxva_decode_slice(avctx, ctx, &buf[buf_index - consumed], consumed);
+                        DXVA_Context* ctx = (DXVA_Context*)h->dxva_context;
+                        DXVA_H264_Context* ctx_pic = &ctx->ctx_pic[nal_pass - 1];
+                        dxva_decode_slice(avctx, ctx, ctx_pic, &buf[buf_index - consumed], consumed);
                     }
                     // <== End patch MPC
                     if (avctx->hwaccel) {
@@ -5442,11 +5458,6 @@ end:
         ff_thread_report_progress(&h->cur_pic_ptr->tf, INT_MAX,
                                   h->picture_structure == PICT_BOTTOM_FIELD);
     }
-
-    // ==> Start patch MPC
-    if (nal_pass < 2)
-        h->second_field_offset = 0;
-    // <== End patch MPC
 
     return (ret < 0) ? ret : buf_index;
 }
