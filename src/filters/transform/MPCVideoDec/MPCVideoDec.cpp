@@ -117,15 +117,15 @@ vcodecs[] = {
 
 #define MAX_SUPPORTED_MODE 5
 
-typedef struct {
+struct DXVA_PARAMS {
 	const int		PicEntryNumber_DXVA1;
 	const int		PicEntryNumber_DXVA2;
 	const UINT		PreferedConfigBitstream;
 	const GUID*		Decoder[MAX_SUPPORTED_MODE];
 	const WORD		RestrictedMode[MAX_SUPPORTED_MODE];
-} DXVA_PARAMS;
+};
 
-typedef struct {
+struct FFMPEG_CODECS {
 	const CLSID*			clsMinorType;
 	const enum AVCodecID	nFFCodec;
 	const DXVA_PARAMS*		DXVAModes;
@@ -144,7 +144,7 @@ typedef struct {
 		}
 		return MAX_SUPPORTED_MODE;
 	}
-} FFMPEG_CODECS;
+};
 
 // DXVA modes supported for Mpeg2
 DXVA_PARAMS		DXVA_Mpeg2 = {
@@ -1489,27 +1489,41 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		DXVA2_ConfigPictureDecode config;
 		ZeroMemory(&config, sizeof(config));
 
-		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids))) {
+		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids)) && cDecoderGuids) {
 			
-			// Look for the decoder GUIDs we want.
+			BOOL supported = FALSE;
+			DbgLog((LOG_TRACE, 3, L"	=> Enumerating supported DXVA2 modes:"));
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
-				// Do we support this mode?
-				if (!IsSupportedDecoderMode(&pDecoderGuids[iGuid])) {
-					continue;
+				CString msg;
+				msg.Format(L"		%s", GetDXVAMode(&pDecoderGuids[iGuid]));
+				if (IsSupportedDecoderMode(&pDecoderGuids[iGuid])) {
+					msg.Append(L" - supported");
+					supported = TRUE;
 				}
+				DbgLog((LOG_TRACE, 3, msg));
+			}
 
-				DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
+			if (supported) {
+				UINT idx = 0;
+				while (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[idx] != GUID_NULL && guidDecoder == GUID_NULL) {
+					for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
+						if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[idx] == pDecoderGuids[iGuid]) {
+							DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
 
-				// Find a configuration that we support.
-				if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration))) {
-					break;
-				}
+							// Find a configuration that we support.
+							if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration))) {
+								break;
+							}
 
-				if (bFoundDXVA2Configuration) {
-					// Found a good configuration. Save the GUID.
-					guidDecoder = pDecoderGuids[iGuid];
-					DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetDXVAMode(&guidDecoder)));
-					break;
+							if (bFoundDXVA2Configuration) {
+								// Found a good configuration. Save the GUID.
+								guidDecoder = pDecoderGuids[iGuid];
+								DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetDXVAMode(&guidDecoder)));
+								break;
+							}
+						}
+					}
+					idx++;
 				}
 			}
 		}
@@ -2658,14 +2672,12 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMA
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 {
 	const CString dxvaMode = GetDXVAMode(mode);
-	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsSupportedDecoderMode() : %s", dxvaMode));
 
 	if (IsDXVASupported()) {
 		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
 			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == GUID_NULL) {
 				break;
 			} else if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == *mode) {
-				DbgLog((LOG_TRACE, 3, L"	=> Found : %s", dxvaMode));
 				return TRUE;
 			}
 		}
@@ -3434,6 +3446,7 @@ STDMETHODIMP CVideoDecOutputPin::GetUncompSurfacesInfo(const GUID *pGuid, LPAMVA
 	HRESULT hr = E_INVALIDARG;
 
 	if (m_pVideoDecFilter->IsSupportedDecoderMode(pGuid)) {
+		DbgLog((LOG_TRACE, 3, L"=> Attempt : %s", GetDXVAMode(pGuid)));
 		CComQIPtr<IAMVideoAccelerator> pAMVideoAccelerator = GetConnected();
 
 		if (pAMVideoAccelerator) {
@@ -3444,6 +3457,7 @@ STDMETHODIMP CVideoDecOutputPin::GetUncompSurfacesInfo(const GUID *pGuid, LPAMVA
 			if (SUCCEEDED(hr)) {
 				memcpy(&m_ddUncompPixelFormat, &pUncompBufferInfo->ddUncompPixelFormat, sizeof(DDPIXELFORMAT));
 				m_GuidDecoderDXVA1 = *pGuid;
+				DbgLog((LOG_TRACE, 3, L"=> Use : %s", GetDXVAMode(pGuid)));
 			}
 		}
 	}
