@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.6
+// Version 2.6rc2
 //
 
 #ifndef _lcms2_H
@@ -55,9 +55,12 @@
 // Uncomment to get rid of the tables for "half" float support
 // #define CMS_NO_HALF_SUPPORT 1
 
-// Uncomment to get cmsContext legacy behavior: just a void pointer passed through. 
-// DON'T USE UNLESS STRICTLY NECESSARY!
-// #define CMS_CONTEXT_IN_LEGACY_MODE 1
+// Uncomment to get rif of pthreads/windows dependency
+// #define CMS_NO_PTHREADS  1
+
+// ==> Start patch MPC
+#define CMS_NO_PTHREADS  1
+// <== End patch MPC
 
 // ********** End of configuration toggles ******************************
 
@@ -209,6 +212,9 @@ typedef int                  cmsBool;
 #ifdef macintosh
 # ifdef __BIG_ENDIAN__
 #   define CMS_USE_BIG_ENDIAN      1
+# endif
+# ifdef __LITTLE_ENDIAN__
+#   undef CMS_USE_BIG_ENDIAN
 # endif
 #endif
 
