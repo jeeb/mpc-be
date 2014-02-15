@@ -315,8 +315,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 					bHasVideo = true;
-				} else if (CodecID == "V_UNCOMPRESSED") {
-					// TODO
 				} else if (CodecID == "V_MPEG4/ISO/AVC") {
 					if (pTE->CodecPrivate.GetCount() > 9) {
 						CGolombBuffer gb((BYTE*)pTE->CodecPrivate.GetData() + 9, pTE->CodecPrivate.GetCount() - 9);
@@ -452,6 +450,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					bHasVideo = true;
 				} else {
 					DWORD fourcc = 0;
+					WORD bitdepth = 0;
 					if (CodecID == "V_MJPEG") {
 						fourcc = FCC('MJPG');
 					} else if (CodecID == "V_MPEG4/MS/V3") {
@@ -473,6 +472,30 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() == 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
+					} else if (CodecID == "V_UNCOMPRESSED") {
+						fourcc = FCC((DWORD)pTE->v.ColourSpace);
+						switch (fourcc) {
+						case FCC('Y8  '):
+						case FCC('Y800'):
+							bitdepth = 8;
+							break;
+						case FCC('NV12'):
+						case FCC('YV12'):
+							bitdepth = 12;
+							break;
+						case FCC('HDYC'):
+						case FCC('UYVY'):
+						case FCC('YUY2'):
+						case FCC('YV16'):
+							bitdepth = 16;
+							break;
+						case FCC('YV24'):
+							bitdepth = 24;
+							break;
+						default:
+							fourcc = 0; // unknown FourCC
+							break;
+						}
 					}
 
 					if (fourcc) {
@@ -484,7 +507,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-						//pvih->bmiHeader.biBitCount = 24;
+						pvih->bmiHeader.biBitCount = bitdepth;
 						pvih->bmiHeader.biCompression = fourcc;
 						if (!bHasVideo) {
 							mts.Add(mt);
