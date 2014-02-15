@@ -164,6 +164,7 @@
     <ClCompile Include="dec\webp.c" />
     <ClCompile Include="dsp\cpu.c" />
     <ClCompile Include="dsp\dec.c" />
+    <ClCompile Include="dsp\dec_clip_tables.c" />
     <ClCompile Include="dsp\dec_sse2.c" />
     <ClCompile Include="dsp\enc.c" />
     <ClCompile Include="dsp\enc_sse2.c" />
