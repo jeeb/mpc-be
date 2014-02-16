@@ -479,14 +479,21 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case FCC('Y800'):
 							bitdepth = 8;
 							break;
+						case FCC('YVU9'):
+							bitdepth = 9;
+							break;
+						case FCC('I420'):
+						case FCC('Y41B'):
 						case FCC('NV12'):
 						case FCC('YV12'):
 							bitdepth = 12;
 							break;
 						case FCC('HDYC'):
 						case FCC('UYVY'):
+						case FCC('Y42B'):
 						case FCC('YUY2'):
 						case FCC('YV16'):
+						case FCC('yuv2'):
 							bitdepth = 16;
 							break;
 						case FCC('YV24'):
@@ -496,6 +503,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = 0; // unknown FourCC
 							break;
 						}
+						// TODO: bitdepth = 8 * framesize / (width * height)
 					}
 
 					if (fourcc) {
@@ -507,8 +515,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
+						pvih->bmiHeader.biPlanes = 1; // must be set to 1. 
 						pvih->bmiHeader.biBitCount = bitdepth;
 						pvih->bmiHeader.biCompression = fourcc;
+						pvih->bmiHeader.biSizeImage = pvih->bmiHeader.biWidth * pvih->bmiHeader.biHeight * bitdepth / 8;
+
 						if (!bHasVideo) {
 							mts.Add(mt);
 						}
