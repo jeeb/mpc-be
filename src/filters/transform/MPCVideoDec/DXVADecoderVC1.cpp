@@ -150,21 +150,15 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 													 (GetConfigIntraResidUnsigned()   << 6) |
 													 (GetConfigResidDiffAccelerator() << 5);
 
-	CHECK_HR_FALSE (FFVC1DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
-									 pDataIn, nSize, rtStart,
-									 &nFrameSize, &got_picture));
+	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
+								  pDataIn, nSize, rtStart,
+							      &got_picture, &nFrameSize));
 
 	if (m_nSurfaceIndex == -1) {
 		return S_FALSE;
 	}
 
-	if (m_bWaitingForKeyFrame && got_picture) {
-		if (m_pFilter->GetFrame()->key_frame) {
-			m_bWaitingForKeyFrame = FALSE;
-		} else {
-			got_picture = 0;
-		}
-	}
+	CheckKeyFrame;
 
 	{
 		bSecondField = FALSE;

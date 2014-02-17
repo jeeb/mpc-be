@@ -133,8 +133,9 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	int		got_picture	= 0;
 
 	memset(&m_DXVA_Context.DXVA_H264Context, 0, sizeof(DXVA_H264_Context) * _countof(m_DXVA_Context.DXVA_H264Context));
-	CHECK_HR_FALSE (FFH264DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
-									  rtStart, &got_picture));
+	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
+								  pDataIn, nSize, rtStart,
+								  &got_picture));
 
 	if (m_nSurfaceIndex == -1 || !m_DXVA_Context.DXVA_H264Context[0].slice_count) {
 		return S_FALSE;

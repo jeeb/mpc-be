@@ -95,20 +95,15 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	int		got_picture	= 0;
 
 	memset(&m_DXVA_Context, 0, sizeof(DXVA_Context));
-	CHECK_HR_FALSE (FFMpeg2DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
-									   rtStart, &got_picture));
+	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
+								  pDataIn, nSize, rtStart,
+								  &got_picture));
 
 	if (m_nSurfaceIndex == -1 || !m_DXVA_Context.DXVA_MPEG2Context[0].slice_count) {
 		return S_FALSE;
 	}
 
-	if (m_bWaitingForKeyFrame && got_picture) {
-		if (m_pFilter->GetFrame()->key_frame) {
-			m_bWaitingForKeyFrame = FALSE;
-		} else {
-			got_picture = 0;
-		}
-	}
+	CheckKeyFrame;
 
 	for (UINT i = 0; i < m_DXVA_Context.frame_count; i++) {
 		DXVA_MPEG2_Context* pDXVA_MPEG2_ctx = &m_DXVA_Context.DXVA_MPEG2Context[i];
