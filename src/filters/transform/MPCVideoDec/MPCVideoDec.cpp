@@ -147,16 +147,16 @@ struct FFMPEG_CODECS {
 };
 
 // DXVA modes supported for Mpeg2
-DXVA_PARAMS		DXVA_Mpeg2 = {
+DXVA_PARAMS DXVA_Mpeg2 = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeMPEG2_VLD, &GUID_NULL },
-	{ DXVA_RESTRICTED_MODE_MPEG2_D, 0 } // Restricted mode for DXVA1?
+	{ DXVA_RESTRICTED_MODE_MPEG2_D, 0 }
 };
 
 // DXVA modes supported for H264
-DXVA_PARAMS		DXVA_H264 = {
+DXVA_PARAMS DXVA_H264 = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
 	2,		// PreferedConfigBitstream
@@ -165,15 +165,15 @@ DXVA_PARAMS		DXVA_H264 = {
 };
 
 // DXVA modes supported for VC1
-DXVA_PARAMS		DXVA_VC1 = {
+DXVA_PARAMS DXVA_VC1 = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
-	{ &DXVA2_ModeVC1_D, &DXVA2_ModeVC1_D2010, &GUID_NULL },
+	{ &DXVA2_ModeVC1_D2010, &DXVA2_ModeVC1_D, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_VC1_D, 0}
 };
 
-FFMPEG_CODECS		ffCodecs[] = {
+FFMPEG_CODECS ffCodecs[] = {
 	// Flash video
 	{ &MEDIASUBTYPE_FLV1, AV_CODEC_ID_FLV1, NULL, FFM_FLV4, -1 },
 	{ &MEDIASUBTYPE_flv1, AV_CODEC_ID_FLV1, NULL, FFM_FLV4, -1 },
@@ -1854,12 +1854,16 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		} else {
 			// Dynamic DXVA media types for DXVA1
 			for (int pos = 0; pos < ffCodecs[m_nCodecNb].DXVAModeCount(); pos++) {
-				m_pVideoOutputFormat[nPos + pos].subtype		= ffCodecs[m_nCodecNb].DXVAModes->Decoder[nPos];
-				m_pVideoOutputFormat[nPos + pos].biCompression	= FCC('dxva');
-				m_pVideoOutputFormat[nPos + pos].biBitCount		= 12;
-				m_pVideoOutputFormat[nPos + pos].biPlanes		= 1;
+				if (m_nPCIVendor == PCIV_ATI && *ffCodecs[m_nCodecNb].DXVAModes->Decoder[pos] == DXVA2_ModeVC1_D2010) {
+					continue;
+				}
+
+				m_pVideoOutputFormat[nPos].subtype			= ffCodecs[m_nCodecNb].DXVAModes->Decoder[pos];
+				m_pVideoOutputFormat[nPos].biCompression	= FCC('dxva');
+				m_pVideoOutputFormat[nPos].biBitCount		= 12;
+				m_pVideoOutputFormat[nPos].biPlanes			= 1;
+				nPos++;
 			}
-			nPos += ffCodecs[m_nCodecNb].DXVAModeCount();
 		}
 	}
 
