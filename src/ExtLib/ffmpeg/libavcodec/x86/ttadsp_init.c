@@ -18,28 +18,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavcodec/flacdsp.h"
+#include "libavcodec/ttadsp.h"
 #include "libavutil/x86/cpu.h"
 #include "config.h"
 
-void ff_flac_lpc_32_sse4(int32_t *samples, const int coeffs[32], int order,
-                         int qlevel, int len);
-void ff_flac_lpc_32_xop(int32_t *samples, const int coeffs[32], int order,
-                        int qlevel, int len);
+void ff_ttafilter_process_dec_ssse3(int32_t *qm, int32_t *dx, int32_t *dl,
+                                    int32_t *error, int32_t *in, int32_t shift,
+                                    int32_t round);
+void ff_ttafilter_process_dec_sse4(int32_t *qm, int32_t *dx, int32_t *dl,
+                                   int32_t *error, int32_t *in, int32_t shift,
+                                   int32_t round);
 
-av_cold void ff_flacdsp_init_x86(FLACDSPContext *c, enum AVSampleFormat fmt,
-                                 int bps)
+av_cold void ff_ttadsp_init_x86(TTADSPContext *c)
 {
 #if HAVE_YASM
     int cpu_flags = av_get_cpu_flags();
 
-    if (EXTERNAL_SSE4(cpu_flags)) {
-        if (bps > 16 && CONFIG_FLAC_DECODER)
-            c->lpc = ff_flac_lpc_32_sse4;
-    }
-    if (EXTERNAL_XOP(cpu_flags)) {
-        if (bps > 16 && CONFIG_FLAC_DECODER)
-            c->lpc = ff_flac_lpc_32_xop;
-    }
+    if (EXTERNAL_SSSE3(cpu_flags))
+        c->ttafilter_process_dec = ff_ttafilter_process_dec_ssse3;
+    if (EXTERNAL_SSE4(cpu_flags))
+        c->ttafilter_process_dec = ff_ttafilter_process_dec_sse4;
 #endif
 }

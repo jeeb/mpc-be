@@ -416,6 +416,7 @@ SRCS_C = \
 	libavcodec/x86/sbrdsp_init.c \
 	libavcodec/x86/simple_idct.c \
 	libavcodec/x86/snowdsp.c \
+	libavcodec/x86/ttadsp_init.c \
 	libavcodec/x86/v210-init.c \
 	libavcodec/x86/vc1dsp_init.c \
 	libavcodec/x86/vc1dsp_mmx.c \
@@ -454,6 +455,7 @@ SRCS_C = \
 	libavutil/cpu.c \
 	libavutil/crc.c \
 	libavutil/dict.c \
+	libavutil/downmix_info.c \
 	libavutil/error.c \
 	libavutil/eval.c \
 	libavutil/fifo.c \
@@ -533,6 +535,7 @@ SRCS_YASM = \
 	libavcodec/x86/rv34dsp.asm \
 	libavcodec/x86/rv40dsp.asm \
 	libavcodec/x86/sbrdsp.asm \
+	libavcodec/x86/ttadsp.asm \
 	libavcodec/x86/v210.asm \
 	libavcodec/x86/vc1dsp.asm \
 	libavcodec/x86/videodsp.asm \
@@ -541,6 +544,7 @@ SRCS_YASM = \
 	libavcodec/x86/vp6dsp.asm \
 	libavcodec/x86/vp8dsp.asm \
 	libavcodec/x86/vp8dsp_loopfilter.asm \
+	libavcodec/x86/vp9intrapred.asm \
 	libavcodec/x86/vp9itxfm.asm \
 	libavcodec/x86/vp9lpf.asm \
 	libavcodec/x86/vp9mc.asm \

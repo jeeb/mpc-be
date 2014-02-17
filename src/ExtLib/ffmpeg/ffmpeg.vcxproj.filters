@@ -217,6 +217,12 @@
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\vp9intrapred.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
+    <None Include="libavcodec\x86\ttadsp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -1257,6 +1263,9 @@
     </ClInclude>
     <ClInclude Include="libavcodec\ttadsp.h">
       <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\downmix_info.h">
+      <Filter>libavutil</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2607,6 +2616,12 @@
     </ClCompile>
     <ClCompile Include="libavcodec\ttadsp.c">
       <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\downmix_info.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\ttadsp_init.c">
+      <Filter>libavcodec\x86</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

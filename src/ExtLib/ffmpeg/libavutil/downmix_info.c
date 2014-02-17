@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2014 Tim Walker <tdskywalker@gmail.com>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -16,19 +18,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_TTADSP_H
-#define AVCODEC_TTADSP_H
+#include "downmix_info.h"
+#include "frame.h"
 
-#include <stdint.h>
-#include "ttadata.h"
+AVDownmixInfo *av_downmix_info_update_side_data(AVFrame *frame)
+{
+    AVFrameSideData *side_data;
 
-typedef struct TTADSPContext {
-    void (*ttafilter_process_dec)(int32_t *qm, int32_t *dx, int32_t *dl,
-                                  int32_t *error, int32_t *in, int32_t shift,
-                                  int32_t round);
-} TTADSPContext;
+    side_data = av_frame_get_side_data(frame, AV_FRAME_DATA_DOWNMIX_INFO);
 
-void ff_ttadsp_init(TTADSPContext *c);
-void ff_ttadsp_init_x86(TTADSPContext *c);
+    if (!side_data)
+        side_data = av_frame_new_side_data(frame, AV_FRAME_DATA_DOWNMIX_INFO,
+                                           sizeof(AVDownmixInfo));
 
-#endif /* AVCODEC_TTADSP_H */
+    if (!side_data)
+        return NULL;
+
+    return (AVDownmixInfo*)side_data->data;
+}

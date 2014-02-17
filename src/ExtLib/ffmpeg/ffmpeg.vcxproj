@@ -54,6 +54,7 @@
     <None Include="libavcodec\x86\rv34dsp.asm" />
     <None Include="libavcodec\x86\rv40dsp.asm" />
     <None Include="libavcodec\x86\sbrdsp.asm" />
+    <None Include="libavcodec\x86\ttadsp.asm" />
     <None Include="libavcodec\x86\v210.asm" />
     <None Include="libavcodec\x86\vc1dsp.asm" />
     <None Include="libavcodec\x86\videodsp.asm" />
@@ -62,6 +63,7 @@
     <None Include="libavcodec\x86\vp6dsp.asm" />
     <None Include="libavcodec\x86\vp8dsp.asm" />
     <None Include="libavcodec\x86\vp8dsp_loopfilter.asm" />
+    <None Include="libavcodec\x86\vp9intrapred.asm" />
     <None Include="libavcodec\x86\vp9itxfm.asm" />
     <None Include="libavcodec\x86\vp9lpf.asm" />
     <None Include="libavcodec\x86\vp9mc.asm" />
@@ -381,6 +383,7 @@
     <ClInclude Include="libavutil\cpu_internal.h" />
     <ClInclude Include="libavutil\crc.h" />
     <ClInclude Include="libavutil\dict.h" />
+    <ClInclude Include="libavutil\downmix_info.h" />
     <ClInclude Include="libavutil\error.h" />
     <ClInclude Include="libavutil\eval.h" />
     <ClInclude Include="libavutil\fifo.h" />
@@ -793,6 +796,7 @@
     <ClCompile Include="libavcodec\x86\sbrdsp_init.c" />
     <ClCompile Include="libavcodec\x86\simple_idct.c" />
     <ClCompile Include="libavcodec\x86\snowdsp.c" />
+    <ClCompile Include="libavcodec\x86\ttadsp_init.c" />
     <ClCompile Include="libavcodec\x86\v210-init.c" />
     <ClCompile Include="libavcodec\x86\vc1dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vc1dsp_mmx.c" />
@@ -833,6 +837,7 @@
     <ClCompile Include="libavutil\cpu.c" />
     <ClCompile Include="libavutil\crc.c" />
     <ClCompile Include="libavutil\dict.c" />
+    <ClCompile Include="libavutil\downmix_info.c" />
     <ClCompile Include="libavutil\error.c" />
     <ClCompile Include="libavutil\eval.c" />
     <ClCompile Include="libavutil\fifo.c" />
