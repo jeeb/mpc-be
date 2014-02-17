@@ -2350,7 +2350,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				}
 
 				if (m_nDecoderMode != MODE_SOFTWARE) {
-					// use ffmpeg's parser for DXVA decoder - H.264 AnnexB format
+					// use ffmpeg's parser for DXVA decoder - H.264 AnnexB & MPEG2 format
 					hr = m_pDXVADecoder->DecodeFrame(avpkt.data, avpkt.size, avpkt.pts, avpkt.pts + 1);
 					av_frame_unref(m_pFrame);
 					continue;
@@ -2592,7 +2592,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 				int nWidth	= PictWidthRounded();
 				int nHeight	= PictHeightRounded();
 
-				if (m_nCodecId == AV_CODEC_ID_H264 && m_pParser) {
+				if (m_pParser) {
 					hr = SoftwareDecode(pIn, pDataIn, nSize, rtStart, rtStop);
 				} else {
 					hr = m_pDXVADecoder->DecodeFrame(pDataIn, nSize, rtStart, rtStop);

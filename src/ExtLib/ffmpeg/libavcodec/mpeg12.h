@@ -24,11 +24,6 @@
 
 #include "mpegvideo.h"
 
-// ==> Start patch MPC
-#include <windows.h>
-#include <dxva.h>
-// <== End patch MPC
-
 #define DC_VLC_BITS 9
 #define MV_VLC_BITS 9
 #define TEX_VLC_BITS 9
@@ -37,29 +32,6 @@
 #define MB_PAT_VLC_BITS 9
 #define MB_PTYPE_VLC_BITS 6
 #define MB_BTYPE_VLC_BITS 6
-
-// ==> Start patch MPC
-typedef struct Mpeg1Context {
-    MpegEncContext mpeg_enc_ctx;
-    int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
-    int repeat_field; /* true if we must repeat the field */
-    AVPanScan pan_scan;              /**< some temporary storage for the panscan */
-    uint8_t *a53_caption;
-    int a53_caption_size;
-    int slice_count;
-    int save_aspect_info;
-    int save_width, save_height, save_progressive_seq;
-    AVRational frame_rate_ext;       ///< MPEG-2 specific framerate modificator
-    int sync;                        ///< Did we reach a sync point like a GOP/SEQ/KEYFrame?
-    int tmpgexs;
-    int first_slice;
-    int extradata_decoded;
-
-    DXVA_SliceInfo* pSliceInfo;
-    uint8_t* prev_slice;
-
-} Mpeg1Context;
-// <== End patch MPC
 
 extern VLC ff_dc_lum_vlc;
 extern VLC ff_dc_chroma_vlc;

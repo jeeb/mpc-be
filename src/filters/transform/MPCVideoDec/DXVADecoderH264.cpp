@@ -87,6 +87,7 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 	DXVA_H264_Context *ctx_pic		= &m_DXVA_Context.DXVA_H264Context[m_nFieldNum];
 	DXVA_Slice_H264_Short *slice	= NULL;
 	BYTE* current					= pDXVABuffer;
+	UINT MBCount					= FFGetMBCount(m_pFilter->GetAVCtx());
 
 	for (unsigned i = 0; i < ctx_pic->slice_count; i++) {
 		static const BYTE start_code[]		= { 0, 0, 1 };
@@ -105,7 +106,7 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 			if (i < ctx_pic->slice_count - 1) {
 				slice_long->NumMbsForSlice = slice_long[1].first_mb_in_slice - slice_long[0].first_mb_in_slice;
 			} else {
-				//slice_long->NumMbsForSlice = mb_count - slice_long->first_mb_in_slice; // TODO ...
+				slice_long->NumMbsForSlice = MBCount - slice_long->first_mb_in_slice;
 			}
 		}
 

@@ -33,45 +33,26 @@ public:
 	CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual ~CDXVADecoderMpeg2();
 
-	virtual void			Flush();
 	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 private:
-	DXVA_PictureParameters	m_PictureParams;
-	DXVA_QmatrixData		m_QMatrixData;
-	WORD					m_wRefPictureIndex[2];
-	DXVA_SliceInfo			m_SliceInfo[MAX_SLICE];
-	int						m_nSliceCount;
-
-	REFERENCE_TIME			m_rtLastStart;
-
-	// Private functions
-	void					Init();
-	void					UpdatePictureParams(int nSurfaceIndex);
-
-protected:
-	BYTE*					m_pMPEG2Buffer;
-	int						m_nMPEG2BufferSize;
-
-	struct BUFFER_TIME {
-		REFERENCE_TIME	rtStart;
-		REFERENCE_TIME	rtStop;
-		int				nBuffPos;
+	struct DXVA_MPEG2_Context {
+		DXVA_PictureParameters	DXVAPicParams;
+		DXVA_QmatrixData		DXVAScalingMatrix;
+		unsigned				slice_count;
+		DXVA_SliceInfo			slice[MAX_SLICE];
+		const uint8_t			*bitstream;
+		unsigned				bitstream_size;
+		int						frame_start;
 	};
+	struct DXVA_Context {
+		unsigned				frame_count;
+		DXVA_MPEG2_Context		DXVA_MPEG2Context[2];	
+	} m_DXVA_Context;
 
-	int						m_nMPEG2BufferPos;
-	int						m_nMPEG2PicEnd;
-	BUFFER_TIME				m_MPEG2BufferTime[MAX_BUFF_TIME];
+	UINT					m_nFieldNum;
 
-	bool					FindPicture(int nIndex, int nStartCode);
-	bool					AppendBuffer(BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	void					PopBufferTime(int nPos);
-	void					PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	void					ResetBuffer();
-	bool					ShrinkBuffer();
-
-	HRESULT					DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual int				FindOldestFrame();
-	void					UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	void					Init();
+	void					UpdatePictureParams();
 };

@@ -29,30 +29,6 @@
 #include "ffmpegContext.h"
 #include <math.h>
 
-static unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
-{
-	unsigned __int64 ret = 0;
-
-	DWORD buff[4];
-	VS_FIXEDFILEINFO* pvsf = (VS_FIXEDFILEINFO*)buff;
-	DWORD d; // a variable that GetFileVersionInfoSize sets to zero (but why is it needed ?????????????????????????????? :)
-	DWORD len = GetFileVersionInfoSize((LPTSTR)lptstrFilename, &d);
-
-	if (len) {
-		TCHAR* b1 = new TCHAR[len];
-		if (b1) {
-			UINT uLen;
-			if (GetFileVersionInfo((LPTSTR)lptstrFilename, 0, len, b1) && VerQueryValue(b1, L"\\", (void**)&pvsf, &uLen)) {
-				ret = ((unsigned __int64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
-			}
-
-			delete [] b1;
-		}
-	}
-
-	return ret;
-}
-
 extern "C" {
 	#include <ffmpeg/libavcodec/dsputil.h>
 	#include <ffmpeg/libavcodec/avcodec.h>
@@ -223,52 +199,7 @@ bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
 	return (nPCIVendor == PCIV_ATI && CheckPCID(nPCIDevice, PCID_ATI_UVD, _countof(PCID_ATI_UVD)));
 }
 
-inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
-{
-	Mpeg1Context*	s1	= NULL;
-	MpegEncContext*	s	= NULL;
-
-	switch (pAVCtx->codec_id) {
-		case AV_CODEC_ID_VC1 :
-		case AV_CODEC_ID_H264 :
-			s	= (MpegEncContext*)pAVCtx->priv_data;
-			break;
-		case AV_CODEC_ID_MPEG2VIDEO:
-			s1	= (Mpeg1Context*)pAVCtx->priv_data;
-			s 	= (MpegEncContext*)&s1->mpeg_enc_ctx;
-			break;
-	}
-	return s;
-}
-
-HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-						  REFERENCE_TIME rtStart, int* got_picture)
-{
-	HRESULT hr = E_FAIL;
-	if (pBuffer != NULL) {
-		H264Context* h	= (H264Context*)pAVCtx->priv_data;
-		AVPacket		avpkt;
-		av_init_packet(&avpkt);
-		avpkt.data		= pBuffer;
-		avpkt.size		= nSize;
-		avpkt.pts		= rtStart;
-		avpkt.flags		= AV_PKT_FLAG_KEY;
-		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
-		
-#if defined(_DEBUG) && 0
-		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : %d, %d\n", used_bytes, *got_picture);
-#endif
-
-		if (used_bytes < 0) {
-			return hr;
-		}
-
-		hr = S_OK;
-	}
-
-	return hr;
-}
-
+// === H264 functions
 // returns TRUE if version is equal to or higher than A.B.C.D, returns FALSE otherwise
 BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, int D)
 {
@@ -288,6 +219,30 @@ BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, i
 		}
 	}
 	return FALSE;
+}
+
+static unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
+{
+	unsigned __int64 ret = 0;
+
+	DWORD buff[4] = { 0 };
+	VS_FIXEDFILEINFO* pvsf = (VS_FIXEDFILEINFO*)buff;
+	DWORD d; // a variable that GetFileVersionInfoSize sets to zero (but why is it needed ?????????????????????????????? :)
+	DWORD len = GetFileVersionInfoSize((LPTSTR)lptstrFilename, &d);
+
+	if (len) {
+		TCHAR* b1 = new TCHAR[len];
+		if (b1) {
+			UINT uLen;
+			if (GetFileVersionInfo((LPTSTR)lptstrFilename, 0, len, b1) && VerQueryValue(b1, L"\\", (void**)&pvsf, &uLen)) {
+				ret = ((unsigned __int64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
+			}
+
+			delete [] b1;
+		}
+	}
+
+	return ret;
 }
 
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
@@ -382,19 +337,48 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	return Flags;
 }
 
+HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
+						  REFERENCE_TIME rtStart, int* got_picture)
+{
+	HRESULT hr = E_FAIL;
+	if (pBuffer) {
+		H264Context* h	= (H264Context*)pAVCtx->priv_data;
+		AVPacket		avpkt;
+		av_init_packet(&avpkt);
+		avpkt.data		= pBuffer;
+		avpkt.size		= nSize;
+		avpkt.pts		= rtStart;
+		avpkt.flags		= AV_PKT_FLAG_KEY;
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
+		
+#if defined(_DEBUG) && 0
+		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : %d, %d\n", used_bytes, *got_picture);
+#endif
+
+		if (used_bytes < 0) {
+			return hr;
+		}
+
+		hr = S_OK;
+	}
+
+	return hr;
+}
+
 void FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* DXVA_Context)
 {
 	H264Context* h			= (H264Context*)pAVCtx->priv_data;
 	h->dxva_context			= DXVA_Context;
 }
 
+// === VC1 functions
 HRESULT FFVC1DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 						 BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
 						 UINT* nFrameSize, int* got_picture)
 {
-	HRESULT	hr		= E_FAIL;
-	VC1Context* vc1	= (VC1Context*)pAVCtx->priv_data;
+	HRESULT	hr = E_FAIL;
 	if (pBuffer) {
+		VC1Context* vc1	= (VC1Context*)pAVCtx->priv_data;
 		AVPacket		avpkt;
 		av_init_packet(&avpkt);
 		avpkt.data		= pBuffer;
@@ -428,10 +412,10 @@ void FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pPicParams, void* p
 	vc1->pSliceInfo			= pSliceInfo;
 }
 
+// === Mpeg2 functions
 int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
-	Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
-	MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
+	MpegEncContext*	s = (MpegEncContext*)pAVCtx->priv_data;
 
 	// restore codec_id value, it's can be changed to AV_CODEC_ID_MPEG1VIDEO on .wtv/.dvr-ms + StreamBufferSource (possible broken extradata)
 	pAVCtx->codec_id = AV_CODEC_ID_MPEG2VIDEO;
@@ -439,24 +423,16 @@ int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 	return (s->chroma_format<2);
 }
 
-HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo,
-						   struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-						   int* nSliceCount, bool* bIsField, int* got_picture)
+HRESULT FFMpeg2DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
+						   REFERENCE_TIME rtStart, int* got_picture)
 {
-	HRESULT			hr = E_FAIL;
-	int				i;
-	Mpeg1Context*	s1			= (Mpeg1Context*)pAVCtx->priv_data;
-	MpegEncContext*	s			= (MpegEncContext*)&s1->mpeg_enc_ctx;
-	int				is_field	= 0;
-	unsigned		mb_count	= 0;
-
+	HRESULT hr = E_FAIL;
 	if (pBuffer) {
-		s1->pSliceInfo	= pSliceInfo;
-
 		AVPacket		avpkt;
 		av_init_packet(&avpkt);
 		avpkt.data		= pBuffer;
 		avpkt.size		= nSize;
+		avpkt.pts		= rtStart;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
 		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
 
@@ -464,96 +440,35 @@ HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData*
 		av_log(pAVCtx, AV_LOG_INFO, "FFMpeg2DecodeFrame() : %d, %d\n", used_bytes, got_picture);
 #endif
 
-		if (used_bytes < 0 || !s1->slice_count) {
+		if (used_bytes < 0) {
 			return hr;
 		}
 
-		hr				= S_OK;
-		*nSliceCount	= s1->slice_count;
+		hr = S_OK;
 	}
 
-	// pPicParams->wDecodedPictureIndex;			set in DecodeFrame
-	// pPicParams->wDeblockedPictureIndex;			0 for Mpeg2
-	// pPicParams->wForwardRefPictureIndex;			set in DecodeFrame
-	// pPicParams->wBackwardRefPictureIndex;		set in DecodeFrame
-
-	is_field									= s->picture_structure != PICT_FRAME;
-	if (bIsField) {
-		*bIsField								= is_field;
-	}
-
-	pPicParams->wPicWidthInMBminus1				= s->mb_width-1;
-	pPicParams->wPicHeightInMBminus1			= (s->mb_height >> is_field) - 1;
-
-	pPicParams->bPicStructure					= s->picture_structure;
-	pPicParams->bSecondField					= is_field && !s->first_field;
-	pPicParams->bPicIntra						= (s->current_picture.f.pict_type == AV_PICTURE_TYPE_I);
-	pPicParams->bPicBackwardPrediction			= (s->current_picture.f.pict_type == AV_PICTURE_TYPE_B);
-
-	//pPicParams->bBidirectionalAveragingMode	= 0;	// The value "0" indicates MPEG-1 and MPEG-2 rounded averaging (//2),
-	//pPicParams->bMVprecisionAndChromaRelation	= 0;	// Indicates that luminance motion vectors have half-sample precision and that chrominance motion vectors are derived from luminance motion vectors according to the rules in MPEG-2
-
-	// pPicParams->bPicScanFixed				= 1;	// set in UpdatePicParams
-	// pPicParams->bPicScanMethod				= 1;	// set in UpdatePicParams
-	// pPicParams->bPicReadbackRequests;				// ??
-
-	// pPicParams->bRcontrol					= 0;	// It shall be set to "0" for all MPEG-1, and MPEG-2 bitstreams in order to conform with the rounding operator defined by those standards
-	// pPicParams->bPicSpatialResid8;					// set in UpdatePicParams
-	// pPicParams->bPicOverflowBlocks;					// set in UpdatePicParams
-	// pPicParams->bPicExtrapolation;			= 0;	// by H.263 Annex D and MPEG-4
-
-	// pPicParams->bPicDeblocked;				= 0;	// MPEG2_A Restricted Profile
-	// pPicParams->bPicDeblockConfined;					// ??
-	// pPicParams->bPic4MVallowed;						// See H.263 Annexes F and J
-	// pPicParams->bPicOBMC;							// H.263 Annex F
-	// pPicParams->bPicBinPB;							// Annexes G and M of H.263
-	// pPicParams->bMV_RPS;								// ???
-	// pPicParams->bReservedBits;						// ??
-
-	pPicParams->wBitstreamFcodes				= (s->mpeg_f_code[0][0]<<12)  | (s->mpeg_f_code[0][1]<<8) |
-												  (s->mpeg_f_code[1][0]<<4)   | (s->mpeg_f_code[1][1]);
-
-	pPicParams->wBitstreamPCEelements			= (s->intra_dc_precision<<14) | (s->picture_structure<<12) |
-												  (s->top_field_first<<11)  | (s->frame_pred_frame_dct<<10)|
-												  (s->concealment_motion_vectors<<9) | (s->q_scale_type<<8)|
-												  (s->intra_vlc_format<<7)    |      (s->alternate_scan<<6)|
-												  (s->repeat_first_field<<5)  |     (s->chroma_420_type<<4)|
-												  (s->progressive_frame<<3);
-
-	//pPicParams->bBitstreamConcealmentNeed		= 0;
-	//pPicParams->bBitstreamConcealmentMethod	= 0;
-
-	pQMatrixData->bNewQmatrix[0] = 1;
-	pQMatrixData->bNewQmatrix[1] = 1;
-	pQMatrixData->bNewQmatrix[2] = 1;
-	pQMatrixData->bNewQmatrix[3] = 1;
-	for (i = 0; i < 64; i++) {
-		int n = s->dsp.idct_permutation[ff_zigzag_direct[i]];
-		pQMatrixData->Qmatrix[0][i] = s->intra_matrix[n];
-		pQMatrixData->Qmatrix[1][i] = s->inter_matrix[n];
-		pQMatrixData->Qmatrix[2][i] = s->chroma_intra_matrix[n];
-		pQMatrixData->Qmatrix[3][i] = s->chroma_inter_matrix[n];
-	}
-
-	mb_count = s->mb_width * (s->mb_height >> is_field);
-	for (i = 0; i < s1->slice_count; i++) {
-		DXVA_SliceInfo *slice = &s1->pSliceInfo[i];
-
-		if (i < s1->slice_count - 1) {
-			slice->wNumberMBsInSlice = slice[1].wNumberMBsInSlice - slice[0].wNumberMBsInSlice;
-		} else {
-			slice->wNumberMBsInSlice = mb_count - slice[0].wNumberMBsInSlice;
-		}
-	}
-
-	return S_OK;
+	return hr;
 }
 
-int FFGetCodedPicture(struct AVCodecContext* pAVCtx)
+void FFMPEG2SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
 {
-	MpegEncContext* s = GetMpegEncContext(pAVCtx);
+	MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
+	s->dxva_context		= pDXVA_Context;
+}
 
-	return (s != NULL) ? s->current_picture.f.coded_picture_number : 0;
+// === Common functions
+inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
+{
+	MpegEncContext*	s = NULL;
+
+	switch (pAVCtx->codec_id) {
+		case AV_CODEC_ID_VC1 :
+		case AV_CODEC_ID_H264 :
+		case AV_CODEC_ID_MPEG2VIDEO:
+			s 	= (MpegEncContext*)pAVCtx->priv_data;
+			break;
+	}
+	return s;
 }
 
 BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
@@ -561,6 +476,26 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
 
 	return (s != NULL) ? s->alternate_scan : 0;
+}
+
+UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
+{
+	UINT MBCount = 0;
+	switch (pAVCtx->codec_id) {
+		case AV_CODEC_ID_H264 : {
+				H264Context* h	= (H264Context*)pAVCtx->priv_data;
+				MBCount			= h->mb_width * h->mb_height;
+			}
+			break;
+		case AV_CODEC_ID_MPEG2VIDEO: {
+				MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
+				const int is_field	= s->picture_structure != PICT_FRAME;
+				MBCount				= s->mb_width * (s->mb_height >> is_field);
+			}
+			break;
+	}
+
+	return MBCount;
 }
 
 void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height)
@@ -591,8 +526,7 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 	case AV_CODEC_ID_MPEG1VIDEO:
 	case AV_CODEC_ID_MPEG2VIDEO:
 		{
-			Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
-			MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
+			MpegEncContext*	s = (MpegEncContext*)pAVCtx->priv_data;
 
 			if (pAVCtx->extradata_size) {
 				// need to try decode extradata to fill MpegEncContext structure.
