@@ -5789,7 +5789,16 @@ static void fill_picture_parameters(AVCodecContext *avctx,
           intcomp = 1;
       }
     }
-
+    pp->wDecodedPictureIndex    =
+    pp->wDeblockedPictureIndex  = (unsigned)s->current_picture_ptr->f.data[4];
+    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type)
+        pp->wForwardRefPictureIndex = (unsigned)s->last_picture.f.data[4];
+    else
+        pp->wForwardRefPictureIndex = 0xffff;
+    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type)
+        pp->wBackwardRefPictureIndex = (unsigned)s->next_picture.f.data[4];
+    else
+        pp->wBackwardRefPictureIndex = 0xffff;
     if (v->profile == PROFILE_ADVANCED) {
         /* It is the cropped width/height -1 of the frame */
         pp->wPicWidthInMBminus1 = avctx->width  - 1;
@@ -5898,7 +5907,7 @@ static void fill_slice(AVCodecContext *avctx, DXVA_SliceInfo *slice,
     slice->dwSliceDataLocation = 0;
     slice->bStartCodeBitOffset = 0;
     slice->bReservedBits       = (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type) ? v->bfraction_lut_index + 9 : 0;
-    slice->wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb);
+    slice->wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb) + (avctx->codec_id == AV_CODEC_ID_VC1 ? 32 : 0);
     slice->wNumberMBsInSlice   = s->mb_width * s->mb_height; /* XXX We assume 1 slice */
     slice->wQuantizerScaleCode = v->pq;
     slice->wBadSliceChopping   = 0;

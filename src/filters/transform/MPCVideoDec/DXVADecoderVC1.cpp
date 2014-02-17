@@ -63,9 +63,6 @@ void CDXVADecoderVC1::Init()
 
 void CDXVADecoderVC1::Flush()
 {
-	m_wRefPictureIndex[0]		= NO_REF_FRAME;
-	m_wRefPictureIndex[1]		= NO_REF_FRAME;
-
 	bSecondField				= FALSE;
 	StatusReportFeedbackNumber	= 0;
 
@@ -142,16 +139,16 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 
 HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	HRESULT						hr				= S_FALSE;
-	UINT						nFrameSize		= 0;
-	UINT						nSize_Result	= 0;
-	int							got_picture		= 0;
+	HRESULT	hr				= S_FALSE;
+	UINT	nFrameSize		= 0;
+	UINT	nSize_Result	= 0;
+	int		got_picture		= 0;
 
 	memset(&m_PictureParams, 0, sizeof(m_PictureParams));
+	m_PictureParams[1].bBidirectionalAveragingMode = 
 	m_PictureParams[0].bBidirectionalAveragingMode = (1                               << 7) |
 													 (GetConfigIntraResidUnsigned()   << 6) |
 													 (GetConfigResidDiffAccelerator() << 5);
-	m_PictureParams[1].bBidirectionalAveragingMode = m_PictureParams[0].bBidirectionalAveragingMode;
 
 	CHECK_HR_FALSE (FFVC1DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
 									 pDataIn, nSize, rtStart,
@@ -171,16 +168,6 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 
 	{
 		bSecondField = FALSE;
-
-		m_PictureParams[0].wDecodedPictureIndex = m_PictureParams[0].wDeblockedPictureIndex = m_nSurfaceIndex;
-
-		// Manage reference picture list
-		if (!m_PictureParams[0].bPicBackwardPrediction) {
-			m_wRefPictureIndex[0] = m_wRefPictureIndex[1];
-			m_wRefPictureIndex[1] = m_nSurfaceIndex;
-		}
-		m_PictureParams[0].wForwardRefPictureIndex	= (m_PictureParams[0].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
-		m_PictureParams[0].wBackwardRefPictureIndex	= (m_PictureParams[0].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
 
 		StatusReportFeedbackNumber++;
 		if (StatusReportFeedbackNumber >= (1 << 16)) {
@@ -205,10 +192,6 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 		if (nFrameSize) {
 			 // Decoding Second Field
 			bSecondField = TRUE;
-
-			m_PictureParams[1].wDecodedPictureIndex		= m_PictureParams[1].wDeblockedPictureIndex			= m_nSurfaceIndex;
-			m_PictureParams[1].wForwardRefPictureIndex	= (m_PictureParams[1].bPicIntra == 0)				? m_wRefPictureIndex[0] : NO_REF_FRAME;
-			m_PictureParams[1].wBackwardRefPictureIndex	= (m_PictureParams[1].bPicBackwardPrediction == 1)	? m_wRefPictureIndex[1] : NO_REF_FRAME;
 
 			StatusReportFeedbackNumber++;
 			if (StatusReportFeedbackNumber >= (1 << 16)) {

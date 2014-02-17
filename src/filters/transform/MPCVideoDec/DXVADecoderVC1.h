@@ -37,7 +37,6 @@ public:
 private:
 	DXVA_PictureParameters	m_PictureParams[2];
 	DXVA_SliceInfo			m_SliceInfo[2];
-	WORD					m_wRefPictureIndex[2];
 	BOOL					bSecondField;
 	UINT					StatusReportFeedbackNumber;
 
