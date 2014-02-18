@@ -43,35 +43,23 @@ enum PCI_Vendors {
 #define DXVA_HIGH_BIT					DXVA_UNSUPPORTED_LEVEL << 4
 
 bool			IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
-
 // === H264 functions
-HRESULT			FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
-								  int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart,
-								  UINT* SecondFieldOffset, int* Sync, int* NALLength);
-HRESULT			FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice,
-									 DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix,
-									 int* nPictStruct);
 int				FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 										 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
-void			FFH264SetCurrentPicture(int nIndex, DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx);
-void			FFH264UpdateRefFramesList(DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx);
-BOOL			FFH264IsRefFrameInUse(int nFrameNum, struct AVCodecContext* pAVCtx);
-void			FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx);
-void			FFH264SetDxvaSliceLong(struct AVCodecContext* pAVCtx, void* pSliceLong);
+void			FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 
 // === VC1 functions
-HRESULT			FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
-								 BYTE* pBuffer, UINT nSize,
-								 BOOL* b_repeat_pict, UINT* nFrameSize, BOOL b_SecondField);
+void			FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pPicParams, void* pSliceInfo);
 
 // === Mpeg2 functions
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
-HRESULT			FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* m_QMatrixData, DXVA_SliceInfo* pSliceInfo,
-									struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-									int* nSliceCount, int* nNextCodecIndex, bool* bIsField);
+void			FFMPEG2SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 
 // === Common functions
-int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);
+HRESULT			FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
+							  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
+							  int* got_picture, UINT* nFrameSize = NULL);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
+UINT			FFGetMBCount(struct AVCodecContext* pAVCtx);
 void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
 BOOL			DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);

@@ -26,28 +26,19 @@
 class CDXVADecoderVC1 : public CDXVADecoder
 {
 public:
-	CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber);
-	CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
+	CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber);
+	CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual ~CDXVADecoderVC1();
 
-	// === Public functions
-	virtual HRESULT DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void	CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
-	virtual void	Flush();
+	virtual void			Flush();
+	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 private:
-	DXVA_PictureParameters		m_PictureParams;
-	DXVA_SliceInfo				m_SliceInfo;
-	WORD						m_wRefPictureIndex[2];
+	DXVA_PictureParameters	m_PictureParams[2];
+	DXVA_SliceInfo			m_SliceInfo[2];
+	BOOL					bSecondField;
+	UINT					StatusReportFeedbackNumber;
 
-	int							m_nDelayedSurfaceIndex;
-	REFERENCE_TIME				m_rtStartDelayed;
-	REFERENCE_TIME				m_rtStopDelayed;
-
-	BOOL 						m_bFrame_repeat_pict;
-
-	// Private functions
-	void						Init();
-	HRESULT						DisplayStatus();
-	BYTE*						FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize);
+	void					Init();
 };

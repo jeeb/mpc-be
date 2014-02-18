@@ -24,7 +24,25 @@
 #include <videoacc.h>
 #include "../../../DSUtil/DSUtil.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4005)
+#include <stdint.h>
+#pragma warning(pop)
+
+#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return S_FALSE; }
+#define CHECK_HR_FRAME(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex)); return S_FALSE; }
+
+#define CheckKeyFrame \
+	if (m_bWaitingForKeyFrame && got_picture) {	\
+		if (m_pFilter->GetFrame()->key_frame) {	\
+			m_bWaitingForKeyFrame = FALSE;		\
+		} else {								\
+			got_picture = 0;					\
+		}										\
+	}											\
+
 class CMPCVideoDecFilter;
+struct AVFrame;
 
 class CDXVADecoder
 {
@@ -37,14 +55,19 @@ class CDXVADecoder
 		ENGINE_DXVA2
 	};
 	struct PICTURE_STORE {
-		bool						bRefPicture;	// True if reference picture
 		bool						bInUse;			// Slot in use
-		bool						bDisplayed;		// True if picture have been presented
 		CComPtr<IMediaSample>		pSample;		// Only for DXVA2 !
 		REFERENCE_TIME				rtStart;
 		REFERENCE_TIME				rtStop;
-		int							nCodecSpecific;
 		DWORD						dwDisplayCount;
+
+		PICTURE_STORE() {
+			bInUse			= false;
+			pSample			= NULL;
+			rtStart			= INVALID_TIME;
+			rtStop			= INVALID_TIME;
+			dwDisplayCount	= 0;
+		}
 	};
 
 public :
@@ -54,16 +77,16 @@ public :
 		MPEG2_VLD
 	};
 
-	// === Public functions
 	virtual						~CDXVADecoder();
 	DXVAMode					GetMode() const { return m_nMode; }
 	DXVA_ENGINE					GetEngine() const { return m_nEngine; }
 	void						AllocExecuteParams(int nSize);
 	void						SetDirectXVideoDec(IDirectXVideoDecoder* pDirectXVideoDec) { m_pDirectXVideoDec = pDirectXVideoDec; }
 
-	virtual HRESULT				DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) PURE;
-	virtual void				CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void				Flush();
+	virtual void				CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize) PURE;
+	virtual HRESULT				DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) PURE;
+
 	HRESULT						ConfigureDXVA1();
 
 	static CDXVADecoder*		CreateDecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, int nPicEntryNumber);
@@ -71,20 +94,34 @@ public :
 
 	void						EndOfStream();
 
+	void						FreePictureSlot(int nSurfaceIndex);
+
+	HRESULT						get_buffer_dxva(struct AVFrame *pic);
+	static void					release_buffer_dxva(void *opaque, uint8_t *data);
+
 protected :
-	CDXVADecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber);
-	CDXVADecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
+	CDXVADecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber);
+	CDXVADecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
+
+	GUID						m_guidDecoder;
 
 	CMPCVideoDecFilter*			m_pFilter;
-	bool						m_bFlushed;
-	int							m_nMaxWaiting;
+	BOOL						m_bWaitingForKeyFrame;
 
 	PICTURE_STORE*				m_pPictureStore;		// Store reference picture, and delayed B-frames
 	int							m_nPicEntryNumber;		// Total number of picture in store
-	int							m_nWaitingPics;			// Number of picture not yet displayed
+
+	int							m_nSurfaceIndex;
+	CComPtr<IMediaSample>		m_pSampleToDeliver;
+
+	struct SurfaceWrapper {
+		void* opaque;
+		int nSurfaceIndex;
+		CComPtr<IMediaSample> pSample;
+	};
 
 	// === DXVA functions
-	HRESULT						AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, void* pBuffer, UINT* pRealSize = NULL);
+	HRESULT						AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize = 0, void* pBuffer = NULL, UINT* pRealSize = NULL);
 	HRESULT						GetDeliveryBuffer(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, IMediaSample** ppSampleToDeliver);
 	HRESULT						Execute();
 	DWORD						GetDXVA1CompressedType(DWORD dwDXVA2CompressedType);
@@ -98,9 +135,7 @@ protected :
 	DXVA2_ConfigPictureDecode*	GetDXVA2Config() { return &m_DXVA2Config; }
 
 	// === Picture store functions
-	bool						AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField, int nCodecSpecific);
-	void						UpdateStore(int nSurfaceIndex, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	void						RemoveRefFrame(int nSurfaceIndex);
+	bool						AddToStore(int nSurfaceIndex, IMediaSample* pSample, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	HRESULT						DisplayNextFrame();
 	HRESULT						GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	virtual int					FindOldestFrame();
@@ -108,9 +143,6 @@ protected :
 private :
 	DXVAMode						m_nMode;
 	DXVA_ENGINE						m_nEngine;
-
-	CComPtr<IMediaSample>			m_pFieldSample;
-	int								m_nFieldSurface;
 
 	// === DXVA1 variables
 	CComQIPtr<IAMVideoAccelerator>	m_pAMVideoAccelerator;
@@ -127,7 +159,6 @@ private :
 	DXVA2_ConfigPictureDecode		m_DXVA2Config;
 	DXVA2_DecodeExecuteParams		m_ExecuteParams;
 
-	void						Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
-	void						FreePictureSlot(int nSurfaceIndex);
-	void						SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
+	void							Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
+	void							SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
 };

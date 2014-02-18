@@ -33,14 +33,14 @@ CDXVA2Sample::CDXVA2Sample(CVideoDecDXVAAllocator *pAlloc, HRESULT *phr)
 
 STDMETHODIMP CDXVA2Sample::QueryInterface(REFIID riid, __deref_out void **ppv)
 {
-	CheckPointer(ppv,E_POINTER);
-	ValidateReadWritePtr(ppv,sizeof(PVOID));
+	CheckPointer(ppv, E_POINTER);
+	ValidateReadWritePtr(ppv, sizeof(PVOID));
 
 	if (riid == __uuidof(IMFGetService)) {
-		return GetInterface((IMFGetService*) this, ppv);
+		return GetInterface((IMFGetService*)this, ppv);
 	}
 	if (riid == __uuidof(IMPCDXVA2Sample)) {
-		return GetInterface((IMPCDXVA2Sample*) this, ppv);
+		return GetInterface((IMPCDXVA2Sample*)this, ppv);
 	} else {
 		return CMediaSample::QueryInterface(riid, ppv);
 	}
@@ -99,6 +99,9 @@ CVideoDecDXVAAllocator::CVideoDecDXVAAllocator(CMPCVideoDecFilter* pVideoDecFilt
 
 CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 {
+	DbgLog((LOG_TRACE, 3, L"CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()"));
+
+	m_pVideoDecFilter->FlushDXVADecoder();
 	Free();
 	if (m_pVideoDecFilter && m_pVideoDecFilter->m_pDXVA2Allocator == this) {
 		m_pVideoDecFilter->m_pDXVA2Allocator = NULL;
@@ -119,6 +122,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 	if (SUCCEEDED(hr)) {
 		// Free the old resources.
+		m_pVideoDecFilter->FlushDXVADecoder();
 		Free();
 
 		m_nSurfaceArrayCount = m_lCount;
@@ -167,7 +171,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 		}
 
 		hr = m_pVideoDecFilter->CreateDXVA2Decoder(m_lCount, m_ppRTSurfaceArray);
-		if (FAILED (hr)) {
+		if (FAILED(hr)) {
 			Free();
 		}
 	}
@@ -182,8 +186,6 @@ void CVideoDecDXVAAllocator::Free()
 {
 	CMediaSample *pSample = NULL;
 	CAutoLock lock(this);
-
-	m_pVideoDecFilter->FlushDXVADecoder();
 
 	do {
 		pSample = m_lFree.RemoveHead();

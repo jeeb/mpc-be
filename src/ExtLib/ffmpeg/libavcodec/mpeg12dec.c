@@ -43,24 +43,201 @@
 #include "vdpau_internal.h"
 #include "xvmc_internal.h"
 
+typedef struct Mpeg1Context {
+    MpegEncContext mpeg_enc_ctx;
+    int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
+    int repeat_field;           /* true if we must repeat the field */
+    AVPanScan pan_scan;         /* some temporary storage for the panscan */
+    AVStereo3D stereo3d;
+    int has_stereo3d;
+    uint8_t *a53_caption;
+    int a53_caption_size;
+    int slice_count;
+    int save_aspect_info;
+    int save_width, save_height, save_progressive_seq;
+    AVRational frame_rate_ext;  /* MPEG-2 specific framerate modificator */
+    int sync;                   /* Did we reach a sync point like a GOP/SEQ/KEYFrame? */
+    int tmpgexs;
+    int first_slice;
+    int extradata_decoded;
+} Mpeg1Context;
+
 // ==> Start patch MPC
-//typedef struct Mpeg1Context {
-//    MpegEncContext mpeg_enc_ctx;
-//    int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
-//    int repeat_field; /* true if we must repeat the field */
-//    AVPanScan pan_scan;              /**< some temporary storage for the panscan */
-//    uint8_t *a53_caption;
-//    int a53_caption_size;
-//    int slice_count;
-//    int save_aspect_info;
-//    int save_width, save_height, save_progressive_seq;
-//    AVRational frame_rate_ext;       ///< MPEG-2 specific framerate modificator
-//    int sync;                        ///< Did we reach a sync point like a GOP/SEQ/KEYFrame?
-//    int tmpgexs;
-//    int first_slice;
-//    int extradata_decoded;
-//} Mpeg1Context;
+#include <windows.h>
+#include <dxva.h>
+
+#define MAX_SLICE 1024
+typedef struct DXVA_MPEG2_Context {
+    DXVA_PictureParameters pp;
+    DXVA_QmatrixData       qm;
+    unsigned               slice_count;
+    DXVA_SliceInfo         slice[MAX_SLICE];
+
+    const uint8_t          *bitstream;
+    unsigned               bitstream_size;
+    int                    frame_start;
+} DXVA_MPEG2_Context;
+typedef struct DXVA_Context {
+    unsigned               frame_count;
+    DXVA_MPEG2_Context     ctx_pic[2];	
+} DXVA_Context;
+
+static void fill_picture_parameters(AVCodecContext *avctx,
+                                    struct DXVA_Context *ctx,
+                                    const struct MpegEncContext *s,
+                                    DXVA_PictureParameters *pp)
+{
+    const Picture *current_picture = s->current_picture_ptr;
+    int is_field = s->picture_structure != PICT_FRAME;
+
+    memset(pp, 0, sizeof(*pp));
+    pp->wDecodedPictureIndex         = (unsigned)s->current_picture_ptr->f.data[4];
+    pp->wDeblockedPictureIndex       = 0;
+    if (s->pict_type != AV_PICTURE_TYPE_I)
+        pp->wForwardRefPictureIndex  = (unsigned)s->last_picture.f.data[4];
+    else
+        pp->wForwardRefPictureIndex  = 0xffff;
+    if (s->pict_type == AV_PICTURE_TYPE_B)
+        pp->wBackwardRefPictureIndex = (unsigned)s->next_picture.f.data[4];
+    else
+        pp->wBackwardRefPictureIndex = 0xffff;
+    pp->wPicWidthInMBminus1          = s->mb_width  - 1;
+    pp->wPicHeightInMBminus1         = (s->mb_height >> is_field) - 1;
+    pp->bMacroblockWidthMinus1       = 15;
+    pp->bMacroblockHeightMinus1      = 15;
+    pp->bBlockWidthMinus1            = 7;
+    pp->bBlockHeightMinus1           = 7;
+    pp->bBPPminus1                   = 7;
+    pp->bPicStructure                = s->picture_structure;
+    pp->bSecondField                 = is_field && !s->first_field;
+    pp->bPicIntra                    = s->pict_type == AV_PICTURE_TYPE_I;
+    pp->bPicBackwardPrediction       = s->pict_type == AV_PICTURE_TYPE_B;
+    pp->bBidirectionalAveragingMode  = 0;
+    pp->bMVprecisionAndChromaRelation= 0; /* FIXME */
+    pp->bChromaFormat                = s->chroma_format;
+    pp->bPicScanFixed                = 1;
+    pp->bPicScanMethod               = s->alternate_scan ? 1 : 0;
+    pp->bPicReadbackRequests         = 0;
+    pp->bRcontrol                    = 0;
+    pp->bPicSpatialResid8            = 0;
+    pp->bPicOverflowBlocks           = 0;
+    pp->bPicExtrapolation            = 0;
+    pp->bPicDeblocked                = 0;
+    pp->bPicDeblockConfined          = 0;
+    pp->bPic4MVallowed               = 0;
+    pp->bPicOBMC                     = 0;
+    pp->bPicBinPB                    = 0;
+    pp->bMV_RPS                      = 0;
+    pp->bReservedBits                = 0;
+    pp->wBitstreamFcodes             = (s->mpeg_f_code[0][0] << 12) |
+                                       (s->mpeg_f_code[0][1] <<  8) |
+                                       (s->mpeg_f_code[1][0] <<  4) |
+                                       (s->mpeg_f_code[1][1]      );
+    pp->wBitstreamPCEelements        = (s->intra_dc_precision         << 14) |
+                                       (s->picture_structure          << 12) |
+                                       (s->top_field_first            << 11) |
+                                       (s->frame_pred_frame_dct       << 10) |
+                                       (s->concealment_motion_vectors <<  9) |
+                                       (s->q_scale_type               <<  8) |
+                                       (s->intra_vlc_format           <<  7) |
+                                       (s->alternate_scan             <<  6) |
+                                       (s->repeat_first_field         <<  5) |
+                                       (s->chroma_420_type            <<  4) |
+                                       (s->progressive_frame          <<  3);
+    pp->bBitstreamConcealmentNeed    = 0;
+    pp->bBitstreamConcealmentMethod  = 0;
+}
+
+static void fill_quantization_matrices(AVCodecContext *avctx,
+                                       struct DXVA_Context *ctx,
+                                       const struct MpegEncContext *s,
+                                       DXVA_QmatrixData *qm)
+{
+    int i;
+    for (i = 0; i < 4; i++)
+        qm->bNewQmatrix[i] = 1;
+    for (i = 0; i < 64; i++) {
+        int n = s->dsp.idct_permutation[ff_zigzag_direct[i]];
+        qm->Qmatrix[0][i] = s->intra_matrix[n];
+        qm->Qmatrix[1][i] = s->inter_matrix[n];
+        qm->Qmatrix[2][i] = s->chroma_intra_matrix[n];
+        qm->Qmatrix[3][i] = s->chroma_inter_matrix[n];
+    }
+}
+
+static int dxva_start_frame(AVCodecContext *avctx,
+                            struct DXVA_Context *ctx,
+                            struct DXVA_MPEG2_Context *ctx_pic)
+{
+    const struct MpegEncContext *s = avctx->priv_data;
+
+    if (ctx->frame_count > 2)
+        return -1;
+    assert(ctx_pic);
+
+    fill_picture_parameters(avctx, ctx, s, &ctx_pic->pp);
+    fill_quantization_matrices(avctx, ctx, s, &ctx_pic->qm);
+
+    ctx_pic->slice_count    = 0;
+    ctx_pic->bitstream_size = 0;
+    ctx_pic->bitstream      = NULL;
+    ctx_pic->frame_start    = 1;
+    return 0;
+}
+
+static void fill_slice(AVCodecContext *avctx,
+                       const struct MpegEncContext *s,
+                       DXVA_SliceInfo *slice,
+                       unsigned position,
+                       const uint8_t *buffer, unsigned size)
+{
+    int is_field = s->picture_structure != PICT_FRAME;
+    GetBitContext gb;
+
+    memset(slice, 0, sizeof(*slice));
+    slice->wHorizontalPosition = s->mb_x;
+    slice->wVerticalPosition   = s->mb_y >> is_field;
+    slice->dwSliceBitsInBuffer = 8 * size;
+    slice->dwSliceDataLocation = position;
+    slice->bStartCodeBitOffset = 0;
+    slice->bReservedBits       = 0;
+    /* XXX We store the index of the first MB and it will be fixed later */
+    slice->wNumberMBsInSlice   = (s->mb_y >> is_field) * s->mb_width + s->mb_x;
+    slice->wBadSliceChopping   = 0;
+
+    init_get_bits(&gb, &buffer[4], 8 * (size - 4));
+
+    slice->wQuantizerScaleCode = get_bits(&gb, 5);
+    skip_1stop_8data_bits(&gb);
+
+    slice->wMBbitOffset        = 4 * 8 + get_bits_count(&gb);
+}
+
+static int dxva_decode_slice(AVCodecContext *avctx,
+                             DXVA_Context *ctx,
+                             DXVA_MPEG2_Context *ctx_pic,
+                             const uint8_t *buffer, uint32_t size)
+{
+    const struct MpegEncContext *s = avctx->priv_data;
+    unsigned position;
+
+    if (ctx->frame_count > 2)
+        return -1;
+
+    if (ctx_pic->slice_count >= MAX_SLICE)
+        return -1;
+
+    if (!ctx_pic->bitstream)
+        ctx_pic->bitstream = buffer;
+    ctx_pic->bitstream_size += size;
+
+    position = buffer - ctx_pic->bitstream;
+    fill_slice(avctx, s, &ctx_pic->slice[ctx_pic->slice_count++], position,
+               buffer, size);
+    return 0;
+}
 // <== End patch MPC
+
 #define MB_TYPE_ZERO_MV   0x20000000
 
 static const uint32_t ptype2mb_type[7] = {
@@ -1214,7 +1391,7 @@ static enum AVPixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
     Mpeg1Context *s1  = avctx->priv_data;
     MpegEncContext *s = &s1->mpeg_enc_ctx;
 
-    if(s->chroma_format < 2) {
+    if (s->chroma_format < 2) {
         // ==> Start patch MPC
         if (s->avctx->using_dxva)
         return AV_PIX_FMT_YUV420P;
@@ -1224,7 +1401,7 @@ static enum AVPixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
                                 avctx->codec_id == AV_CODEC_ID_MPEG1VIDEO ?
                                 mpeg1_hwaccel_pixfmt_list_420 :
                                 mpeg2_hwaccel_pixfmt_list_420);
-    } else if(s->chroma_format == 2)
+    } else if (s->chroma_format == 2)
         return AV_PIX_FMT_YUV422P;
     else
         return AV_PIX_FMT_YUV444P;
@@ -1648,6 +1825,15 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
                 memcpy(sd->data, s1->a53_caption, s1->a53_caption_size);
             av_freep(&s1->a53_caption);
         }
+
+        if (s1->has_stereo3d) {
+            AVStereo3D *stereo = av_stereo3d_create_side_data(&s->current_picture_ptr->f);
+            if (!stereo)
+                return AVERROR(ENOMEM);
+
+            *stereo = s1->stereo3d;
+            s1->has_stereo3d = 0;
+        }
         if (HAVE_THREADS && (avctx->active_thread_type & FF_THREAD_FRAME))
             ff_thread_finish_setup(avctx);
     } else { // second field
@@ -1677,6 +1863,18 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
         if (avctx->hwaccel->start_frame(avctx, buf, buf_size) < 0)
             return -1;
     }
+
+    // ==> Start patch MPC
+    if (avctx->using_dxva) {
+        DXVA_Context* ctx = (DXVA_Context*)s->dxva_context;
+        ctx->frame_count++;
+        if (ctx->frame_count <= 2) {
+            DXVA_MPEG2_Context* ctx_pic = &ctx->ctx_pic[ctx->frame_count - 1];
+            if (dxva_start_frame(avctx, ctx, ctx_pic) < 0)
+                return -1;
+        }
+    }
+    // <== End patch MPC
 
     return 0;
 }
@@ -1762,48 +1960,21 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
     }
 
     // ==> Start patch MPC
-    if (s->avctx->using_dxva) {
-        Mpeg1Context *s1 = (Mpeg1Context*)s;
-        const uint8_t *buf_end, *buf_start = *buf - 4; /* include start_code */
-        const uint8_t *buffer;
-        uint32_t size;
-        int start_code = -1;
-        int is_field = s->picture_structure != PICT_FRAME;
-        GetBitContext gb;
-
-        buf_end = avpriv_find_start_code(buf_start + 2, *buf + buf_size, &start_code);
-        if (buf_end < *buf + buf_size)
-            buf_end -= 4;
-        s->mb_y = mb_y;
-
-        buffer = buf_start;
-        size = buf_end - buf_start;
-
-        s1->pSliceInfo[s1->slice_count].wHorizontalPosition = s->mb_x;
-        s1->pSliceInfo[s1->slice_count].wVerticalPosition   = s->mb_y >> is_field;
-        s1->pSliceInfo[s1->slice_count].dwSliceBitsInBuffer = 8 * size;
-        s1->pSliceInfo[s1->slice_count].bStartCodeBitOffset = 0;
-        s1->pSliceInfo[s1->slice_count].bReservedBits       = 0;
-        s1->pSliceInfo[s1->slice_count].wNumberMBsInSlice   = (s->mb_y >> is_field) * s->mb_width + s->mb_x;//s->mb_width;
-        s1->pSliceInfo[s1->slice_count].wBadSliceChopping   = 0;
-
-        init_get_bits(&gb, &buffer[4], 8 * (size - 4));
-        s1->pSliceInfo[s1->slice_count].wQuantizerScaleCode = get_bits(&gb, 5);
-        while (get_bits1(&gb))
-            skip_bits(&gb, 8);
-
-        s1->pSliceInfo[s1->slice_count].wMBbitOffset = 4 * 8 + get_bits_count(&gb);
-        if (s1->slice_count>0) {
-            s1->pSliceInfo[s1->slice_count-1].dwSliceBitsInBuffer = (buffer - s1->prev_slice)*8;
-            s1->pSliceInfo[s1->slice_count].dwSliceDataLocation   = s1->pSliceInfo[s1->slice_count-1].dwSliceDataLocation +
-                                                                    s1->pSliceInfo[s1->slice_count-1].dwSliceBitsInBuffer/8;
-        }
-
-        s1->prev_slice = (uint8_t*)buffer;
-        s1->slice_count++;
-
-        *buf = buf_end;
-        return 0;
+    if (avctx->using_dxva) {
+        DXVA_Context* ctx = (DXVA_Context*)s->dxva_context;
+        if (ctx->frame_count <= 2) {
+            DXVA_MPEG2_Context* ctx_pic = &ctx->ctx_pic[ctx->frame_count - 1];
+            const uint8_t *buf_end, *buf_start = *buf - 4; /* include start_code */
+            int start_code = -1;
+            buf_end = avpriv_find_start_code(buf_start + 2, *buf + buf_size, &start_code);
+            if (buf_end < *buf + buf_size)
+                buf_end -= 4;
+            s->mb_y = mb_y;
+		    if (dxva_decode_slice(avctx, ctx, ctx_pic, buf_start, buf_end - buf_start) < 0)
+                return DECODE_SLICE_ERROR;
+            *buf = buf_end;
+		}
+        return DECODE_SLICE_OK;
     }
     // <== End patch MPC
 
@@ -2060,9 +2231,6 @@ static int slice_end(AVCodecContext *avctx, AVFrame *pict)
     if (/* s->mb_y << field_pic == s->mb_height && */ !s->first_field && !s1->first_slice) {
         /* end of image */
 
-        // ==> Start patch MPC
-        if (!s->avctx->using_dxva)
-        // ==> End patch MPC
         ff_er_frame_end(&s->er);
 
         ff_MPV_frame_end(s);
@@ -2327,28 +2495,21 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
             S3D_video_format_type == 0x08 ||
             S3D_video_format_type == 0x23) {
             Mpeg1Context *s1   = avctx->priv_data;
-            MpegEncContext *s  = &s1->mpeg_enc_ctx;
-            AVStereo3D *stereo;
-            if (!s->current_picture_ptr)
-                return;
 
-            stereo =
-                av_stereo3d_create_side_data(&s->current_picture_ptr->f);
-            if (!stereo)
-                return;
+            s1->has_stereo3d = 1;
 
             switch (S3D_video_format_type) {
             case 0x03:
-                stereo->type = AV_STEREO3D_SIDEBYSIDE;
+                s1->stereo3d.type = AV_STEREO3D_SIDEBYSIDE;
                 break;
             case 0x04:
-                stereo->type = AV_STEREO3D_TOPBOTTOM;
+                s1->stereo3d.type = AV_STEREO3D_TOPBOTTOM;
                 break;
             case 0x08:
-                stereo->type = AV_STEREO3D_2D;
+                s1->stereo3d.type = AV_STEREO3D_2D;
                 break;
             case 0x23:
-                stereo->type = AV_STEREO3D_SIDEBYSIDE_QUINCUNX;
+                s1->stereo3d.type = AV_STEREO3D_SIDEBYSIDE_QUINCUNX;
                 break;
             }
         }
@@ -2704,9 +2865,6 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
                                             s2->resync_mb_y, s2->mb_x, s2->mb_y,
                                             ER_AC_ERROR | ER_DC_ERROR | ER_MV_ERROR);
                     } else {
-                        // ==> Start patch MPC
-                        if (!s2->avctx->using_dxva)
-                        // <== End patch MPC
                         ff_er_add_slice(&s2->er, s2->resync_mb_x,
                                         s2->resync_mb_y, s2->mb_x - 1, s2->mb_y,
                                         ER_AC_END | ER_DC_END | ER_MV_END);

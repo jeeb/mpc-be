@@ -12,9 +12,9 @@
 * libavcodec/h264.h
 * libavcodec/h264_ps.c
 * libavcodec/internal.h
-* libavcodec/mpeg12.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegvideo.c
+* libavcodec/mpegvideo.h
 * libavcodec/options.c
 * libavcodec/utils.c
 * libavcodec/vc1.h
@@ -24,7 +24,6 @@
 * libavutil/common.h
 * libavutil/eval.c
 * libavutil/file_open.c
-* libavutil/frame.h
 * libavutil/internal.h
 * libavutil/mathematics.h
 

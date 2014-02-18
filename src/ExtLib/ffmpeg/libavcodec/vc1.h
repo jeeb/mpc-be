@@ -417,6 +417,8 @@ typedef struct VC1Context{
     int resync_marker;           ///< could this stream contain resync markers
     // ==> Start patch MPC
     int second_field_offset;
+    void* pPictureParameters;
+    void* pSliceInfo;
     // <== End patch MPC
 } VC1Context;
 

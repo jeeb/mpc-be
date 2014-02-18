@@ -33,9 +33,6 @@
 
 #define MPCVideoDecName L"MPC Video Decoder"
 
-#define CHECK_HR(x)			hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return hr; }
-#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return S_FALSE; }
-
 struct AVCodec;
 struct AVCodecContext;
 struct AVCodecParserContext;
@@ -152,6 +149,8 @@ protected:
 
 	REFERENCE_TIME							m_rtStartCache;
 
+	DWORD									m_fSYNC;
+
 	// === Private functions
 	void				Cleanup();
 	void				ffmpegCleanup();
@@ -169,17 +168,17 @@ protected:
 
 	HRESULT				InitDecoder(const CMediaType *pmt);
 
+	static int			av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
+
 public:
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CMPCVideoDecFilter();
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP			NonDelegatingQueryInterface(REFIID riid, void** ppv);
-	virtual bool			IsVideoInterlaced();
+	virtual bool			IsVideoInterlaced() { return true; };
 	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight);
-	CTransformOutputPin*	GetOutputPin() {
-		return m_pOutput;
-	}
+	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 
 	REFERENCE_TIME	GetDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool pulldown_flag = false);
@@ -262,12 +261,7 @@ public:
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
 	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	void						FlushDXVADecoder()	{
-		if (m_pDXVADecoder) {
-			m_pDXVADecoder->Flush();
-		}
-	}
-
+	void						FlushDXVADecoder();
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
 
 	// === DXVA1 functions
@@ -280,7 +274,7 @@ public:
 
 
 	// === DXVA2 functions
-	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc);
+	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMAT Format = D3DFMT_A8R8G8B8);
 	HRESULT						ConfigureDXVA2(IPin *pPin);
 	HRESULT						SetEVRForDXVA2(IPin *pPin);
 	HRESULT						FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,
@@ -306,9 +300,6 @@ private:
 	HRESULT						RecommitAllocator();
 };
 
-class CMPCVideoDecFilter;
-class CVideoDecDXVAAllocator;
-
 class CVideoDecOutputPin : public CBaseVideoOutputPin
 	, public IAMVideoAcceleratorNotify
 {
@@ -333,7 +324,6 @@ private :
 	DDPIXELFORMAT		m_ddUncompPixelFormat;
 };
 
-//
 struct SUPPORTED_FORMATS {
 	const CLSID*	clsMajorType;
 	const CLSID*	clsMinorType;

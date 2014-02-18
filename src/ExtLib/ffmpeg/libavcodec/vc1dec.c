@@ -44,6 +44,11 @@
 #undef NDEBUG
 #include <assert.h>
 
+// ==> Start patch MPC
+#include <windows.h>
+#include <dxva.h>
+// <== End patch MPC
+
 #define MB_INTRA_VLC_BITS 9
 #define DC_VLC_BITS 9
 
@@ -5777,6 +5782,146 @@ av_cold int ff_vc1_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
+// ==> Start patch MPC
+static void fill_picture_parameters(AVCodecContext *avctx,
+                                    const VC1Context *v,
+                                    DXVA_PictureParameters *pp)
+{
+    const MpegEncContext *s = &v->s;
+    const Picture *current_picture = s->current_picture_ptr;
+    int intcomp = 0;
+
+    // determine if intensity compensation is needed
+    if (s->pict_type == AV_PICTURE_TYPE_P) {
+      if ((v->fcm == ILACE_FRAME && v->intcomp) || (v->fcm != ILACE_FRAME && v->mv_mode == MV_PMODE_INTENSITY_COMP)) {
+        if (v->lumscale != 32 || v->lumshift != 0 || (s->picture_structure != PICT_FRAME && (v->lumscale2 != 32 || v->lumshift2 != 0)))
+          intcomp = 1;
+      }
+    }
+    pp->wDecodedPictureIndex    =
+    pp->wDeblockedPictureIndex  = (unsigned)s->current_picture_ptr->f.data[4];
+    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type)
+        pp->wForwardRefPictureIndex = (unsigned)s->last_picture.f.data[4];
+    else
+        pp->wForwardRefPictureIndex = 0xffff;
+    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type)
+        pp->wBackwardRefPictureIndex = (unsigned)s->next_picture.f.data[4];
+    else
+        pp->wBackwardRefPictureIndex = 0xffff;
+    if (v->profile == PROFILE_ADVANCED) {
+        /* It is the cropped width/height -1 of the frame */
+        pp->wPicWidthInMBminus1 = avctx->width  - 1;
+        pp->wPicHeightInMBminus1= avctx->height - 1;
+    } else {
+        /* It is the coded width/height in macroblock -1 of the frame */
+        pp->wPicWidthInMBminus1 = s->mb_width  - 1;
+        pp->wPicHeightInMBminus1= s->mb_height - 1;
+    }
+    pp->bMacroblockWidthMinus1  = 15;
+    pp->bMacroblockHeightMinus1 = 15;
+    pp->bBlockWidthMinus1       = 7;
+    pp->bBlockHeightMinus1      = 7;
+    pp->bBPPminus1              = 7;
+    if (s->picture_structure & PICT_TOP_FIELD)
+        pp->bPicStructure      |= 0x01;
+    if (s->picture_structure & PICT_BOTTOM_FIELD)
+        pp->bPicStructure      |= 0x02;
+    pp->bSecondField            = v->interlace && v->fcm == ILACE_FIELD && v->second_field;
+    pp->bPicIntra               = s->pict_type == AV_PICTURE_TYPE_I || v->bi_type;
+    pp->bPicBackwardPrediction  = s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type;
+    pp->bBidirectionalAveragingMode = (pp->bBidirectionalAveragingMode           & 0xE0) |
+                                      (intcomp                                     << 4) |
+                                      ((v->profile == PROFILE_ADVANCED)            << 3);
+    pp->bMVprecisionAndChromaRelation = ((v->mv_mode == MV_PMODE_1MV_HPEL_BILIN) << 3) |
+                                        (1                                       << 2) |
+                                        (0                                       << 1) |
+                                        (!s->quarter_sample                          );
+    pp->bChromaFormat           = v->chromaformat;
+    pp->bPicReadbackRequests    = 0;
+    pp->bRcontrol               = v->rnd;
+    pp->bPicSpatialResid8       = (v->panscanflag  << 7) |
+                                  (v->refdist_flag << 6) |
+                                  (s->loop_filter  << 5) |
+                                  (v->fastuvmc     << 4) |
+                                  (v->extended_mv  << 3) |
+                                  (v->dquant       << 1) |
+                                  (v->vstransform      );
+    pp->bPicOverflowBlocks      = (v->quantizer_mode << 6) |
+                                  (v->multires       << 5) |
+                                  (v->resync_marker  << 4) |
+                                  (v->rangered       << 3) |
+                                  (s->max_b_frames       );
+    pp->bPicExtrapolation       = (!v->interlace || v->fcm == PROGRESSIVE) ? 1 : 2;
+    pp->bPicDeblocked           = ((!pp->bPicBackwardPrediction && v->overlap)        << 6) |
+                                  ((v->profile != PROFILE_ADVANCED && v->rangeredfrm) << 5) |
+                                  (s->loop_filter                                     << 1);
+    pp->bPicDeblockConfined     = (v->postprocflag             << 7) |
+                                  (v->broadcast                << 6) |
+                                  (v->interlace                << 5) |
+                                  (v->tfcntrflag               << 4) |
+                                  (v->finterpflag              << 3) |
+                                  ((s->pict_type != AV_PICTURE_TYPE_B) << 2) |
+                                  (v->psf                      << 1) |
+                                  (v->extended_dmv                 );
+    if (s->pict_type != AV_PICTURE_TYPE_I)
+        pp->bPic4MVallowed      = v->mv_mode == MV_PMODE_MIXED_MV ||
+                                  (v->mv_mode == MV_PMODE_INTENSITY_COMP &&
+                                   v->mv_mode2 == MV_PMODE_MIXED_MV);
+    if (v->profile == PROFILE_ADVANCED)
+        pp->bPicOBMC            = (v->range_mapy_flag  << 7) |
+                                  (v->range_mapy       << 4) |
+                                  (v->range_mapuv_flag << 3) |
+                                  (v->range_mapuv          );
+    pp->bPicBinPB               = 0;
+    pp->bMV_RPS                 = (v->fcm == ILACE_FIELD && pp->bPicBackwardPrediction) ? v->refdist + 9 : 0;
+    pp->bReservedBits           = v->pq;
+    if (s->picture_structure == PICT_FRAME) {
+        if (intcomp) {
+            pp->wBitstreamFcodes      = v->lumscale;
+            pp->wBitstreamPCEelements = v->lumshift;
+        } else {
+            pp->wBitstreamFcodes      = 32;
+            pp->wBitstreamPCEelements = 0;
+        }
+    } else {
+        /* Syntax: (top_field_param << 8) | bottom_field_param */
+        if (intcomp) {
+            pp->wBitstreamFcodes      = (v->lumscale << 8) | v->lumscale2;
+            pp->wBitstreamPCEelements = (v->lumshift << 8) | v->lumshift2;
+        } else {
+            pp->wBitstreamFcodes      = (32 << 8) | 32;
+            pp->wBitstreamPCEelements = 0;
+        }
+    }
+    pp->bBitstreamConcealmentNeed   = 0;
+    pp->bBitstreamConcealmentMethod = 0;
+}
+
+static void fill_slice(AVCodecContext *avctx, DXVA_SliceInfo *slice,
+                       const uint8_t *buffer, uint32_t size)
+{
+    const VC1Context *v = avctx->priv_data;
+    const MpegEncContext *s = &v->s;
+
+    if (avctx->codec_id == AV_CODEC_ID_VC1 &&
+        size >= 4 && IS_MARKER(AV_RB32(buffer))) {
+        buffer += 4;
+        size   -= 4;
+    }
+
+    memset(slice, 0, sizeof(*slice));
+    slice->wHorizontalPosition = 0;
+    slice->wVerticalPosition   = s->mb_y;
+    slice->dwSliceBitsInBuffer = 8 * size;
+    slice->dwSliceDataLocation = 0;
+    slice->bStartCodeBitOffset = 0;
+    slice->bReservedBits       = (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type) ? v->bfraction_lut_index + 9 : 0;
+    slice->wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb) + (avctx->codec_id == AV_CODEC_ID_VC1 ? 32 : 0);
+    slice->wNumberMBsInSlice   = s->mb_width * s->mb_height; /* XXX We assume 1 slice */
+    slice->wQuantizerScaleCode = v->pq;
+    slice->wBadSliceChopping   = 0;
+}
+// <== End patch MPC
 
 /** Decode a VC1/WMV3 frame
  * @todo TODO: Handle VC-1 IDUs (Transport level?)
@@ -6105,7 +6250,41 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         }
     } else
         // ==> Start patch MPC
-        if (!avctx->using_dxva)
+        if (avctx->using_dxva) {
+            if (v->field_mode && buf_start_second_field) {
+                // decode first field
+                v->second_field_offset = buf_start_second_field - buf;
+                s->picture_structure = PICT_BOTTOM_FIELD - v->tff;
+
+                DXVA_PictureParameters* pp = &((DXVA_PictureParameters*)v->pPictureParameters)[0];
+                fill_picture_parameters(avctx, v, pp);
+                DXVA_SliceInfo* si = &((DXVA_SliceInfo*)v->pSliceInfo)[0];
+                fill_slice(avctx, si, buf_start, buf_start_second_field - buf_start);
+
+                // decode second field
+                s->gb = slices[n_slices1 + 1].gb;
+                s->picture_structure = PICT_TOP_FIELD + v->tff;
+                v->second_field = 1;
+                v->pic_header_flag = 0;
+                if (ff_vc1_parse_frame_header_adv(v, &s->gb) < 0) {
+                    av_log(avctx, AV_LOG_ERROR, "parsing header for second field failed");
+                    goto err;
+                }
+                v->s.current_picture_ptr->f.pict_type = v->s.pict_type;
+
+                pp = &((DXVA_PictureParameters*)v->pPictureParameters)[1];
+                fill_picture_parameters(avctx, v, pp);
+                si = &((DXVA_SliceInfo*)v->pSliceInfo)[1];
+                fill_slice(avctx, si, buf_start_second_field, (buf + buf_size) - buf_start_second_field);
+            } else {
+                s->picture_structure = PICT_FRAME;
+
+                DXVA_PictureParameters* pp = &((DXVA_PictureParameters*)v->pPictureParameters)[0];
+                fill_picture_parameters(avctx, v, pp);
+                DXVA_SliceInfo* si = &((DXVA_SliceInfo*)v->pSliceInfo)[0];
+                fill_slice(avctx, si, buf_start, (buf + buf_size) - buf_start);
+            }
+        } else
         // <== End patch MPC
         {
         int header_ret = 0;
@@ -6235,15 +6414,6 @@ image:
             *got_frame = 1;
         }
     }
-
-    // ==> Start patch MPC
-    if (v->field_mode && buf_start_second_field) {
-        s->picture_structure   = PICT_BOTTOM_FIELD - v->tff;
-        v->second_field_offset = buf_start_second_field - buf;
-    } else {
-        s->picture_structure = PICT_FRAME;
-    }
-    // <== End patch MPC
 
 end:
     av_free(buf2);
