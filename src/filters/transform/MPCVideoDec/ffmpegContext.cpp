@@ -47,7 +47,7 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/319.49/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/331.38/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
@@ -65,8 +65,11 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FE2, // GeForce GT 745M
 	0x0FE3, // GeForce GT 745M
 	0x0FE4, // GeForce GT 750M
+	0x0FE9, // GeForce GT 750M
+	0x0FEA, // GeForce GT 755M
 	0x0FEF, // GRID K340
 	0x0FF2, // GRID K1
+	0x0FF6, // Quadro K1100M
 	0x0FF8, // Quadro K500M
 	0x0FF9, // Quadro K2000D
 	0x0FFA, // Quadro K600
@@ -77,10 +80,15 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FFF, // Quadro 410
 	0x1004, // GeForce GTX 780
 	0x1005, // GeForce GTX TITAN
+	0x100A, // GeForce GTX 780 Ti
 	0x1021, // Tesla K20Xm
 	0x1022, // Tesla K20c
+	0x1023, // Tesla K40m
+	0x1024, // Tesla K40c
 	0x1026, // Tesla K20s
+	0x1027, // Tesla K40st
 	0x1028, // Tesla K20m
+	0x1029, // Tesla K40s
 	0x103A, // Quadro K6000
 	0x1040, // GeForce GT 520 (GF119) (not officially supported or typo, 4k tested)
 	0x1042, // GeForce 510
@@ -105,14 +113,20 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1188, // GeForce GTX 690
 	0x1189, // GeForce GTX 670
 	0x118A, // GRID K520
+	0x118E, // GeForce GTX 760 (192-bit)
 	0x118F, // Tesla K10
+	0x1193, // GeForce GTX 760 Ti OEM
 	0x119D, // GeForce GTX 775M
+	0x119E, // GeForce GTX 780M
 	0x119F, // GeForce GTX 780M
 	0x11A0, // GeForce GTX 680M
 	0x11A1, // GeForce GTX 670MX
 	0x11A2, // GeForce GTX 675MX
 	0x11A3, // GeForce GTX 680MX
 	0x11A7, // GeForce GTX 675MX
+	0x11B6, // Quadro K3100M
+	0x11B7, // Quadro K4100M
+	0x11B8, // Quadro K5100M
 	0x11BA, // Quadro K5000
 	0x11BC, // Quadro K5000M
 	0x11BD, // Quadro K4000M
@@ -129,11 +143,14 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x11E2, // GeForce GTX 765M
 	0x11E3, // GeForce GTX 760M
 	0x11FA, // Quadro K4000
+	0x11FC, // Quadro K2100M
 	0x1280, // GeForce GT 635
 	0x1290, // GeForce GT 730M
 	0x1291, // GeForce GT 735M
 	0x1292, // GeForce GT 740M
 	0x1293, // GeForce GT 730M
+	0x12B9, // Quadro K610M
+	0x12BA, // Quadro K510M
 };
 
 static const WORD PCID_ATI_UVD [] = {
