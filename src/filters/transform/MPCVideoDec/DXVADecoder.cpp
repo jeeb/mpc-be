@@ -471,7 +471,6 @@ bool CDXVADecoder::AddToStore(int nSurfaceIndex, IMediaSample* pSample, REFERENC
 
 	m_pPictureStore[nSurfaceIndex].bInUse			= true;
 	m_pPictureStore[nSurfaceIndex].pSample			= pSample;
-
 	m_pPictureStore[nSurfaceIndex].rtStart			= rtStart;
 	m_pPictureStore[nSurfaceIndex].rtStop			= rtStop;
 
@@ -572,7 +571,6 @@ HRESULT CDXVADecoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppS
 				}
 
 				if (nPos != -1) {
-					//m_pPictureStore[nPos].bInUse = true;
 					nSurfaceIndex = nPos;
 					return S_OK;
 				}
@@ -714,8 +712,10 @@ void CDXVADecoder::release_buffer_dxva(void *opaque, uint8_t *data)
 	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)opaque;
 
 	CDXVADecoder* pDec = (CDXVADecoder*)pSurfaceWrapper->opaque;
-	pDec->FreePictureSlot(pSurfaceWrapper->nSurfaceIndex);
+	if (pDec->GetEngine() == ENGINE_DXVA2) {
+		pDec->FreePictureSlot(pSurfaceWrapper->nSurfaceIndex);
+		pSurfaceWrapper->pSample.Release();
+	}
 
-	pSurfaceWrapper->pSample.Release();
 	delete pSurfaceWrapper;
 }
