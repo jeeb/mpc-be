@@ -716,7 +716,7 @@
 #define IDC_DX_SURFACE                  10733
 #define IDC_DSVMRYUVMIXER               10734
 #define IDC_DSVMR9LOADMIXER2            10735
-#define IDC_BUTTON_MI                   10736
+#define IDC_BUTTON_MI_SAVEAS            10736
 #define IDC_MIEDIT                      10737
 #define IDC_LISTCHANNELS                10738
 #define IDC_STATUSBAR                   10739
@@ -726,6 +726,7 @@
 #define IDC_MAXQUEUE_SIZE               10743
 #define IDC_CACH_SIZE                   10744
 #define IDC_PERFOMANCE_DEFAULT          10745
+#define IDC_BUTTON_MI_CLIPBOARD         10746
 //
 // 11000...13999 are reserved
 //
@@ -1233,6 +1234,7 @@
 #define IDS_SAVE_FILE                   33447
 #define IDS_AG_VIDEOFILES               33448
 #define IDS_VOLUME_OSD_MUTE             33449
+#define IDS_COPY_TO_CLIPBOARD           33450
 // video files
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002

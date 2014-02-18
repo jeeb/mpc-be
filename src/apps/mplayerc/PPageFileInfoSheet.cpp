@@ -73,7 +73,8 @@ BEGIN_MESSAGE_MAP(CPPageFileInfoSheet, CMPCPropertySheet)
 	ON_WM_DESTROY()
 	ON_WM_GETMINMAXINFO()
 	ON_WM_SIZE()
-	ON_BN_CLICKED(IDC_BUTTON_MI, OnSaveAs)
+	ON_BN_CLICKED(IDC_BUTTON_MI_SAVEAS, OnSaveAs)
+	ON_BN_CLICKED(IDC_BUTTON_MI_CLIPBOARD, OnCopyToClipboard)
 END_MESSAGE_MAP()
 
 // CPPageFileInfoSheet message handlers
@@ -81,6 +82,8 @@ END_MESSAGE_MAP()
 BOOL CPPageFileInfoSheet::OnInitDialog()
 {
 	BOOL bResult = CPropertySheet::OnInitDialog();
+
+	const AppSettings& s = AfxGetAppSettings();
 
 	m_fn.TrimRight('/');
 	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
@@ -101,10 +104,15 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 	GetDlgItem(IDOK)->MoveWindow(r);
 
 	r.MoveToX(5);
-	r.right += 10;
-	m_Button_MI.Create(ResStr(IDS_AG_SAVE_AS), WS_CHILD|BS_PUSHBUTTON|WS_VISIBLE, r, this, IDC_BUTTON_MI);
-	m_Button_MI.SetFont(GetFont());
-	m_Button_MI.ShowWindow(SW_HIDE);
+	r.right = r.left + 120;
+	m_Button_MI_SaveAs.Create(ResStr(IDS_AG_SAVE_AS), WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE, r, this, IDC_BUTTON_MI_SAVEAS);
+	m_Button_MI_SaveAs.SetFont(GetFont());
+	m_Button_MI_SaveAs.ShowWindow(SW_HIDE);
+
+	r.MoveToX(r.Width() + 10);
+	m_Button_MI_Clipboard.Create(ResStr(IDS_COPY_TO_CLIPBOARD), WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE, r, this, IDC_BUTTON_MI_CLIPBOARD);
+	m_Button_MI_Clipboard.SetFont(GetFont());
+	m_Button_MI_Clipboard.ShowWindow(SW_HIDE);
 
 	GetTabControl()->SetFocus();
 
@@ -116,17 +124,16 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 	GetClientRect(&m_rCrt);
 	ScreenToClient(&m_rCrt);
 
-	GetWindowRect (&r);
-	ScreenToClient (&r);
-	r.right		+= AfxGetAppSettings().iDlgPropX;
-	r.bottom	+= AfxGetAppSettings().iDlgPropY;
+	GetWindowRect(&r);
+	ScreenToClient(&r);
+	r.right		+= s.iDlgPropX;
+	r.bottom	+= s.iDlgPropY;
 	MoveWindow (&r);
 
 	CenterWindow();
 
 	ModifyStyle(0, WS_MAXIMIZEBOX);
 
-	const AppSettings& s = AfxGetAppSettings();
 	for (int i = 0; i < GetPageCount(); i++) {
 		DWORD nID = GetResourceId(i);
 		if (nID == s.nLastFileInfoPage) {
@@ -141,7 +148,7 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 void CPPageFileInfoSheet::OnSaveAs()
 {
 	CFileDialog filedlg (FALSE, _T("*.txt"), m_fn,
-						 OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
+						 OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 						 _T("Text Files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL);
 
 	if (filedlg.DoModal() == IDOK) {
@@ -150,9 +157,31 @@ void CPPageFileInfoSheet::OnSaveAs()
 
 		if (mFile.Open(filedlg.GetPathName(), CFile::modeCreate | CFile::modeWrite)) {
 			mFile.Write(&bom, sizeof(TCHAR));
-			mFile.Write(LPCTSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength()*sizeof(TCHAR));
+			mFile.Write(LPCTSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength() * sizeof(TCHAR));
 			mFile.Close();
 		}
+	}
+}
+
+void CPPageFileInfoSheet::OnCopyToClipboard()
+{
+	size_t cbStr = (m_mi.MI_Text.GetLength() + 1) * sizeof(TCHAR);
+	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, cbStr);
+	if (hGlob) {
+		LPVOID pData = GlobalLock(hGlob);
+		if (pData) {
+			memcpy_s(GlobalLock(pData), cbStr, m_mi.MI_Text.LockBuffer(), cbStr);
+			GlobalUnlock(hGlob);
+			m_mi.MI_Text.UnlockBuffer();
+
+			if (OpenClipboard()) {
+				EmptyClipboard();
+				::SetClipboardData(CF_UNICODETEXT, hGlob);
+				CloseClipboard();
+			}
+		}
+
+		GlobalFree(hGlob);
 	}
 }
 
@@ -184,7 +213,9 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 
 	CRect r;
 
-	if (m_bNeedInit) return;
+	if (m_bNeedInit) {
+		return;
+	}
 
 	CTabCtrl *pTab = GetTabControl();
 	ASSERT(NULL != pTab && IsWindow(pTab->m_hWnd));
@@ -195,10 +226,12 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 
 	HDWP hDWP = ::BeginDeferWindowPos(5);
 
+	UINT uDefFlags = SWP_NOACTIVATE | SWP_NOZORDER;
+
 	pTab->GetClientRect(&r);
 	r.right += dx;
 	r.bottom += dy;
-	::DeferWindowPos(hDWP, pTab->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+	::DeferWindowPos(hDWP, pTab->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), uDefFlags | SWP_NOMOVE);
 
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDOK)) {
@@ -208,18 +241,18 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 			r.bottom += dy;
 			r.left+= dx;
 			r.right += dx;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
-		} else if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDC_BUTTON_MI)) {
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, uDefFlags | SWP_NOSIZE);
+		} else if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && (pChild == GetDlgItem(IDC_BUTTON_MI_SAVEAS) || pChild == GetDlgItem(IDC_BUTTON_MI_CLIPBOARD))) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.top += dy;
 			r.bottom += dy;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, uDefFlags | SWP_NOSIZE);
 		} else {
 			pChild->GetClientRect(&r);
 			r.right += dx;
 			r.bottom += dy;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), uDefFlags | SWP_NOMOVE);
 		}
 	}
 

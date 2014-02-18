@@ -23,7 +23,7 @@
 #include "PPageFileMediaInfo.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
-String mi_get_lang_file()
+static String mi_get_lang_file()
 {
 	HINSTANCE mpcres = NULL;
 	int lang = AfxGetAppSettings().iLanguage;
@@ -32,27 +32,40 @@ String mi_get_lang_file()
 		mpcres = LoadLibrary(CMPlayerCApp::GetSatelliteDll(lang));
 	}
 
+	String str = L"  Config_Text_ColumnSize;30";
 	if (mpcres) {
-		HRSRC hRes = FindResource(mpcres, MAKEINTRESOURCE(IDB_MEDIAINFO_LANGUAGE), _T("FILE"));
+		HRSRC hRes = FindResource(mpcres, MAKEINTRESOURCE(IDB_MEDIAINFO_LANGUAGE), L"FILE");
 
 		if (hRes) {
-			HANDLE lRes = LoadResource(mpcres, hRes);
-			int size = SizeofResource(mpcres, hRes);
-			wchar_t* wstr = DNew wchar_t[size];
+			HANDLE lRes = ::LoadResource(mpcres, hRes);
+			if (lRes) {
+				LPCSTR lpMultiByteStr = (LPCSTR)LockResource(lRes);
 
-			if (!MultiByteToWideChar(CP_UTF8, 0, (char*)LockResource(lRes), size, wstr, size)) {
-				MultiByteToWideChar(CP_ACP, 0, (char*)LockResource(lRes), size, wstr, size);
+				BOOL acp = FALSE;
+				int dstlen = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, NULL, 0);
+				if (!dstlen) {
+					acp = TRUE;
+					dstlen = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, NULL, 0);
+				}
+
+				if (dstlen) {
+					WCHAR* wstr = DNew WCHAR[dstlen];
+					if (wstr) {
+						MultiByteToWideChar(acp ? CP_ACP : CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, wstr, dstlen);
+					
+						str = wstr;
+						delete wstr;
+					}
+				}
+
+				UnlockResource(lRes);
+				FreeResource(lRes);
 			}
-
-			UnlockResource(lRes);
-			FreeResource(lRes);
 			FreeLibrary(mpcres);
-
-			return (String)wstr;
 		}
 	}
 
-	return _T("  Config_Text_ColumnSize;30");
+	return str;
 }
 
 // CPPageFileMediaInfo dialog
@@ -159,9 +172,11 @@ void CPPageFileMediaInfo::OnShowWindow(BOOL bShow, UINT nStatus)
 	__super::OnShowWindow(bShow, nStatus);
 
 	if (bShow) {
-		GetParent()->GetDlgItem(IDC_BUTTON_MI)->ShowWindow(SW_SHOW);
+		GetParent()->GetDlgItem(IDC_BUTTON_MI_SAVEAS)->ShowWindow(SW_SHOW);
+		GetParent()->GetDlgItem(IDC_BUTTON_MI_CLIPBOARD)->ShowWindow(SW_SHOW);
 	} else {
-		GetParent()->GetDlgItem(IDC_BUTTON_MI)->ShowWindow(SW_HIDE);
+		GetParent()->GetDlgItem(IDC_BUTTON_MI_SAVEAS)->ShowWindow(SW_HIDE);
+		GetParent()->GetDlgItem(IDC_BUTTON_MI_CLIPBOARD)->ShowWindow(SW_HIDE);
 	}
 }
 

@@ -2646,6 +2646,7 @@ BEGIN
     IDS_MPLAYERC_16         "Framestep back"
     IDS_AG_GO_TO            "Go To"
     IDS_AG_INCREASE_RATE    "Increase Rate"
+    IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
 END
 
 STRINGTABLE

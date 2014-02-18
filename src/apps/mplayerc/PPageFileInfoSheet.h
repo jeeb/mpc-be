@@ -71,13 +71,15 @@ private:
 	CPPageFileInfoRes m_res;
 	CPPageFileMediaInfo m_mi;
 
-	CButton m_Button_MI;
+	CButton m_Button_MI_SaveAs;
+	CButton m_Button_MI_Clipboard;
 
 public:
 	CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWnd* pParentWnd);
 	virtual ~CPPageFileInfoSheet();
 
 	afx_msg void OnSaveAs();
+	afx_msg void OnCopyToClipboard();
 	INT_PTR DoModal();
 	CString m_fn;
 
