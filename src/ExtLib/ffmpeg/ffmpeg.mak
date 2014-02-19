@@ -32,8 +32,8 @@ TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
 CFLAGS	= -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(OPUS_DIR) -I$(SPEEX_DIR)\
 		-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
-		-O2 -ffast-math -fomit-frame-pointer \
-		-std=gnu99 -fno-common -mthreads
+		-fomit-frame-pointer -std=gnu99 \
+		-fno-common -mthreads
 YASMFLAGS = -I. -Ilibavutil/x86 -Pconfig.asm
 
 ifeq ($(64BIT),yes)
@@ -50,9 +50,9 @@ else
 endif
 
 ifeq ($(DEBUG),yes)
-	CFLAGS		+= -DDEBUG -D_DEBUG -g
+	CFLAGS		+= -DDEBUG -D_DEBUG -g -Og
 else
-	CFLAGS		+= -DNDEBUG -UDEBUG -U_DEBUG
+	CFLAGS		+= -DNDEBUG -UDEBUG -U_DEBUG -O2
 endif
 
 # Object directories
