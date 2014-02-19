@@ -293,7 +293,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void SetupSubtitlesSubMenu();
 	void SetupNavMixAudioSubMenu();
 	void SetupNavMixSubtitleSubMenu();
-	void SetupNavAngleSubMenu();
+	void SetupVideoStreamsSubMenu();
 	void SetupNavChaptersSubMenu();
 	void SetupFavoritesSubMenu();
 	void SetupShadersSubMenu();
@@ -310,16 +310,15 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup);
 
-	CMenu m_popupmain, m_popup;
-	CMenu m_opencds;
-	CMenu m_filters, m_subtitles, m_audios;
-	CMenu m_language;
-	CAutoPtrArray<CMenu> m_filterpopups;
-	CMenu m_navangle;
-	CMenu m_navchapters;
-	CMenu m_favorites;
-	CMenu m_shaders;
-	CMenu m_recentfiles;
+	CMenu m_popupMainMenu, m_popupMenu;
+	CMenu m_openCDsMenu;
+	CMenu m_filtersMenu, m_subtitlesMenu, m_audiosMenu;
+	CMenu m_languageMenu;
+	CMenu m_videostreamsMenu;
+	CMenu m_chaptersMenu;
+	CMenu m_favoritesMenu;
+	CMenu m_shadersMenu;
+	CMenu m_recentfilesMenu;
 
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
@@ -1023,7 +1022,6 @@ public:
 	afx_msg void OnClose();
 
 	afx_msg void OnLanguage(UINT nID);
-	afx_msg void OnUpdateLanguage(CCmdUI* pCmdUI);
 
 	void OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void OnFilePostCloseMedia();

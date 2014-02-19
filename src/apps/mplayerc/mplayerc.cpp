@@ -2339,9 +2339,9 @@ CString CMPlayerCApp::GetSatelliteDll(int nLanguage)
 	path = path.Left(path.ReverseFind('\\') + 1);
 
 	if (nLanguage < 0 || nLanguage >= languageResourcesCount || languageResources[nLanguage].resourceID == ID_LANGUAGE_ENGLISH) {
-		path = _T("");
+		path.Empty();
 	} else {
-		path.AppendFormat(_T("Lang\\mpcresources.%ws.dll"), languageResources[nLanguage].strcode);
+		path.AppendFormat(L"Lang\\mpcresources.%s.dll", languageResources[nLanguage].strcode);
 	}
 
 	return path;

@@ -454,7 +454,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_SHIFT_SUB_DOWN, ID_SHIFT_SUB_UP, OnShiftSubtitle)
 	ON_COMMAND_RANGE(ID_SUB_DELAY_DOWN, ID_SUB_DELAY_UP, OnSubtitleDelay)
 	ON_COMMAND_RANGE(ID_LANGUAGE_ENGLISH, ID_LANGUAGE_LAST, OnLanguage)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_LANGUAGE_ENGLISH, ID_LANGUAGE_LAST, OnUpdateLanguage)
 
 	ON_COMMAND(ID_PLAY_PLAY, OnPlayPlay)
 	ON_COMMAND(ID_PLAY_PAUSE, OnPlayPause)
@@ -748,13 +747,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	m_popup.LoadMenu(IDR_POPUP);
-	m_popupmain.LoadMenu(IDR_POPUPMAIN);
+	m_popupMenu.LoadMenu(IDR_POPUP);
+	m_popupMainMenu.LoadMenu(IDR_POPUPMAIN);
 
 	AppSettings& s = AfxGetAppSettings();
 
 	HDC hdc = ::GetDC(NULL);
-	s.scalefont = 1.0*GetDeviceCaps(hdc, LOGPIXELSY) / 96.0;
+	s.scalefont = 1.0 * GetDeviceCaps(hdc, LOGPIXELSY) / 96.0;
 	::ReleaseDC(0, hdc);
 
 	// create a Main View Window
@@ -984,11 +983,11 @@ void CMainFrame::OnDestroy()
 {
 	WTSUnRegisterSessionNotification();
 
-	ShowTrayIcon( false );
+	ShowTrayIcon(false);
 
 	m_fileDropTarget.Revoke();
 
-	if ( m_pGraphThread ) {
+	if (m_pGraphThread) {
 		CAMEvent e;
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_EXIT, 0, (LPARAM)&e);
 		if (!e.Wait(5000)) {
@@ -1043,7 +1042,6 @@ void CMainFrame::OnClose()
 
 	m_fClosingState = true;
 
-	// Destroy flybar-window
 	KillTimer(TIMER_FLYBARWINDOWHIDER);
 	KillTimer(TIMER_EXCLUSIVEBARHIDER);
 	DestroyOSDBar();
@@ -1242,7 +1240,7 @@ LRESULT CMainFrame::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 			POINT p;
 			GetCursorPos(&p);
 			SetForegroundWindow();
-			m_popupmain.GetSubMenu(0)->TrackPopupMenu(TPM_RIGHTBUTTON | TPM_NOANIMATION, p.x, p.y, GetModalParent());
+			m_popupMainMenu.GetSubMenu(0)->TrackPopupMenu(TPM_RIGHTBUTTON | TPM_NOANIMATION, p.x, p.y, GetModalParent());
 			PostMessage(WM_NULL);
 			break;
 		}
@@ -3900,10 +3898,10 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 
 		if (itemID == ID_FAVORITES) {
 			SetupFavoritesSubMenu();
-			pSubMenu = &m_favorites;
+			pSubMenu = &m_favoritesMenu;
 		}/*else if(itemID == ID_RECENT_FILES) {
 			SetupRecentFilesSubMenu();
-			pSubMenu = &m_recentfiles;
+			pSubMenu = &m_recentfilesMenu;
 		}*/
 
 		if (pSubMenu) {
@@ -3970,19 +3968,19 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 
 		if (itemID == ID_FILE_OPENDISC) {
 			SetupOpenCDSubMenu();
-			pSubMenu = &m_opencds;
+			pSubMenu = &m_openCDsMenu;
 		} else if (itemID == ID_FILTERS) {
 			SetupFiltersSubMenu();
-			pSubMenu = &m_filters;
+			pSubMenu = &m_filtersMenu;
 		} else if (itemID == ID_MENU_LANGUAGE) {
 			SetupLanguageMenu();
-			pSubMenu = &m_language;
+			pSubMenu = &m_languageMenu;
 		} else if (itemID == ID_AUDIOS) {
 			SetupAudioOptionSubMenu();
-			pSubMenu = &m_audios;
+			pSubMenu = &m_audiosMenu;
 		} else if (itemID == ID_SUBTITLES) {
 			SetupSubtitlesSubMenu();
-			pSubMenu = &m_subtitles;
+			pSubMenu = &m_subtitlesMenu;
 		} else if (itemID == ID_AUDIOLANGUAGE) {
 			SetupNavMixAudioSubMenu();
 			pSubMenu = &m_navMixaudio;
@@ -3991,31 +3989,26 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pSubMenu = &m_navMixsubtitle;
 		} else if (itemID == ID_VIDEOANGLE) {
 
-			CString menu_str;
-			if (GetPlaybackMode() == PM_DVD) {
-				menu_str = ResStr(IDS_MENU_VIDEO_ANGLE);
-			} else {
-				menu_str = ResStr(IDS_MENU_VIDEO_STREAM);
-			}
+			CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
 
 			mii.fMask = MIIM_STRING;
 			mii.dwTypeData = (LPTSTR)(LPCTSTR)menu_str;
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
 
-			SetupNavAngleSubMenu();
-			pSubMenu = &m_navangle;
+			SetupVideoStreamsSubMenu();
+			pSubMenu = &m_videostreamsMenu;
 		} else if (itemID == ID_JUMPTO) {
 			SetupNavChaptersSubMenu();
-			pSubMenu = &m_navchapters;
+			pSubMenu = &m_chaptersMenu;
 		} else if (itemID == ID_FAVORITES) {
 			SetupFavoritesSubMenu();
-			pSubMenu = &m_favorites;
+			pSubMenu = &m_favoritesMenu;
 		} else if (itemID == ID_RECENT_FILES) {
 			SetupRecentFilesSubMenu();
-			pSubMenu = &m_recentfiles;
+			pSubMenu = &m_recentfilesMenu;
 		} else if (itemID == ID_SHADERS) {
 			SetupShadersSubMenu();
-			pSubMenu = &m_shaders;
+			pSubMenu = &m_shadersMenu;
 		}
 
 		if (pSubMenu) {
@@ -4149,21 +4142,21 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 void CMainFrame::OnMenuPlayerShort()
 {
 	if (IsMenuHidden() || m_pFullscreenWnd->IsWindow()) {
-		OnMenu(m_popupmain.GetSubMenu(0));
+		OnMenu(m_popupMainMenu.GetSubMenu(0));
 	} else {
-		OnMenu(m_popup.GetSubMenu(0));
+		OnMenu(m_popupMenu.GetSubMenu(0));
 	}
 }
 
 void CMainFrame::OnMenuPlayerLong()
 {
-	OnMenu(m_popupmain.GetSubMenu(0));
+	OnMenu(m_popupMainMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnMenuFilters()
 {
 	SetupFiltersSubMenu();
-	OnMenu(&m_filters);
+	OnMenu(&m_filtersMenu);
 }
 
 void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
@@ -4345,6 +4338,15 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_LastOpenBDPath.Empty();
 	}
 
+	// Ensure the dynamically added menu items are updated
+	SetupFiltersSubMenu();
+	SetupSubtitlesSubMenu();
+	SetupNavMixAudioSubMenu();
+	SetupNavMixSubtitleSubMenu();
+	SetupVideoStreamsSubMenu();
+	SetupNavChaptersSubMenu();
+	SetupRecentFilesSubMenu();
+
 	// correct window size if "Limit window proportions on resize" enable.
 	if (!s.fRememberZoomLevel) {
 		CRect r;
@@ -4445,15 +4447,13 @@ void CMainFrame::OnFilePostCloseMedia()
 
 	m_bIsBDPlay = FALSE;
 
-	// this will prevent any further UI updates on the dynamically added menu items
+	// Ensure the dynamically added menu items are cleared
 	SetupFiltersSubMenu();
 	SetupSubtitlesSubMenu();
 	SetupNavMixAudioSubMenu();
 	SetupNavMixSubtitleSubMenu();
-	SetupNavAngleSubMenu();
+	SetupVideoStreamsSubMenu();
 	SetupNavChaptersSubMenu();
-	SetupFavoritesSubMenu();
-	SetupRecentFilesSubMenu();
 
 	UnloadExternalObjects();
 
@@ -9784,25 +9784,25 @@ void CMainFrame::OnMenuNavSubtitle()
 void CMainFrame::OnMenuNavAudioOptions()
 {
 	SetupAudioOptionSubMenu();
-	OnMenu(&m_audios);
+	OnMenu(&m_audiosMenu);
 }
 
 void CMainFrame::OnMenuNavSubtitleOptions()
 {
 	SetupSubtitlesSubMenu();
-	OnMenu(&m_subtitles);
+	OnMenu(&m_subtitlesMenu);
 }
 
 void CMainFrame::OnMenuNavJumpTo()
 {
 	SetupNavChaptersSubMenu();
-	OnMenu(&m_navchapters);
+	OnMenu(&m_chaptersMenu);
 }
 
 void CMainFrame::OnMenuRecentFiles()
 {
 	SetupRecentFilesSubMenu();
-	OnMenu(&m_recentfiles);
+	OnMenu(&m_recentfilesMenu);
 }
 
 void CMainFrame::OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI)
@@ -13274,7 +13274,7 @@ void CMainFrame::SetupChapters()
 	} else if (GetPlaybackMode() == PM_DVD) {
 		m_pCB->ChapRemoveAll();
 
- 		WCHAR buff[_MAX_PATH];
+		WCHAR buff[MAX_PATH] = { 0 };
  		ULONG len = 0;
  		DVD_PLAYBACK_LOCATION2 loc;
 		ULONG ulNumOfChapters = 0;
@@ -15091,6 +15091,9 @@ void CMainFrame::CloseMediaPrivate()
 	m_OSD.Stop();
 	OnPlayStop();
 
+	m_pparray.RemoveAll();
+	m_ssarray.RemoveAll();
+
 	if (m_pMC) {
 		OAFilterState fs;
 		m_pMC->GetState(0, &fs);
@@ -15337,19 +15340,13 @@ void CMainFrame::DoTunerScan(TunerScanData* pTSD)
 
 void CMainFrame::SetupOpenCDSubMenu()
 {
-	CMenu* pSub = &m_opencds;
+	CMenu* pSub = &m_openCDsMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
-	if (m_iMediaLoadState == MLS_LOADING) {
-		return;
-	}
-
-	if (AfxGetAppSettings().fHideCDROMsSubMenu) {
+	if (m_iMediaLoadState == MLS_LOADING || AfxGetAppSettings().fHideCDROMsSubMenu) {
 		return;
 	}
 
@@ -15397,15 +15394,11 @@ void CMainFrame::SetupOpenCDSubMenu()
 
 void CMainFrame::SetupFiltersSubMenu()
 {
-	CMenu* pSub = &m_filters;
+	CMenu* pSub = &m_filtersMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-	}
-
-	m_filterpopups.RemoveAll();
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	m_pparray.RemoveAll();
 	m_ssarray.RemoveAll();
@@ -15461,14 +15454,14 @@ void CMainFrame::SetupFiltersSubMenu()
 				continue;
 			}
 
-			CAutoPtr<CMenu> pSubSub(DNew CMenu);
-			pSubSub->CreatePopupMenu();
+			CMenu subMenu;
+			subMenu.CreatePopupMenu();
 
 			int nPPages = 0;
 
 			CComQIPtr<ISpecifyPropertyPages> pSPP = pBF;
 			m_pparray.Add(pBF);
-			pSubSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ids, ResStr(IDS_MAINFRM_116));
+			subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ids, ResStr(IDS_MAINFRM_116));
 			nPPages++;
 
 			BeginEnumPins(pBF, pEP, pPin) {
@@ -15480,7 +15473,7 @@ void CMainFrame::SetupFiltersSubMenu()
 					caGUID.pElems = NULL;
 					if (SUCCEEDED(pSPP->GetPages(&caGUID)) && caGUID.cElems > 0) {
 						m_pparray.Add(pPin);
-						pSubSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ids + nPPages, name + ResStr(IDS_MAINFRM_117));
+						subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ids + nPPages, name + ResStr(IDS_MAINFRM_117));
 
 						if (caGUID.pElems) {
 							CoTaskMemFree(caGUID.pElems);
@@ -15505,7 +15498,7 @@ void CMainFrame::SetupFiltersSubMenu()
 				pSS->Count(&nStreams);
 
 				if (nStreams > 0 && nPPages > 0) {
-					pSubSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
+					subMenu.AppendMenu(MF_SEPARATOR | MF_ENABLED);
 				}
 
 				UINT idlstart = idl;
@@ -15518,7 +15511,7 @@ void CMainFrame::SetupFiltersSubMenu()
 					pSS->Info(i, NULL, &flags, &lcid, &group, &wname, &pObj, &pUnk);
 
 					if (group != prevgroup && idl > idlstart) {
-						pSubSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
+						subMenu.AppendMenu(MF_SEPARATOR | MF_ENABLED);
 					}
 					prevgroup = group;
 
@@ -15539,7 +15532,7 @@ void CMainFrame::SetupFiltersSubMenu()
 					CString name(wname);
 					name.Replace(_T("&"), _T("&&"));
 
-					pSubSub->AppendMenu(nflags, idl++, name);
+					subMenu.AppendMenu(nflags, idl++, name);
 
 					CoTaskMemFree(wname);
 				}
@@ -15559,11 +15552,9 @@ void CMainFrame::SetupFiltersSubMenu()
 					mii.cbSize = sizeof(mii);
 					mii.fMask = MIIM_STATE | MIIM_SUBMENU;
 					mii.fType = MF_POPUP;
-					mii.hSubMenu = pSubSub->m_hMenu;
+					mii.hSubMenu = subMenu.Detach();
 					mii.fState = (pSPP || pSS) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED);
 					pSub->SetMenuItemInfo(idf, &mii, TRUE);
-
-					m_filterpopups.Add(pSubSub);
 				}
 			}
 
@@ -15576,14 +15567,13 @@ void CMainFrame::SetupFiltersSubMenu()
 
 void CMainFrame::SetupLanguageMenu()
 {
-	CMenu* pSub = &m_language;
+	CMenu* pSub = &m_languageMenu;
 	int iCount = 0;
+	const AppSettings& s = AfxGetAppSettings();
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-		;
-	}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	for (size_t i = 0; i < CMPlayerCApp::languageResourcesCount; i++) {
 
@@ -15596,7 +15586,11 @@ void CMainFrame::SetupLanguageMenu()
 				if (lib) {
 					FreeLibrary(lib);
 				}
-				pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, i + ID_LANGUAGE_ENGLISH, lr.name);
+				UINT uFlags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+				if (i == s.iLanguage) {
+					uFlags |= MF_CHECKED;
+				}
+				pSub->AppendMenu(uFlags, i + ID_LANGUAGE_ENGLISH, lr.name);
 				iCount++;
 			}
 		}
@@ -15609,13 +15603,11 @@ void CMainFrame::SetupLanguageMenu()
 
 void CMainFrame::SetupAudioSwitcherSubMenu()
 {
-	CMenu* pSub = &m_audios;
+	CMenu* pSub = &m_audiosMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	if (m_iMediaLoadState == MLS_LOADED) {
 		UINT id = ID_AUDIO_SUBITEM_START;
@@ -15647,27 +15639,25 @@ void CMainFrame::SetupAudioSwitcherSubMenu()
 
 void CMainFrame::SetupAudioOptionSubMenu()
 {
-	CMenu* pSub = &m_audios;
+	CMenu* pSub = &m_audiosMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
+
 	UINT id = ID_AUDIO_SUBITEM_START;
+
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_AG_LOAD_AUDIO));
 }
 
 void CMainFrame::SetupSubtitlesSubMenu()
 {
-	CMenu* pSub = &m_subtitles;
+	CMenu* pSub = &m_subtitlesMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	UINT id = ID_SUBTITLES_SUBITEM_START;
 
@@ -15688,9 +15678,7 @@ void CMainFrame::SetupNavMixSubtitleSubMenu()
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	if (m_iMediaLoadState != MLS_LOADED) {
 		return;
@@ -16039,22 +16027,18 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 		}
 
 		if ((pSub->GetMenuItemCount() < 2) || (!m_pSubStreams.GetHeadPosition() && pSub->GetMenuItemCount() <= 3)) {
-			while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-				;
-			}
+			while (pSub->RemoveMenu(0, MF_BYPOSITION));
 		}
 	}
 }
 
-void CMainFrame::SetupNavAngleSubMenu()
+void CMainFrame::SetupVideoStreamsSubMenu()
 {
-	CMenu* pSub = &m_navangle;
+	CMenu* pSub = &m_videostreamsMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	if (m_iMediaLoadState != MLS_LOADED) {
 		return;
@@ -16098,13 +16082,11 @@ static CString StripPath(CString path)
 
 void CMainFrame::SetupNavChaptersSubMenu()
 {
-	CMenu* pSub = &m_navchapters;
+	CMenu* pSub = &m_chaptersMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	if (m_iMediaLoadState != MLS_LOADED) {
 		return;
@@ -16544,9 +16526,7 @@ void CMainFrame::SetupNavMixAudioSubMenu()
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-		;
-	}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	if (m_iMediaLoadState != MLS_LOADED) {
 		return;
@@ -16714,13 +16694,11 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 void CMainFrame::SetupRecentFilesSubMenu()
 {
-	CMenu* pSub = &m_recentfiles;
+	CMenu* pSub = &m_recentfilesMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-		;
-	}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	if (m_iMediaLoadState == MLS_LOADING) {
 		return;
@@ -16730,7 +16708,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 	CRecentFileList& MRU = AfxGetAppSettings().MRU;
 	MRU.ReadList();
 
-	int mru_count=0;
+	int mru_count = 0;
 	for (int i = 0; i < MRU.GetSize(); i++) {
 		if (!MRU[i].IsEmpty()) {
 			mru_count++;
@@ -16766,13 +16744,11 @@ void CMainFrame::SetupRecentFilesSubMenu()
 
 void CMainFrame::SetupFavoritesSubMenu()
 {
-	CMenu* pSub = &m_favorites;
+	CMenu* pSub = &m_favoritesMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -16900,13 +16876,11 @@ void CMainFrame::SetupFavoritesSubMenu()
 
 void CMainFrame::SetupShadersSubMenu()
 {
-	CMenu* pSub = &m_shaders;
+	CMenu* pSub = &m_shadersMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
-	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SHADERS_TOGGLE, ResStr(IDS_SHADERS_TOGGLE));
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SHADERS_TOGGLE_SCREENSPACE, ResStr(IDS_SHADERS_TOGGLE_SCREENSPACE));
@@ -18252,6 +18226,8 @@ void CMainFrame::CloseMedia()
 
 	SetLoadState(MLS_CLOSING);
 
+	//PostMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(0, 0));
+
 	if (m_pGraphThread && m_bOpenedThruThread) {
 		m_hGraphThreadEventClose.ResetEvent();
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_CLOSE, 0, 0);
@@ -18627,23 +18603,23 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	CMPlayerCApp::SetLanguage(nID);
 
-	m_opencds.DestroyMenu();
-	m_filters.DestroyMenu();
-	m_subtitles.DestroyMenu();
-	m_audios.DestroyMenu();
+	m_openCDsMenu.DestroyMenu();
+	m_filtersMenu.DestroyMenu();
+	m_subtitlesMenu.DestroyMenu();
+	m_audiosMenu.DestroyMenu();
 	m_navMixaudio.DestroyMenu();
 	m_navsubtitle.DestroyMenu();
-	m_navangle.DestroyMenu();
-	m_navchapters.DestroyMenu();
-	m_favorites.DestroyMenu();
-	m_shaders.DestroyMenu();
-	m_recentfiles.DestroyMenu();
-	m_language.DestroyMenu();
+	m_videostreamsMenu.DestroyMenu();
+	m_chaptersMenu.DestroyMenu();
+	m_favoritesMenu.DestroyMenu();
+	m_shadersMenu.DestroyMenu();
+	m_recentfilesMenu.DestroyMenu();
+	m_languageMenu.DestroyMenu();
 
-	m_popup.DestroyMenu();
-	m_popup.LoadMenu(IDR_POPUP);
-	m_popupmain.DestroyMenu();
-	m_popupmain.LoadMenu(IDR_POPUPMAIN);
+	m_popupMenu.DestroyMenu();
+	m_popupMenu.LoadMenu(IDR_POPUP);
+	m_popupMainMenu.DestroyMenu();
+	m_popupMainMenu.LoadMenu(IDR_POPUPMAIN);
 
 	oldMenu = GetMenu();
 	defaultMenu.LoadMenu(IDR_MAINFRAME);
@@ -18663,23 +18639,6 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
 	UpdateThumbarButton();
-}
-
-afx_msg void CMainFrame::OnUpdateLanguage(CCmdUI* pCmdUI)
-{
-	int nLang				= pCmdUI->m_nID - ID_LANGUAGE_ENGLISH;
-	CString strSatellite	= CMPlayerCApp::GetSatelliteDll(nLang);
-
-	if (!strSatellite.IsEmpty()) {
-		HMODULE lib = NULL;
-		if ((lib = LoadLibrary(strSatellite)) != NULL) {
-			FreeLibrary(lib);
-		}
-
-		pCmdUI->Enable(lib != NULL);
-	}
-
-	pCmdUI->SetCheck(nLang == AfxGetAppSettings().iLanguage);
 }
 
 void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
