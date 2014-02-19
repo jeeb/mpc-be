@@ -16077,7 +16077,7 @@ void CMainFrame::SetupNavAngleSubMenu()
 		for (ULONG i = 1; i <= ulStreamsAvailable; i++) {
 			UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 			if (i == ulCurrentStream) {
-				flags |= MF_CHECKED;
+				flags |= MF_CHECKED | MFT_RADIOCHECK;
 			}
 
 			CString str;
@@ -16339,7 +16339,7 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		if (dwFlags) {
-			flags |= MF_CHECKED;
+			flags |= MF_CHECKED | MFT_RADIOCHECK;
 		}
 
 		str.Replace(_T("&"), _T("&&"));
