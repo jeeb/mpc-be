@@ -267,7 +267,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     memset(s->vlc, 0, 4 * sizeof(VLC));
 
-    s->interlaced = s->height > 288;
+    s->interlaced = avctx->height > 288;
 
     s->bgr32 = 1;
 
@@ -361,13 +361,16 @@ static av_cold int decode_init(AVCodecContext *avctx)
             s->yuv = 1;
             break;
         case 24:
-        case 32:
             if (s->bgr32) {
-                avctx->pix_fmt = AV_PIX_FMT_RGB32;
-                s->alpha = 1;
+                avctx->pix_fmt = AV_PIX_FMT_0RGB32;
             } else {
                 avctx->pix_fmt = AV_PIX_FMT_BGR24;
             }
+            break;
+        case 32:
+            av_assert0(s->bgr32);
+            avctx->pix_fmt = AV_PIX_FMT_RGB32;
+            s->alpha = 1;
             break;
         default:
             return AVERROR_INVALIDDATA;
