@@ -235,19 +235,23 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(&pvih->bmiHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
 					switch (pvih->bmiHeader.biCompression) {
-						case BI_RGB:
-						case BI_BITFIELDS:
-							mt.subtype =
-								pvih->bmiHeader.biBitCount == 1 ? MEDIASUBTYPE_RGB1 :
-								pvih->bmiHeader.biBitCount == 4 ? MEDIASUBTYPE_RGB4 :
-								pvih->bmiHeader.biBitCount == 8 ? MEDIASUBTYPE_RGB8 :
-								pvih->bmiHeader.biBitCount == 16 ? MEDIASUBTYPE_RGB565 :
-								pvih->bmiHeader.biBitCount == 24 ? MEDIASUBTYPE_RGB24 :
-								pvih->bmiHeader.biBitCount == 32 ? MEDIASUBTYPE_ARGB32 :
-								MEDIASUBTYPE_NULL;
-							break;
-							//					case BI_RLE8: mt.subtype = MEDIASUBTYPE_RGB8; break;
-							//					case BI_RLE4: mt.subtype = MEDIASUBTYPE_RGB4; break;
+					case BI_RGB:
+					case BI_BITFIELDS:
+						mt.subtype =
+							pvih->bmiHeader.biBitCount == 1 ? MEDIASUBTYPE_RGB1 :
+							pvih->bmiHeader.biBitCount == 4 ? MEDIASUBTYPE_RGB4 :
+							pvih->bmiHeader.biBitCount == 8 ? MEDIASUBTYPE_RGB8 :
+							pvih->bmiHeader.biBitCount == 16 ? MEDIASUBTYPE_RGB565 :
+							pvih->bmiHeader.biBitCount == 24 ? MEDIASUBTYPE_RGB24 :
+							pvih->bmiHeader.biBitCount == 32 ? MEDIASUBTYPE_ARGB32 :
+							MEDIASUBTYPE_NULL;
+						break;
+					//case BI_RLE8: mt.subtype = MEDIASUBTYPE_RGB8; break;
+					//case BI_RLE4: mt.subtype = MEDIASUBTYPE_RGB4; break;
+					case FCC('v210'):
+						pvih->bmiHeader.biBitCount = 20; // fixed incorrect bitdepth (ffmpeg bug)
+						pvih->bmiHeader.biSizeImage = pvih->bmiHeader.biWidth * pvih->bmiHeader.biHeight * pvih->bmiHeader.biBitCount / 8;
+						break;
 					}
 					if (!bHasVideo) {
 						mts.Add(mt);
