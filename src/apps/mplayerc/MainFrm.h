@@ -970,8 +970,7 @@ public:
 
 	afx_msg void OnUpdateNavMixSubtitles(CCmdUI* pCmdUI);
 
-	afx_msg void OnPlayLanguage(UINT nID);
-	afx_msg void OnUpdatePlayLanguage(CCmdUI* pCmdUI);
+	afx_msg void OnSelectStream(UINT nID);
 	afx_msg void OnPlayVolume(UINT nID);
 	afx_msg void OnPlayVolumeBoost(UINT nID);
 	afx_msg void OnUpdatePlayVolumeBoost(CCmdUI* pCmdUI);
