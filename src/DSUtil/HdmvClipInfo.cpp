@@ -337,7 +337,7 @@ LPCTSTR CHdmvClipInfo::Stream::Format()
 		case VIDEO_STREAM_H264:
 			return _T("H264");
 		case VIDEO_STREAM_VC1:
-			return _T("VC1");
+			return _T("VC-1");
 		case AUDIO_STREAM_MPEG1:
 			return _T("MPEG1");
 		case AUDIO_STREAM_MPEG2:

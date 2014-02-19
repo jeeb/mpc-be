@@ -90,7 +90,7 @@ static filter_t s_filters[] = {
 	// DXVA decoder
 	{_T("H264/AVC (DXVA)"),       DXVA_DECODER,   VIDEO,  TRA_DXVA_H264,  IDS_TRA_FFMPEG},
 	{_T("MPEG-2 Video (DXVA)"),   DXVA_DECODER,   VIDEO,  TRA_DXVA_MPEG2, IDS_TRA_FFMPEG},
-	{_T("VC1 (DXVA)"),            DXVA_DECODER,   VIDEO,  TRA_DXVA_VC1,   IDS_TRA_FFMPEG},
+	{_T("VC-1 (DXVA)"),           DXVA_DECODER,   VIDEO,  TRA_DXVA_VC1,   IDS_TRA_FFMPEG},
 	{_T("WMV3 (DXVA)"),           DXVA_DECODER,   VIDEO,  TRA_DXVA_WMV3,  IDS_TRA_FFMPEG},
 
 	// Video Decoder
