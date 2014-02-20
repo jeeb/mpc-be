@@ -8135,8 +8135,10 @@ void CMainFrame::OnViewDefaultVideoFrame(UINT nID)
 void CMainFrame::OnUpdateViewDefaultVideoFrame(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly);
-	int dvs = pCmdUI->m_nID - ID_VIEW_VF_HALF;
-	pCmdUI->SetRadio(AfxGetAppSettings().iDefaultVideoSize == dvs);
+
+	if (AfxGetAppSettings().iDefaultVideoSize == (pCmdUI->m_nID - ID_VIEW_VF_HALF)) {
+		CheckMenuRadioItem(ID_VIEW_VF_HALF, ID_VIEW_VF_ZOOM2, pCmdUI->m_nID);
+	}
 }
 
 void CMainFrame::OnViewSwitchVideoFrame()
@@ -8413,7 +8415,7 @@ void CMainFrame::OnUpdateViewRotate(CCmdUI* pCmdUI)
 }
 
 // FIXME
-const static SIZE s_ar[] = {{0,0}, {4,3}, {5,4}, {16,9}, {235,100}, {185,100}};
+const static SIZE s_ar[] = {{0, 0}, {4, 3}, {5, 4}, {16, 9}, {235, 100}, {185, 100}};
 
 void CMainFrame::OnViewAspectRatio(UINT nID)
 {
@@ -8436,8 +8438,11 @@ void CMainFrame::OnViewAspectRatio(UINT nID)
 
 void CMainFrame::OnUpdateViewAspectRatio(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetRadio(AfxGetAppSettings().sizeAspectRatio == s_ar[pCmdUI->m_nID - ID_ASPECTRATIO_START]);
 	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly);
+
+	if (AfxGetAppSettings().sizeAspectRatio == s_ar[pCmdUI->m_nID - ID_ASPECTRATIO_START]) {
+		CheckMenuRadioItem(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, pCmdUI->m_nID);
+	}
 }
 
 void CMainFrame::OnViewAspectRatioNext()
@@ -8467,8 +8472,9 @@ void CMainFrame::OnViewOntop(UINT nID)
 
 void CMainFrame::OnUpdateViewOntop(CCmdUI* pCmdUI)
 {
-	int onTop = pCmdUI->m_nID - ID_ONTOP_NEVER;
-	pCmdUI->SetRadio(AfxGetAppSettings().iOnTop == onTop);
+	if (AfxGetAppSettings().iOnTop == (pCmdUI->m_nID - ID_ONTOP_NEVER)) {
+		CheckMenuRadioItem(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, pCmdUI->m_nID);
+	}
 }
 
 void CMainFrame::OnViewOptions()
@@ -20383,6 +20389,13 @@ CString CMainFrame::GetCurFileName()
 	}
 
 	return fn;
+}
+
+void CMainFrame::CheckMenuRadioItem(UINT first, UINT last, UINT check)
+{
+	m_popupMenu.CheckMenuRadioItem(first, last, check, MF_BYCOMMAND);
+	m_popupMainMenu.CheckMenuRadioItem(first, last, check, MF_BYCOMMAND);
+	::CheckMenuRadioItem(m_hMenuDefault, first, last, check, MF_BYCOMMAND);
 }
 
 #pragma region GraphThread

@@ -1185,6 +1185,8 @@ public:
 	bool			b_UseVSFilter;
 
 	bool			b_UseReclock;
+
+	void			CheckMenuRadioItem(UINT first, UINT last, UINT check);
 private:
 	typedef enum TH_STATE {TH_START, TH_WORK, TH_CLOSE};
 	TH_STATE	m_fYoutubeThreadWork;
@@ -1206,15 +1208,13 @@ private:
 		return E_FAIL;
 	}
 
-public:
-	UINT		YoutubeThreadProc();
-
-private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
 	DWORD_PTR	m_nMainFilterId;
 
 public:
+	UINT		YoutubeThreadProc();
+
 	BOOL		CheckMainFilter(IBaseFilter* pBF);
 
 	void		AddSubtitlePathsAddons(CString FileName);
