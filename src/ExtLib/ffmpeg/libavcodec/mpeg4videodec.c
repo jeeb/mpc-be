@@ -1916,6 +1916,11 @@ static int decode_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
         else
             s->quarter_sample = 0;
 
+        if (get_bits_left(gb) < 4) {
+            av_log(s->avctx, AV_LOG_ERROR, "VOL Header truncated\n");
+            return AVERROR_INVALIDDATA;
+        }
+
         if (!get_bits1(gb)) {
             int pos               = get_bits_count(gb);
             int estimation_method = get_bits(gb, 2);
@@ -2297,8 +2302,10 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
                             ROUNDED_DIV(s->last_non_b_time - s->pp_time, ctx->t_frame)) * 2;
         s->pb_field_time = (ROUNDED_DIV(s->time, ctx->t_frame) -
                             ROUNDED_DIV(s->last_non_b_time - s->pp_time, ctx->t_frame)) * 2;
-        if (!s->progressive_sequence) {
-            if (s->pp_field_time <= s->pb_field_time || s->pb_field_time <= 1)
+        if (s->pp_field_time <= s->pb_field_time || s->pb_field_time <= 1) {
+            s->pb_field_time = 2;
+            s->pp_field_time = 4;
+            if (!s->progressive_sequence)
                 return FRAME_SKIPPED;
         }
     }
