@@ -145,6 +145,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x11FA, // Quadro K4000
 	0x11FC, // Quadro K2100M
 	0x1280, // GeForce GT 635
+	0x1282, // GeForce GT 640 rev. 2 (not officially supported or typo, fully tested)
 	0x1290, // GeForce GT 730M
 	0x1291, // GeForce GT 735M
 	0x1292, // GeForce GT 740M
