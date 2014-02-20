@@ -1658,10 +1658,11 @@ BEGIN
             MENUITEM "Shutdown",                    ID_AFTERPLAYBACK_SHUTDOWN
             MENUITEM "Log Off",                     ID_AFTERPLAYBACK_LOGOFF
             MENUITEM "Lock",                        ID_AFTERPLAYBACK_LOCK
+            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_DONOTHING
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
-            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_DONOTHING
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
+            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
     END
     POPUP "&Navigate"
@@ -1822,10 +1823,11 @@ BEGIN
             MENUITEM "Shutdown",                    ID_AFTERPLAYBACK_SHUTDOWN
             MENUITEM "Log Off",                     ID_AFTERPLAYBACK_LOGOFF
             MENUITEM "Lock",                        ID_AFTERPLAYBACK_LOCK
+            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_DONOTHING
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
-            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_DONOTHING
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
+            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
         MENUITEM SEPARATOR
         POPUP "Vi&ew"
@@ -2170,10 +2172,11 @@ BEGIN
             MENUITEM "Shutdown",                    ID_AFTERPLAYBACK_SHUTDOWN
             MENUITEM "Log Off",                     ID_AFTERPLAYBACK_LOGOFF
             MENUITEM "Lock",                        ID_AFTERPLAYBACK_LOCK
+            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_DONOTHING
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
-            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_DONOTHING
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
+            MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
         MENUITEM SEPARATOR
         POPUP "Renderer Settings"

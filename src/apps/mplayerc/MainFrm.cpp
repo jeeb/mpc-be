@@ -511,8 +511,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_COLOR_BRIGHTNESS_INC, ID_COLOR_RESET, OnPlayColor)
 	ON_COMMAND_RANGE(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_DONOTHING, OnAfterplayback)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_DONOTHING, OnUpdateAfterplayback)
-	ON_COMMAND_RANGE(ID_AFTERPLAYBACK_EXIT, ID_AFTERPLAYBACK_NEXT, OnAfterplayback)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_AFTERPLAYBACK_EXIT, ID_AFTERPLAYBACK_NEXT, OnUpdateAfterplayback)
+	ON_COMMAND_RANGE(ID_AFTERPLAYBACK_EXIT, ID_AFTERPLAYBACK_EVERYTIMEDONOTHING, OnAfterplayback)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_AFTERPLAYBACK_EXIT, ID_AFTERPLAYBACK_EVERYTIMEDONOTHING, OnUpdateAfterplayback)
 
 	ON_COMMAND_RANGE(ID_NAVIGATE_SKIPBACK, ID_NAVIGATE_SKIPFORWARD, OnNavigateSkip)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_NAVIGATE_SKIPBACK, ID_NAVIGATE_SKIPFORWARD, OnUpdateNavigateSkip)
@@ -10010,21 +10010,6 @@ void CMainFrame::OnAfterplayback(UINT nID)
 	CString osdMsg;
 
 	switch (nID) {
-		case ID_AFTERPLAYBACK_NEXT:
-			s.fNextInDirAfterPlayback = true;
-			s.fExitAfterPlayback = false;
-			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
-			break;
-		case ID_AFTERPLAYBACK_EXIT:
-			s.fExitAfterPlayback = true;
-			s.fNextInDirAfterPlayback = false;
-			osdMsg = ResStr(IDS_AFTERPLAYBACK_EXIT);
-			break;
-		case ID_AFTERPLAYBACK_DONOTHING:
-			s.fExitAfterPlayback = false;
-			s.fNextInDirAfterPlayback = false;
-			osdMsg = ResStr(IDS_AFTERPLAYBACK_DONOTHING);
-			break;
 		case ID_AFTERPLAYBACK_CLOSE:
 			s.nCLSwitches |= CLSW_CLOSE;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_CLOSE);
@@ -10049,6 +10034,25 @@ void CMainFrame::OnAfterplayback(UINT nID)
 			s.nCLSwitches |= CLSW_LOCK;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_LOCK);
 			break;
+		case ID_AFTERPLAYBACK_DONOTHING:
+			s.nCLSwitches &= ~CLSW_AFTERPLAYBACK_MASK;
+			osdMsg = ResStr(IDS_AFTERPLAYBACK_DONOTHING);
+			break;
+		case ID_AFTERPLAYBACK_NEXT:
+			s.fNextInDirAfterPlayback = true;
+			s.fExitAfterPlayback = false;
+			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
+			break;
+		case ID_AFTERPLAYBACK_EXIT:
+			s.fExitAfterPlayback = true;
+			s.fNextInDirAfterPlayback = false;
+			osdMsg = ResStr(IDS_AFTERPLAYBACK_EXIT);
+			break;
+		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
+			s.fExitAfterPlayback = false;
+			s.fNextInDirAfterPlayback = false;
+			osdMsg = ResStr(IDS_AFTERPLAYBACK_DONOTHING);
+			break;
 	}
 
 	m_OSD.DisplayMessage(OSD_TOPLEFT, osdMsg);
@@ -10060,12 +10064,6 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 	bool fChecked = false;
 
 	switch (pCmdUI->m_nID) {
-		case ID_AFTERPLAYBACK_EXIT:
-			fChecked = !!s.fExitAfterPlayback;
-			break;
-		case ID_AFTERPLAYBACK_NEXT:
-			fChecked = !!s.fNextInDirAfterPlayback;
-			break;
 		case ID_AFTERPLAYBACK_CLOSE:
 			fChecked = !!(s.nCLSwitches & CLSW_CLOSE);
 			break;
@@ -10085,11 +10083,26 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 			fChecked = !!(s.nCLSwitches & CLSW_LOCK);
 			break;
 		case ID_AFTERPLAYBACK_DONOTHING:
+			fChecked = !(s.nCLSwitches & CLSW_AFTERPLAYBACK_MASK);
+			break;
+		case ID_AFTERPLAYBACK_EXIT:
+			fChecked = !!s.fExitAfterPlayback;
+			break;
+		case ID_AFTERPLAYBACK_NEXT:
+			fChecked = !!s.fNextInDirAfterPlayback;
+			break;
+		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
 			fChecked = (!s.fExitAfterPlayback) && (!s.fNextInDirAfterPlayback);
 			break;
 	}
 
-	pCmdUI->SetRadio(fChecked);
+	if (fChecked) {
+		if (pCmdUI->m_nID >= ID_AFTERPLAYBACK_EXIT && pCmdUI->m_nID <= ID_AFTERPLAYBACK_EVERYTIMEDONOTHING) {
+			CheckMenuRadioItem(ID_AFTERPLAYBACK_EXIT, ID_AFTERPLAYBACK_EVERYTIMEDONOTHING, pCmdUI->m_nID);
+		} else {
+			CheckMenuRadioItem(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_DONOTHING, pCmdUI->m_nID);
+		}
+	}
 }
 
 // navigate
