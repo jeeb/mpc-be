@@ -29,6 +29,7 @@ Changes (*):
 	* MediaInfo 0.7.67+ svn rev.6110;
 	* Little-CMS 2.6 git-33378251;
 	* VirtualDub 1.10.4;
+	* ZenLib 0.4.29+ svn rev.455;
 
 Fixes (!):
 
