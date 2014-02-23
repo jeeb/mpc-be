@@ -1654,6 +1654,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	if (IsDXVASupported()) {
 		m_pAVCtx->get_buffer2		= av_get_buffer;
+		if (m_nCodecId == AV_CODEC_ID_H264 && !IsWinVistaOrLater()) {
+			// for DXVA1 decoder ...
+			m_pAVCtx->flags2		|= CODEC_FLAG2_SHOW_ALL;
+		}
 	}
 
 	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
@@ -1702,8 +1706,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 						}
 						IsAtiDXVACompatible = (_wtoi(&ati_version) >= 4); // HD4xxx/Mobility and above AMD/ATI cards support level 5.1 and ref = 16
 					}
-				} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater() && m_nPCIDevice == 0x8108) {
-					break; // Disable support H.264 DXVA on Intel GMA500 in WinXP
+				} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater()) {
+					break; // Disable support H.264 DXVA on Intel in WinXP ...
 				}
 				int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
 
@@ -2534,6 +2538,9 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 		m_bUseDXVA = false;
 		avcodec_close(m_pAVCtx);
 		m_pAVCtx->using_dxva = false;
+		if (m_nCodecId == AV_CODEC_ID_H264) {
+			m_pAVCtx->flags2 &= ~CODEC_FLAG2_SHOW_ALL;
+		}
 		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
 		m_pAVCtx->thread_count = max(1, min(m_nCodecId == AV_CODEC_ID_MPEG4 ? 1 : nThreadNumber, MAX_AUTO_THREADS));
 		
@@ -3424,7 +3431,7 @@ CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFi
 	memset(&m_ddUncompPixelFormat, 0, sizeof(m_ddUncompPixelFormat));
 }
 
-CVideoDecOutputPin::~CVideoDecOutputPin(void)
+CVideoDecOutputPin::~CVideoDecOutputPin()
 {
 }
 

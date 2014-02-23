@@ -55,17 +55,23 @@ class CDXVADecoder
 		ENGINE_DXVA2
 	};
 	struct PICTURE_STORE {
+		bool						bRefPicture;	// True if reference picture
 		bool						bInUse;			// Slot in use
+		bool						bDisplayed;		// True if picture have been presented
 		CComPtr<IMediaSample>		pSample;		// Only for DXVA2 !
 		REFERENCE_TIME				rtStart;
 		REFERENCE_TIME				rtStop;
+		int							nCodecSpecific;
 		DWORD						dwDisplayCount;
 
 		PICTURE_STORE() {
+			bRefPicture		= false;
 			bInUse			= false;
+			bDisplayed		= false;
 			pSample			= NULL;
 			rtStart			= INVALID_TIME;
 			rtStop			= INVALID_TIME;
+			nCodecSpecific	= -1;
 			dwDisplayCount	= 0;
 		}
 	};
@@ -100,7 +106,7 @@ public :
 	static void					release_buffer_dxva(void *opaque, uint8_t *data);
 
 protected :
-	CDXVADecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber);
+	CDXVADecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber);
 	CDXVADecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
 	GUID						m_guidDecoder;
@@ -137,7 +143,7 @@ protected :
 	// === Picture store functions
 	bool						AddToStore(int nSurfaceIndex, IMediaSample* pSample, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	HRESULT						DisplayNextFrame();
-	HRESULT						GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual HRESULT				GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	virtual int					FindOldestFrame();
 
 private :

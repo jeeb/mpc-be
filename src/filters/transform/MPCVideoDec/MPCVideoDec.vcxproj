@@ -247,6 +247,13 @@ update_version.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CpuId.cpp" />
+    <ClCompile Include="DXVA1\DXVADecoderH264_DXVA1.cpp">
+      <PrecompiledHeaderFile>../stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="DXVA1\ffmpegContext_DXVA1.cpp">
+      <WarningLevel>Level1</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="DXVADecoder.cpp" />
     <ClCompile Include="DXVADecoderH264.cpp" />
     <ClCompile Include="DXVADecoderMpeg2.cpp" />
@@ -266,6 +273,8 @@ update_version.bat</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuId.h" />
+    <ClInclude Include="DXVA1\DXVADecoderH264_DXVA1.h" />
+    <ClInclude Include="DXVA1\ffmpegContext_DXVA1.h" />
     <ClInclude Include="DXVADecoder.h" />
     <ClInclude Include="DXVADecoderH264.h" />
     <ClInclude Include="DXVADecoderMpeg2.h" />

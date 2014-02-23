@@ -13,6 +13,12 @@
       <UniqueIdentifier>{29435264-dc59-4006-a197-91a4bd1e583f}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="Header Files\DXVA1">
+      <UniqueIdentifier>{6c6db163-3759-4569-8494-2b6a17bb8944}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DXVA1">
+      <UniqueIdentifier>{0476f273-431d-4107-af4a-0240498b4bc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CpuId.cpp">
@@ -50,6 +56,12 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVA1\DXVADecoderH264_DXVA1.cpp">
+      <Filter>Source Files\DXVA1</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVA1\ffmpegContext_DXVA1.cpp">
+      <Filter>Source Files\DXVA1</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="memcpy_sse.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVA1\DXVADecoderH264_DXVA1.h">
+      <Filter>Header Files\DXVA1</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVA1\ffmpegContext_DXVA1.h">
+      <Filter>Header Files\DXVA1</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

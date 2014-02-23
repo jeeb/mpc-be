@@ -701,6 +701,7 @@ typedef struct H264Context {
     AVBufferPool *ref_index_pool;
 
     // ==> Start patch MPC
+    int   ref_pic_flag;
     void* dxva_context;
     // <== End patch MPC
 }H264Context;

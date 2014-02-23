@@ -22,6 +22,7 @@
 #include <dxva2api.h>
 #include <moreuuids.h>
 #include "DXVADecoderH264.h"
+#include "DXVA1/DXVADecoderH264_DXVA1.h"
 #include "DXVADecoderVC1.h"
 #include "DXVADecoderMpeg2.h"
 #include "MPCVideoDec.h"
@@ -100,8 +101,11 @@ void CDXVADecoder::Flush()
 
 	if (m_pPictureStore) {
 		for (int i = 0; i < m_nPicEntryNumber; i++) {
+			m_pPictureStore[i].bRefPicture		= false;
 			m_pPictureStore[i].bInUse			= false;
+			m_pPictureStore[i].bDisplayed		= false;
 			m_pPictureStore[i].pSample.Release();
+			m_pPictureStore[i].nCodecSpecific	= -1;
 			m_pPictureStore[i].dwDisplayCount	= 0;
 		}
 	}
@@ -168,7 +172,7 @@ CDXVADecoder* CDXVADecoder::CreateDecoder(CMPCVideoDecFilter* pFilter, IAMVideoA
 	CDXVADecoder* pDecoder = NULL;
 
 	if ((*guidDecoder == DXVA2_ModeH264_E) || (*guidDecoder == DXVA2_ModeH264_F) || (*guidDecoder == DXVA_Intel_H264_ClearVideo)) {
-		pDecoder	= DNew CDXVADecoderH264(pFilter, pAMVideoAccelerator, guidDecoder, H264_VLD, nPicEntryNumber);
+		pDecoder	= DNew CDXVADecoderH264_DXVA1(pFilter, pAMVideoAccelerator, guidDecoder, H264_VLD, nPicEntryNumber);
 	} else if (*guidDecoder == DXVA2_ModeVC1_D || *guidDecoder == DXVA2_ModeVC1_D2010) {
 		pDecoder	= DNew CDXVADecoderVC1(pFilter, pAMVideoAccelerator, guidDecoder, VC1_VLD, nPicEntryNumber);
 	} else if (*guidDecoder == DXVA2_ModeMPEG2_VLD) {
@@ -549,7 +553,10 @@ HRESULT CDXVADecoder::DisplayNextFrame()
 #endif
 		}
 
-		FreePictureSlot(nPicIndex);
+		m_pPictureStore[nPicIndex].bDisplayed = true;
+		if (!m_pPictureStore[nPicIndex].bRefPicture) {
+			FreePictureSlot(nPicIndex);
+		}
 	}
 
 	return hr;
@@ -621,7 +628,9 @@ void CDXVADecoder::FreePictureSlot(int nSurfaceIndex)
 	if (nSurfaceIndex >= 0 && nSurfaceIndex < m_nPicEntryNumber) {
 		m_pPictureStore[nSurfaceIndex].dwDisplayCount	= m_dwDisplayCount++;
 		m_pPictureStore[nSurfaceIndex].bInUse			= false;
+		m_pPictureStore[nSurfaceIndex].bDisplayed		= false;
 		m_pPictureStore[nSurfaceIndex].pSample.Release();
+		m_pPictureStore[nSurfaceIndex].nCodecSpecific	= -1;
 	}
 }
 
@@ -690,9 +699,12 @@ void CDXVADecoder::EndOfStream()
 
 HRESULT CDXVADecoder::get_buffer_dxva(AVFrame *pic)
 {
+	HRESULT hr = S_OK;
+	if (GetEngine() == ENGINE_DXVA1 && GetMode() == H264_VLD) {
+		return hr;
+	}
 	m_pSampleToDeliver.Release();
 	m_nSurfaceIndex = -1;
-	HRESULT hr = S_OK;
 	CHECK_HR_FALSE (GetFreeSurfaceIndex(m_nSurfaceIndex, &m_pSampleToDeliver, 0, 0));
 	
 	SurfaceWrapper* pSurfaceWrapper = DNew SurfaceWrapper();
@@ -712,10 +724,8 @@ void CDXVADecoder::release_buffer_dxva(void *opaque, uint8_t *data)
 	SurfaceWrapper* pSurfaceWrapper = (SurfaceWrapper*)opaque;
 
 	CDXVADecoder* pDec = (CDXVADecoder*)pSurfaceWrapper->opaque;
-	if (pDec->GetEngine() == ENGINE_DXVA2) {
-		pDec->FreePictureSlot(pSurfaceWrapper->nSurfaceIndex);
-		pSurfaceWrapper->pSample.Release();
-	}
+	pDec->FreePictureSlot(pSurfaceWrapper->nSurfaceIndex);
+	pSurfaceWrapper->pSample.Release();
 
 	delete pSurfaceWrapper;
 }

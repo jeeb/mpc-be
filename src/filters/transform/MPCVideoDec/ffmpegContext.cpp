@@ -21,27 +21,20 @@
 #define HAVE_AV_CONFIG_H
 
 #include <Windows.h>
-#include <WinNT.h>
-#include <vfwmsgs.h>
-#include <sys/timeb.h>
 #include <time.h> // for the _time64 workaround
 #include "../../../DSUtil/SysVersion.h"
 #include "ffmpegContext.h"
-#include <math.h>
 
 extern "C" {
-	#include <ffmpeg/libavcodec/dsputil.h>
 	#include <ffmpeg/libavcodec/avcodec.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name
 #define class classFFMPEG
 	#include <ffmpeg/libavcodec/mpegvideo.h>
 #undef class
-	#include <ffmpeg/libavcodec/golomb.h>
 // hack since "h264.h" is using "new" as a variable
 #define new newFFMPEG
 	#include <ffmpeg/libavcodec/h264.h>
 #undef new
-	#include <ffmpeg/libavcodec/h264data.h>
 	#include <ffmpeg/libavcodec/vc1.h>
 	#include <ffmpeg/libavcodec/mpeg12.h>
 }

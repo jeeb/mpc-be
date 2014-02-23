@@ -1188,7 +1188,11 @@ public:
 
 	void			CheckMenuRadioItem(UINT first, UINT last, UINT check);
 private:
-	typedef enum TH_STATE {TH_START, TH_WORK, TH_CLOSE};
+	enum TH_STATE {
+		TH_START,
+		TH_WORK,
+		TH_CLOSE
+	};
 	TH_STATE	m_fYoutubeThreadWork;
 	CString		m_YoutubeFile;
 	CWinThread*	m_YoutubeThread;

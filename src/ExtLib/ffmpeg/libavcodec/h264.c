@@ -5282,6 +5282,9 @@ again:
                 hx->inter_gb_ptr      = &hx->gb;
                 hx->data_partitioning = 0;
 
+                // ==> Start patch MPC
+                hx->ref_pic_flag = (h->nal_ref_idc != 0);
+                // <== End patch MPC
                 if ((err = decode_slice_header(hx, h)))
                     break;
 
@@ -5326,8 +5329,10 @@ again:
 					// ==> Start patch MPC
                     if (h->avctx->using_dxva && nal_pass < 2) {
                         DXVA_Context* ctx = (DXVA_Context*)h->dxva_context;
-                        DXVA_H264_Context* ctx_pic = &ctx->ctx_pic[nal_pass];
-                        dxva_start_frame(avctx, ctx, ctx_pic);
+                        if (ctx) {
+                            DXVA_H264_Context* ctx_pic = &ctx->ctx_pic[nal_pass];
+                            dxva_start_frame(avctx, ctx, ctx_pic);
+                        }
                     }
                     nal_pass++;
 					// <== End patch MPC
@@ -5351,8 +5356,10 @@ again:
                     // ==> Start patch MPC
                     if (h->avctx->using_dxva && nal_pass <= 2) {
                         DXVA_Context* ctx = (DXVA_Context*)h->dxva_context;
-                        DXVA_H264_Context* ctx_pic = &ctx->ctx_pic[nal_pass - 1];
-                        dxva_decode_slice(avctx, ctx, ctx_pic, &buf[buf_index - consumed], consumed);
+                        if (ctx) {
+                            DXVA_H264_Context* ctx_pic = &ctx->ctx_pic[nal_pass - 1];
+                            dxva_decode_slice(avctx, ctx, ctx_pic, &buf[buf_index - consumed], consumed);
+                        }
                     }
                     // <== End patch MPC
                     if (avctx->hwaccel) {
