@@ -56,7 +56,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	}
 	EndEnumFilters;
 
-	if (m_fn.Find(L"://") < 0 && m_fn.Right(5).CompareNoCase(L".mpls") != 0) {
+	if (m_fn.Find(_T("://")) < 0) {
 		AddPage(&m_mi);
 	}
 }
