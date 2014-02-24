@@ -69,14 +69,12 @@ CVMROSD::CVMROSD()
 
 	m_MainWndRect = m_MainWndRectCashed = CRect(0,0,0,0);
 
-	int fp = m_bm.FileExists(CString(_T("flybar")));
-
-	HBITMAP hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1);
-	BITMAP bm;
+	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
+	BITMAP bm = { 0 };
 	::GetObject(hBmp, sizeof(bm), &bm);
 
-	if (fp && bm.bmWidth != bm.bmHeight * 25) {
-		hBmp = m_bm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1);
+	if (CMPCPngImage::FileExists(CString(L"flybar")) && bm.bmWidth != bm.bmHeight * 25) {
+		hBmp = CMPCPngImage::LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 

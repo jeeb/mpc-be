@@ -130,7 +130,6 @@ private :
 	CRect	m_rectCloseButton;
 	CRect	m_rectExitButton;
 
-	MPCPngImage m_bm;
 	int			m_nButtonHeight;
 	CImageList	*m_pButtonsImages;
 

@@ -33,17 +33,14 @@ IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
 CPlayerToolBar::CPlayerToolBar()
 	: fDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)
+	, m_hDXVAIcon(NULL)
 {
-	m_hDXVAIcon = NULL;
-
-	bool fp = m_logobm.FileExists(CString(L"gpu"));
-
-	HBITMAP hBmp = m_logobm.LoadExternalImage(L"gpu", IDB_DXVA_ON, -1);
-	BITMAP bm;
+	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"gpu", IDB_DXVA_ON, IMG_TYPE::UNDEF);
+	BITMAP bm = { 0 };
 	::GetObject(hBmp, sizeof(bm), &bm);
 
-	if (fp && (bm.bmHeight > 32 || bm.bmWidth > 32)) {
-		hBmp = m_logobm.LoadExternalImage(L"", IDB_DXVA_ON, -1);
+	if (CMPCPngImage::FileExists(CString(L"gpu")) && (bm.bmHeight > 32 || bm.bmWidth > 32)) {
+		hBmp = CMPCPngImage::LoadExternalImage(L"", IDB_DXVA_ON, IMG_TYPE::UNDEF);
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 
@@ -51,9 +48,9 @@ CPlayerToolBar::CPlayerToolBar()
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
 
-		CImageList	*pButtonDXVA = DNew CImageList();
+		CImageList *pButtonDXVA = DNew CImageList();
 		pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-		pButtonDXVA->Add(bmp, static_cast<CBitmap*>(0));
+		pButtonDXVA->Add(bmp, static_cast<CBitmap*>(NULL));
 
 		m_hDXVAIcon = pButtonDXVA->ExtractIcon(0);
 
@@ -157,9 +154,8 @@ void CPlayerToolBar::SwitchTheme()
 		tb.SetIndent(0);
 	}
 
-	bool fp = m_logobm.FileExists(CString(L"toolbar"));
-
 	HBITMAP hBmp = NULL;
+	bool fp = CMPCPngImage::FileExists(CString(L"toolbar"));
 	if (s.fDisableXPToolbars && !fp) {
 		/*
 		int col = s.clrFaceABGR;
@@ -168,9 +164,9 @@ void CPlayerToolBar::SwitchTheme()
 		g = (col >> 8) & 0xFF;
 		b = col >> 16;
 		*/
-		hBmp = m_logobm.LoadExternalImage(L"toolbar", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", IDB_PLAYERTOOLBAR_PNG, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else if (fp) {
-		hBmp = m_logobm.LoadExternalImage(L"toolbar", 0, -1);
+		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", 0, IMG_TYPE::UNDEF);
 	}
 
 	BITMAP bitmapBmp;
@@ -179,7 +175,7 @@ void CPlayerToolBar::SwitchTheme()
 
 		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
 			if (s.fDisableXPToolbars) {
-				hBmp = m_logobm.LoadExternalImage(L"", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+				hBmp = CMPCPngImage::LoadExternalImage(L"", IDB_PLAYERTOOLBAR_PNG, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 				::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 			} else {
 				DeleteObject(hBmp);

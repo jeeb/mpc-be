@@ -33,7 +33,7 @@ class CPPageLogo : public CPPageBase
 private:
 	CList<UINT> m_logoids;
 	POSITION m_logoidpos;
-	MPCPngImage m_logobm;
+	CMPCPngImage m_logobm;
 	void GetDataFromRes();
 
 public:

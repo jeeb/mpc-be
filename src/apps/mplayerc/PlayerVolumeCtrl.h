@@ -33,9 +33,8 @@ private:
 	bool m_fSelfDrawn;
 	CBitmap m_bmUnderCtrl;
 
-	MPCPngImage m_logobm;
-	MPCPngImage	m_BackGroundbm;
-	MPCPngImage	m_Volumebm;
+	CMPCPngImage m_BackGroundbm;
+	CMPCPngImage m_Volumebm;
 
 	__int64 iDisableXPToolbars;
 	__int64 iThemeBrightness;

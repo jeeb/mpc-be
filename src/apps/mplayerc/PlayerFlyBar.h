@@ -43,7 +43,6 @@ private:
 	CRect r_FSIcon;
 	CRect r_LockIcon;
 
-	MPCPngImage m_logobm;
 	CToolTipCtrl m_tooltip;
 	CImageList *m_pButtonsImages;
 

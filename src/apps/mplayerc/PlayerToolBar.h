@@ -35,8 +35,8 @@ private:
 	void SetMute(bool fMute = true);
 	int getHitButtonIdx(CPoint point);
 
-	MPCPngImage	m_logobm;
-	MPCPngImage	m_BackGroundbm;
+	CMPCPngImage m_BackGroundbm;
+
 	__int64		iDisableXPToolbars;
 	int			iMute;
 

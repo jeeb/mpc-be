@@ -23,46 +23,6 @@
 #include "MainFrm.h"
 #include "PlayerStatusBar.h"
 #include "OpenImage.h"
-//#include "mpciconlib/resource.h"
-
-/*
-static HICON get_hicon(CString path, CString fn)
-{
-	HINSTANCE mpciconlib = LoadLibrary(path + _T("mpciconlib.dll"));
-
-	if (!mpciconlib) {
-		return NULL;
-	}
-
-	CString ext;
-	int pos = fn.ReverseFind(_T('.'));
-
-	if (pos != -1) {
-		ext = fn.Right(fn.GetLength() - pos);
-	} else {
-		ext = fn;
-	}
-
-	HICON hicon = NULL;
-	typedef int (*GetIconIndexFunc)(LPCTSTR);
-	GetIconIndexFunc _getIconIndexFunc;
-	int iconindex = -1;
-	_getIconIndexFunc = (GetIconIndexFunc)GetProcAddress(mpciconlib, "get_icon_index");
-	if (_getIconIndexFunc) {
-		iconindex = _getIconIndexFunc((LPCTSTR)ext);
-	}
-
-	if (iconindex != -1) {
-		hicon = LoadIcon(mpciconlib, MAKEINTRESOURCE(iconindex));
-	} else {
-		hicon = LoadIcon(mpciconlib, MAKEINTRESOURCE(IDI_DEFAULT_ICON));
-	}
-
-	FreeLibrary(mpciconlib);
-
-	return hicon;
-}
-*/
 
 // CPlayerStatusBar
 
@@ -72,7 +32,6 @@ CPlayerStatusBar::CPlayerStatusBar()
 	: m_status(false, false)
 	, m_time(true, false)
 	, m_bmid(0)
-	, m_hIcon(NULL)
 	, m_time_rect(-1, -1, -1, -1)
 	, m_time_rect2(-1, -1, -1, -1)
 {
@@ -80,9 +39,6 @@ CPlayerStatusBar::CPlayerStatusBar()
 
 CPlayerStatusBar::~CPlayerStatusBar()
 {
-	if (m_hIcon) {
-		DestroyIcon(m_hIcon);
-	}
 }
 
 BOOL CPlayerStatusBar::Create(CWnd* pParentWnd)
@@ -181,7 +137,6 @@ void CPlayerStatusBar::Clear()
 	m_time.SetWindowText(_T(""));
 
 	SetStatusBitmap(0);
-	SetStatusTypeIcon(0);
 
 	Relayout();
 
@@ -205,31 +160,6 @@ void CPlayerStatusBar::SetStatusBitmap(UINT id)
 	}
 
 	m_bmid = id;
-
-	Relayout();
-
-	Invalidate();
-}
-
-void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
-{
-	if (m_hIcon == hIcon) {
-		return;
-	}
-
-	if (m_hIcon) {
-		DestroyIcon(m_hIcon);
-	}
-
-	/*
-	HICON hico = get_hicon(m_logobm.LoadCurrentPath(), ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn);
-
-	if (hico) {
-		m_type.SetIcon(hico);
-	} else {
-		m_type.SetIcon(m_hIcon = hIcon);
-	}
-	*/
 
 	Relayout();
 
@@ -489,33 +419,13 @@ void CPlayerStatusBar::OnPaint()
 		CString str2;
 		str2 = GetStatusMessage();
 
-		/*
-		if (str2.GetLength()) {
-			m_hIcon = get_hicon(m_logobm.LoadCurrentPath(), ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn);
-		}
-		*/
-
 		CRect rs	= r;
 		rs.left		= r.left + 7;
 		rs.top		= r.top + 3;
 
-		/*
-		if (m_hIcon) {
-			rs.left += 22-2;
-		}
-		*/
-
 		memdc.DrawText(str2, str2.GetLength(), &rs, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
-
-		/*
-		if (m_hIcon) {
-			GetClientRect(&r);
-			r.SetRect(6, r.top+6, 22-1, r.bottom-2-1);
-			DrawIconEx(dc, r.left, r.top, m_hIcon, r.Width(), r.Height(), 0, NULL, DI_NORMAL | DI_COMPAT);
-		}
-		*/
 	}
 }
 

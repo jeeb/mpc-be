@@ -616,8 +616,6 @@ public:
 
 protected:  // control bar embedded members
 
-	MPCPngImage m_logobm;
-
 	CChildView m_wndView;
 	CPlayerSeekBar m_wndSeekBar;
 	CPlayerInfoBar m_wndInfoBar;
@@ -1126,7 +1124,7 @@ public:
 	bool		isWindowMinimized;
 	HBITMAP		CreateCaptureDIB(int nWidth, int nHeight);
 	void		CreateCaptureWindow();
-	MPCPngImage	m_InternalImage, m_InternalImageSmall;
+	CMPCPngImage	m_InternalImage, m_InternalImageSmall;
 	bool		m_bInternalImageRes;
 
 	HBITMAP		m_ThumbCashedBitmap;

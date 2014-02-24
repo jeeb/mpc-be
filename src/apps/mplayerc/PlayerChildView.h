@@ -27,11 +27,11 @@ class CChildView : public CWnd
 {
 	CRect m_vrect;
 
-	DWORD m_lastlmdowntime;
-	CPoint m_lastlmdownpoint;
+	DWORD	m_lastlmdowntime;
+	CPoint	m_lastlmdownpoint;
 
-	CCritSec m_csLogo;
-	MPCPngImage m_logo;
+	CCritSec		m_csLogo;
+	CMPCPngImage	m_logo;
 
 public:
 	CChildView();

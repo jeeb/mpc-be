@@ -13953,19 +13953,6 @@ void CMainFrame::OpenSetupStatusBar()
 
 		m_wndStatusBar.SetStatusBitmap(id);
 	}
-
-	/*
-	disable load icon for status bar ...
-	HICON hIcon = NULL;
-
-	if (GetPlaybackMode() == PM_FILE) {
-		hIcon = LoadIcon(GetCurFileName(), true);
-	} else if (GetPlaybackMode() == PM_DVD) {
-		hIcon = LoadIcon(_T(".ifo"), true);
-	}
-
-	m_wndStatusBar.SetStatusTypeIcon(hIcon); TODO - black icons look bad, maybe add text with file type ???
-	*/
 }
 
 void CMainFrame::OpenSetupWindowTitle(CString fn)
@@ -19165,11 +19152,11 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 
 	HRESULT hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pTaskbarList));
 	if (SUCCEEDED(hr)) {
-		MPCPngImage mpc_png;
+		CMPCPngImage mpc_png;
 		BYTE* pData;
 		int width, height, bpp;
 
-		HBITMAP hB = mpc_png.TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_W7_TOOLBAR, 0, 0, 0, 0);
+		HBITMAP hB = mpc_png.TypeLoadImage(IMG_TYPE::PNG, &pData, &width, &height, &bpp, NULL, IDB_W7_TOOLBAR, 0, 0, 0, 0);
 		if (!hB) {
 			m_pTaskbarList->Release();
 			return E_FAIL;

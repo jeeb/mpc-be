@@ -34,10 +34,8 @@ class CPlayerStatusBar : public CDialogBar
 	CStatusLabel m_status, m_time;
 	CBitmap m_bm;
 	UINT m_bmid;
-	HICON m_hIcon;
 
-	MPCPngImage m_logobm;
-	MPCPngImage	m_BackGroundbm;
+	CMPCPngImage m_BackGroundbm;
 
 	CRect m_time_rect;
 	CRect m_time_rect2;
@@ -51,7 +49,6 @@ public:
 	void Clear();
 
 	void SetStatusBitmap(UINT id);
-	void SetStatusTypeIcon(HICON hIcon);
 	void SetStatusMessage(CString str);
 	void SetStatusTimer(CString str);
 	void SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID* pTimeFormat = &TIME_FORMAT_MEDIA_TIME);
