@@ -22,6 +22,24 @@
 #include "PngImage.h"
 //#include "OpenImage.h"
 
+MPCPngImage::MPCPngImage()
+	: CImage()
+	, m_pExtGradientDATA(NULL)
+	, m_ExtGradientHB(NULL)
+	, m_width(0)
+	, m_height(0)
+	, m_bpp(0)
+	, m_type(-1)
+{
+}
+
+MPCPngImage::~MPCPngImage()
+{
+	if (m_ExtGradientHB) {
+		DeleteObject(m_ExtGradientHB);
+	}
+}
+
 bool MPCPngImage::DecompressPNG(struct png_t* png)
 {
 	if (png_sig_cmp(png->data, 0, 8) == 0) {
@@ -54,22 +72,15 @@ bool MPCPngImage::DecompressPNG(struct png_t* png)
 	bool ret = false;
 
 	if (Create(w, -(int)h, b * 8)) {
-
 		for (y = 0; y < h; y++) {
-
 			row = &pic[len * y];
-
 			for (x = 0; x < len; row += b) {
-
 				for (c = 0; c < b; c++) {
-
 					row[c] = row_pointers[y][x++];
 				}
 			}
-
 			memcpy(GetPixelAddress(0, y), &pic[len * y], len);
 		}
-
 		ret = true;
 	}
 
@@ -84,8 +95,7 @@ bool MPCPngImage::LoadFromResource(UINT id) {
 	bool ret = false;
 
 	CStringA str;
-	if (LoadResource(id, str, _T("FILE")) || LoadResource(id, str, _T("PNG"))) {
-
+	if (LoadResource(id, str, L"FILE") || LoadResource(id, str, L"PNG")) {
 		struct png_t png;
 		png.data = (unsigned char*)(LPCSTR)str;
 		png.size = str.GetLength();
@@ -109,14 +119,14 @@ bool MPCPngImage::FileExists(CString& fn, bool bInclJPEG)
 {
 	CString path = LoadCurrentPath();
 
-	if (::PathFileExists(path + fn + _T(".png"))) {
-		fn = path + fn + _T(".png");
+	if (::PathFileExists(path + fn + L".png")) {
+		fn = path + fn + L".png";
 		return true;
-	} else if (::PathFileExists(path + fn + _T(".bmp"))) {
-		fn = path + fn + _T(".bmp");
+	} else if (::PathFileExists(path + fn + L".bmp")) {
+		fn = path + fn + L".bmp";
 		return true;
-	} else if (bInclJPEG && ::PathFileExists(path + fn + _T(".jpg"))) {
-		fn = path + fn + _T(".jpg");
+	} else if (bInclJPEG && ::PathFileExists(path + fn + L".jpg")) {
+		fn = path + fn + L".jpg";
 		return true;
 	}
 
@@ -183,7 +193,7 @@ BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, 
 	return lpBits;
 }
 
-HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc)
+HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
 {
 	HBITMAP hbm = NULL;
 	BYTE* bmp;
@@ -267,7 +277,7 @@ HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* heig
 	return hbm;
 }
 
-HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, int rc, int gc, int bc)
+HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
 {
 	CString path = LoadCurrentPath();
 
@@ -279,12 +289,7 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, 
 		_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
 	}
 	if (fp) {
-		//if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
-			return TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
-		//} else {
-		//	fclose(fp);
-		//	return OpenImage(path + fn + _T(".png"));
-		//}
+		return TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 	} else {
 		if (fn.GetLength() > 0) {
 			_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
@@ -301,32 +306,49 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, 
 	return NULL;
 }
 
-void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc)
+bool MPCPngImage::LoadExternalGradient(CString fn)
 {
 	CString path = LoadCurrentPath();
 
-	BYTE* pData;
-	int width, height, bpp;
-
 	FILE* fp = NULL;
-	_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
+	_tfopen_s(&fp, path + fn + L".png", L"rb");
+
+	if (m_ExtGradientHB) {
+		DeleteObject(m_ExtGradientHB);
+	}
+	m_ExtGradientHB = NULL;
+
 	if (fp) {
-		TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
+		m_ExtGradientHB = TypeLoadImage(1, &m_pExtGradientDATA, &m_width, &m_height, &m_bpp, fp, 0);
+		m_type = 1;
 	} else {
-		_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
+		_tfopen_s(&fp, path + fn + L".bmp", L"rb");
 		if (fp) {
-			TypeLoadImage(0, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
+			m_ExtGradientHB = TypeLoadImage(0, &m_pExtGradientDATA, &m_width, &m_height, &m_bpp, fp, 0);
+			m_type = 0;
 		}
 	}
 
 	if (fp) {
+		fclose(fp);
+	}
+
+	return m_ExtGradientHB != NULL;
+}
+
+bool MPCPngImage::PaintExternalGradient(CDC* dc, CRect r, int ptop, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
+{
+	if (IsExtGradiendLoading()) {
+		size_t size = m_width * m_height * m_bpp >> 3;
+		BYTE* pData = DNew BYTE[size];
+		memcpy(pData, BrightnessRGB(0, m_pExtGradientDATA, m_width, m_height, m_bpp, br, rc, gc, bc), size);
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
-		int bt = bpp / 8, st = 2, pa = 255 * 256;
+		int bt = m_bpp >> 3, st = 2, pa = 255 * 256;
 		int sp = bt * ptop, hs = bt * st;
 
-		if (width > height) {
+		if (m_width > m_height) {
 			for (int k = sp, t = 0; t < r.right; k += hs, t += st) {
 				TRIVERTEX tv[2] = {
 					{t, 0, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
@@ -343,5 +365,11 @@ void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, i
 				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
 		}
+
+		delete [] pData;
+
+		return true;
 	}
+
+	return false;
 }

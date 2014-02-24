@@ -71,12 +71,12 @@ CVMROSD::CVMROSD()
 
 	int fp = m_bm.FileExists(CString(_T("flybar")));
 
-	HBITMAP hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+	HBITMAP hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 
 	if (fp && bm.bmWidth != bm.bmHeight * 25) {
-		hBmp = m_bm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+		hBmp = m_bm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1);
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 

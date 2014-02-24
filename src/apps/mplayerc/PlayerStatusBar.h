@@ -37,6 +37,7 @@ class CPlayerStatusBar : public CDialogBar
 	HICON m_hIcon;
 
 	MPCPngImage m_logobm;
+	MPCPngImage	m_BackGroundbm;
 
 	CRect m_time_rect;
 	CRect m_time_rect2;

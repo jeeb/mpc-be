@@ -47,6 +47,7 @@ private:
 	UINT_PTR m_tooltipTimer;
 
 	MPCPngImage m_logobm;
+	MPCPngImage	m_BackGroundbm;
 
 	void MoveThumb(CPoint point);
 	__int64 CalculatePosition(CPoint point);

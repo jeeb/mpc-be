@@ -36,6 +36,7 @@ private:
 	int getHitButtonIdx(CPoint point);
 
 	MPCPngImage	m_logobm;
+	MPCPngImage	m_BackGroundbm;
 	__int64		iDisableXPToolbars;
 	int			iMute;
 

@@ -36,14 +36,14 @@ CPlayerToolBar::CPlayerToolBar()
 {
 	m_hDXVAIcon = NULL;
 
-	int fp = m_logobm.FileExists(CString(_T("gpu")));
+	bool fp = m_logobm.FileExists(CString(L"gpu"));
 
-	HBITMAP hBmp = m_logobm.LoadExternalImage("gpu", IDB_DXVA_ON, -1, -1, -1, -1, -1);
+	HBITMAP hBmp = m_logobm.LoadExternalImage(L"gpu", IDB_DXVA_ON, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 
 	if (fp && (bm.bmHeight > 32 || bm.bmWidth > 32)) {
-		hBmp = m_logobm.LoadExternalImage("", IDB_DXVA_ON, -1, -1, -1, -1, -1);
+		hBmp = m_logobm.LoadExternalImage(L"", IDB_DXVA_ON, -1);
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 
@@ -157,10 +157,10 @@ void CPlayerToolBar::SwitchTheme()
 		tb.SetIndent(0);
 	}
 
-	int fp = m_logobm.FileExists(CString(_T("toolbar")));
+	bool fp = m_logobm.FileExists(CString(L"toolbar"));
 
 	HBITMAP hBmp = NULL;
-	if (s.fDisableXPToolbars && NULL == fp) {
+	if (s.fDisableXPToolbars && !fp) {
 		/*
 		int col = s.clrFaceABGR;
 		int r, g, b, R, G, B;
@@ -168,9 +168,9 @@ void CPlayerToolBar::SwitchTheme()
 		g = (col >> 8) & 0xFF;
 		b = col >> 16;
 		*/
-		hBmp = m_logobm.LoadExternalImage("toolbar", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+		hBmp = m_logobm.LoadExternalImage(L"toolbar", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else if (fp) {
-		hBmp = m_logobm.LoadExternalImage("toolbar", 0, -1, -1, -1, -1, -1);
+		hBmp = m_logobm.LoadExternalImage(L"toolbar", 0, -1);
 	}
 
 	BITMAP bitmapBmp;
@@ -179,7 +179,7 @@ void CPlayerToolBar::SwitchTheme()
 
 		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
 			if (s.fDisableXPToolbars) {
-				hBmp = m_logobm.LoadExternalImage("", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+				hBmp = m_logobm.LoadExternalImage(L"", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 				::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 			} else {
 				DeleteObject(hBmp);
@@ -256,6 +256,10 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	VERIFY(__super::CreateEx(pParentWnd,
 			TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
 			WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS));
+
+	if (m_BackGroundbm.FileExists(CString(L"background"))) {
+		m_BackGroundbm.LoadExternalGradient(L"background");
+	}
 
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
@@ -453,8 +457,6 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if (s.fDisableXPToolbars) {
 
-		int fp = m_logobm.FileExists(CString(_T("background")));
-
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
 		case CDDS_PREERASE:
@@ -468,9 +470,9 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 				GetClientRect(&r);
 
-				if (NULL != fp) {
+				if (m_BackGroundbm.IsExtGradiendLoading()) {
 					ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-					m_logobm.LoadExternalGradient("background", &dc, r, 21, s.nThemeBrightness, R, G, B);
+					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, R, G, B);
 				} else {
 					ThemeRGB(50, 55, 60, R, G, B);
 					ThemeRGB(20, 25, 30, R2, G2, B2);
@@ -545,9 +547,9 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			for (int j = 0; j < _countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
-				if (NULL != fp) {
+				if (m_BackGroundbm.IsExtGradiendLoading()) {
 					ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-					m_logobm.LoadExternalGradient("background", &dc, r, 21, s.nThemeBrightness, R, G, B);
+					m_BackGroundbm.PaintExternalGradient(&dc, r, 21, s.nThemeBrightness, R, G, B);
 				} else {
 					ThemeRGB(50, 55, 60, R, G, B);
 					ThemeRGB(20, 25, 30, R2, G2, B2);

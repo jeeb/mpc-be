@@ -37,12 +37,12 @@ CFlyBar::CFlyBar() :
 {
 	int fp = m_logobm.FileExists(CString(_T("flybar")));
 
-	HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+	HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 
 	if (fp && bm.bmWidth != bm.bmHeight * 25) {
-		hBmp = m_logobm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+		hBmp = m_logobm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1);
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 

@@ -34,6 +34,9 @@ private:
 	CBitmap m_bmUnderCtrl;
 
 	MPCPngImage m_logobm;
+	MPCPngImage	m_BackGroundbm;
+	MPCPngImage	m_Volumebm;
+
 	__int64 iDisableXPToolbars;
 	__int64 iThemeBrightness;
 	__int64 iThemeRed;

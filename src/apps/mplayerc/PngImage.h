@@ -37,15 +37,28 @@ static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
 
 class MPCPngImage : public CImage
 {
-public:
+	// External Gradient
+	BYTE*	m_pExtGradientDATA;
+	HBITMAP	m_ExtGradientHB;
+	int		m_width, m_height, m_bpp;
+	int		m_type;
+
 	bool	DecompressPNG(struct png_t* png);
+public:
+	MPCPngImage();
+	~MPCPngImage();
+
 	bool	LoadFromResource(UINT id);
 
 	CString	LoadCurrentPath();
 	bool	FileExists(CString& fn, bool bInclJPEG = false);
 
 	BYTE*	BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
-	HBITMAP	TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);
-	HBITMAP	LoadExternalImage(CString fn, int resid, int type, int br, int rc, int gc, int bc);
-	void	LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc);
+	HBITMAP	TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+	HBITMAP	LoadExternalImage(CString fn, int resid, int type, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+
+	bool	LoadExternalGradient(CString fn);
+	bool	PaintExternalGradient(CDC* dc, CRect r, int ptop, int br = -1, int rc = -1, int gc = -1, int bc = -1);
+
+	const bool IsExtGradiendLoading() { return m_ExtGradientHB && m_width && m_height && m_bpp; };
 };

@@ -41,6 +41,13 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 
 	AppSettings& s = AfxGetAppSettings();
 
+	if (m_BackGroundbm.FileExists(CString(L"background"))) {
+		m_BackGroundbm.LoadExternalGradient(L"background");
+	}
+	if (m_Volumebm.FileExists(CString(L"volume"))) {
+		m_Volumebm.LoadExternalGradient(L"volume");
+	}
+
 	EnableToolTips(TRUE);
 	SetRange(0, 100);
 	SetPos(s.nVolume);
@@ -124,11 +131,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					int nBMedian = nHeight - 3 - 0.5 * nHeight - 8;
 					int height = r.Height() + nBMedian + 4;
 
-					int fp = m_logobm.FileExists(CString(_T("background")));
-
-					if (NULL != fp) {
+					if (m_BackGroundbm.IsExtGradiendLoading()) {
 						ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-						m_logobm.LoadExternalGradient("background", &dc, r, 22, s.nThemeBrightness, R, G, B);
+						m_BackGroundbm.PaintExternalGradient(&dc, r, 22, s.nThemeBrightness, R, G, B);
 					} else {
 						ThemeRGB(50, 55, 60, R, G, B);
 						ThemeRGB(20, 25, 30, R2, G2, B2);
@@ -197,10 +202,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					int nVolPos = r.left + (nVolume * 0.43) + 4;
 
-					int fp = m_logobm.FileExists(CString(_T("volume")));
-
-					if (NULL != fp) {
-						m_logobm.LoadExternalGradient("volume", &dc, r, 0, -1, -1, -1, -1);
+					if (m_Volumebm.IsExtGradiendLoading()) {
+						m_Volumebm.PaintExternalGradient(&dc, r, 0);
 					} else {
 						int ir1 = p1 * 256;
 						int ig1 = (p1 >> 8) * 256;
