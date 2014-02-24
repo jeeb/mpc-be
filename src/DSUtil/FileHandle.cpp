@@ -116,3 +116,17 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 
 	return TRUE;
 }
+
+//
+// Compact Path
+//
+CString CompactPath(LPCTSTR Path, UINT cchMax)
+{
+	CString cs = Path;
+	WCHAR pathbuf[MAX_PATH] = { 0 };
+	if (::PathCompactPathEx(pathbuf, cs, cchMax, 0)) {
+		cs = pathbuf;
+	}
+
+	return cs;
+}

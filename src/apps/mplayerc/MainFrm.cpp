@@ -6121,12 +6121,11 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 	fName.Replace(_T("\\\\"), _T("\\"));
 
 	CPath p(fName);
-
-	if (CDC* pDC = m_wndStatusBar.m_status.GetDC()) {
+	if (CDC* pDC = m_wndStatusBar.GetDC()) {
 		CRect r;
-		m_wndStatusBar.m_status.GetClientRect(r);
+		m_wndStatusBar.GetClientRect(r);
 		p.CompactPath(pDC->m_hDC, r.Width());
-		m_wndStatusBar.m_status.ReleaseDC(pDC);
+		m_wndStatusBar.ReleaseDC(pDC);
 	}
 
 	SendStatusMessage((LPCTSTR)p, 3000);
@@ -6418,7 +6417,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		}
 
 		str.Format(ResStr(IDS_MAINFRM_59),
-				   fn, fs, framesize.cx, framesize.cy, ar, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+				   CompactPath(fn, 90), fs, framesize.cx, framesize.cy, ar, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 		rts.Add(str, true, 0, 1, _T("thumbs"));
 
 		rts.Render(spd, 0, 25, bbox);
