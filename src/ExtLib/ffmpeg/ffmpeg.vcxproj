@@ -870,6 +870,7 @@
     <ClCompile Include="libavutil\x86\cpu.c" />
     <ClCompile Include="libavutil\x86\float_dsp_init.c" />
     <ClCompile Include="libavutil\x86\lls_init.c" />
+    <ClCompile Include="libswscale\bayer_template.c" />
     <ClCompile Include="libswscale\input.c" />
     <ClCompile Include="libswscale\options.c" />
     <ClCompile Include="libswscale\output.c" />

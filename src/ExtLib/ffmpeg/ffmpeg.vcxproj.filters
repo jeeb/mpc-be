@@ -2623,5 +2623,8 @@
     <ClCompile Include="libavcodec\x86\ttadsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libswscale\bayer_template.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
