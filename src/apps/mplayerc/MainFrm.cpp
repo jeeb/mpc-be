@@ -15524,7 +15524,7 @@ void CMainFrame::SetupFiltersSubMenu()
 					if (flags & AMSTREAMSELECTINFO_EXCLUSIVE) {
 						nflags |= MF_CHECKED | MFT_RADIOCHECK;
 					} else if (flags & AMSTREAMSELECTINFO_ENABLED) {
-						;
+						nflags |= MF_CHECKED;
 					}
 
 					if (!wname) {
