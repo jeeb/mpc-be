@@ -176,7 +176,6 @@ public:
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP			NonDelegatingQueryInterface(REFIID riid, void** ppv);
-	virtual bool			IsVideoInterlaced() { return true; };
 	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight);
 	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 

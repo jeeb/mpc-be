@@ -61,7 +61,7 @@ protected:
 
 	virtual void GetOutputSize(int& w, int& h, int& arx, int& ary, int &RealWidth, int &RealHeight, int& vsfilter) {}
 	virtual HRESULT Transform(IMediaSample* pIn) PURE;
-	virtual bool IsVideoInterlaced() { return false; }
+	virtual bool IsVideoInterlaced() { return true; }
 	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats) PURE;
 
 public:

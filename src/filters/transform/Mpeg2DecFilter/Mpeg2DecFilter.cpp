@@ -670,11 +670,6 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 	return S_OK;
 }
 
-bool CMpeg2DecFilter::IsVideoInterlaced()
-{
-	return IsInterlacedEnabled();
-}
-
 void CMpeg2DecFilter::UpdateAspectRatio()
 {
 	if (m_bReadARFromStream && m_dec->m_info.m_sequence->pixel_width && m_dec->m_info.m_sequence->pixel_height) {

@@ -198,11 +198,11 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 	HRESULT hr;
 
 
-	REFERENCE_TIME rtStart, rtStop;
+	REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
 	if (SUCCEEDED(pIn->GetTime(&rtStart, &rtStop))) {
 		double dRate = m_pInput->CurrentRate();
 
-		m_tPrev = m_pInput->CurrentStartTime() + dRate*rtStart;
+		m_tPrev = m_pInput->CurrentStartTime() + dRate * rtStart;
 
 		REFERENCE_TIME rtAvgTimePerFrame = rtStop - rtStart;
 		if (CComQIPtr<ISubClock2> pSC2 = m_pSubClock) {
@@ -212,10 +212,8 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 			}
 		}
 
-		m_fps = 10000000.0/rtAvgTimePerFrame / dRate;
+		m_fps = 10000000.0 / rtAvgTimePerFrame / dRate;
 	}
-
-	//
 
 	{
 		CAutoLock cAutoLock(&m_csQueueLock);
@@ -225,8 +223,6 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 			m_pSubPicQueue->SetFPS(m_fps);
 		}
 	}
-
-	//
 
 	BYTE* pDataIn = NULL;
 	if (FAILED(pIn->GetPointer(&pDataIn)) || !pDataIn) {
@@ -282,7 +278,6 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 			return E_FAIL;
 		}
 	}
-	//
 
 	SubPicDesc spd = m_spd;
 
@@ -299,8 +294,6 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 	pOut->SetDiscontinuity(pIn->IsDiscontinuity() == S_OK);
 	pOut->SetSyncPoint(pIn->IsSyncPoint() == S_OK);
 	pOut->SetPreroll(pIn->IsPreroll() == S_OK);
-
-	//
 
 	BITMAPINFOHEADER bihOut;
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
@@ -341,8 +334,23 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 
 	CopyBuffer(pDataOut, (BYTE*)spd.bits, spd.w, abs(spd.h)*(fFlip?-1:1), spd.pitch, mt.subtype);
 
-	PrintMessages(pDataOut);
+	{
+		// copy dwTypeSpecificFlags from input IMediaSample
+		if (CComQIPtr<IMediaSample2> pMS2in = pIn) {
+			AM_SAMPLE2_PROPERTIES propsIn;
+			if (SUCCEEDED(pMS2in->GetProperties(sizeof(propsIn), (BYTE*)&propsIn))) {
+				if (CComQIPtr<IMediaSample2> pMS2out = pOut) {
+					AM_SAMPLE2_PROPERTIES propsOut;
+					if (SUCCEEDED(pMS2out->GetProperties(sizeof(propsOut), (BYTE*)&propsOut))) {
+						propsOut.dwTypeSpecificFlags = propsIn.dwTypeSpecificFlags;
+						pMS2out->SetProperties(sizeof(propsOut), (BYTE*)&propsOut);
+					}
+				}
+			}
+		}
+	}
 
+	PrintMessages(pDataOut);
 	return m_pOutput->Deliver(pOut);
 }
 
