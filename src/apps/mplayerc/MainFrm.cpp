@@ -15601,7 +15601,7 @@ void CMainFrame::SetupLanguageMenu()
 				}
 				UINT uFlags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 				if (i == s.iLanguage) {
-					uFlags |= MF_CHECKED;
+					uFlags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 				pSub->AppendMenu(uFlags, i + ID_LANGUAGE_ENGLISH, lr.name);
 				iCount++;
