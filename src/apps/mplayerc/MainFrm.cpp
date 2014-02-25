@@ -370,29 +370,31 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SYNCHRONIZEDISPLAY, OnUpdateViewSynchronizeDisplay)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SYNCHRONIZENEAREST, OnUpdateViewSynchronizeNearest)
 
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_ENABLE, OnViewColorManagementEnable)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_ENABLE, OnUpdateViewColorManagementEnable)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, OnUpdateViewColorManagementInput)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INPUT_HDTV, OnUpdateViewColorManagementInput)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_NTSC, OnUpdateViewColorManagementInput)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, OnUpdateViewColorManagementInput)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, OnUpdateViewColorManagementAmbientLight)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DIM, OnUpdateViewColorManagementAmbientLight)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, OnUpdateViewColorManagementAmbientLight)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, OnUpdateViewColorManagementIntent)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INTENT_RELATIVECOLORIMETRIC, OnUpdateViewColorManagementIntent)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INTENT_SATURATION, OnUpdateViewColorManagementIntent)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, OnUpdateViewColorManagementIntent)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, OnViewColorManagementInputAuto)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_HDTV, OnViewColorManagementInputHDTV)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_NTSC, OnViewColorManagementInputSDTV_NTSC)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, OnViewColorManagementInputSDTV_PAL)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, OnUpdateViewColorManagementInput)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, OnViewColorManagementAmbientLightBright)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DIM, OnViewColorManagementAmbientLightDim)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, OnViewColorManagementAmbientLightDark)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, OnUpdateViewColorManagementAmbientLight)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, OnViewColorManagementIntentPerceptual)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_RELATIVECOLORIMETRIC, OnViewColorManagementIntentRelativeColorimetric)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_SATURATION, OnViewColorManagementIntentSaturation)
+	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, OnViewColorManagementIntentAbsoluteColorimetric)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, OnUpdateViewColorManagementIntent)
 
-	ON_UPDATE_COMMAND_UI(ID_VIEW_EVROUTPUTRANGE_0_255, OnUpdateViewEVROutputRange)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_EVROUTPUTRANGE_16_235, OnUpdateViewEVROutputRange)
+	ON_COMMAND(ID_VIEW_EVROUTPUTRANGE_0_255, OnViewEVROutputRange_0_255)
+	ON_COMMAND(ID_VIEW_EVROUTPUTRANGE_16_235, OnViewEVROutputRange_16_235)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_EVROUTPUTRANGE_0_255, ID_VIEW_EVROUTPUTRANGE_16_235, OnUpdateViewEVROutputRange)
 
-	ON_UPDATE_COMMAND_UI(ID_VIEW_FLUSHGPU_BEFOREVSYNC, OnUpdateViewFlushGPU)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_FLUSHGPU_AFTERPRESENT, OnUpdateViewFlushGPU)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_FLUSHGPU_WAIT, OnUpdateViewFlushGPU)
-
-	ON_UPDATE_COMMAND_UI(ID_VIEW_D3DFULLSCREEN, OnUpdateViewD3DFullscreen)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_ALTERNATIVEVSYNC, OnUpdateViewAlternativeVSync)
+	ON_COMMAND(ID_VIEW_FLUSHGPU_BEFOREVSYNC, OnViewFlushGPUBeforeVSync)
+	ON_COMMAND(ID_VIEW_FLUSHGPU_AFTERPRESENT, OnViewFlushGPUAfterVSync)
+	ON_COMMAND(ID_VIEW_FLUSHGPU_WAIT, OnViewFlushGPUWait)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_FLUSHGPU_BEFOREVSYNC, ID_VIEW_FLUSHGPU_WAIT, OnUpdateViewFlushGPU)
 
 	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCOFFSET_INCREASE, OnUpdateViewVSyncOffsetIncrease)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCOFFSET_DECREASE, OnUpdateViewVSyncOffsetDecrease)
@@ -409,29 +411,13 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_SYNCHRONIZEDISPLAY, OnViewSynchronizeDisplay)
 	ON_COMMAND(ID_VIEW_SYNCHRONIZENEAREST, OnViewSynchronizeNearest)
 
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_ENABLE, OnViewColorManagementEnable)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, OnViewColorManagementInputAuto)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_HDTV, OnViewColorManagementInputHDTV)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_NTSC, OnViewColorManagementInputSDTV_NTSC)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, OnViewColorManagementInputSDTV_PAL)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, OnViewColorManagementAmbientLightBright)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DIM, OnViewColorManagementAmbientLightDim)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, OnViewColorManagementAmbientLightDark)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, OnViewColorManagementIntentPerceptual)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_RELATIVECOLORIMETRIC, OnViewColorManagementIntentRelativeColorimetric)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_SATURATION, OnViewColorManagementIntentSaturation)
-	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, OnViewColorManagementIntentAbsoluteColorimetric)
-
-	ON_COMMAND(ID_VIEW_EVROUTPUTRANGE_0_255, OnViewEVROutputRange_0_255)
-	ON_COMMAND(ID_VIEW_EVROUTPUTRANGE_16_235, OnViewEVROutputRange_16_235)
-
-	ON_COMMAND(ID_VIEW_FLUSHGPU_BEFOREVSYNC, OnViewFlushGPUBeforeVSync)
-	ON_COMMAND(ID_VIEW_FLUSHGPU_AFTERPRESENT, OnViewFlushGPUAfterVSync)
-	ON_COMMAND(ID_VIEW_FLUSHGPU_WAIT, OnViewFlushGPUWait)
-
 	ON_COMMAND(ID_VIEW_D3DFULLSCREEN, OnViewD3DFullScreen)
 	ON_COMMAND(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnViewDisableDesktopComposition)
 	ON_COMMAND(ID_VIEW_ALTERNATIVEVSYNC, OnViewAlternativeVSync)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_D3DFULLSCREEN, OnUpdateViewD3DFullscreen)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_ALTERNATIVEVSYNC, OnUpdateViewAlternativeVSync)
+	
 	ON_COMMAND(ID_VIEW_RESET_DEFAULT, OnViewResetDefault)
 	ON_COMMAND(ID_VIEW_RESET_OPTIMAL, OnViewResetOptimal)
 
@@ -6990,7 +6976,7 @@ void CMainFrame::OnUpdateViewVSync(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck (!supported || (r.m_AdvRendSets.iVMR9VSync));
 }
 
@@ -7017,7 +7003,7 @@ void CMainFrame::OnUpdateViewVSyncAccurate(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9VSyncAccurate);
 }
 
@@ -7061,7 +7047,7 @@ void CMainFrame::OnUpdateViewColorManagementEnable(CCmdUI* pCmdUI)
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
 					 rd.m_bFP16Support;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementEnable);
 }
 
@@ -7076,24 +7062,29 @@ void CMainFrame::OnUpdateViewColorManagementInput(CCmdUI* pCmdUI)
 					 rd.m_bFP16Support &&
 					 r.m_AdvRendSets.iVMR9ColorManagementEnable;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 
+	bool fChecked = false;
 	switch (pCmdUI->m_nID) {
 		case ID_VIEW_COLORMANAGEMENT_INPUT_AUTO:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_UNKNOWN);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_UNKNOWN;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_INPUT_HDTV:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_HDTV);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_HDTV;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_NTSC:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_SDTV_NTSC);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_SDTV_NTSC;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_SDTV_PAL);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_SDTV_PAL;
 			break;
+	}
+
+	if (fChecked) {
+		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, pCmdUI->m_nID);	
 	}
 }
 
@@ -7108,20 +7099,25 @@ void CMainFrame::OnUpdateViewColorManagementAmbientLight(CCmdUI* pCmdUI)
 					 rd.m_bFP16Support &&
 					 r.m_AdvRendSets.iVMR9ColorManagementEnable;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 
+	bool fChecked = false;
 	switch (pCmdUI->m_nID) {
 		case ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementAmbientLight == AMBIENT_LIGHT_BRIGHT);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementAmbientLight == AMBIENT_LIGHT_BRIGHT;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DIM:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementAmbientLight == AMBIENT_LIGHT_DIM);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementAmbientLight == AMBIENT_LIGHT_DIM;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementAmbientLight == AMBIENT_LIGHT_DARK);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementAmbientLight == AMBIENT_LIGHT_DARK;
 			break;
+	}
+
+	if (fChecked) {
+		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, pCmdUI->m_nID);	
 	}
 }
 
@@ -7136,24 +7132,29 @@ void CMainFrame::OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI)
 					 rd.m_bFP16Support &&
 					 r.m_AdvRendSets.iVMR9ColorManagementEnable;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 
+	bool fChecked = false;
 	switch (pCmdUI->m_nID) {
 		case ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_PERCEPTUAL);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_PERCEPTUAL;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_INTENT_RELATIVECOLORIMETRIC:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_INTENT_SATURATION:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_SATURATION);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_SATURATION;
 			break;
 
 		case ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC:
-			pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC);
+			fChecked = r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC;
 			break;
+	}
+
+	if (fChecked) {
+		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, pCmdUI->m_nID);	
 	}
 }
 
@@ -7165,12 +7166,20 @@ void CMainFrame::OnUpdateViewEVROutputRange(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 
-	if (pCmdUI->m_nID == ID_VIEW_EVROUTPUTRANGE_0_255) {
-		pCmdUI->SetCheck(r.m_AdvRendSets.iEVROutputRange == 0);
-	} else if (pCmdUI->m_nID == ID_VIEW_EVROUTPUTRANGE_16_235) {
-		pCmdUI->SetCheck(r.m_AdvRendSets.iEVROutputRange == 1);
+	bool fChecked = false;
+	switch (pCmdUI->m_nID) {
+		case ID_VIEW_EVROUTPUTRANGE_0_255:
+			fChecked = r.m_AdvRendSets.iEVROutputRange == 0;
+			break;
+		case ID_VIEW_EVROUTPUTRANGE_16_235:
+			fChecked = r.m_AdvRendSets.iEVROutputRange == 1;
+			break;
+	}
+
+	if (fChecked) {
+		CheckMenuRadioItem(ID_VIEW_EVROUTPUTRANGE_0_255, ID_VIEW_EVROUTPUTRANGE_16_235, pCmdUI->m_nID);	
 	}
 }
 
@@ -7182,7 +7191,7 @@ void CMainFrame::OnUpdateViewFlushGPU(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 
 	if (pCmdUI->m_nID == ID_VIEW_FLUSHGPU_BEFOREVSYNC) {
 		pCmdUI->SetCheck(r.m_AdvRendSets.iVMRFlushGPUBeforeVSync != 0);
@@ -7191,7 +7200,6 @@ void CMainFrame::OnUpdateViewFlushGPU(CCmdUI* pCmdUI)
 	} else if (pCmdUI->m_nID == ID_VIEW_FLUSHGPU_WAIT) {
 		pCmdUI->SetCheck(r.m_AdvRendSets.iVMRFlushGPUWait != 0);
 	}
-
 }
 
 void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
@@ -7203,7 +7211,7 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(s.fD3DFullscreen);
 }
 
@@ -7229,7 +7237,7 @@ void CMainFrame::OnUpdateViewAlternativeVSync(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.fVMR9AlterativeVSync);
 }
 
@@ -7241,7 +7249,7 @@ void CMainFrame::OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9FullscreenGUISupport);
 }
 
@@ -7255,7 +7263,7 @@ void CMainFrame::OnUpdateViewHighColorResolution(CCmdUI* pCmdUI)
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
 					 rd.m_b10bitSupport;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iEVRHighColorResolution);
 }
 
@@ -7268,7 +7276,7 @@ void CMainFrame::OnUpdateViewForceInputHighColorResolution(CCmdUI* pCmdUI)
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
 					 rd.m_b10bitSupport;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iEVRForceInputHighColorResolution);
 }
 
@@ -7282,7 +7290,7 @@ void CMainFrame::OnUpdateViewFullFloatingPointProcessing(CCmdUI* pCmdUI)
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
 					 rd.m_bFP16Support;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9FullFloatingPointProcessing);
 }
 
@@ -7296,7 +7304,7 @@ void CMainFrame::OnUpdateViewHalfFloatingPointProcessing(CCmdUI* pCmdUI)
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
 					 rd.m_bFP16Support;
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9HalfFloatingPointProcessing);
 }
 
@@ -7307,7 +7315,7 @@ void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iEVREnableFrameTimeCorrection);
 }
 
@@ -7321,7 +7329,7 @@ void CMainFrame::OnUpdateViewVSyncOffsetIncrease(CCmdUI* pCmdUI)
 					   r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
 					  r.m_AdvRendSets.fVMR9AlterativeVSync);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 }
 
 void CMainFrame::OnUpdateViewVSyncOffsetDecrease(CCmdUI* pCmdUI)
@@ -7334,7 +7342,7 @@ void CMainFrame::OnUpdateViewVSyncOffsetDecrease(CCmdUI* pCmdUI)
 					   r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
 					  r.m_AdvRendSets.fVMR9AlterativeVSync);
 
-	pCmdUI->Enable (supported);
+	pCmdUI->Enable(supported);
 }
 
 void CMainFrame::OnViewVSync()
@@ -7688,7 +7696,7 @@ void CMainFrame::OnViewVSyncOffsetDecrease()
 void CMainFrame::OnUpdateViewRemainingTime(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
-	pCmdUI->Enable (s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
+	pCmdUI->Enable(s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
 	pCmdUI->SetCheck (m_bRemainingTime);
 }
 
@@ -7718,7 +7726,7 @@ CString CMainFrame::GetSystemLocalTime()
 void CMainFrame::OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
-	pCmdUI->Enable (s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
+	pCmdUI->Enable(s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
 	pCmdUI->SetCheck (m_bOSDLocalTime);
 }
 
@@ -7736,7 +7744,7 @@ void CMainFrame::OnViewOSDLocalTime()
 void CMainFrame::OnUpdateViewOSDFileName(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
-	pCmdUI->Enable (s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
+	pCmdUI->Enable(s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
 	pCmdUI->SetCheck (m_bOSDFileName);
 }
 
