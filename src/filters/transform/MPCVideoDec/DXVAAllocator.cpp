@@ -153,8 +153,17 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 	}
 
 	if (SUCCEEDED(hr)) {
+		// get the device, for ColorFill() to init the surfaces in black
+		CComPtr<IDirect3DDevice9> pDev;
+		m_ppRTSurfaceArray[0]->GetDevice(&pDev);
+
 		// Important : create samples in reverse order !
 		for (m_lAllocated = m_lCount-1; m_lAllocated >= 0; m_lAllocated--) {
+			// fill the surface in black, to avoid the "green screen" in case the first frame fails to decode.
+			if (pDev) {
+				pDev->ColorFill(m_ppRTSurfaceArray[m_lAllocated], NULL, D3DCOLOR_XYUV(0, 128, 128));
+			}
+
 			CDXVA2Sample *pSample = DNew CDXVA2Sample(this, &hr);
 			if (pSample == NULL) {
 				hr = E_OUTOFMEMORY;
