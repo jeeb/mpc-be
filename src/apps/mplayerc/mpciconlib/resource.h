@@ -25,7 +25,7 @@
 #define IDI_AVI_ICON			20
 #define IDI_BIK_ICON			21
 #define IDI_CDA_ICON			22
-#define IDI_D2V_ICON			23
+#define IDI_ICON_23				23
 #define IDI_DIVX_ICON			24
 #define IDI_DSA_ICON			25
 #define IDI_DSM_ICON			26
@@ -89,7 +89,7 @@
 #define IDI_ROQ_ICON			84
 #define IDI_RP_ICON				85
 #define IDI_RT_ICON				86
-#define IDI_SMI_ICON			87
+#define IDI_ICON_87				87
 #define IDI_SMIL_ICON			88
 #define IDI_SMK_ICON			89
 #define IDI_SND_ICON			90
