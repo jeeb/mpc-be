@@ -191,10 +191,14 @@ HRESULT CGPUUsage::Init(CString DeviceName)
 		}
 
 		if (NVData.hNVApi) {
-			NvAPI_QueryInterface_t		NvAPI_QueryInterface	= (NvAPI_QueryInterface_t)GetProcAddress(NVData.hNVApi, "nvapi_QueryInterface");;
-			NvAPI_Initialize_t			NvAPI_Initialize		= (NvAPI_Initialize_t)(NvAPI_QueryInterface)(0x0150E828);
-			NvAPI_EnumPhysicalGPUs_t	NvAPI_EnumPhysicalGPUs	= (NvAPI_EnumPhysicalGPUs_t)(NvAPI_QueryInterface)(0xE5AC921F);
-			NVData.NvAPI_GPU_GetUsages							= (NvAPI_GPU_GetUsages_t)(NvAPI_QueryInterface)(0x189A1FDF);
+			NvAPI_QueryInterface_t		NvAPI_QueryInterface	= (NvAPI_QueryInterface_t)GetProcAddress(NVData.hNVApi, "nvapi_QueryInterface");
+			NvAPI_Initialize_t			NvAPI_Initialize		= NULL;
+			NvAPI_EnumPhysicalGPUs_t	NvAPI_EnumPhysicalGPUs	= NULL;
+			if (NvAPI_QueryInterface) {
+				NvAPI_Initialize			= (NvAPI_Initialize_t)(NvAPI_QueryInterface)(0x0150E828);
+				NvAPI_EnumPhysicalGPUs		= (NvAPI_EnumPhysicalGPUs_t)(NvAPI_QueryInterface)(0xE5AC921F);
+				NVData.NvAPI_GPU_GetUsages	= (NvAPI_GPU_GetUsages_t)(NvAPI_QueryInterface)(0x189A1FDF);
+			}
 			if (NULL == NvAPI_QueryInterface ||
 					NULL == NvAPI_Initialize ||
 					NULL == NvAPI_EnumPhysicalGPUs ||
