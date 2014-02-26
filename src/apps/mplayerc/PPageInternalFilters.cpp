@@ -28,107 +28,104 @@
 static filter_t s_filters[] = {
 
 	// Source filters
-	{_T("AMR"),                   SOURCE_FILTER,  SOURCE, SRC_AMR,        0},
-	{_T("AVI"),                   SOURCE_FILTER,  SOURCE, SRC_AVI,        IDS_SRC_AVI},
-	{_T("APE"),                   SOURCE_FILTER,  SOURCE, SRC_APE,        0},
-	{_T("CDDA (Audio CD)"),       SOURCE_FILTER,  SOURCE, SRC_CDDA,       IDS_SRC_CDDA},
-	{_T("CDXA (VCD/SVCD/XCD)"),   SOURCE_FILTER,  SOURCE, SRC_CDXA,       0},
-	{_T("DirectShow Media"),      SOURCE_FILTER,  SOURCE, SRC_DSM,        0},
-	{_T("DTS/AC3"),               SOURCE_FILTER,  SOURCE, SRC_DTSAC3,     0},
-	{_T("DVD Video Title Set"),   SOURCE_FILTER,  SOURCE, SRC_VTS,        IDS_SRC_VTS},
-	{_T("FLI/FLC"),               SOURCE_FILTER,  SOURCE, SRC_FLIC,       0},
-	{_T("FLAC"),                  SOURCE_FILTER,  SOURCE, SRC_FLAC,       0},
-	{_T("FLV"),                   SOURCE_FILTER,  SOURCE, SRC_FLV,        0},
-	{_T("Matroska"),              SOURCE_FILTER,  SOURCE, SRC_MATROSKA,   0},
-	{_T("MP4/MOV"),               SOURCE_FILTER,  SOURCE, SRC_MP4,        0},
-	{_T("MPEG Audio"),            SOURCE_FILTER,  SOURCE, SRC_MPA,        IDS_SRC_MPA},
-	{_T("MPEG PS/TS/PVA"),        SOURCE_FILTER,  SOURCE, SRC_MPEG,       0},
-	{_T("MusePack"),              SOURCE_FILTER,  SOURCE, SRC_MPAC,       0},
-	{_T("Ogg/Opus/Speex"),        SOURCE_FILTER,  SOURCE, SRC_OGG,        0},
-	{_T("RAW Video"),             SOURCE_FILTER,  SOURCE, SRC_RAWVIDEO,   0},
-	{_T("RealMedia"),             SOURCE_FILTER,  SOURCE, SRC_REALMEDIA,  IDS_SRC_REALMEDIA},
-	{_T("RoQ"),                   SOURCE_FILTER,  SOURCE, SRC_ROQ,        IDS_SRC_ROQ},
-	{_T("SHOUTcast"),             SOURCE_FILTER,  SOURCE, SRC_SHOUTCAST,  0},
-	{_T("TAK"),                   SOURCE_FILTER,  SOURCE, SRC_TAK,        0},
-	{_T("TTA"),                   SOURCE_FILTER,  SOURCE, SRC_TTA,        0},
-	{_T("WAV/Wave64"),            SOURCE_FILTER,  SOURCE, SRC_WAV,        0},
-	{_T("WavPack"),               SOURCE_FILTER,  SOURCE, SRC_WPAC,       0},
-	{_T("UDP/HTTP"),              SOURCE_FILTER,  SOURCE, SRC_UDP,        0},
-
-	// Audio decoder
-	{_T("AAC"),                   FFMPEG_DECODER, AUDIO,  FFM_AAC,        IDS_TRA_FFMPEG,},
-	{_T("AC3/E-AC3/TrueHD/MLP"),  DECODER,        AUDIO,  TRA_AC3,        IDS_TRA_FFMPEG,},
-	{_T("ALAC"),                  FFMPEG_DECODER, AUDIO,  FFM_ALAC,       IDS_TRA_FFMPEG,},
-	{_T("ALS"),                   FFMPEG_DECODER, AUDIO,  FFM_ALS,        IDS_TRA_FFMPEG,},
-	{_T("AMR"),                   FFMPEG_DECODER, AUDIO,  FFM_AMR,        IDS_TRA_FFMPEG,},
-	{_T("APE"),                   FFMPEG_DECODER, AUDIO,  FFM_APE,        IDS_TRA_FFMPEG,},
-	{_T("Bink Audio"),            FFMPEG_DECODER, AUDIO,  FFM_BINKA,      IDS_TRA_FFMPEG,},
-	{_T("DSP Group TrueSpeech"),  FFMPEG_DECODER, AUDIO,  FFM_TRUESPEECH, IDS_TRA_FFMPEG,},
-	{_T("DTS"),                   DECODER,        AUDIO,  TRA_DTS,        IDS_TRA_FFMPEG,},
-	{_T("FLAC"),                  FFMPEG_DECODER, AUDIO,  FFM_FLAC,       IDS_TRA_FFMPEG},
-	{_T("Indeo Audio"),           FFMPEG_DECODER, AUDIO,  FFM_IAC,        IDS_TRA_FFMPEG,},
-	{_T("LPCM"),                  DECODER,        AUDIO,  TRA_LPCM,       IDS_TRA_LPCM,},
-	{_T("MPEG Audio"),            FFMPEG_DECODER, AUDIO,  FFM_MPA,        IDS_TRA_FFMPEG,},
-	{_T("MusePack SV7/SV8"),      FFMPEG_DECODER, AUDIO,  FFM_MPAC,       IDS_TRA_FFMPEG,},
-	{_T("Nellymoser"),            FFMPEG_DECODER, AUDIO,  FFM_NELLY,      IDS_TRA_FFMPEG,},
-	{_T("Opus"),                  FFMPEG_DECODER, AUDIO,  FFM_OPUS,       IDS_TRA_FFMPEG,},
-	{_T("PS2 Audio (PCM/ADPCM)"), DECODER,        AUDIO,  TRA_PS2AUD,     IDS_TRA_PS2AUD,},
-	{_T("QDesign Music Codec 2"), FFMPEG_DECODER, AUDIO,  FFM_QDM2,       IDS_TRA_FFMPEG,},
-	{_T("RealAudio"),             DECODER,        AUDIO,  TRA_RA,         IDS_TRA_RA},
-	{_T("Speex"),                 FFMPEG_DECODER, AUDIO,  FFM_SPEEX,      IDS_TRA_FFMPEG,},
-	{_T("TAK"),                   FFMPEG_DECODER, AUDIO,  FFM_TAK,        IDS_TRA_FFMPEG,},
-	{_T("TTA"),                   FFMPEG_DECODER, AUDIO,  FFM_TTA,        IDS_TRA_FFMPEG,},
-	{_T("Vorbis"),                FFMPEG_DECODER, AUDIO,  FFM_VORBIS,     IDS_TRA_FFMPEG,},
-	{_T("Voxware MetaSound"),     FFMPEG_DECODER, AUDIO,  FFM_VOXWARE,    IDS_TRA_FFMPEG,},
-	{_T("WavPack lossless audio"),FFMPEG_DECODER, AUDIO,  FFM_WPAC,       IDS_TRA_FFMPEG,},
-	{_T("WMA v.1/v.2"),           FFMPEG_DECODER, AUDIO,  FFM_WMA2,       IDS_TRA_FFMPEG,},
-	{_T("WMA v.9 Professional"),  FFMPEG_DECODER, AUDIO,  FFM_WMAPRO,     IDS_TRA_FFMPEG,},
-	{_T("WMA Lossless"),          FFMPEG_DECODER, AUDIO,  FFM_WMALOSS,    IDS_TRA_FFMPEG,},
-	{_T("WMA Voice"),             FFMPEG_DECODER, AUDIO,  FFM_WMAVOICE,   IDS_TRA_FFMPEG,},
-	{_T("Other PCM/ADPCM"),       DECODER,        AUDIO,  TRA_PCM,        IDS_TRA_FFMPEG,},
+	{_T("AMR"),						SOURCE_FILTER, SRC_AMR,				0},
+	{_T("AVI"),						SOURCE_FILTER, SRC_AVI,				IDS_SRC_AVI},
+	{_T("APE"),						SOURCE_FILTER, SRC_APE,				0},
+	{_T("CDDA (Audio CD)"),			SOURCE_FILTER, SRC_CDDA,			IDS_SRC_CDDA},
+	{_T("CDXA (VCD/SVCD/XCD)"),		SOURCE_FILTER, SRC_CDXA,			0},
+	{_T("DirectShow Media"),		SOURCE_FILTER, SRC_DSM,				0},
+	{_T("DTS/AC3"),					SOURCE_FILTER, SRC_DTSAC3,			0},
+	{_T("DVD Video Title Set"),		SOURCE_FILTER, SRC_VTS,				IDS_SRC_VTS},
+	{_T("FLI/FLC"),					SOURCE_FILTER, SRC_FLIC,			0},
+	{_T("FLAC"),					SOURCE_FILTER, SRC_FLAC,			0},
+	{_T("FLV"),						SOURCE_FILTER, SRC_FLV,				0},
+	{_T("Matroska"),				SOURCE_FILTER, SRC_MATROSKA,		0},
+	{_T("MP4/MOV"),					SOURCE_FILTER, SRC_MP4,				0},
+	{_T("MPEG Audio"),				SOURCE_FILTER, SRC_MPA,				IDS_SRC_MPA},
+	{_T("MPEG PS/TS/PVA"),			SOURCE_FILTER, SRC_MPEG,			0},
+	{_T("MusePack"),				SOURCE_FILTER, SRC_MUSEPACK,		0},
+	{_T("Ogg/Opus/Speex"),			SOURCE_FILTER, SRC_OGG,				0},
+	{_T("RAW Video"),				SOURCE_FILTER, SRC_RAWVIDEO,		0},
+	{_T("RealMedia"),				SOURCE_FILTER, SRC_REAL,			IDS_SRC_REALMEDIA},
+	{_T("RoQ"),						SOURCE_FILTER, SRC_ROQ,				IDS_SRC_ROQ},
+	{_T("SHOUTcast"),				SOURCE_FILTER, SRC_SHOUTCAST,		0},
+	{_T("TAK"),						SOURCE_FILTER, SRC_TAK,				0},
+	{_T("TTA"),						SOURCE_FILTER, SRC_TTA,				0},
+	{_T("WAV/Wave64"),				SOURCE_FILTER, SRC_WAV,				0},
+	{_T("WavPack"),					SOURCE_FILTER, SRC_WAVPACK,			0},
+	{_T("UDP/HTTP"),				SOURCE_FILTER, SRC_UDP,				0},
 
 	// DXVA decoder
-	{_T("H264/AVC (DXVA)"),       DXVA_DECODER,   VIDEO,  TRA_DXVA_H264,  IDS_TRA_FFMPEG},
-	{_T("MPEG-2 Video (DXVA)"),   DXVA_DECODER,   VIDEO,  TRA_DXVA_MPEG2, IDS_TRA_FFMPEG},
-	{_T("VC-1 (DXVA)"),           DXVA_DECODER,   VIDEO,  TRA_DXVA_VC1,   IDS_TRA_FFMPEG},
-	{_T("WMV3 (DXVA)"),           DXVA_DECODER,   VIDEO,  TRA_DXVA_WMV3,  IDS_TRA_FFMPEG},
+	{_T("H264/AVC (DXVA)"),			DXVA_DECODER,  VDEC_DXVA_H264,		0},
+	{_T("MPEG-2 Video (DXVA)"),		DXVA_DECODER,  VDEC_DXVA_MPEG2,		0},
+	{_T("VC-1 (DXVA)"),				DXVA_DECODER,  VDEC_DXVA_VC1,		0},
+	{_T("WMV3 (DXVA)"),				DXVA_DECODER,  VDEC_DXVA_WMV3,		0},
 
-	// Video Decoder
-	{_T("AMV Video"),             FFMPEG_DECODER, VIDEO,  FFM_AMVV,       IDS_TRA_FFMPEG},
-	{_T("Apple ProRes"),          FFMPEG_DECODER, VIDEO,  FFM_PRORES,     IDS_TRA_FFMPEG},
-	{_T("Avid DNxHD"),            FFMPEG_DECODER, VIDEO,  FFM_DNXHD,      IDS_TRA_FFMPEG},
-	{_T("Bink Video"),            FFMPEG_DECODER, VIDEO,  FFM_BINKV,      IDS_TRA_FFMPEG},
-	{_T("Canopus Lossless"),      FFMPEG_DECODER, VIDEO,  FFM_CLLC,       IDS_TRA_FFMPEG},
-	{_T("Dirac"),                 FFMPEG_DECODER, VIDEO,  FFM_DIRAC,      IDS_TRA_FFMPEG},
-	{_T("DivX"),                  FFMPEG_DECODER, VIDEO,  FFM_DIVX,       IDS_TRA_FFMPEG},
-	{_T("DV Video"),              FFMPEG_DECODER, VIDEO,  FFM_DV,         IDS_TRA_FFMPEG},
-	{_T("FLV1/4"),                FFMPEG_DECODER, VIDEO,  FFM_FLV4,       IDS_TRA_FFMPEG},
-	{_T("H263"),                  FFMPEG_DECODER, VIDEO,  FFM_H263,       IDS_TRA_FFMPEG},
-	{_T("H264/AVC (FFmpeg)"),     FFMPEG_DECODER, VIDEO,  FFM_H264,       IDS_TRA_FFMPEG},
-	{_T("HEVC (experimental)"),   FFMPEG_DECODER, VIDEO,  FFM_HEVC,       IDS_TRA_FFMPEG},
-	{_T("Indeo 3/4/5"),           FFMPEG_DECODER, VIDEO,  FFM_INDEO,      IDS_TRA_FFMPEG},
-	{_T("Lossless video (huffyuv, Lagarith, FFV1)"), FFMPEG_DECODER, VIDEO,  FFM_LOSSLESS,   IDS_TRA_FFMPEG},
-	{_T("MJPEG"),                 FFMPEG_DECODER, VIDEO,  FFM_MJPEG,      IDS_TRA_FFMPEG},
-	{_T("MPEG-1 Video (FFmpeg)"), FFMPEG_DECODER, VIDEO,  FFM_MPEG1,      IDS_TRA_FFMPEG},
-	{_T("MPEG-2 Video (FFmpeg)"), FFMPEG_DECODER, VIDEO,  FFM_MPEG2,      IDS_TRA_FFMPEG},
-	{_T("MPEG-1 Video (libmpeg2)"),     DECODER,        VIDEO,  TRA_MPEG1,      IDS_TRA_MPEG2},
-	{_T("MPEG-2/DVD Video (libmpeg2)"), DECODER,        VIDEO,  TRA_MPEG2,      IDS_TRA_MPEG2},
-	{_T("MS MPEG-4"),             FFMPEG_DECODER, VIDEO,  FFM_MSMPEG4,    IDS_TRA_FFMPEG},
-	{_T("PNG"),                   FFMPEG_DECODER, VIDEO,  FFM_PNG,        IDS_TRA_FFMPEG},
-	{_T("Screen Recorder (Cinepak/CSCD/QTRle/MS/TSCC/VMnc)"), FFMPEG_DECODER, VIDEO, FFM_SCREC, IDS_TRA_FFMPEG},
-	{_T("SVQ1/3"),                FFMPEG_DECODER, VIDEO,  FFM_SVQ3,       IDS_TRA_FFMPEG},
-	{_T("Theora"),                FFMPEG_DECODER, VIDEO,  FFM_THEORA,     IDS_TRA_FFMPEG},
-	{_T("Ut Video"),              FFMPEG_DECODER, VIDEO,  FFM_UTVD,       IDS_TRA_FFMPEG},
-	{_T("VC-1 (FFmpeg)"),         FFMPEG_DECODER, VIDEO,  FFM_VC1,        IDS_TRA_FFMPEG},
-	{_T("VP3/5/6"),               FFMPEG_DECODER, VIDEO,  FFM_VP356,      IDS_TRA_FFMPEG},
-	{_T("VP8/9"),                 FFMPEG_DECODER, VIDEO,  FFM_VP8,        IDS_TRA_FFMPEG},
-	{_T("WMV1/2/3"),              FFMPEG_DECODER, VIDEO,  FFM_WMV,        IDS_TRA_FFMPEG},
-	{_T("Xvid/MPEG-4"),           FFMPEG_DECODER, VIDEO,  FFM_XVID,       IDS_TRA_FFMPEG},
-	{_T("RealVideo"),             FFMPEG_DECODER, VIDEO,  FFM_RV,         IDS_TRA_RV},
-	{_T("Uncompressed video (v210, V410, Y800, I420, ...)"),   FFMPEG_DECODER, VIDEO, FFM_UNCOMPRESSED, IDS_TRA_FFMPEG},
+		// Video Decoder
+	{_T("AMV Video"),				VIDEO_DECODER, VDEC_AMV,			0},
+	{_T("Apple ProRes"),			VIDEO_DECODER, VDEC_PRORES,			0},
+	{_T("Avid DNxHD"),				VIDEO_DECODER, VDEC_DNXHD,			0},
+	{_T("Bink Video"),				VIDEO_DECODER, VDEC_BINK,			0},
+	{_T("Canopus Lossless"),		VIDEO_DECODER, VDEC_CANOPUS,		0},
+	{_T("Dirac"),					VIDEO_DECODER, VDEC_DIRAC,			0},
+	{_T("DivX"),					VIDEO_DECODER, VDEC_DIVX,			0},
+	{_T("DV Video"),				VIDEO_DECODER, VDEC_DV,				0},
+	{_T("FLV1/4"),					VIDEO_DECODER, VDEC_FLV,			0},
+	{_T("H263"),					VIDEO_DECODER, VDEC_H263,			0},
+	{_T("H264/AVC (FFmpeg)"),		VIDEO_DECODER, VDEC_H264,			0},
+	{_T("HEVC (experimental)"),		VIDEO_DECODER, VDEC_HEVC,			0},
+	{_T("Indeo 3/4/5"),				VIDEO_DECODER, VDEC_INDEO,			0},
+	{_T("Lossless video (huffyuv, Lagarith, FFV1)"), VIDEO_DECODER, VDEC_LOSSLESS, 0},
+	{_T("MJPEG"),					VIDEO_DECODER, VDEC_MJPEG,			0},
+	{_T("MPEG-1 Video (FFmpeg)"),	VIDEO_DECODER, VDEC_MPEG1,			IDS_TRA_FFMPEG},
+	{_T("MPEG-2 Video (FFmpeg)"),	VIDEO_DECODER, VDEC_MPEG2,			IDS_TRA_FFMPEG},
+	{_T("MPEG-1 Video (libmpeg2)"),	VIDEO_DECODER, VDEC_LIBMPEG2_MPEG1,	IDS_TRA_MPEG2},
+	{_T("MPEG-2/DVD Video (libmpeg2)"), VIDEO_DECODER, VDEC_LIBMPEG2_MPEG2, IDS_TRA_MPEG2},
+	{_T("MS MPEG-4"),				VIDEO_DECODER, VDEC_MSMPEG4,		0},
+	{_T("PNG"),						VIDEO_DECODER, VDEC_PNG,			0},
+	{_T("Screen Recorder (Cinepak/CSCD/QTRle/MS/TSCC/VMnc)"), VIDEO_DECODER, VDEC_SCREEN, 0},
+	{_T("SVQ1/3"),					VIDEO_DECODER, VDEC_SVQ,			0},
+	{_T("Theora"),					VIDEO_DECODER, VDEC_THEORA,			0},
+	{_T("Ut Video"),				VIDEO_DECODER, VDEC_UT,				0},
+	{_T("VC-1 (FFmpeg)"),			VIDEO_DECODER, VDEC_VC1,			0},
+	{_T("VP3/5/6"),					VIDEO_DECODER, VDEC_VP356,			0},
+	{_T("VP8/9"),					VIDEO_DECODER, VDEC_VP89,			0},
+	{_T("WMV1/2/3"),				VIDEO_DECODER, VDEC_WMV,			0},
+	{_T("Xvid/MPEG-4"),				VIDEO_DECODER, VDEC_XVID,			0},
+	{_T("RealVideo"),				VIDEO_DECODER, VDEC_REAL,			IDS_TRA_RV},
+	{_T("Uncompressed video (v210, V410, Y800, I420, ...)"), VIDEO_DECODER, VDEC_UNCOMPRESSED, 0},
 
-	// End
-	{NULL, 0, 0, 0, NULL}
+	// Audio decoder
+	{_T("AAC"),						AUDIO_DECODER, ADEC_AAC,			0},
+	{_T("AC3/E-AC3/TrueHD/MLP"),	AUDIO_DECODER, ADEC_AC3,			0},
+	{_T("ALAC"),					AUDIO_DECODER, ADEC_ALAC,			0},
+	{_T("ALS"),						AUDIO_DECODER, ADEC_ALS,			0},
+	{_T("AMR"),						AUDIO_DECODER, ADEC_AMR,			0},
+	{_T("APE"),						AUDIO_DECODER, ADEC_APE,			0},
+	{_T("Bink Audio"),				AUDIO_DECODER, ADEC_BINK,			0},
+	{_T("DSP Group TrueSpeech"),	AUDIO_DECODER, ADEC_TRUESPEECH,		0},
+	{_T("DTS"),						AUDIO_DECODER, ADEC_DTS,			0},
+	{_T("FLAC"),					AUDIO_DECODER, ADEC_FLAC,			0},
+	{_T("Indeo Audio"),				AUDIO_DECODER, ADEC_INDEO,			0},
+	{_T("LPCM"),					AUDIO_DECODER, ADEC_LPCM,			IDS_TRA_LPCM},
+	{_T("MPEG Audio"),				AUDIO_DECODER, ADEC_MPA,			0},
+	{_T("MusePack SV7/SV8"),		AUDIO_DECODER, ADEC_MUSEPACK,		0},
+	{_T("Nellymoser"),				AUDIO_DECODER, ADEC_NELLY,			0},
+	{_T("Opus"),					AUDIO_DECODER, ADEC_OPUS,			0},
+	{_T("PS2 Audio (PCM/ADPCM)"),	AUDIO_DECODER, ADEC_PS2,			IDS_TRA_PS2AUD},
+	{_T("QDesign Music Codec 2"),	AUDIO_DECODER, ADEC_QDM2,			0},
+	{_T("RealAudio"),				AUDIO_DECODER, ADEC_REAL,			IDS_TRA_RA},
+	{_T("Speex"),					AUDIO_DECODER, ADEC_SPEEX,			0},
+	{_T("TAK"),						AUDIO_DECODER, ADEC_TAK,			0},
+	{_T("TTA"),						AUDIO_DECODER, ADEC_TTA,			0},
+	{_T("Vorbis"),					AUDIO_DECODER, ADEC_VORBIS,			0},
+	{_T("Voxware MetaSound"),		AUDIO_DECODER, ADEC_VOXWARE,		0},
+	{_T("WavPack lossless audio"),	AUDIO_DECODER, ADEC_WAVPACK,		0},
+	{_T("WMA v.1/v.2"),				AUDIO_DECODER, ADEC_WMA,			0},
+	{_T("WMA v.9 Professional"),	AUDIO_DECODER, ADEC_WMA9,			0},
+	{_T("WMA Lossless"),			AUDIO_DECODER, ADEC_WMALOSSLESS,	0},
+	{_T("WMA Voice"),				AUDIO_DECODER, ADEC_WMAVOICE,		0},
+	{_T("Other PCM/ADPCM"),			AUDIO_DECODER, ADEC_PCM_ADPCM,		0},
 };
 
 IMPLEMENT_DYNAMIC(CPPageInternalFiltersListBox, CCheckListBox)
@@ -250,15 +247,13 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 	state = (totalChecked != 0) ? MF_ENABLED : MF_GRAYED;
 	m.AppendMenu(MF_STRING | state, DISABLE_ALL, ResStr(IDS_DISABLE_ALL_FILTERS));
 
-	if (m_n) {
-		m.AppendMenu(MF_SEPARATOR);
-		state = (m_nbChecked[FFMPEG_DECODER] != m_nbFiltersPerType[FFMPEG_DECODER]) ? MF_ENABLED : MF_GRAYED;
-		m.AppendMenu(MF_STRING | state, ENABLE_FFMPEG, ResStr(IDS_ENABLE_FFMPEG_FILTERS));
-		state = (m_nbChecked[FFMPEG_DECODER] != 0) ? MF_ENABLED : MF_GRAYED;
-		m.AppendMenu(MF_STRING | state, DISABLE_FFMPEG, ResStr(IDS_DISABLE_FFMPEG_FILTERS));
-	}
-
 	if (m_n == VIDEO) {
+		m.AppendMenu(MF_SEPARATOR);
+		state = (m_nbChecked[VIDEO_DECODER] != m_nbFiltersPerType[VIDEO_DECODER]) ? MF_ENABLED : MF_GRAYED;
+		m.AppendMenu(MF_STRING | state, ENABLE_FFMPEG, ResStr(IDS_ENABLE_FFMPEG_FILTERS));
+		state = (m_nbChecked[VIDEO_DECODER] != 0) ? MF_ENABLED : MF_GRAYED;
+		m.AppendMenu(MF_STRING | state, DISABLE_FFMPEG, ResStr(IDS_DISABLE_FFMPEG_FILTERS));
+
 		m.AppendMenu(MF_SEPARATOR);
 		state = (m_nbChecked[DXVA_DECODER] != m_nbFiltersPerType[DXVA_DECODER]) ? MF_ENABLED : MF_GRAYED;
 		m.AppendMenu(MF_STRING | state, ENABLE_DXVA, ResStr(IDS_ENABLE_DXVA_FILTERS));
@@ -279,65 +274,53 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 
 	for (int i = 0; i < _countof(s_filters); i++) {
 		switch (s_filters[i].type) {
-			case SOURCE_FILTER:
-				if (!(m_n == SOURCE)) {
-					continue;
-				}
-				if (s_filters[i].filter_type != SOURCE) {
-					continue;
-				}
-				break;
-			case DECODER:
-			case FFMPEG_DECODER:
-				if (m_n == SOURCE) {
-					continue;
-				}
-				if (m_n == VIDEO && s_filters[i].filter_type != VIDEO) {
-					continue;
-				}
-				if (m_n == AUDIO && s_filters[i].filter_type != AUDIO) {
-					continue;
-				}
-				break;
-			case DXVA_DECODER:
-				if (m_n == SOURCE || m_n == AUDIO) {
-					continue;
-				}
-				if (s_filters[i].filter_type != VIDEO) {
-					continue;
-				}
-				break;
-			default:
+		case SOURCE_FILTER:
+			if (m_n != SOURCE) {
 				continue;
+			}
+			break;
+		case DXVA_DECODER:
+		case VIDEO_DECODER:
+			if (m_n != VIDEO) {
+				continue;
+			}
+			break;
+		case AUDIO_DECODER:
+			if (m_n != AUDIO) {
+				continue;
+			}
+			break;
+		default:
+			continue;
 		}
 
 		switch (id) {
-			case ENABLE_ALL:
+		case ENABLE_ALL:
+			SetCheck(index, TRUE);
+			break;
+		case DISABLE_ALL:
+			SetCheck(index, FALSE);
+			break;
+		case ENABLE_FFMPEG:
+			if (s_filters[i].type == VIDEO_DECODER) {
 				SetCheck(index, TRUE);
-				break;
-			case DISABLE_ALL:
+			}
+			break;
+		case DISABLE_FFMPEG:
+			if (s_filters[i].type == VIDEO_DECODER) {
 				SetCheck(index, FALSE);
-				break;
-			case ENABLE_FFMPEG:
-				if (s_filters[i].type == FFMPEG_DECODER) {
-					SetCheck(index, TRUE);
-				}
-				break;
-			case DISABLE_FFMPEG:
-				if (s_filters[i].type == FFMPEG_DECODER) {
-					SetCheck(index, FALSE);
-				}
-				break;
-			case ENABLE_DXVA:
-				if (s_filters[i].type == DXVA_DECODER) {
-					SetCheck(index, TRUE);
-				}
-				break;
-			case DISABLE_DXVA:
-				if (s_filters[i].type == DXVA_DECODER) {
-					SetCheck(index, FALSE);
-				}
-				break;
+			}
+			break;
+		case ENABLE_DXVA:
+			if (s_filters[i].type == DXVA_DECODER) {
+				SetCheck(index, TRUE);
+			}
+			break;
+		case DISABLE_DXVA:
+			if (s_filters[i].type == DXVA_DECODER) {
+				SetCheck(index, FALSE);
+			}
+			break;
 		}
 
 		index++;
@@ -410,17 +393,17 @@ BOOL CPPageInternalFilters::OnInitDialog()
 				l		= &m_listSrc;
 				checked	= s.SrcFilters[s_filters[i].flag];
 				break;
-			case DECODER:
-				l		= (s_filters[i].filter_type == AUDIO) ? &m_listAudio : &m_listVideo;
-				checked	= s.TraFilters[s_filters[i].flag];
-				break;
 			case DXVA_DECODER:
 				l		= &m_listVideo;
 				checked	= s.DXVAFilters[s_filters[i].flag];
 				break;
-			case FFMPEG_DECODER:
-				l		= (s_filters[i].filter_type == AUDIO) ? &m_listAudio : &m_listVideo;
-				checked	= s.FFmpegFilters[s_filters[i].flag];
+			case VIDEO_DECODER:
+				l		= &m_listVideo;
+				checked	= s.VideoFilters[s_filters[i].flag];
+				break;
+			case AUDIO_DECODER:
+				l		= &m_listAudio;
+				checked	= s.AudioFilters[s_filters[i].flag];
 				break;
 			default:
 				l		= NULL;
@@ -488,14 +471,14 @@ BOOL CPPageInternalFilters::OnApply()
 				case SOURCE_FILTER:
 					s.SrcFilters[f->flag] = !!list->GetCheck(i);
 					break;
-				case DECODER:
-					s.TraFilters[f->flag] = !!list->GetCheck(i);
-					break;
 				case DXVA_DECODER:
 					s.DXVAFilters[f->flag] = !!list->GetCheck(i);
 					break;
-				case FFMPEG_DECODER:
-					s.FFmpegFilters[f->flag] = !!list->GetCheck(i);
+				case VIDEO_DECODER:
+					s.VideoFilters[f->flag] = !!list->GetCheck(i);
+					break;
+				case AUDIO_DECODER:
+					s.AudioFilters[f->flag] = !!list->GetCheck(i);
 					break;
 			}
 		}

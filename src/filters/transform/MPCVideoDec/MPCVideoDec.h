@@ -69,8 +69,8 @@ protected:
 	CCpuId*									m_pCpuId;
 	CCritSec								m_csProps;
 
-	bool									m_FFmpegFilters[FFM_LAST + !FFM_LAST];
-	bool									m_DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
+	bool									m_DXVAFilters[VDEC_DXVA_LAST];
+	bool									m_VideoFilters[VDEC_LAST];
 
 	bool									m_bDXVACompatible;
 	unsigned __int64						m_nActiveCodecs;

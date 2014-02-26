@@ -34,7 +34,6 @@ enum {
 struct filter_t {
 	LPCTSTR label;
 	int type;
-	int filter_type;
 	int flag;
 	UINT nHintID;
 };

@@ -39,106 +39,105 @@ CAppSettings::CAppSettings()
 	, scalefont(1.0)
 	, p_MainWnd(NULL)
 {
-	// Internal source filter
-	SrcFiltersKeys[SRC_CDDA]		= _T("SRC_CDDA");
-	SrcFiltersKeys[SRC_CDXA]		= _T("SRC_CDXA");
-	SrcFiltersKeys[SRC_VTS]			= _T("SRC_VTS");
-	SrcFiltersKeys[SRC_FLIC]		= _T("SRC_FLIC");
-	SrcFiltersKeys[SRC_DTSAC3]		= _T("SRC_DTSAC3");
-	SrcFiltersKeys[SRC_MATROSKA]	= _T("SRC_MATROSKA");
-	SrcFiltersKeys[SRC_SHOUTCAST]	= _T("SRC_SHOUTCAST");
-	SrcFiltersKeys[SRC_REALMEDIA]	= _T("SRC_REALMEDIA");
-	SrcFiltersKeys[SRC_ROQ]			= _T("SRC_ROQ");
-	SrcFiltersKeys[SRC_AVI]			= _T("SRC_AVI");
-	SrcFiltersKeys[SRC_OGG]			= _T("SRC_OGG");
-	SrcFiltersKeys[SRC_MPEG]		= _T("SRC_MPEG");
-	SrcFiltersKeys[SRC_MPA]			= _T("SRC_MPA");
-	SrcFiltersKeys[SRC_DSM]			= _T("SRC_DSM");
-	SrcFiltersKeys[SRC_SUBS]		= _T("SRC_SUBS");
-	SrcFiltersKeys[SRC_MP4]			= _T("SRC_MP4");
-	SrcFiltersKeys[SRC_FLV]			= _T("SRC_FLV");
-	SrcFiltersKeys[SRC_FLAC]		= _T("SRC_FLAC");
-	SrcFiltersKeys[SRC_WPAC]		= _T("SRC_WPAC");
-	SrcFiltersKeys[SRC_MPAC]		= _T("SRC_MPAC");
-	SrcFiltersKeys[SRC_AMR]			= _T("SRC_AMR");
-	SrcFiltersKeys[SRC_TTA]			= _T("SRC_TTA");
-	SrcFiltersKeys[SRC_UDP]			= _T("SRC_UDP");
-	SrcFiltersKeys[SRC_APE]			= _T("SRC_APE");
-	SrcFiltersKeys[SRC_TAK]			= _T("SRC_TAK");
-	SrcFiltersKeys[SRC_WAV]			= _T("SRC_WAV");
-	SrcFiltersKeys[SRC_RAWVIDEO]	= _T("SRC_RAWVIDEO");
-
-	// Internal decoders
-	TraFiltersKeys[TRA_MPEG1]		= _T("TRA_MPEG1");
-	TraFiltersKeys[TRA_MPEG2]		= _T("TRA_MPEG2");
-	TraFiltersKeys[TRA_RA]			= _T("TRA_RA");
-	TraFiltersKeys[TRA_DTS]			= _T("TRA_DTS");
-	TraFiltersKeys[TRA_LPCM]		= _T("TRA_LPCM");
-	TraFiltersKeys[TRA_AC3]			= _T("TRA_AC3");
-	TraFiltersKeys[TRA_PS2AUD]		= _T("TRA_PS2AUD");
-	TraFiltersKeys[TRA_PCM]			= _T("TRA_PCM");
+	// Internal source filters
+	SrcFiltersKeys[SRC_AMR]					= _T("src_amr");
+	SrcFiltersKeys[SRC_AVI]					= _T("src_avi");
+	SrcFiltersKeys[SRC_APE]					= _T("src_ape");
+	SrcFiltersKeys[SRC_CDDA]				= _T("src_cdda");
+	SrcFiltersKeys[SRC_CDXA]				= _T("src_cdxa");
+	SrcFiltersKeys[SRC_DSM]					= _T("src_dsm");
+	SrcFiltersKeys[SRC_DTSAC3]				= _T("src_dtsac3");
+	SrcFiltersKeys[SRC_VTS]					= _T("src_vts");
+	SrcFiltersKeys[SRC_FLIC]				= _T("src_flic");
+	SrcFiltersKeys[SRC_FLAC]				= _T("src_flac");
+	SrcFiltersKeys[SRC_FLV]					= _T("src_flv");
+	SrcFiltersKeys[SRC_MATROSKA]			= _T("src_matroska");
+	SrcFiltersKeys[SRC_MP4]					= _T("src_mp4");
+	SrcFiltersKeys[SRC_MPA]					= _T("src_mpa");
+	SrcFiltersKeys[SRC_MPEG]				= _T("src_mpeg");
+	SrcFiltersKeys[SRC_MUSEPACK]			= _T("src_musepack");
+	SrcFiltersKeys[SRC_OGG]					= _T("src_ogg");
+	SrcFiltersKeys[SRC_RAWVIDEO]			= _T("src_rawvideo");
+	SrcFiltersKeys[SRC_REAL]				= _T("src_real");
+	SrcFiltersKeys[SRC_ROQ]					= _T("src_roq");
+	SrcFiltersKeys[SRC_SHOUTCAST]			= _T("src_shoutcast");
+	SrcFiltersKeys[SRC_TAK]					= _T("src_tak");
+	SrcFiltersKeys[SRC_TTA]					= _T("src_tta");
+	SrcFiltersKeys[SRC_WAV]					= _T("src_wav");
+	SrcFiltersKeys[SRC_WAVPACK]				= _T("src_wavpack");
+	SrcFiltersKeys[SRC_UDP]					= _T("src_udp");
 
 	// Internal DXVA decoders
-	DXVAFiltersKeys[TRA_DXVA_H264]	= _T("TRA_DXVA_H264");
-	DXVAFiltersKeys[TRA_DXVA_VC1]	= _T("TRA_DXVA_VC1");
-	DXVAFiltersKeys[TRA_DXVA_WMV3]	= _T("TRA_DXVA_WMV3");
-	DXVAFiltersKeys[TRA_DXVA_MPEG2]	= _T("TRA_DXVA_MPEG2");
+	DXVAFiltersKeys[VDEC_DXVA_H264]			= _T("vdec_dxva_h264");
+	DXVAFiltersKeys[VDEC_DXVA_MPEG2]		= _T("vdec_dxva_mpeg2");
+	DXVAFiltersKeys[VDEC_DXVA_VC1]			= _T("vdec_dxva_vc1");
+	DXVAFiltersKeys[VDEC_DXVA_WMV3]			= _T("vdec_dxva_wmv3");
 
-	// Internal FFMpeg decoders
-	FFMFiltersKeys[FFM_MPA]			= _T("FFM_MPA");
-	FFMFiltersKeys[FFM_AAC]			= _T("FFM_AAC");
-	FFMFiltersKeys[FFM_ALAC]		= _T("FFM_ALAC");
-	FFMFiltersKeys[FFM_ALS]			= _T("FFM_ALS");
-	FFMFiltersKeys[FFM_VORBIS]		= _T("FFM_VORBIS");
-	FFMFiltersKeys[FFM_NELLY]		= _T("FFM_NELLY");
-	FFMFiltersKeys[FFM_AMR]			= _T("FFM_AMR");
-	FFMFiltersKeys[FFM_H264]		= _T("FFM_H264");
-	FFMFiltersKeys[FFM_VC1]			= _T("FFM_VC1");
-	FFMFiltersKeys[FFM_FLAC]		= _T("FFM_FLAC");
-	FFMFiltersKeys[FFM_FLV4]		= _T("FFM_FLV4");
-	FFMFiltersKeys[FFM_VP356]		= _T("FFM_VP356");
-	FFMFiltersKeys[FFM_VP8]			= _T("FFM_VP8");
-	FFMFiltersKeys[FFM_XVID]		= _T("FFM_XVID");
-	FFMFiltersKeys[FFM_DIVX]		= _T("FFM_DIVX");
-	FFMFiltersKeys[FFM_MSMPEG4]		= _T("FFM_MSMPEG4");
-	FFMFiltersKeys[FFM_WMV]			= _T("FFM_WMV");
-	FFMFiltersKeys[FFM_SVQ3]		= _T("FFM_SVQ3");
-	FFMFiltersKeys[FFM_H263]		= _T("FFM_H263");
-	FFMFiltersKeys[FFM_DIRAC]		= _T("FFM_DIRAC");
-	FFMFiltersKeys[FFM_DV]			= _T("FFM_DV");
-	FFMFiltersKeys[FFM_THEORA]		= _T("FFM_THEORA");
-	FFMFiltersKeys[FFM_AMVV]		= _T("FFM_AMVV");
-	FFMFiltersKeys[FFM_MJPEG]		= _T("FFM_MJPEG");
-	FFMFiltersKeys[FFM_INDEO]		= _T("FFM_INDEO");
-	FFMFiltersKeys[FFM_SCREC]		= _T("FFM_SCREC");
-	FFMFiltersKeys[FFM_UTVD]		= _T("FFM_UTVD");
-	FFMFiltersKeys[FFM_LOSSLESS]	= _T("FFM_LOSSLESS");
-	FFMFiltersKeys[FFM_WPAC]		= _T("FFM_WPAC");
-	FFMFiltersKeys[FFM_MPAC]		= _T("FFM_MPAC");
-	FFMFiltersKeys[FFM_QDM2]		= _T("FFM_QDM2");
-	FFMFiltersKeys[FFM_APE]			= _T("FFM_APE");
-	FFMFiltersKeys[FFM_TAK]			= _T("FFM_TAK");
-	FFMFiltersKeys[FFM_TTA]			= _T("FFM_TTA");
-	FFMFiltersKeys[FFM_PRORES]		= _T("FFM_PRORES");
-	FFMFiltersKeys[FFM_TRUESPEECH]	= _T("FFM_TRUESPEECH");
-	FFMFiltersKeys[FFM_WMAPRO]		= _T("FFM_WMAPRO");
-	FFMFiltersKeys[FFM_WMA2]		= _T("FFM_WMA2");
-	FFMFiltersKeys[FFM_WMALOSS]		= _T("FFM_WMALOSS");
-	FFMFiltersKeys[FFM_BINKV]		= _T("FFM_BINKV");
-	FFMFiltersKeys[FFM_BINKA]		= _T("FFM_BINKA");
-	FFMFiltersKeys[FFM_IAC]			= _T("FFM_IAC");
-	FFMFiltersKeys[FFM_OPUS]		= _T("FFM_OPUS");
-	FFMFiltersKeys[FFM_PNG]			= _T("FFM_PNG");
-	FFMFiltersKeys[FFM_WMAVOICE]	= _T("FFM_WMAVOICE");
-	FFMFiltersKeys[FFM_CLLC]		= _T("FFM_CLLC");
-	FFMFiltersKeys[FFM_SPEEX]		= _T("FFM_SPEEX");
-	FFMFiltersKeys[FFM_RV]			= _T("FFM_RV");
-	FFMFiltersKeys[FFM_UNCOMPRESSED]= _T("FFM_UNCOMPRESSED");
-	FFMFiltersKeys[FFM_MPEG2]		= _T("FFM_MPEG2");
-	FFMFiltersKeys[FFM_MPEG1]		= _T("FFM_MPEG1");
-	FFMFiltersKeys[FFM_HEVC]		= _T("FFM_HEVC");
-	FFMFiltersKeys[FFM_DNXHD]		= _T("FFM_DNXHD");
-	FFMFiltersKeys[FFM_VOXWARE]		= _T("FFM_VOXWARE");
+	// Internal video decoders
+	VideoFiltersKeys[VDEC_AMV]				= _T("vdec_amv");
+	VideoFiltersKeys[VDEC_PRORES]			= _T("vdec_prores");
+	VideoFiltersKeys[VDEC_DNXHD]			= _T("vdec_dnxhd");
+	VideoFiltersKeys[VDEC_BINK]				= _T("vdec_bink");
+	VideoFiltersKeys[VDEC_CANOPUS]			= _T("vdec_canopus");
+	VideoFiltersKeys[VDEC_DIRAC]			= _T("vdec_dirac");
+	VideoFiltersKeys[VDEC_DIVX]				= _T("vdec_divx");
+	VideoFiltersKeys[VDEC_DV]				= _T("vdec_dv");
+	VideoFiltersKeys[VDEC_FLV]				= _T("vdec_flv");
+	VideoFiltersKeys[VDEC_H263]				= _T("vdec_h263");
+	VideoFiltersKeys[VDEC_H264]				= _T("vdec_h264");
+	VideoFiltersKeys[VDEC_HEVC]				= _T("vdec_hevc");
+	VideoFiltersKeys[VDEC_INDEO]			= _T("vdec_indeo");
+	VideoFiltersKeys[VDEC_LOSSLESS]			= _T("vdec_lossless");
+	VideoFiltersKeys[VDEC_MJPEG]			= _T("vdec_mjpeg");
+	VideoFiltersKeys[VDEC_MPEG1]			= _T("vdec_mpeg1");
+	VideoFiltersKeys[VDEC_MPEG2]			= _T("vdec_mpeg2");
+	VideoFiltersKeys[VDEC_LIBMPEG2_MPEG1]	= _T("vdec_libmpeg2_mpeg1");
+	VideoFiltersKeys[VDEC_LIBMPEG2_MPEG2]	= _T("vdec_libmpeg2_mpeg2");
+	VideoFiltersKeys[VDEC_MSMPEG4]			= _T("vdec_msmpeg4");
+	VideoFiltersKeys[VDEC_PNG]				= _T("vdec_png");
+	VideoFiltersKeys[VDEC_SCREEN]			= _T("vdec_screen");
+	VideoFiltersKeys[VDEC_SVQ]				= _T("vdec_svq");
+	VideoFiltersKeys[VDEC_THEORA]			= _T("vdec_theora");
+	VideoFiltersKeys[VDEC_UT]				= _T("vdec_ut");
+	VideoFiltersKeys[VDEC_VC1]				= _T("vdec_vc1");
+	VideoFiltersKeys[VDEC_VP356]			= _T("vdec_vp356");
+	VideoFiltersKeys[VDEC_VP89]				= _T("vdec_vp89");
+	VideoFiltersKeys[VDEC_WMV]				= _T("vdec_wmv");
+	VideoFiltersKeys[VDEC_XVID]				= _T("vdec_xvid");
+	VideoFiltersKeys[VDEC_REAL]				= _T("vdec_real");
+	VideoFiltersKeys[VDEC_UNCOMPRESSED]		= _T("vdec_uncompressed");
+
+	// Internal audio decoders
+	AudioFiltersKeys[ADEC_AAC]				= _T("adec_aac");
+	AudioFiltersKeys[ADEC_AC3]				= _T("adec_ac3");
+	AudioFiltersKeys[ADEC_ALAC]				= _T("adec_alac");
+	AudioFiltersKeys[ADEC_ALS]				= _T("adec_als");
+	AudioFiltersKeys[ADEC_AMR]				= _T("adec_amr");
+	AudioFiltersKeys[ADEC_APE]				= _T("adec_ape");
+	AudioFiltersKeys[ADEC_BINK]				= _T("adec_bink");
+	AudioFiltersKeys[ADEC_TRUESPEECH]		= _T("adec_truespeech");
+	AudioFiltersKeys[ADEC_DTS]				= _T("adec_dts");
+	AudioFiltersKeys[ADEC_FLAC]				= _T("adec_flac");
+	AudioFiltersKeys[ADEC_INDEO]			= _T("adec_indeo");
+	AudioFiltersKeys[ADEC_LPCM]				= _T("adec_lpcm");
+	AudioFiltersKeys[ADEC_MPA]				= _T("adec_mpa");
+	AudioFiltersKeys[ADEC_MUSEPACK]			= _T("adec_musepack");
+	AudioFiltersKeys[ADEC_NELLY]			= _T("adec_nelly");
+	AudioFiltersKeys[ADEC_OPUS]				= _T("adec_opus");
+	AudioFiltersKeys[ADEC_PS2]				= _T("adec_ps2");
+	AudioFiltersKeys[ADEC_QDM2]				= _T("adec_qdm2");
+	AudioFiltersKeys[ADEC_REAL]				= _T("adec_real");
+	AudioFiltersKeys[ADEC_SPEEX]			= _T("adec_speex");
+	AudioFiltersKeys[ADEC_TAK]				= _T("adec_tak");
+	AudioFiltersKeys[ADEC_TTA]				= _T("adec_tta");
+	AudioFiltersKeys[ADEC_VORBIS]			= _T("adec_vorbis");
+	AudioFiltersKeys[ADEC_VOXWARE]			= _T("adec_voxware");
+	AudioFiltersKeys[ADEC_WAVPACK]			= _T("adec_wavpack");
+	AudioFiltersKeys[ADEC_WMA]				= _T("adec_wma");
+	AudioFiltersKeys[ADEC_WMA9]				= _T("adec_wma9");
+	AudioFiltersKeys[ADEC_WMALOSSLESS]		= _T("adec_wmalossless");
+	AudioFiltersKeys[ADEC_WMAVOICE]			= _T("adec_wmavoice");
+	AudioFiltersKeys[ADEC_PCM_ADPCM]		= _T("adec_pcm_adpcm");
 }
 
 void CAppSettings::CreateCommands()
@@ -755,14 +754,14 @@ void CAppSettings::SaveSettings()
 	for (int f = 0; f < SRC_LAST; f++) {
 		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
 	}
-	for (int f = 0; f < TRA_LAST; f++) {
-		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, TraFiltersKeys[f], TraFilters[f]);
-	}
-	for (int f = 0; f < TRA_DXVA_LAST; f++) {
+	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
 		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], DXVAFilters[f]);
 	}
-	for (int f = 0; f < FFM_LAST; f++) {
-		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, FFMFiltersKeys[f], FFmpegFilters[f]);
+	for (int f = 0; f < VDEC_LAST; f++) {
+		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], VideoFilters[f]);
+	}
+	for (int f = 0; f < ADEC_LAST; f++) {
+		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], AudioFilters[f]);
 	}
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LOGOFILE, strLogoFileName);
@@ -1308,14 +1307,14 @@ void CAppSettings::LoadSettings()
 	for (int f = 0; f < SRC_LAST; f++) {
 		SrcFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], 1);
 	}
-	for (int f = 0; f < TRA_LAST; f++) {
-		TraFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, TraFiltersKeys[f], 1);
-	}
-	for (int f = 0; f < TRA_DXVA_LAST; f++) {
+	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
 		DXVAFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], 1);
 	}
-	for (int f = 0; f < FFM_LAST; f++) {
-		FFmpegFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, FFMFiltersKeys[f], 1);
+	for (int f = 0; f < VDEC_LAST; f++) {
+		VideoFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], 1);
+	}
+	for (int f = 0; f < ADEC_LAST; f++) {
+		AudioFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], 1);
 	}
 
 	strLogoFileName = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LOGOFILE);

@@ -32,7 +32,7 @@
 
 #define IDS_R_SETTINGS						_T("Settings")
 #define IDS_R_FILTERS						_T("Filters")
-#define IDS_R_INTERNAL_FILTERS				_T("Internal Filters")
+#define IDS_R_INTERNAL_FILTERS				_T("InternalFilters")
 #define IDS_R_FAVFILES						_T("Favorites\\Files")
 #define IDS_R_FAVDVDS						_T("Favorites\\DVDs")
 #define IDS_R_FAVDEVICES					_T("Favorites\\Devices")

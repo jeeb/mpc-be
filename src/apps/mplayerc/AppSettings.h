@@ -604,10 +604,10 @@ public:
 	CAtlList<CDVBChannel> m_DVBChannels;
 
 	// Internal Filters
-	bool			SrcFilters[SRC_LAST + !SRC_LAST];
-	bool			TraFilters[TRA_LAST + !TRA_LAST];
-	bool			DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
-	bool			FFmpegFilters[FFM_LAST + !FFM_LAST];
+	bool			SrcFilters[SRC_LAST];
+	bool			DXVAFilters[VDEC_DXVA_LAST];
+	bool			VideoFilters[VDEC_LAST];
+	bool			AudioFilters[ADEC_LAST];
 
 	// Audio Switcher
 	bool			fEnableAudioSwitcher;
@@ -789,10 +789,10 @@ private :
 	FILE_POSITION	FilePosition[MAX_FILE_POSITION];
 	int				nCurrentFilePosition;
 
-	CString			SrcFiltersKeys[SRC_LAST + !SRC_LAST];
-	CString			TraFiltersKeys[TRA_LAST + !TRA_LAST];
-	CString			DXVAFiltersKeys[TRA_DXVA_LAST + !TRA_DXVA_LAST];
-	CString			FFMFiltersKeys[FFM_LAST + !FFM_LAST];
+	CString			SrcFiltersKeys[SRC_LAST];
+	CString			DXVAFiltersKeys[VDEC_DXVA_LAST];
+	CString			VideoFiltersKeys[VDEC_LAST];
+	CString			AudioFiltersKeys[ADEC_LAST];
 
 	__int64			ConvertTimeToMSec(CString& time) const;
 	void			ExtractDVDStartPos(CString& strParam);
