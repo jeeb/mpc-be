@@ -1132,11 +1132,6 @@ void CPPageFormats::OnBnClickedAll()
 	}
 	m_bFileExtChanged = true;
 
-	m_apvideo.SetCheck(1);
-	m_apmusic.SetCheck(1);
-	m_apaudiocd.SetCheck(1);
-	m_apdvd.SetCheck(1);
-
 	SetModified();
 }
 
@@ -1149,11 +1144,6 @@ void CPPageFormats::OnBnClickedVideo()
 	}
 	m_bFileExtChanged = true;
 
-	m_apvideo.SetCheck(1);
-	m_apmusic.SetCheck(0);
-	m_apaudiocd.SetCheck(0);
-	m_apdvd.SetCheck(1);
-
 	SetModified();
 }
 
@@ -1165,11 +1155,6 @@ void CPPageFormats::OnBnClickedAudio()
 		SetChecked(i, mf[(int)m_list.GetItemData(i)].GetFileType() == TAudio ? 1 : 0);
 	}
 	m_bFileExtChanged = true;
-
-	m_apvideo.SetCheck(0);
-	m_apmusic.SetCheck(1);
-	m_apaudiocd.SetCheck(1);
-	m_apdvd.SetCheck(0);
 
 	SetModified();
 }
@@ -1195,11 +1180,6 @@ void CPPageFormats::OnBnClickedNone()
 		SetChecked(i, 0);
 	}
 	m_bFileExtChanged = true;
-
-	m_apvideo.SetCheck(0);
-	m_apmusic.SetCheck(0);
-	m_apaudiocd.SetCheck(0);
-	m_apdvd.SetCheck(0);
 
 	SetModified();
 }
