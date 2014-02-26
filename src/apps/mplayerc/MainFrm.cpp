@@ -4191,6 +4191,11 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	ASSERT(m_iMediaLoadState == MLS_LOADING);
 	SetLoadState(MLS_LOADED);
 
+	if (m_bIsBDPlay == FALSE) {
+		m_MPLSPlaylist.RemoveAll();
+		m_LastOpenBDPath.Empty();
+	}
+
 	SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 
 	AppSettings& s = AfxGetAppSettings();
@@ -4316,11 +4321,6 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 	if (m_fFullScreen && s.fRememberZoomLevel) {
 		m_fFirstFSAfterLaunchOnFS = true;
-	}
-
-	if (m_bIsBDPlay == FALSE) {
-		m_MPLSPlaylist.RemoveAll();
-		m_LastOpenBDPath.Empty();
 	}
 
 	// Ensure the dynamically added menu items are updated
@@ -18143,13 +18143,9 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
-	BOOL bIsBDPlay = m_bIsBDPlay;
 	if (m_iMediaLoadState != MLS_CLOSED) {
 		CloseMedia();
 	}
-	m_bIsBDPlay = bIsBDPlay;
-
-	//m_iMediaLoadState = MLS_LOADING; // HACK: hides the logo
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -19559,6 +19555,10 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 		}
 		Path.TrimRight('\\');
 
+		if (m_iMediaLoadState != MLS_CLOSED) {
+			CloseMedia();
+		}
+
 		if (SUCCEEDED (ClipInfo.FindMainMovie(Path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
 			CString infFile = Path + L"\\disc.inf";
 			if (::PathFileExists(infFile)) {
@@ -19577,7 +19577,6 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 			}
 
 			bool InternalMpegSplitter = AfxGetAppSettings().SrcFilters[SRC_MPEG];
-			m_bIsBDPlay = TRUE;
 
 			{
 				CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
@@ -19587,7 +19586,7 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 			}
 
 			if (!InternalMpegSplitter && ext == _T(".bdmv")) {
-				return false;
+				return FALSE;
 			} else {
 				m_wndPlaylistBar.Empty();
 				CAtlList<CString> sl;
@@ -19596,6 +19595,8 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 				} else {
 					sl.AddTail(CString(Path + _T("\\BDMV\\index.bdmv")));
 				}
+
+				m_bIsBDPlay = TRUE;
 				m_wndPlaylistBar.Append(sl, false);
 				if (OpenCurPlaylistItem(rtStart)) {
 					return TRUE;
