@@ -2903,8 +2903,7 @@ bool CMainFrame::GraphEventComplete()
 			}
 
 			if (s.fRewind) {
-				s.nCLSwitches |= CLSW_OPEN; // HACK
-				PostMessage(WM_COMMAND, ID_NAVIGATE_SKIPFORWARD);
+				SendMessage(WM_COMMAND, ID_PLAY_STOP);
 			} else {
 				m_fEndOfStream = true;
 				PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
