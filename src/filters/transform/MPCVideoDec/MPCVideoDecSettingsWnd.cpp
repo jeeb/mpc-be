@@ -479,6 +479,7 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{CODEC_DNXHD,		_T("Avid DNxHD")},
 	{CODEC_BINKV,		_T("Bink video")},
 	{CODEC_CLLC,		_T("Canopus Lossless")},
+	{CODEC_CINEPAK,		_T("Cinepak")},
 	{CODEC_DIRAC,		_T("Dirac")},
 	{CODEC_DIVX,		_T("DivX")},
 	{CODEC_DV,			_T("DV video")},
@@ -493,7 +494,8 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{CODEC_MPEG2,		_T("MPEG-2 (FFmpeg)")},
 	{CODEC_MSMPEG4,		_T("MS-MPEG4")},
 	{CODEC_PNG,			_T("PNG")},
-	{CODEC_SCREC,		_T("Screen Recorder (CSCD, QTRle, MS, TSCC, VMnc, ...)")},
+	{CODEC_QT,			_T("QuickTime video (8BPS, QTRle)")
+	{CODEC_SCREC,		_T("Screen Recorder (CSCD, MS, TSCC, VMnc)")},
 	{CODEC_SVQ3,		_T("SVQ1/3")},
 	{CODEC_THEORA,		_T("Theora")},
 	{CODEC_UTVD,		_T("Ut video")},
