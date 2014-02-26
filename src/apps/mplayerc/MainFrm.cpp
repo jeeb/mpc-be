@@ -10562,11 +10562,14 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			while (pos) {
 				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
 				if (idx == id) {
+					if (m_iMediaLoadState != MLS_CLOSED) {
+						CloseMedia();
+					}
+
 					m_bIsBDPlay = TRUE;
-					m_wndPlaylistBar.Empty();
 					CAtlList<CString> sl;
 					sl.AddTail(CString(Item->m_strFileName));
-					m_wndPlaylistBar.Append(sl, false);
+					m_wndPlaylistBar.Open(sl, false);
 					OpenCurPlaylistItem();
 					return;
 				}
@@ -19588,7 +19591,6 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 			if (!InternalMpegSplitter && ext == _T(".bdmv")) {
 				return FALSE;
 			} else {
-				m_wndPlaylistBar.Empty();
 				CAtlList<CString> sl;
 				if (InternalMpegSplitter) {
 					sl.AddTail(strPlaylistFile);
@@ -19597,7 +19599,7 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 				}
 
 				m_bIsBDPlay = TRUE;
-				m_wndPlaylistBar.Append(sl, false);
+				m_wndPlaylistBar.Open(sl, false);
 				if (OpenCurPlaylistItem(rtStart)) {
 					return TRUE;
 				}
