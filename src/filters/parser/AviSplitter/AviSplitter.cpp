@@ -290,6 +290,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('JPGL'): // uncommon fourcc
 					mt.subtype = MEDIASUBTYPE_MJPG;
 					break;
+				case FCC('azpr'): // uncommon fourcc
+					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('rpza'));
+					break;
 				case FCC('mpg2'):
 				case FCC('MPG2'):
 				case FCC('MMES'):
