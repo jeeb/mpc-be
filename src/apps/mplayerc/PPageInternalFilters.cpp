@@ -84,7 +84,7 @@ static filter_t s_filters[] = {
 	{_T("MPEG-2/DVD Video (libmpeg2)"), VIDEO_DECODER, VDEC_LIBMPEG2_MPEG2, IDS_TRA_MPEG2},
 	{_T("MS MPEG-4"),				VIDEO_DECODER, VDEC_MSMPEG4,		0},
 	{_T("PNG"),						VIDEO_DECODER, VDEC_PNG,			0},
-	{_T("QuickTime video (8BPS, QTRle)"), VIDEO_DECODER, VDEC_QT,		0},
+	{_T("QuickTime video (8BPS, QTRle, rpza)"), VIDEO_DECODER, VDEC_QT,		0},
 	{_T("Screen Recorder (CSCD, MS, TSCC, VMnc)"), VIDEO_DECODER, VDEC_SCREEN, 0},
 	{_T("SVQ1/3"),					VIDEO_DECODER, VDEC_SVQ,			0},
 	{_T("Theora"),					VIDEO_DECODER, VDEC_THEORA,			0},

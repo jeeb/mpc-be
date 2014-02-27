@@ -494,7 +494,7 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{CODEC_MPEG2,		_T("MPEG-2 (FFmpeg)")},
 	{CODEC_MSMPEG4,		_T("MS-MPEG4")},
 	{CODEC_PNG,			_T("PNG")},
-	{CODEC_QT,			_T("QuickTime video (8BPS, QTRle)")},
+	{CODEC_QT,			_T("QuickTime video (8BPS, QTRle, rpza)")},
 	{CODEC_SCREC,		_T("Screen Recorder (CSCD, MS, TSCC, VMnc)")},
 	{CODEC_SVQ3,		_T("SVQ1/3")},
 	{CODEC_THEORA,		_T("Theora")},

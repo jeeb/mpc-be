@@ -299,8 +299,9 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_DVC,  AV_CODEC_ID_DVVIDEO, NULL, VDEC_DV, -1 },
 
 	// Quicktime
-	{ &MEDIASUBTYPE_8BPS, AV_CODEC_ID_8BPS,   NULL, VDEC_QT, -1 },
-	{ &MEDIASUBTYPE_QTRle, AV_CODEC_ID_QTRLE, NULL, VDEC_QT, -1 },
+	{ &MEDIASUBTYPE_8BPS,   AV_CODEC_ID_8BPS,  NULL, VDEC_QT, -1 },
+	{ &MEDIASUBTYPE_QTRle,  AV_CODEC_ID_QTRLE, NULL, VDEC_QT, -1 },
+	{ &MEDIASUBTYPE_QTRpza, AV_CODEC_ID_RPZA,  NULL, VDEC_QT, -1 },
 
 	// Screen recorder
 	{ &MEDIASUBTYPE_CSCD, AV_CODEC_ID_CSCD,		   NULL, VDEC_SCREEN, -1 },
@@ -594,8 +595,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 
 
 	// QuickTime video
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_8BPS },
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTRle },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_8BPS   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTRle  },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTRpza },
 
 	// Screen recorder
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CSCD },
@@ -1277,6 +1279,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					break;
 				case AV_CODEC_ID_8BPS  :
 				case AV_CODEC_ID_QTRLE :
+				case AV_CODEC_ID_RPZA  :
 					bCodecActivated = (m_nActiveCodecs & CODEC_QT) != 0;
 					break;
 			}

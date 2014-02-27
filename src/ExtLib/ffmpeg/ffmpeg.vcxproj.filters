@@ -2161,6 +2161,9 @@
     <ClCompile Include="libavcodec\rdft.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\rpza.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\rv10.c">
       <Filter>libavcodec</Filter>
     </ClCompile>

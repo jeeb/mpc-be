@@ -682,6 +682,7 @@
     <ClCompile Include="libavcodec\raw.c" />
     <ClCompile Include="libavcodec\rawdec.c" />
     <ClCompile Include="libavcodec\rdft.c" />
+    <ClCompile Include="libavcodec\rpza.c" />
     <ClCompile Include="libavcodec\rv10.c" />
     <ClCompile Include="libavcodec\rv30.c" />
     <ClCompile Include="libavcodec\rv30dsp.c" />
