@@ -3342,7 +3342,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 		break;
 	case INFO_InputFormat:
 		if (m_pAVCtx) {
-			infostr = m_pAVCtx->codec->name;
+			infostr = m_pAVCtx->codec_descriptor->name;;
 			if (const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
 				if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
 					infostr.AppendFormat(_T(", %d-bit"), GetLumaBits(m_pAVCtx->pix_fmt));
