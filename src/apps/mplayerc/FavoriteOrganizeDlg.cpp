@@ -133,7 +133,7 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 
 	m_list.InsertColumn(0, _T(""));
 	m_list.InsertColumn(1, _T(""));
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT);
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
 	s.GetFav(FAV_FILE, m_sl[0]);
 	s.GetFav(FAV_DVD, m_sl[1]);
@@ -167,7 +167,7 @@ void CFavoriteOrganizeDlg::OnTcnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	SetupList(false);
 
-	m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+	m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	*pResult = 0;
 }
@@ -187,6 +187,7 @@ void CFavoriteOrganizeDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStr
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
 		b.CreateSolidBrush(0xf1dacc);
 		pDC->FillRect(rcItem, &b);
+		b.DeleteObject();
 		b.CreateSolidBrush(0xc56a31);
 		pDC->FrameRect(rcItem, &b);
 	} else {
@@ -198,11 +199,11 @@ void CFavoriteOrganizeDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStr
 	pDC->SetTextColor(0);
 
 	str = m_list.GetItemText(nItem, 0);
-	pDC->TextOut(rcItem.left + 3, (rcItem.top+rcItem.bottom - pDC->GetTextExtent(str).cy) / 2, str);
+	pDC->TextOut(rcItem.left + 3, (rcItem.top + rcItem.bottom - pDC->GetTextExtent(str).cy) / 2, str);
 	str = m_list.GetItemText(nItem, 1);
 
 	if (!str.IsEmpty()) {
-		pDC->TextOut(rcItem.right - pDC->GetTextExtent(str).cx - 3, (rcItem.top+rcItem.bottom - pDC->GetTextExtent(str).cy) / 2, str);
+		pDC->TextOut(rcItem.right - pDC->GetTextExtent(str).cx - 3, (rcItem.top + rcItem.bottom - pDC->GetTextExtent(str).cy) / 2, str);
 	}
 }
 
@@ -404,7 +405,7 @@ void CFavoriteOrganizeDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimi
 	__super::OnActivate(nState, pWndOther, bMinimized);
 
 	if (nState == WA_ACTIVE) {
-		m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+		m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
 }
 
