@@ -2994,6 +2994,8 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 			case EC_DVD_DOMAIN_CHANGE:
 				if (m_pDVDC) {
 					m_iDVDDomain = (DVD_DOMAIN)evParam1;
+					OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(m_lastOMD.m_p);
+					ASSERT(pDVDData);
 
 					CString Domain('-');
 
@@ -3091,6 +3093,12 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									m_iDVDTitle	  = s.lDVDTitle;
 									s.lDVDTitle   = 0;
 									s.lDVDChapter = 0;
+								} else if (pDVDData->pDvdState) {
+									// Set position from favorite
+									VERIFY(SUCCEEDED(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, NULL)));
+									// We don't want to restore the position from the favorite
+									// if the playback is reinitialized so we clear the saved state
+									pDVDData->pDvdState.Release();
 								} else if (s.fKeepHistory && s.fRememberDVDPos && !s.NewDvd(llDVDGuid)) {
 									// Set last remembered position (if founded...)
 									DVD_POSITION* DvdPos = s.CurrentDVDPosition();
@@ -4191,6 +4199,10 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	ASSERT(m_iMediaLoadState == MLS_LOADING);
 	SetLoadState(MLS_LOADED);
 
+	// remember OpenMediaData for later use
+	m_lastOMD.Free();
+	m_lastOMD.Attach(pOMD.Detach());
+
 	if (m_bIsBDPlay == FALSE) {
 		m_MPLSPlaylist.RemoveAll();
 		m_LastOpenBDPath.Empty();
@@ -4201,11 +4213,11 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fEnableEDLEditor) {
-		m_wndEditListEditor.OpenFile(pOMD->title);
+		m_wndEditListEditor.OpenFile(m_lastOMD->title);
 	}
 
 	m_AngleZ = 0;
-	if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(pOMD.m_p)) {
+	if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p)) {
 		// Rotation flag;
 		BeginEnumFilters(m_pGB, pEF, pBF) {
 			if (CComQIPtr<IPropertyBag> pPB = pBF) {
@@ -4225,7 +4237,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		EndEnumFilters;
 	}
 
-	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(pOMD.m_p)) {
+	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.m_p)) {
 		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
 		m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
 		m_wndCaptureBar.m_capdlg.SetAudioInput(pDeviceData->ainput);
@@ -4300,18 +4312,12 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	m_bfirstPlay	= true;
-	m_LastOpenFile	= pOMD->title;
+	m_LastOpenFile	= m_lastOMD->title;
 
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
 	}
 	s.nCLSwitches &= ~CLSW_OPEN;
-
-	if (OpenDVDData *pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p)) {
-		if (pDVDData->pDvdState && m_pDVDC) {
-			VERIFY(SUCCEEDED(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, NULL)));
-		}
-	}
 
 	SendNowPlayingToApi();
 	SetupChapters();

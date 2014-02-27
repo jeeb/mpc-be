@@ -480,8 +480,10 @@ protected:
 	bool			m_fClosingState;
 	bool			m_fAudioOnly;
 
-	dispmode m_dmBeforeFullscreen;
-	CString m_LastOpenFile;
+	dispmode		m_dmBeforeFullscreen;
+
+	CString					m_LastOpenFile;
+	CAutoPtr<OpenMediaData>	m_lastOMD;
 
 	CString m_LastOpenBDPath, m_BDLabel;
 	HMONITOR m_LastWindow_HM;
