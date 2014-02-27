@@ -74,6 +74,7 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
 	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
 	DDX_Text(pDX, IDC_EDIT4, m_sAudioPaths);
+	DDX_Control(pDX, IDC_COMBO1, m_zoomlevelctrl);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -110,7 +111,6 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_iLoopForever = s.fLoopForever?1:0;
 	m_nLoops = s.nLoops;
 	m_fRewind = s.fRewind;
-	m_iZoomLevel = s.iZoomLevel;
 	m_iRememberZoomLevel = s.fRememberZoomLevel;
 	m_fAutoloadAudio = s.fAutoloadAudio;
 	m_fPrioritizeExternalAudio = s.fPrioritizeExternalAudio;
@@ -119,6 +119,13 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_fReportFailedPins = s.fReportFailedPins;
 	m_subtitlesLanguageOrder = s.strSubtitlesLanguageOrder;
 	m_audiosLanguageOrder = s.strAudiosLanguageOrder;
+
+	m_zoomlevelctrl.AddString(L"50%");
+	m_zoomlevelctrl.AddString(L"100%");
+	m_zoomlevelctrl.AddString(L"200%");
+	m_zoomlevelctrl.AddString(ResStr(IDS_ZOOM_AUTOFIT));
+	CorrectComboListWidth(m_zoomlevelctrl);
+	m_iZoomLevel = s.iZoomLevel;
 
 	for (int idx = 1; idx <= 10; idx++) {
 		CString str; str.Format(_T("%d"), idx);
