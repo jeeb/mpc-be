@@ -15737,7 +15737,7 @@ void CMainFrame::SetupNavMixSubtitleSubMenu()
 				flags |= MF_DEFAULT;
 			}
 			if (i == ulCurrentStream) {
-				flags |= MF_CHECKED;
+				flags |= MF_CHECKED | MFT_RADIOCHECK;
 			}
 
 			CString str;
@@ -16580,7 +16580,7 @@ void CMainFrame::SetupNavMixAudioSubMenu()
 				flags |= MF_DEFAULT;
 			}
 			if (i == ulCurrentStream) {
-				flags |= MF_CHECKED;
+				flags |= MF_CHECKED | MFT_RADIOCHECK;
 			}
 
 			CString str;
