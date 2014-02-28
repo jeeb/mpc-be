@@ -378,8 +378,12 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         if (s->rgb)
             s->avctx->pix_fmt = s->bits <= 9 ? AV_PIX_FMT_ABGR : AV_PIX_FMT_RGBA64;
         else {
-            s->avctx->pix_fmt = s->bits <= 8 ? AV_PIX_FMT_YUVA444P : AV_PIX_FMT_YUVA444P16;
-            s->avctx->color_range = s->cs_itu601 ? AVCOL_RANGE_MPEG : AVCOL_RANGE_JPEG;
+            if (s->adobe_transform == 0 && s->bits <= 8) {
+                s->avctx->pix_fmt = AV_PIX_FMT_GBRAP;
+            } else {
+                s->avctx->pix_fmt = s->bits <= 8 ? AV_PIX_FMT_YUVA444P : AV_PIX_FMT_YUVA444P16;
+                s->avctx->color_range = s->cs_itu601 ? AVCOL_RANGE_MPEG : AVCOL_RANGE_JPEG;
+            }
         }
         av_assert0(s->nb_components == 4);
         break;
@@ -492,7 +496,7 @@ unk_pixfmt:
     s->picture_ptr->key_frame = 1;
     s->got_picture            = 1;
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 4; i++)
         s->linesize[i] = s->picture_ptr->linesize[i] << s->interlaced;
 
     av_dlog(s->avctx, "%d %d %d %d %d %d\n",
@@ -1455,8 +1459,11 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
     id   = get_bits_long(&s->gb, 32);
     len -= 6;
 
-    if (s->avctx->debug & FF_DEBUG_STARTCODE)
-        av_log(s->avctx, AV_LOG_DEBUG, "APPx %8X len=%d\n", id, len);
+    if (s->avctx->debug & FF_DEBUG_STARTCODE) {
+        char id_str[32];
+        av_get_codec_tag_string(id_str, sizeof(id_str), av_bswap32(id));
+        av_log(s->avctx, AV_LOG_DEBUG, "APPx (%s / %8X) len=%d\n", id_str, id, len);
+    }
 
     /* Buggy AVID, it puts EOI only at every 10th frame. */
     /* Also, this fourcc is used by non-avid files too, it holds some
@@ -1512,12 +1519,12 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
     }
 
     if (id == AV_RB32("Adob") && (get_bits(&s->gb, 8) == 'e')) {
-        if (s->avctx->debug & FF_DEBUG_PICT_INFO)
-            av_log(s->avctx, AV_LOG_INFO, "mjpeg: Adobe header found\n");
         skip_bits(&s->gb, 16); /* version */
         skip_bits(&s->gb, 16); /* flags0 */
         skip_bits(&s->gb, 16); /* flags1 */
-        skip_bits(&s->gb,  8); /* transform */
+        s->adobe_transform = get_bits(&s->gb,  8);
+        if (s->avctx->debug & FF_DEBUG_PICT_INFO)
+            av_log(s->avctx, AV_LOG_INFO, "mjpeg: Adobe header found, transform=%d\n", s->adobe_transform);
         len -= 7;
         goto out;
     }
@@ -1833,6 +1840,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
     av_dict_free(&s->exif_metadata);
     av_freep(&s->stereo3d);
+    s->adobe_transform = -1;
 
     buf_ptr = buf;
     buf_end = buf + buf_size;
@@ -2059,6 +2067,28 @@ the_end:
                     dst  += s->picture_ptr->linesize[index];
                     dst2 -= s->picture_ptr->linesize[index];
                 }
+            }
+        }
+    }
+    if (s->adobe_transform == 0 && s->avctx->pix_fmt == AV_PIX_FMT_GBRAP) {
+        int w = s->picture_ptr->width;
+        int h = s->picture_ptr->height;
+        for (i=0; i<h; i++) {
+            int j;
+            uint8_t *dst[4];
+            for (index=0; index<4; index++) {
+                dst[index] =   s->picture_ptr->data[index]
+                             + s->picture_ptr->linesize[index]*i;
+            }
+            for (j=0; j<w; j++) {
+                int k = dst[3][j];
+                int r = dst[0][j] * k;
+                int g = dst[1][j] * k;
+                int b = dst[2][j] * k;
+                dst[0][j] = g*257 >> 16;
+                dst[1][j] = b*257 >> 16;
+                dst[2][j] = r*257 >> 16;
+                dst[3][j] = 255;
             }
         }
     }

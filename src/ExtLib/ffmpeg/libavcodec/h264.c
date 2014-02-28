@@ -372,6 +372,7 @@ static int ref_picture(H264Context *h, Picture *dst, Picture *src)
     dst->crop_left     = src->crop_left;
     dst->crop_top      = src->crop_top;
     dst->recovered     = src->recovered;
+    dst->invalid_gap   = src->invalid_gap;
 
     return 0;
 fail:
@@ -1995,6 +1996,7 @@ static int h264_frame_start(H264Context *h)
     pic->f.key_frame = 0;
     pic->mmco_reset  = 0;
     pic->recovered   = 0;
+    pic->invalid_gap = 0;
 
     if ((ret = alloc_picture(h, pic)) < 0)
         return ret;
@@ -2993,18 +2995,18 @@ static void init_scan_tables(H264Context *h)
 {
     int i;
     for (i = 0; i < 16; i++) {
-#define T(x) (x >> 2) | ((x << 2) & 0xF)
-        h->zigzag_scan[i] = T(zigzag_scan[i]);
-        h->field_scan[i]  = T(field_scan[i]);
-#undef T
+#define TRANSPOSE(x) (x >> 2) | ((x << 2) & 0xF)
+        h->zigzag_scan[i] = TRANSPOSE(zigzag_scan[i]);
+        h->field_scan[i]  = TRANSPOSE(field_scan[i]);
+#undef TRANSPOSE
     }
     for (i = 0; i < 64; i++) {
-#define T(x) (x >> 3) | ((x & 7) << 3)
-        h->zigzag_scan8x8[i]       = T(ff_zigzag_direct[i]);
-        h->zigzag_scan8x8_cavlc[i] = T(zigzag_scan8x8_cavlc[i]);
-        h->field_scan8x8[i]        = T(field_scan8x8[i]);
-        h->field_scan8x8_cavlc[i]  = T(field_scan8x8_cavlc[i]);
-#undef T
+#define TRANSPOSE(x) (x >> 3) | ((x & 7) << 3)
+        h->zigzag_scan8x8[i]       = TRANSPOSE(ff_zigzag_direct[i]);
+        h->zigzag_scan8x8_cavlc[i] = TRANSPOSE(zigzag_scan8x8_cavlc[i]);
+        h->field_scan8x8[i]        = TRANSPOSE(field_scan8x8[i]);
+        h->field_scan8x8_cavlc[i]  = TRANSPOSE(field_scan8x8_cavlc[i]);
+#undef TRANSPOSE
     }
     if (h->sps.transform_bypass) { // FIXME same ugly
         memcpy(h->zigzag_scan_q0          , zigzag_scan             , sizeof(h->zigzag_scan_q0         ));
@@ -3828,6 +3830,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
             h->prev_frame_num++;
             h->prev_frame_num        %= 1 << h->sps.log2_max_frame_num;
             h->cur_pic_ptr->frame_num = h->prev_frame_num;
+            h->cur_pic_ptr->invalid_gap = !h->sps.gaps_in_frame_num_allowed_flag;
             ff_thread_report_progress(&h->cur_pic_ptr->tf, INT_MAX, 0);
             ff_thread_report_progress(&h->cur_pic_ptr->tf, INT_MAX, 1);
             ret = ff_generate_sliding_window_mmcos(h, 1);
@@ -5231,7 +5234,9 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
                 case NAL_IDR_SLICE:
                 case NAL_SLICE:
                     init_get_bits(&hx->gb, ptr, bit_length);
-                    if (!get_ue_golomb(&hx->gb) || !first_slice)
+                    if (!get_ue_golomb(&hx->gb) ||
+                        !first_slice ||
+                        first_slice != hx->nal_unit_type)
                         nals_needed = nal_index;
                     if (!first_slice)
                         first_slice = hx->nal_unit_type;
@@ -5279,7 +5284,7 @@ again:
 
             switch (hx->nal_unit_type) {
             case NAL_IDR_SLICE:
-                if (first_slice != NAL_IDR_SLICE) {
+                if (h->nal_unit_type != NAL_IDR_SLICE) {
                     av_log(h->avctx, AV_LOG_ERROR,
                            "Invalid mix of idr and non-idr slices\n");
                     ret = -1;
