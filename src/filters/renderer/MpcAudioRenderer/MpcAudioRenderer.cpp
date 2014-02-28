@@ -576,7 +576,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME tStart)
 
 STDMETHODIMP CMpcAudioRenderer::Stop()
 {
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::Run()"));
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::Stop()"));
 
 	if (m_hStopWaitingRenderer) {
 		SetEvent(m_hStopWaitingRenderer);
