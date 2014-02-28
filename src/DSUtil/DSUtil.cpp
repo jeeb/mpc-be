@@ -2572,6 +2572,7 @@ static const DXVA2_DECODER DXVA2Decoder[] = {
 	{&DXVA2_ModeMPEG2_MoComp,			_T("MPEG-2 motion compensation")},
 	{&DXVA2_ModeMPEG2_IDCT,				_T("MPEG-2 IDCT")},
 	{&DXVA2_ModeMPEG2_VLD,				_T("MPEG-2 variable-length decoder")},
+	{&DXVA_ModeMPEG2and1_VLD,			_T("MPEG-2 and MPEG-1 variable-length decoder")},
 	{&DXVA2_ModeH264_A,					_T("H.264 A, motion compensation, no FGT")},
 	{&DXVA2_ModeH264_B,					_T("H.264 B, motion compensation, FGT")},
 	{&DXVA2_ModeH264_C,					_T("H.264 C, IDCT, no FGT")},
