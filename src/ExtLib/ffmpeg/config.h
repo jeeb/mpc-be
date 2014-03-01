@@ -286,7 +286,6 @@
 #define HAVE_ALSA_ASOUNDLIB_H 0
 #define HAVE_ALTIVEC_H 0
 #define HAVE_ARPA_INET_H 0
-#define HAVE_ASM_MOD_Y 0
 #define HAVE_ASM_TYPES_H 0
 #define HAVE_ATANF 1
 #define HAVE_ATAN2F 1
