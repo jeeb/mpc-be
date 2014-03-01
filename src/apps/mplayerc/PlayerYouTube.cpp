@@ -404,15 +404,19 @@ again:
 				slparams.AddTail(_T("fexp"));
 				slparams.AddTail(_T("key"));
 				slparams.AddTail(_T("sig"));
+				slparams.AddTail(_T("signature"));
 			}
 
 			POSITION pos = slparams.GetHeadPosition();
 			while (pos) {
 				CString param = slparams.GetNext(pos);
-				if (param == L"sig") {
-					url.AppendFormat(L"signature=%s&", UrlFields[param]);
-				} else {
-					url.AppendFormat(L"%s=%s&", param, UrlFields[param]);
+				CString value = UrlFields[param];
+				if (value.GetLength() > 0) {
+					if (param == L"sig") {
+						url.AppendFormat(L"signature=%s&", value);
+					} else {
+						url.AppendFormat(L"%s=%s&", param, value);
+					}
 				}
 			}
 			url.Trim(_T("&"));
