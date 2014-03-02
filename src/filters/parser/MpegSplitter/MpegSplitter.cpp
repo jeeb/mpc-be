@@ -784,7 +784,7 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 					fName = fName.Left(fName.ReverseFind('.') + 1);
 					fName.TrimRight(_T(".0123456789")) += _T("0.ifo");
 
-					if (::PathFileExists(fname)) {
+					if (::PathFileExists(fName)) {
 						// read palette from .ifo file, code from CVobSubFile::ReadIfo()
 						CFile f;
 						if (!f.Open(fName, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
@@ -841,7 +841,7 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		if (pos) {
 			CMpegSplitterFile::stream& sVideo = m_pFile->m_streams[CMpegSplitterFile::stream_type::video].GetHead();
 			int arx, ary;
-			ExtractDim(&s.mt, vid_width, vid_height, arx, ary);
+			ExtractDim(&sVideo.mt, vid_width, vid_height, arx, ary);
 		}
 
 		CStringA hdr		= VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576, palette);
