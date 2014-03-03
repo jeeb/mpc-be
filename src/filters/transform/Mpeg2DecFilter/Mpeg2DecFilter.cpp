@@ -957,22 +957,6 @@ HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 
 HRESULT CMpeg2DecFilter::CheckConnect(PIN_DIRECTION dir, IPin* pPin)
 {
-	if (dir == PINDIR_INPUT) {
-		CComQIPtr<IBaseFilter> pBF = GetFilterFromPin(pPin);
-
-		if (GetCLSID(pBF) != CLSID_DVDNavigator) {
-			BeginEnumMediaTypes(pPin, pEM, pmt) {
-				if (pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
-					if (pmt) {
-						DeleteMediaType(pmt);
-					}
-					return E_FAIL;
-				}
-			}
-			EndEnumMediaTypes(pmt)
-		}
-	}
-
 	if (dir == PINDIR_OUTPUT) {
 		if (GetCLSID(m_pInput->GetConnected()) == CLSID_DVDNavigator) {
 			// one of these needed for dynamic format changes
