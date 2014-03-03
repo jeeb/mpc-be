@@ -3121,6 +3121,10 @@ CStringA VobSubDefHeader(int w, int h, CStringA palette)
 		"palette: %s\n",
 		w, h, !palette.IsEmpty() ? palette : def_palette);
 
+	if (palette.IsEmpty()) {
+		hdr.Append("custom colors: ON, tridx: 1000, colors: 00000, e0e0e0, 808080, 202020\n");
+	}
+
 	return hdr;
 }
 
