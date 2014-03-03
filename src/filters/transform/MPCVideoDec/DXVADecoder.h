@@ -121,9 +121,9 @@ protected :
 	CComPtr<IMediaSample>		m_pSampleToDeliver;
 
 	struct SurfaceWrapper {
-		void* opaque;
-		int nSurfaceIndex;
-		CComPtr<IMediaSample> pSample;
+		void*					opaque;
+		int						nSurfaceIndex;
+		CComPtr<IMediaSample>	pSample;
 	};
 
 	// === DXVA functions

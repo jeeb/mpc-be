@@ -1296,10 +1296,11 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 
 void CMPCVideoDecFilter::Cleanup()
 {
-	SAFE_DELETE(m_pDXVADecoder);
+	CAutoLock cAutoLock(&m_csReceive);
 
 	ffmpegCleanup();
 
+	SAFE_DELETE(m_pDXVADecoder);
 	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
 
 	if (m_hDevice != INVALID_HANDLE_VALUE) {
@@ -2643,6 +2644,10 @@ void CMPCVideoDecFilter::ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME&
 
 void CMPCVideoDecFilter::FlushDXVADecoder()	{
 	if (m_pDXVADecoder) {
+		CAutoLock cAutoLock(&m_csReceive);
+		if (m_pAVCtx) {
+			avcodec_flush_buffers(m_pAVCtx);
+		}
 		m_pDXVADecoder->Flush();
 	}
 }
