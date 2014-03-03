@@ -131,7 +131,5 @@ class CMpegSplitterOutputPin : public CBaseSplitterParserOutputPin
 public:
 	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets);
 
-	HRESULT CheckMediaType(const CMediaType* pmt) { return S_OK; }
-
 	STDMETHODIMP Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt);
 };

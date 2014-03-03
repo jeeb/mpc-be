@@ -852,21 +852,17 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		SUBTITLEINFO* si	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
 		memset(si, 0, mt.FormatLength());
 		si->dwOffset		= sizeof(SUBTITLEINFO);
-		strncpy_s(si->IsoLang, pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang)-1);
-
+		strncpy_s(si->IsoLang, pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang) - 1);
 		memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
-		s.mts.push_back(mt);
 
-		s.mt.majortype = GUID_NULL;
+		s.mts.push_back(mt);
 	}
 
 	if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
 		s.mts.push_back(mt);
 	}
 
-	if (s.mt.majortype != GUID_NULL) {
-		s.mts.push_back(s.mt);
-	}
+	s.mts.push_back(s.mt);
 }
 
 //
