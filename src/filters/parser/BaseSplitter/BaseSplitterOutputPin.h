@@ -25,7 +25,7 @@
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
 #include <IBitRateInfo.h>
-#include "Packet.h"
+#include "../../../DSUtil/Packet.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 
 static const TCHAR* MPEG2_Profile[]=

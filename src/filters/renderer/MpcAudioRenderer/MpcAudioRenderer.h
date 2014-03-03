@@ -28,7 +28,7 @@
 #include "MpcAudioRendererSettingsWnd.h"
 
 #include "Mixer.h"
-#include "../../parser/BaseSplitter/Packet.h"
+#include "../../../DSUtil/Packet.h"
 
 #define MpcAudioRendererName L"MPC Audio Renderer"
 

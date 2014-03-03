@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "Packet.h"
+#include "../../../DSUtil/Packet.h"
 #include "BaseSplitterOutputPin.h"
 
 class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CCritSec
