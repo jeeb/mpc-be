@@ -856,13 +856,17 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 
 		memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 		s.mts.push_back(mt);
+
+		s.mt.majortype = GUID_NULL;
 	}
 
 	if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
 		s.mts.push_back(mt);
 	}
 
-	s.mts.push_back(s.mt);
+	if (s.mt.majortype != GUID_NULL) {
+		s.mts.push_back(s.mt);
+	}
 }
 
 //
