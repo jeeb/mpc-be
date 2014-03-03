@@ -563,6 +563,12 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 		return hr;
 	}
 
+	if (m_bEOS) {
+		NotifyEvent(EC_COMPLETE, S_OK, 0);
+		// I don't know why, but requires double calling NotifyEvent(EC_COMPLETE, ...);
+		return NotifyEvent(EC_COMPLETE, S_OK, 0);
+	}
+
 	hr = CheckAudioClient(m_pWaveFileFormat);
 	if (FAILED(hr)) {
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::Run() - Error on check audio client"));
@@ -782,7 +788,7 @@ HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
 
 HRESULT CMpcAudioRenderer::EndOfStream(void)
 {
-	HRESULT hr = S_OK;
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::EndOfStream()"));
 
 	if (m_hStopWaitingRenderer) {
 		SetEvent(m_hStopWaitingRenderer);
