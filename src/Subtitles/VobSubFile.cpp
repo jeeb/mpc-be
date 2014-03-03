@@ -2377,16 +2377,31 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 
 void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData, int len)
 {
-	if (len <= 4 || ((pData[0]<<8)|pData[1]) != len) {
+	if (len <= 4 || ((pData[0] << 8) | pData[1]) != len) {
 		return;
 	}
 
+	{
+		CAutoLock cAutoLock(&m_csSubPics);
+		POSITION pos = m_subpics.GetTailPosition();
+		while (pos) {
+			SubPic* sp = m_subpics.GetPrev(pos);
+			if (sp->tStop == _I64_MAX) {
+				sp->tStop = tStart;
+				break;
+			}
+		}
+	}
+
 	CVobSubImage vsi;
-	vsi.GetPacketInfo(pData, (pData[0]<<8)|pData[1], (pData[2]<<8)|pData[3]);
+	vsi.GetPacketInfo(pData, (pData[0] << 8) | pData[1], (pData[2] << 8) | pData[3]);
 
 	CAutoPtr<SubPic> p(DNew SubPic());
-	p->tStart = tStart;
-	p->tStop = vsi.delay > 0 ? (tStart + 10000i64*vsi.delay) : tStop;
+	p->tStart	= tStart;
+	p->tStop	= vsi.delay > 0 ? (tStart + 10000i64 * vsi.delay) : tStop;
+	if (p->tStop - p->tStart < UNITS) {
+		p->tStop = _I64_MAX;
+	}
 	p->pData.SetCount(len);
 	memcpy(p->pData.GetData(), pData, p->pData.GetCount());
 
