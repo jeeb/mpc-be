@@ -701,28 +701,28 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	VideoFormat = (MFVIDEOFORMAT*)pAMMedia->pbFormat;
 	hr = pfMFCreateVideoMediaType  (VideoFormat, &m_pMediaType);
 
-	if (0) {
-		// This code doesn't work, use same method as VMR9 instead
-		if (VideoFormat->videoInfo.FramesPerSecond.Numerator != 0) {
-			switch (VideoFormat->videoInfo.InterlaceMode) {
-				case MFVideoInterlace_Progressive:
-				case MFVideoInterlace_MixedInterlaceOrProgressive:
-				default: {
-					m_rtTimePerFrame = (10000000I64*VideoFormat->videoInfo.FramesPerSecond.Denominator)/VideoFormat->videoInfo.FramesPerSecond.Numerator;
-					m_bInterlaced = false;
-				}
-				break;
-				case MFVideoInterlace_FieldSingleUpper:
-				case MFVideoInterlace_FieldSingleLower:
-				case MFVideoInterlace_FieldInterleavedUpperFirst:
-				case MFVideoInterlace_FieldInterleavedLowerFirst: {
-					m_rtTimePerFrame = (20000000I64*VideoFormat->videoInfo.FramesPerSecond.Denominator)/VideoFormat->videoInfo.FramesPerSecond.Numerator;
-					m_bInterlaced = true;
-				}
-				break;
+#if 0
+	// This code doesn't work, use same method as VMR9 instead
+	if (VideoFormat->videoInfo.FramesPerSecond.Numerator != 0) {
+		switch (VideoFormat->videoInfo.InterlaceMode) {
+			case MFVideoInterlace_Progressive:
+			case MFVideoInterlace_MixedInterlaceOrProgressive:
+			default: {
+				m_rtTimePerFrame = (10000000I64*VideoFormat->videoInfo.FramesPerSecond.Denominator)/VideoFormat->videoInfo.FramesPerSecond.Numerator;
+				m_bInterlaced = false;
 			}
+			break;
+			case MFVideoInterlace_FieldSingleUpper:
+			case MFVideoInterlace_FieldSingleLower:
+			case MFVideoInterlace_FieldInterleavedUpperFirst:
+			case MFVideoInterlace_FieldInterleavedLowerFirst: {
+				m_rtTimePerFrame = (20000000I64*VideoFormat->videoInfo.FramesPerSecond.Denominator)/VideoFormat->videoInfo.FramesPerSecond.Numerator;
+				m_bInterlaced = true;
+			}
+			break;
 		}
 	}
+#endif
 
 	m_AspectRatio.cx	= VideoFormat->videoInfo.PixelAspectRatio.Numerator;
 	m_AspectRatio.cy	= VideoFormat->videoInfo.PixelAspectRatio.Denominator;
