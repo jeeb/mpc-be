@@ -44,7 +44,6 @@ public :
 	bool				m_object_cropped_flag;
 	bool				m_forced_on_flag;
 	BYTE				m_version_number;
-	BYTE				m_nObjectNumber;
 
 	SHORT				m_horizontal_position;
 	SHORT				m_vertical_position;
@@ -78,6 +77,16 @@ public :
 	void				SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD, bool bIsRGB = false);
 	void				SetPalette (int nNbEntry, DWORD* dwColors);
 	bool				HavePalette() { return m_nColorNumber > 0; };
+
+	CompositionObject* Copy() {
+		CompositionObject* pCompositionObject = DNew CompositionObject(*this);
+		if (m_pRLEData) {
+			pCompositionObject->m_pRLEData = NULL;
+			pCompositionObject->SetRLEData(m_pRLEData, m_nRLEDataSize, m_nRLEDataSize);
+		}
+
+		return pCompositionObject;
+	}
 
 private :
 	BYTE*		m_pRLEData;

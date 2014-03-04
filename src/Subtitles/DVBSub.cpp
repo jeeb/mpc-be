@@ -31,16 +31,18 @@
 
 #define BUFFER_CHUNK_GROW 0x1000
 
-CDVBSub::CDVBSub(void)
+CDVBSub::CDVBSub()
 	: CBaseSub(ST_DVB)
+	, m_nBufferReadPos(0)
+	, m_nBufferWritePos(0)
+	, m_nBufferSize(0)
+	, m_pBuffer(NULL)
+	, m_rtStart(0)
+	, m_rtStop(0)
 {
-	m_nBufferReadPos	= 0;
-	m_nBufferWritePos	= 0;
-	m_nBufferSize		= 0;
-	m_pBuffer			= NULL;
 }
 
-CDVBSub::~CDVBSub(void)
+CDVBSub::~CDVBSub()
 {
 	Reset();
 	SAFE_DELETE(m_pBuffer);
@@ -48,16 +50,13 @@ CDVBSub::~CDVBSub(void)
 
 CDVBSub::DVB_PAGE* CDVBSub::FindPage(REFERENCE_TIME rt)
 {
-	POSITION pos = m_Pages.GetHeadPosition();
-
+	POSITION pos = m_pages.GetHeadPosition();
 	while (pos) {
-		DVB_PAGE* pPage = m_Pages.GetAt (pos);
+		DVB_PAGE* pPage = m_pages.GetNext(pos);
 
 		if (rt >= pPage->rtStart && rt < pPage->rtStop) {
 			return pPage;
 		}
-
-		m_Pages.GetNext(pos);
 	}
 
 	return NULL;
@@ -66,9 +65,11 @@ CDVBSub::DVB_PAGE* CDVBSub::FindPage(REFERENCE_TIME rt)
 CDVBSub::DVB_REGION* CDVBSub::FindRegion(DVB_PAGE* pPage, BYTE bRegionId)
 {
 	if (pPage != NULL) {
-		for (int i = 0; i < pPage->RegionCount; i++) {
-			if (pPage->Regions[i].Id == bRegionId) {
-				return &pPage->Regions[i];
+		POSITION pos = pPage->regions.GetHeadPosition();
+		while (pos) {
+			DVB_REGION* pRegion = pPage->regions.GetNext(pos);
+			if (pRegion->id == bRegionId) {
+				return pRegion;
 			}
 		}
 	}
@@ -78,14 +79,12 @@ CDVBSub::DVB_REGION* CDVBSub::FindRegion(DVB_PAGE* pPage, BYTE bRegionId)
 CDVBSub::DVB_CLUT* CDVBSub::FindClut(DVB_PAGE* pPage, BYTE bClutId)
 {
 	if (pPage != NULL) {
-		POSITION pos = pPage->Clut.GetHeadPosition();
+		POSITION pos = pPage->CLUTs.GetHeadPosition();
 		while (pos) {
-			DVB_CLUT Clut = pPage->Clut.GetAt(pos);
-
-			if (Clut.id == bClutId) {
-				return &pPage->Clut.GetAt(pos);
+			DVB_CLUT* pCLUT = pPage->CLUTs.GetNext(pos);
+			if (pCLUT->id == bClutId) {
+				return pCLUT;
 			}
-			pPage->Clut.GetNext(pos);
 		}
 	}
 	return NULL;
@@ -94,14 +93,12 @@ CDVBSub::DVB_CLUT* CDVBSub::FindClut(DVB_PAGE* pPage, BYTE bClutId)
 CompositionObject* CDVBSub::FindObject(DVB_PAGE* pPage, SHORT sObjectId)
 {
 	if (pPage != NULL) {
-		POSITION pos = pPage->Objects.GetHeadPosition();
+		POSITION pos = pPage->objects.GetHeadPosition();
 		while (pos) {
-			CompositionObject* pObject = pPage->Objects.GetAt (pos);
-
+			CompositionObject* pObject = pPage->objects.GetNext(pos);
 			if (pObject->m_object_id_ref == sObjectId) {
 				return pObject;
 			}
-			pPage->Objects.GetNext(pos);
 		}
 	}
 	return NULL;
@@ -120,7 +117,7 @@ HRESULT CDVBSub::AddToBuffer(BYTE* pData, int nSize)
 		if (m_nBufferWritePos+nSize > m_nBufferSize) {
 			if (m_nBufferWritePos+nSize > 20 * BUFFER_CHUNK_GROW) {
 				// Too big to be a DVB sub !
-				TRACE_DVB (_T("DVB - Too much data receive...\n"));
+				TRACE_DVB (_T("DVB - Too much data received...\n"));
 				ASSERT (FALSE);
 
 				Reset();
@@ -135,14 +132,18 @@ HRESULT CDVBSub::AddToBuffer(BYTE* pData, int nSize)
 				SAFE_DELETE(pPrev);
 			}
 		}
-		memcpy_s(m_pBuffer+m_nBufferWritePos, m_nBufferSize, pData, nSize);
+		memcpy_s(m_pBuffer + m_nBufferWritePos, m_nBufferSize, pData, nSize);
 		m_nBufferWritePos += nSize;
 		return S_OK;
 	}
 	return S_FALSE;
 }
 
-#define MARKER if(gb.BitRead(1) != 1) {ASSERT(0); return(E_FAIL);}
+#define MARKER					\
+	if (gb.BitRead(1) != 1) {	\
+		ASSERT(FALSE);			\
+		return E_FAIL;			\
+	}
 
 HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 {
@@ -189,7 +190,7 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 			BYTE b = (BYTE)gb.BitRead(4);
 			if (!(fdts && b == 3 || !fdts && b == 2)) {
 				ASSERT(0);
-				return(E_FAIL);
+				return E_FAIL;
 			}
 
 			REFERENCE_TIME	pts = 0;
@@ -199,7 +200,7 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 			MARKER; // 29..15
 			pts |= gb.BitRead(15);
 			MARKER; // 14..0
-			pts = 10000*pts/90;
+			pts = 10000*pts / 90;
 
 			m_rtStart	= pts;
 			m_rtStop	= pts + 1;
@@ -220,7 +221,7 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 		CGolombBuffer	gb(m_pBuffer + m_nBufferReadPos, m_nBufferWritePos - m_nBufferReadPos);
 		int				nLastPos = 0;
 
-		while (!gb.IsEOF()) {
+		while (gb.RemainingSize() >= 6) { // Ensure there is enough data to parse the entire segment header
 			if (gb.ReadByte() == 0x0F) {
 				WORD	wPageId;
 				WORD	wSegLength;
@@ -234,38 +235,48 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 					break;
 				}
 
-				TRACE_DVB (_T("DVB - ParseSample, Segment = [%ws], PageId = [%d], SegLength/Buffer = [%d]/[%d]\n"), GetSegmentType(nCurSegment), wPageId, wSegLength, gb.RemainingSize());
+				TRACE_DVB (_T("DVB - ParseSample, Segment = %s, PageId = %d, SegLength/Buffer = %d/%d\n"), GetSegmentType(nCurSegment), wPageId, wSegLength, gb.RemainingSize());
 
 				switch (nCurSegment) {
 					case PAGE : {
-						CAutoPtr<DVB_PAGE>	pPage;
+						if (m_pCurrentPage != NULL) {
+							TRACE_DVB(_T("DVB - Force End display"));
+							EnqueuePage(m_rtStart);
+						}
+						UpdateTimeStamp(m_rtStart);
+
+						CAutoPtr<DVB_PAGE> pPage;
 						ParsePage(gb, wSegLength, pPage);
 
-						if (pPage->PageState == DPS_ACQUISITION || pPage->PageState == DPS_MODE) {
-							TRACE_DVB (_T("DVB - Page start\n"));
-
-							if (m_pCurrentPage != NULL) {
-								m_pCurrentPage->rtStop = min(m_pCurrentPage->rtStop, m_rtStart);
-								TRACE_DVB (_T("DVB - store Page : %ws => %ws\n"), ReftimeToString(m_pCurrentPage->rtStart), ReftimeToString(m_pCurrentPage->rtStop));
-								m_Pages.AddTail(m_pCurrentPage.Detach());
-							}
-							UpdateTimeStamp(m_rtStart);
-
-							m_pCurrentPage = pPage;
+						if (pPage->pageState == DPS_ACQUISITION || pPage->pageState == DPS_MODE_CHANGE) {
+							m_pCurrentPage			= pPage;
 							m_pCurrentPage->rtStart	= m_rtStart;
-							m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->PageTimeOut * UNITS; // TODO - need to limit the duration of the segment
+							m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->pageTimeOut * 10000000;
 
-							TRACE_DVB (_T("DVB - Page started : %ws, TimeOut = %d\n"), ReftimeToString(m_pCurrentPage->rtStart), m_pCurrentPage->PageTimeOut);
-						} else if (pPage->PageState == DPS_NORMAL) {
-							TRACE_DVB (_T("DVB - Page update\n"));
+							TRACE_DVB(_T("DVB - Page started [pageState = %d] %s, TimeOut = %ds\n"), m_pCurrentPage->pageState, ReftimeToString(m_rtStart), m_pCurrentPage->pageTimeOut);
+						} else if (!m_pages.IsEmpty()) {
+							m_pCurrentPage			= pPage;
+							m_pCurrentPage->rtStart	= m_rtStart;
+							m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->pageTimeOut * 10000000;
 
-							if (m_pCurrentPage && !m_pCurrentPage->RegionCount && pPage->RegionCount) {
-								m_pCurrentPage = pPage;
-								m_pCurrentPage->rtStart	= m_rtStart;
-								m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->PageTimeOut * UNITS; // TODO - need to limit the duration of the segment
+							// Copy data from the previous page
+							DVB_PAGE* pPrevPage = m_pages.GetTail();
 
-								TRACE_DVB (_T("DVB - Page started[update] : %ws, TimeOut = %d\n"), ReftimeToString(m_pCurrentPage->rtStart), m_pCurrentPage->PageTimeOut);
+							for (POSITION pos = pPrevPage->regions.GetHeadPosition(); pos;) {
+								m_pCurrentPage->regions.AddTail(DNew DVB_REGION(*pPrevPage->regions.GetNext(pos)));
 							}
+
+							for (POSITION pos = pPrevPage->objects.GetHeadPosition(); pos;) {
+								m_pCurrentPage->objects.AddTail(pPrevPage->objects.GetNext(pos)->Copy());
+							}
+
+							for (POSITION pos = pPrevPage->CLUTs.GetHeadPosition(); pos;) {
+								m_pCurrentPage->CLUTs.AddTail(DNew DVB_CLUT(*pPrevPage->CLUTs.GetNext(pos)));
+							}
+
+							TRACE_DVB(_T("DVB - Page started [update] %s, TimeOut = %ds\n"), ReftimeToString(m_rtStart), m_pCurrentPage->pageTimeOut);
+						} else {
+							TRACE_DVB(_T("DVB - Page update ignored %s\n"), ReftimeToString(m_rtStart));
 						}
 					}
 					break;
@@ -286,17 +297,16 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 						TRACE_DVB (_T("DVB - Display\n"));
 						break;
 					case END_OF_DISPLAY :
-						/*
-						if (m_pCurrentPage != NULL && (m_pCurrentPage->rtStart != m_rtStart)) {
-							m_pCurrentPage->rtStop = max(m_pCurrentPage->rtStop, m_rtStart);
-							TRACE_DVB (_T("DVB - End display : %ws => %ws\n"), ReftimeToString(m_pCurrentPage->rtStart), ReftimeToString(m_pCurrentPage->rtStop));
-							m_Pages.AddTail (m_pCurrentPage.Detach());
+						if (m_pCurrentPage == NULL) {
+							TRACE_DVB(_T("DVB - Ignored End display %s: no current page\n"), ReftimeToString(m_rtStart));
+						} else if (m_pCurrentPage->rtStart < m_rtStart) {
+							TRACE_DVB(_T("DVB - End display"));
+							EnqueuePage(m_rtStart);
+						} else {
+							TRACE_DVB(_T("DVB - Ignored End display %s: no information on page duration\n"), ReftimeToString(m_rtStart));
 						}
-						*/
-						TRACE_DVB (_T("DVB - End display\n"));
 						break;
 					default :
-						TRACE_DVB (_T("DVB - unknown Segment\n"));
 						break;
 				}
 				nLastPos = gb.GetPos();
@@ -308,43 +318,73 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 	return hr;
 }
 
+HRESULT CDVBSub::EndOfStream()
+{
+	// Enqueue the last page if necessary.
+	TRACE_DVB(_T("DVB - EndOfStream"));
+	if (m_pCurrentPage) {
+		TRACE_DVB(_T(": Enqueue last page"));
+		EnqueuePage(INVALID_TIME);
+	} else {
+		TRACE_DVB(_T(" ignored: no page to enqueue\n"));
+	}
+
+	return S_OK;
+}
+
+
+void CDVBSub::CleanOld(REFERENCE_TIME rt)
+{
+	// Cleanup old PG
+	while (m_pages.GetCount() && m_pages.GetHead()->rtStart < rt) {
+		DVB_PAGE* pPage_old = m_pages.GetHead();
+		if (!pPage_old->rendered) {
+			TRACE_DVB (_T("DVB - remove unrendered object, %s => %s, (rt = %s)\n"),
+						ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),
+						ReftimeToString(rt));
+		}
+		m_pages.RemoveHead();
+		delete pPage_old;
+	}
+}
+
 void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
 	DVB_PAGE* pPage = FindPage(rt);
 
 	if (pPage != NULL) {
-		pPage->Rendered = true;
-		for (int i = 0; i < pPage->RegionCount; i++) {
-			CDVBSub::DVB_REGION* pRegion = &pPage->Regions[i];
-			for (int j = 0; j < pRegion->ObjectCount; j++) {
-				CompositionObject* pObject = FindObject(pPage, pRegion->Objects[j].object_id);
-				if (pObject) {
-					SHORT nX, nY;
-					nX = pRegion->HorizAddr + pRegion->Objects[j].object_horizontal_position;
-					nY = pRegion->VertAddr  + pRegion->Objects[j].object_vertical_position;
-					pObject->m_width  = pRegion->width;
-					pObject->m_height = pRegion->height;
-					CDVBSub::DVB_CLUT* pClut = FindClut(pPage, pRegion->CLUT_id);
-					if (pClut != NULL) {
-						pObject->SetPalette(pClut->Size, pClut->Palette, m_Display.width > 720);
-					}
+		pPage->rendered = true;
+		TRACE_DVB(_T("DVB - Renderer - %s - %s\n"), ReftimeToString(pPage->rtStart), ReftimeToString(pPage->rtStop));
 
-					if (m_Display.width > spd.w) {
-						nX = max(10, nX - (m_Display.width - spd.w));
-					}
-					if (m_Display.height > spd.h) {
-						nY = max(10, nY - (m_Display.height - spd.h));
-					}
+		int nRegion = 1, nObject = 1;
+		for (POSITION pos = pPage->regionsPos.GetHeadPosition(); pos; nRegion++) {
+			DVB_REGION_POS regionPos = pPage->regionsPos.GetNext(pos);
+			DVB_REGION* pRegion = FindRegion(pPage, regionPos.id);
 
-					TRACE_DVB (_T("CDVBSub::Render() : size = %ld, %d:%d, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %ws, [%ws => %ws]\n"),
-									pObject->GetRLEDataSize(),
-									nX, nY,
-									pObject->m_width, pObject->m_height, spd.w, spd.h,
-									rt, ReftimeToString(rt),
-									ReftimeToString(pPage->rtStart), ReftimeToString(pPage->rtStop));
+			DVB_CLUT* pCLUT = FindClut(pPage, pRegion->CLUT_id);
 
-					
-					pObject->RenderDvb(spd, nX, nY);
+			if (pRegion && pCLUT) {
+				for (POSITION posO = pRegion->objects.GetHeadPosition(); posO; nObject++) {
+					DVB_OBJECT objectPos = pRegion->objects.GetNext(posO);
+					CompositionObject* pObject = FindObject(pPage, objectPos.object_id);
+					if (pObject) {
+						SHORT nX, nY;
+						nX					= regionPos.horizAddr + objectPos.object_horizontal_position;
+						nY					= regionPos.vertAddr  + objectPos.object_vertical_position;
+						pObject->m_width	= pRegion->width;
+						pObject->m_height	= pRegion->height;
+						pObject->SetPalette(pCLUT->size, pCLUT->palette, m_Display.width > 720);
+						
+						if (m_Display.width > spd.w) {
+							nX = max(10, nX - (m_Display.width - spd.w));
+						}
+						if (m_Display.height > spd.h) {
+							nY = max(10, nY - (m_Display.height - spd.h));
+						}
+						
+						pObject->RenderDvb(spd, nX, nY);
+						TRACE_DVB(_T(" --> %d/%d - %d/%d\n"), nRegion, pPage->regionsPos.GetCount(), nObject, pRegion->objects.GetCount());
+					}
 				}
 			}
 		}
@@ -368,31 +408,40 @@ HRESULT CDVBSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoS
 	return S_OK;
 }
 
-POSITION CDVBSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
+POSITION CDVBSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld/* = false*/)
 {
 	if (CleanOld) {
 		CDVBSub::CleanOld(rt);
 	}
+	POSITION pos = m_pages.GetHeadPosition();
+	while (pos) {
+		DVB_PAGE* pPage = m_pages.GetAt(pos);
+		if (pPage->rtStop <= rt) {
+			m_pages.GetNext(pos);
+		} else {
+			break;
+		}
+	}
 
-	return m_Pages.GetHeadPosition();
+	return pos;
 }
 
 POSITION CDVBSub::GetNext(POSITION pos)
 {
-	m_Pages.GetNext(pos);
+	m_pages.GetNext(pos);
 	return pos;
 }
 
 
 REFERENCE_TIME CDVBSub::GetStart(POSITION nPos)
 {
-	DVB_PAGE* pPage = m_Pages.GetAt(nPos);
+	DVB_PAGE* pPage = m_pages.GetAt(nPos);
 	return pPage != NULL ? pPage->rtStart : INVALID_TIME;
 }
 
 REFERENCE_TIME CDVBSub::GetStop(POSITION nPos)
 {
-	DVB_PAGE* pPage = m_Pages.GetAt(nPos);
+	DVB_PAGE* pPage = m_pages.GetAt(nPos);
 	return pPage != NULL ? pPage->rtStop : INVALID_TIME;
 }
 
@@ -402,9 +451,8 @@ void CDVBSub::Reset()
 	m_nBufferWritePos	= 0;
 	m_pCurrentPage.Free();
 
-	DVB_PAGE* pPage;
-	while (m_Pages.GetCount() > 0) {
-		pPage = m_Pages.RemoveHead();
+	while (!m_pages.IsEmpty()) {
+		DVB_PAGE* pPage = m_pages.RemoveHead();
 		delete pPage;
 	}
 
@@ -412,24 +460,20 @@ void CDVBSub::Reset()
 
 HRESULT CDVBSub::ParsePage(CGolombBuffer& gb, WORD wSegLength, CAutoPtr<DVB_PAGE>& pPage)
 {
-	int nEnd	= gb.GetPos() + wSegLength;
-	int nPos	= 0;
+	int nEnd = gb.GetPos() + wSegLength;
 
 	pPage.Attach(DNew DVB_PAGE());
-	pPage->PageTimeOut			= gb.ReadByte();
-	pPage->PageVersionNumber	= (BYTE)gb.BitRead(4);
-	pPage->PageState			= (BYTE)gb.BitRead(2);
-	pPage->RegionCount			= 0;
-	gb.BitRead(2);	// Reserved
+	pPage->pageTimeOut			= gb.ReadByte();
+	pPage->pageVersionNumber	= (BYTE)gb.BitRead(4);
+	pPage->pageState			= (BYTE)gb.BitRead(2);
+	gb.BitRead(2);  // Reserved
 	while (gb.GetPos() < nEnd) {
-		if (nPos < MAX_REGIONS) {
-			pPage->Regions[nPos].Id			= gb.ReadByte();
-			gb.ReadByte();					// Reserved
-			pPage->Regions[nPos].HorizAddr	= gb.ReadShort();
-			pPage->Regions[nPos].VertAddr	= gb.ReadShort();
-			pPage->RegionCount++;
-		}
-		nPos++;
+		DVB_REGION_POS regionPos;
+		regionPos.id			= gb.ReadByte();
+		gb.ReadByte();  // Reserved
+		regionPos.horizAddr		= gb.ReadShort();
+		regionPos.vertAddr		= gb.ReadShort();
+		pPage->regionsPos.AddTail(regionPos);
 	}
 
 	return S_OK;
@@ -454,106 +498,114 @@ HRESULT CDVBSub::ParseDisplay(CGolombBuffer& gb, WORD wSegLength)
 
 HRESULT CDVBSub::ParseRegion(CGolombBuffer& gb, WORD wSegLength)
 {
-	int						nEnd	= gb.GetPos() + wSegLength;
-	CDVBSub::DVB_REGION*	pRegion;
-	CDVBSub::DVB_REGION		DummyRegion;
+	HRESULT hr = E_FAIL;
+	int nEnd = gb.GetPos() + wSegLength;
 
-	pRegion = FindRegion(m_pCurrentPage, gb.ReadByte());
+	if (m_pCurrentPage && wSegLength >= 9) {
+		BYTE id = gb.ReadByte();
+		DVB_REGION* pRegion = FindRegion(m_pCurrentPage, id);
 
-	if (pRegion == NULL) {
-		pRegion = &DummyRegion;
-	}
+		bool bIsNewRegion = (pRegion == NULL);
+		if (bIsNewRegion) {
+			pRegion = DNew DVB_REGION();
+		}
 
-	if (pRegion != NULL) {
+		pRegion->id = id;
 		pRegion->version_number			= (BYTE)gb.BitRead(4);
 		pRegion->fill_flag				= (BYTE)gb.BitRead(1);
-		gb.BitRead(3);	// Reserved
+		gb.BitRead(3);  // Reserved
 		pRegion->width					= gb.ReadShort();
 		pRegion->height					= gb.ReadShort();
 		pRegion->level_of_compatibility	= (BYTE)gb.BitRead(3);
 		pRegion->depth					= (BYTE)gb.BitRead(3);
-		gb.BitRead(2);	// Reserved
+		gb.BitRead(2);  // Reserved
 		pRegion->CLUT_id				= gb.ReadByte();
 		pRegion->_8_bit_pixel_code		= gb.ReadByte();
 		pRegion->_4_bit_pixel_code		= (BYTE)gb.BitRead(4);
 		pRegion->_2_bit_pixel_code		= (BYTE)gb.BitRead(2);
-		gb.BitRead(2);	// Reserved
+		gb.BitRead(2);  // Reserved
 
-		pRegion->ObjectCount = 0;
 		while (gb.GetPos() < nEnd) {
-			DVB_OBJECT* pObject					= &pRegion->Objects[pRegion->ObjectCount];
-			pObject->object_id					= gb.ReadShort();
-			pObject->object_type				= (BYTE)gb.BitRead(2);
-			pObject->object_provider_flag		= (BYTE)gb.BitRead(2);
-			pObject->object_horizontal_position	= (SHORT)gb.BitRead(12);
-			gb.BitRead(4);	// Reserved
-			pObject->object_vertical_position	= (SHORT)gb.BitRead(12);
-			if (pObject->object_type == 0x01 || pObject->object_type == 0x02) {
-				pObject->foreground_pixel_code	= gb.ReadByte();
-				pObject->background_pixel_code	= gb.ReadByte();
+			DVB_OBJECT object;
+			object.object_id					= gb.ReadShort();
+			object.object_type					= (BYTE)gb.BitRead(2);
+			object.object_provider_flag			= (BYTE)gb.BitRead(2);
+			object.object_horizontal_position	= (SHORT)gb.BitRead(12);
+			gb.BitRead(4);  // Reserved
+			object.object_vertical_position = (SHORT)gb.BitRead(12);
+			if (object.object_type == 0x01 || object.object_type == 0x02) {
+				object.foreground_pixel_code	= gb.ReadByte();
+				object.background_pixel_code	= gb.ReadByte();
 			}
-			pRegion->ObjectCount++;
+			pRegion->objects.AddTail(object);
 		}
-	} else {
-		gb.SkipBytes(wSegLength - 1);
+
+		if (bIsNewRegion) {
+			m_pCurrentPage->regions.AddTail(pRegion);
+		}
+
+		hr = S_OK;
 	}
 
-	return S_OK;
+	return hr;
 }
 
 HRESULT CDVBSub::ParseClut(CGolombBuffer& gb, WORD wSegLength)
 {
-	HRESULT	hr		= S_OK;
-	int		nEnd	= gb.GetPos() + wSegLength;
-	BYTE	CLUT_id	= gb.ReadByte();
+	HRESULT hr = E_FAIL;
+	int nEnd = gb.GetPos() + wSegLength;
 
-	if (m_pCurrentPage != NULL) {
-		CDVBSub::DVB_CLUT	DummyClut;
-		CDVBSub::DVB_CLUT*	pClut = FindClut(m_pCurrentPage, CLUT_id);
-		if (pClut == NULL) {
-			pClut = &DummyClut;
+	if (m_pCurrentPage && wSegLength > 2) {
+		BYTE id = gb.ReadByte();
+		DVB_CLUT* pClut = FindClut(m_pCurrentPage, id);
+
+		bool bIsNewClut = (pClut == NULL);
+		if (bIsNewClut) {
+			pClut = DNew DVB_CLUT();
 		}
 
-		pClut->id				= CLUT_id;
-		pClut->version_number	= (BYTE)gb.BitRead(4);
-		gb.BitRead(4);	// Reserved
+		pClut->id = id;
+		pClut->version_number = (BYTE)gb.BitRead(4);
+		gb.BitRead(4);  // Reserved
 
-		pClut->Size = 0;
+		pClut->size = 0;
 		while (gb.GetPos() < nEnd) {
-			BYTE entry_id	= gb.ReadByte();
-			BYTE _2_bit		= (BYTE)gb.BitRead(1);
-			BYTE _4_bit		= (BYTE)gb.BitRead(1);
-			BYTE _8_bit		= (BYTE)gb.BitRead(1);
+			pClut->palette[pClut->size].entry_id = gb.ReadByte();
+
+			BYTE _2_bit = (BYTE)gb.BitRead(1);
+			BYTE _4_bit = (BYTE)gb.BitRead(1);
+			BYTE _8_bit = (BYTE)gb.BitRead(1);
 			UNREFERENCED_PARAMETER(_2_bit);
 			UNREFERENCED_PARAMETER(_4_bit);
 			UNREFERENCED_PARAMETER(_8_bit);
-			gb.BitRead(4);	// Reserved
+			gb.BitRead(4);  // Reserved
 
-			pClut->Palette[entry_id].entry_id = entry_id;
 			if (gb.BitRead(1)) {
-				pClut->Palette[entry_id].Y	= gb.ReadByte();
-				pClut->Palette[entry_id].Cr	= gb.ReadByte();
-				pClut->Palette[entry_id].Cb	= gb.ReadByte();
-				pClut->Palette[entry_id].T	= 0xff - gb.ReadByte();
+				pClut->palette[pClut->size].Y	= gb.ReadByte();
+				pClut->palette[pClut->size].Cr	= gb.ReadByte();
+				pClut->palette[pClut->size].Cb	= gb.ReadByte();
+				pClut->palette[pClut->size].T	= 0xff - gb.ReadByte();
 			} else {
-				pClut->Palette[entry_id].Y	= (BYTE)gb.BitRead(6) << 2;
-				pClut->Palette[entry_id].Cr	= (BYTE)gb.BitRead(4) << 4;
-				pClut->Palette[entry_id].Cb	= (BYTE)gb.BitRead(4) << 4;
-				pClut->Palette[entry_id].T	= 0xff - ((BYTE)gb.BitRead(2) << 6);
+				pClut->palette[pClut->size].Y	= (BYTE)gb.BitRead(6) << 2;
+				pClut->palette[pClut->size].Cr	= (BYTE)gb.BitRead(4) << 4;
+				pClut->palette[pClut->size].Cb	= (BYTE)gb.BitRead(4) << 4;
+				pClut->palette[pClut->size].T	= 0xff - ((BYTE)gb.BitRead(2) << 6);
 			}
-			if (!pClut->Palette[entry_id].Y) {
-				pClut->Palette[entry_id].Cr	= 0;
-				pClut->Palette[entry_id].Cb	= 0;
-				pClut->Palette[entry_id].T	= 0;
+			if (!pClut->palette[pClut->size].Y) {
+				pClut->palette[pClut->size].Cr	= 0;
+				pClut->palette[pClut->size].Cb	= 0;
+				pClut->palette[pClut->size].T	= 0;
 			}
 
-			pClut->Size = max(pClut->Size, entry_id + 1);
+			pClut->size++;
 		}
 
-		if (DummyClut.Size) {
-			m_pCurrentPage->Clut.AddTail(DummyClut);
+		if (bIsNewClut) {
+			m_pCurrentPage->CLUTs.AddTail(pClut);
 		}
-	}	
+
+		hr = S_OK;
+	}
 
 	return hr;
 }
@@ -563,20 +615,29 @@ HRESULT CDVBSub::ParseObject(CGolombBuffer& gb, WORD wSegLength)
 	HRESULT hr = E_FAIL;
 
 	if (m_pCurrentPage && wSegLength > 2) {
-		CompositionObject*	pObject = DNew CompositionObject();
-		BYTE				object_coding_method;
+		SHORT id = gb.ReadShort();
+		CompositionObject* pObject = FindObject(m_pCurrentPage, id);
 
-		pObject->m_object_id_ref	= gb.ReadShort();
-		pObject->m_version_number	= (BYTE)gb.BitRead(4);
+		bool bIsNewObject = (pObject == NULL);
+		if (bIsNewObject) {
+			pObject = DNew CompositionObject();
+		}
 
-		object_coding_method = (BYTE)gb.BitRead(2);	// object_coding_method
-		gb.BitRead(1);	// non_modifying_colour_flag
-		gb.BitRead(1);	// reserved
+		pObject->m_object_id_ref  = id;
+		pObject->m_version_number = (BYTE)gb.BitRead(4);
+
+		BYTE object_coding_method = (BYTE)gb.BitRead(2); // object_coding_method
+		gb.BitRead(1);  // non_modifying_colour_flag
+		gb.BitRead(1);  // reserved
 
 		if (object_coding_method == 0x00) {
 			pObject->SetRLEData(gb.GetBufferPos(), wSegLength - 3, wSegLength - 3);
 			gb.SkipBytes(wSegLength - 3);
-			m_pCurrentPage->Objects.AddTail(pObject);
+
+			if (bIsNewObject) {
+				m_pCurrentPage->objects.AddTail(pObject);
+			}
+
 			hr = S_OK;
 		} else {
 			delete pObject;
@@ -587,48 +648,36 @@ HRESULT CDVBSub::ParseObject(CGolombBuffer& gb, WORD wSegLength)
 	return hr;
 }
 
-HRESULT CDVBSub::UpdateTimeStamp(REFERENCE_TIME rtStop)
+HRESULT CDVBSub::EnqueuePage(REFERENCE_TIME rtStop)
 {
-	HRESULT hr = E_FAIL;
-	POSITION pos = m_Pages.GetHeadPosition();
-	while (pos) {
-		DVB_PAGE* pPage = m_Pages.GetAt(pos);
-		if (pPage->rtStop > rtStop) {
-			pPage->rtStop = rtStop;
-			hr = S_OK;
-		}
-		m_Pages.GetNext(pos);
+	ASSERT(m_pCurrentPage != NULL);
+	if (m_pCurrentPage->rtStart < rtStop && m_pCurrentPage->rtStop > rtStop) {
+		m_pCurrentPage->rtStop = rtStop;
 	}
+	TRACE_DVB(_T(" %s (%s - %s)\n"), ReftimeToString(rtStop), ReftimeToString(m_pCurrentPage->rtStart), ReftimeToString(m_pCurrentPage->rtStop));
+	m_pages.AddTail(m_pCurrentPage.Detach());
 
-	return hr;
+	return S_OK;
 }
 
-void CDVBSub::CleanOld(REFERENCE_TIME rt)
+HRESULT CDVBSub::UpdateTimeStamp(REFERENCE_TIME rtStop)
 {
-	// Cleanup old PG
-	DVB_PAGE* pPage_old;
-	while (m_Pages.GetCount()>0) {
-		pPage_old = m_Pages.GetHead();
-		if (pPage_old->rtStop < rt) {
-			if (!pPage_old->Rendered) {
-				TRACE_DVB (_T("DVB - remove unrendered object, %ws => %ws, (rt = %ws)\n"),
-							ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),
-							ReftimeToString(rt));
-			}
-			m_Pages.RemoveHead();
-			delete pPage_old;
+	HRESULT hr = S_FALSE;
+	POSITION pos = m_pages.GetTailPosition();
+	while (pos) {
+		DVB_PAGE* pPage = m_pages.GetPrev(pos);
+		if (pPage->rtStop > rtStop) {
+			TRACE_DVB(_T("DVB - Updated end of display %s - %s --> %s - %s\n"),
+					  ReftimeToString(pPage->rtStart),
+					  ReftimeToString(pPage->rtStop),
+					  ReftimeToString(pPage->rtStart),
+					  ReftimeToString(rtStop));
+			pPage->rtStop = rtStop;
+			hr = S_OK;
 		} else {
 			break;
 		}
 	}
-}
 
-HRESULT CDVBSub::EndOfStream()
-{
-	if (m_pCurrentPage != NULL) {
-		TRACE_DVB (_T("DVB - EndOfStream() : %ws => %ws\n"), ReftimeToString(m_pCurrentPage->rtStart), ReftimeToString(m_pCurrentPage->rtStop));
-		m_Pages.AddTail(m_pCurrentPage.Detach());
-	}
-
-	return S_OK;
+	return hr;
 }
