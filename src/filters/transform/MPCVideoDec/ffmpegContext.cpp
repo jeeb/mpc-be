@@ -40,7 +40,7 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/331.38/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/334.21/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
@@ -74,6 +74,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1004, // GeForce GTX 780
 	0x1005, // GeForce GTX TITAN
 	0x100A, // GeForce GTX 780 Ti
+	0x100C, // GeForce GTX TITAN Black
 	0x1021, // Tesla K20Xm
 	0x1022, // Tesla K20c
 	0x1023, // Tesla K40m
@@ -138,13 +139,20 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x11FA, // Quadro K4000
 	0x11FC, // Quadro K2100M
 	0x1280, // GeForce GT 635
+ 	0x1281, // GeForce GT 710
 	0x1282, // GeForce GT 640 rev. 2 (not officially supported or typo, fully tested)
 	0x1290, // GeForce GT 730M
 	0x1291, // GeForce GT 735M
 	0x1292, // GeForce GT 740M
 	0x1293, // GeForce GT 730M
+	0x1296, // GeForce 825M
 	0x12B9, // Quadro K610M
 	0x12BA, // Quadro K510M
+
+	// VP6
+	0x1380, // GeForce GTX 750 Ti
+	0x1381, // GeForce GTX 750
+	0x1382, // GeForce GTX 745
 };
 
 static const WORD PCID_ATI_UVD [] = {
