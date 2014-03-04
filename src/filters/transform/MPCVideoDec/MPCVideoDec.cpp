@@ -1662,7 +1662,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		do {
 			m_bDXVACompatible = false;
 
-			if (!DXVACheckFramesize(PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice)) { // check frame size
+			if (!DXVACheckFramesize(m_nCodecId, PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice)) { // check frame size
 				break;
 			}
 
@@ -1711,10 +1711,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				}
 			} else if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
 				if (!MPEG2CheckCompatibility(m_pAVCtx)) {
-					break;
-				}
-			} else if (m_nCodecId == AV_CODEC_ID_WMV3) {
-				if (PictWidth() <= 720) { // fixes color problem for some wmv files (profile <= MP@ML)
 					break;
 				}
 			}

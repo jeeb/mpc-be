@@ -563,10 +563,16 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 }
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
-BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
+
+BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;
+
+	if (nCodecId == AV_CODEC_ID_WMV3 && width <= 720) {
+		// fixes color problem for some wmv files (profile <= MP@ML)
+		return FALSE;
+	}
 
 	if (nPCIVendor == PCIV_nVidia) {
 		if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP5, _countof(PCID_NVIDIA_VP5)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {

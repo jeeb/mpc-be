@@ -62,4 +62,4 @@ HRESULT			FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
 UINT			FFGetMBCount(struct AVCodecContext* pAVCtx);
 void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
-BOOL			DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);
+BOOL			DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);
