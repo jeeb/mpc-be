@@ -524,6 +524,23 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 #endif
 }
 
+void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, CAtlArray<CMediaType>& mts)
+{
+	for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+		if (type == sType) {
+			POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
+			while (pos) {
+				CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
+				for(size_t i = 0; i < s.mts.size(); i++) {
+					mts.Add(s.mts[i]);
+				}
+			}
+
+			return;
+		}
+	}
+}
+
 STDMETHODIMP CMpegSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
@@ -865,7 +882,6 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 	s.mts.push_back(s.mt);
 }
 
-//
 HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -1081,7 +1097,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			for(size_t i = 0; i < s.mts.size(); i++) {
 				mts.Add(s.mts[i]);
 			}
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, (type != CMpegSplitterFile::stream_type::video) ? 20 : 1));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, (CMpegSplitterFile::stream_type)type, str, this, this, &hr, (type != CMpegSplitterFile::stream_type::video) ? 20 : 1));
 
 			if (type == CMpegSplitterFile::stream_type::audio) {
 				if (!cs_audioProgram.IsEmpty()) {
@@ -1636,9 +1652,23 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 // CMpegSplitterOutputPin
 //
 
-CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets)
+CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets)
 	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr, QueueMaxPackets)
+	, m_type(type)
 {
+}
+
+HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
+{
+	CAtlArray<CMediaType> mts;
+	(static_cast<CMpegSplitterFilter*>(m_pFilter))->GetMediaTypes(m_type, mts);
+	for (size_t i = 0; i < mts.GetCount(); i++) {
+		if (mts[i] == *pmt) {
+			return S_OK;
+		}
+	}
+	
+	return E_INVALIDARG;
 }
 
 STDMETHODIMP CMpegSplitterOutputPin::Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt)

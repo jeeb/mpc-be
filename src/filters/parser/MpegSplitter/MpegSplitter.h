@@ -72,6 +72,8 @@ public:
 		m_pPipoBimbo = bPipo;
 	};
 
+	void GetMediaTypes(CMpegSplitterFile::stream_type sType, CAtlArray<CMediaType>& mts);
+
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 	STDMETHODIMP GetClassID(CLSID* pClsID);
@@ -128,8 +130,11 @@ public:
 
 class CMpegSplitterOutputPin : public CBaseSplitterParserOutputPin
 {
+	CMpegSplitterFile::stream_type m_type;
 public:
-	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets);
+	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets);
+
+	HRESULT CheckMediaType(const CMediaType* pmt);
 
 	STDMETHODIMP Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt);
 };
