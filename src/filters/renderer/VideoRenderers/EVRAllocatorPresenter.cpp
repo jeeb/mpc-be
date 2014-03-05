@@ -106,6 +106,8 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, pfAvSetMmThreadCharacteristicsW(NULL)
 	, pfAvSetMmThreadPriority(NULL)
 	, pfAvRevertMmThreadCharacteristics(NULL)
+	, m_pMediaType(NULL)
+	, m_bStreamChanged(TRUE)
 {
 	HMODULE hLib = NULL;
 	CRenderersSettings& s = GetRenderersSettings();
@@ -166,9 +168,9 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
-	if (SUCCEEDED (hr)) {
+	if (SUCCEEDED(hr)) {
 		hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
-		if (!SUCCEEDED (hr)) {
+		if (!SUCCEEDED(hr)) {
 			_Error += L"m_pD3DManager->ResetDevice failed\n";
 		}
 	} else {
@@ -592,8 +594,9 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 
 	switch (eMessage) {
 		case MFVP_MESSAGE_BEGINSTREAMING :			// The EVR switched from stopped to paused. The presenter should allocate resources
-			ResetStats();
 			TRACE_EVR ("EVR: MFVP_MESSAGE_BEGINSTREAMING\n");
+			ResetStats();
+			m_bStreamChanged = TRUE;
 			break;
 
 		case MFVP_MESSAGE_CANCELSTEP :				// Cancels a frame step
@@ -604,6 +607,7 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 		case MFVP_MESSAGE_ENDOFSTREAM :				// All input streams have ended.
 			TRACE_EVR ("EVR: MFVP_MESSAGE_ENDOFSTREAM\n");
 			m_bPendingMediaFinished = true;
+			m_bStreamChanged = TRUE;
 			break;
 
 		case MFVP_MESSAGE_ENDSTREAMING :			// The EVR switched from running or paused to stopped. The presenter should free resources
@@ -611,12 +615,10 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 			break;
 
 		case MFVP_MESSAGE_FLUSH :					// The presenter should discard any pending samples
+			TRACE_EVR ("EVR: MFVP_MESSAGE_FLUSH\n");
 			SetEvent(m_hEvtFlush);
 			m_bEvtFlush = true;
-			TRACE_EVR ("EVR: MFVP_MESSAGE_FLUSH\n");
-			while (WaitForSingleObject(m_hEvtFlush, 1) == WAIT_OBJECT_0) {
-				;
-			}
+			while (WaitForSingleObject(m_hEvtFlush, 1) == WAIT_OBJECT_0);
 			break;
 
 		case MFVP_MESSAGE_INVALIDATEMEDIATYPE :		// The mixer's output format has changed. The EVR will initiate format negotiation, as described previously
@@ -650,7 +652,7 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 			hr = S_OK;
 			break;
 
-		default :
+		default:
 			ASSERT(FALSE);
 			break;
 	}
@@ -738,7 +740,7 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	m_AspectRatio.cx	= VideoFormat->videoInfo.PixelAspectRatio.Numerator;
 	m_AspectRatio.cy	= VideoFormat->videoInfo.PixelAspectRatio.Denominator;
 
-	if (SUCCEEDED (hr)) {
+	if (SUCCEEDED(hr)) {
 		i64Size.HighPart = VideoFormat->videoInfo.dwWidth;
 		i64Size.LowPart	 = VideoFormat->videoInfo.dwHeight;
 		m_pMediaType->SetUINT64 (MF_MT_FRAME_SIZE, i64Size.QuadPart);
@@ -794,15 +796,15 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
 HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 {
-	HRESULT				hr;
-	AM_MEDIA_TYPE*		pAMMedia = NULL;
-	CString				strTemp, strTemp1;
+	HRESULT			hr;
+	AM_MEDIA_TYPE*	pAMMedia = NULL;
 
 	CheckPointer(pType, E_POINTER);
 	CHECK_HR(pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pAMMedia));
 
-	hr = InitializeDevice (pType);
+	hr = InitializeDevice(pType);
 	if (SUCCEEDED(hr)) {
+		CString strTemp, strTemp1;
 		strTemp = GetMediaTypeName (pAMMedia->subtype);
 		strTemp.Replace (L"MEDIASUBTYPE_", L"");
 		strTemp1 = GetMediaTypeFormatDesc(pType);
@@ -810,7 +812,7 @@ HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 		m_strStatsMsg[MSG_MIXEROUT].Format (L"Mixer output : %-10s    Type %-10s", strTemp, strTemp1);
 	}
 
-	pType->FreeRepresentation (FORMAT_VideoInfo2, (void*)pAMMedia);
+	pType->FreeRepresentation(FORMAT_VideoInfo2, (void*)pAMMedia);
 
 	return hr;
 }
@@ -1042,7 +1044,6 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		// Step 3. Adjust the mixer's type to match our requirements.
 		pType = ValidMixerTypes[i];
 
-
 		TRACE_EVR("EVR: Trying mixer output type: %ws\n", GetMediaTypeFormatDesc(pType));
 
 		// Step 5. Try to set the media type on ourselves.
@@ -1056,6 +1057,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 			if (FAILED(hr)) {
 				SetMediaType(NULL);
 			} else {
+				m_bStreamChanged = FALSE;
 				break;
 			}
 		}
@@ -1470,13 +1472,15 @@ STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpH
 
 STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 {
-	HRESULT			hr;
+	HRESULT hr;
 	CAutoLock lock(this);
 	CAutoLock lock2(&m_ImageProcessingLock);
 	CAutoLock cRenderLock(&m_RenderLock);
 
-	RemoveAllSamples();
-	DeleteSurfaces();
+	if (m_bStreamChanged) {
+		DeleteSurfaces();
+		RemoveAllSamples();
+	}
 
 	// Retrieve the surface size and format
 	UINT32 Width;
@@ -1489,20 +1493,20 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 		hr = GetMediaTypeFourCC(pMediaType, (DWORD*)&Format);
 	}
 
-	if (SUCCEEDED(hr)) {
+	if (m_bStreamChanged && SUCCEEDED(hr)) {
 		hr = AllocSurfaces();
 	}
 
-	if (SUCCEEDED(hr)) {
+	if (m_bStreamChanged && SUCCEEDED(hr)) {
 		for (int i = 0; i < m_nNbDXSurface; i++) {
-			CComPtr<IMFSample>		pMFSample;
-			hr = pfMFCreateVideoSampleFromSurface (m_pVideoSurface[i], &pMFSample);
+			CComPtr<IMFSample> pMFSample;
+			hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurface[i], &pMFSample);
 
-			if (SUCCEEDED (hr)) {
-				pMFSample->SetUINT32 (GUID_SURFACE_INDEX, i);
-				m_FreeSamples.AddTail (pMFSample);
+			if (SUCCEEDED(hr)) {
+				pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
+				m_FreeSamples.AddTail(pMFSample);
 			}
-			ASSERT(SUCCEEDED (hr));
+			ASSERT(SUCCEEDED(hr));
 		}
 	}
 
@@ -1588,8 +1592,8 @@ void CEVRAllocatorPresenter::GetMixerThread()
 					// Use the code from VMR9 to get the movie fps, as this method is reliable.
 					CComPtr<IPin>	pPin;
 					CMediaType		mt;
-					if (SUCCEEDED (m_pOuterEVR->FindPin(L"EVR Input0", &pPin)) &&
-						SUCCEEDED (pPin->ConnectionMediaType(&mt)) ) {
+					if (SUCCEEDED(m_pOuterEVR->FindPin(L"EVR Input0", &pPin)) &&
+						SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
 
 						ExtractAvgTimePerFrame(&mt, m_rtTimePerFrame);
 
@@ -1879,11 +1883,11 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 		CComPtr<IMFSample>		pMFSample;
 		HRESULT hr = pfMFCreateVideoSampleFromSurface (m_pVideoSurface[i], &pMFSample);
 
-		if (SUCCEEDED (hr)) {
+		if (SUCCEEDED(hr)) {
 			pMFSample->SetUINT32 (GUID_SURFACE_INDEX, i);
 			m_FreeSamples.AddTail (pMFSample);
 		}
-		ASSERT(SUCCEEDED (hr));
+		ASSERT(SUCCEEDED(hr));
 	}
 
 	if (bResult) {
@@ -1979,7 +1983,7 @@ void CEVRAllocatorPresenter::RenderThread()
 					LONGLONG	llPerf = GetRenderersData()->GetPerfCounter();
 					UNREFERENCED_PARAMETER(llPerf);
 					int nSamplesLeft = 0;
-					if (SUCCEEDED (GetScheduledSample(&pMFSample, nSamplesLeft))) {
+					if (SUCCEEDED(GetScheduledSample(&pMFSample, nSamplesLeft))) {
 						//					pMFSample->GetUINT32 (GUID_SURFACE_INDEX, (UINT32*)&m_nCurSurface);
 						m_pCurrentDisplaydSample = pMFSample;
 

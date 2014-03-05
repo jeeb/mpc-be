@@ -228,6 +228,8 @@ namespace DSObjects
 		UINT									m_piAvg;
 		UINT									m_piDev;
 
+		BOOL									m_bStreamChanged;
+
 		bool									m_bChangeMT;
 
 		void									GetMixerThread();
