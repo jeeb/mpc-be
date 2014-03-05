@@ -164,6 +164,8 @@ namespace DSObjects
 		LONGLONG		GetClockTime(LONGLONG PerformanceCounter);
 
 	private :
+		CCritSec                                m_csExternalMixerLock;
+
 		enum RENDER_STATE {
 			Started		= State_Running,
 			Stopped		= State_Stopped,
@@ -172,7 +174,7 @@ namespace DSObjects
 		};
 		RENDER_STATE							m_nRenderState;
 
-		HANDLE									m_hThread;
+		HANDLE									m_hRenderThread;
 		HANDLE									m_hGetMixerThread;
 		HANDLE									m_hVSyncThread;
 
@@ -180,6 +182,7 @@ namespace DSObjects
 		bool									m_bEvtQuit;
 		HANDLE									m_hEvtFlush;		// Discard all buffers
 		bool									m_bEvtFlush;
+		HANDLE                                  m_hEvtRenegotiate;
 
 		COuterEVR*								m_pOuterEVR;
 		CComPtr<IMFClock>						m_pClock;
@@ -193,7 +196,6 @@ namespace DSObjects
 
 		bool									m_fUseInternalTimer;
 		int32									m_LastSetOutputRange;
-		bool									m_bPendingRenegotiate;
 		bool									m_bPendingMediaFinished;
 
 		CCritSec								m_SampleQueueLock;

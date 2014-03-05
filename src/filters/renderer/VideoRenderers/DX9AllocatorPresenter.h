@@ -64,7 +64,8 @@ namespace DSObjects
 		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 		HMODULE m_hD3D9;
 
-		CCritSec			 m_RenderLock, m_CreateLock;
+		CCritSec m_RenderLock, m_CreateLock;
+
 		CComPtr<IDirectDraw> m_pDirectDraw;
 
 		void LockD3DDevice() {
