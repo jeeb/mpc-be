@@ -76,14 +76,18 @@ static void synth_filter_##opt(FFTContext *imdct,                              \
     *synth_buf_offset = (*synth_buf_offset - 32) & 511;                        \
 }                                                                              \
 
+#if HAVE_YASM
 #if ARCH_X86_32
 SYNTH_FILTER_FUNC(sse)
 #endif
 SYNTH_FILTER_FUNC(sse2)
 SYNTH_FILTER_FUNC(avx)
+SYNTH_FILTER_FUNC(fma3)
+#endif
 
 av_cold void ff_synth_filter_init_x86(SynthFilterContext *s)
 {
+#if HAVE_YASM
     int cpu_flags = av_get_cpu_flags();
 
 #if ARCH_X86_32
@@ -97,4 +101,8 @@ av_cold void ff_synth_filter_init_x86(SynthFilterContext *s)
     if (EXTERNAL_AVX(cpu_flags)) {
         s->synth_filter_float = synth_filter_avx;
     }
+    if (EXTERNAL_FMA3(cpu_flags)) {
+        s->synth_filter_float = synth_filter_fma3;
+    }
+#endif
 }
