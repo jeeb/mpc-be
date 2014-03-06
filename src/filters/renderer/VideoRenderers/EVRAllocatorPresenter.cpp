@@ -70,7 +70,6 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_hEvtFlush(NULL)
 	, m_hEvtQuit(NULL)
 	, m_hEvtRenegotiate(NULL)
-	, m_hEvtReset(NULL)
 	, m_bEvtQuit(false)
 	, m_bEvtFlush(false)
 	, m_ModeratedTime(0)
@@ -1069,10 +1068,6 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 	if (m_nRenderState == Started || m_nRenderState == Paused) {
 		m_bChangeMT = true;
-	}
-
-	if (m_hEvtReset) {// when in a complete reset, keep the main thread on hold until the mixer is alive again
-		SetEvent(m_hEvtReset);
 	}
 
 	return hr;
@@ -2416,26 +2411,15 @@ DWORD WINAPI CEVRAllocatorPresenter::VSyncThreadStatic(LPVOID lpParam)
 
 void CEVRAllocatorPresenter::OnResetDevice()
 {
-	m_RenderLock.Lock();
-
-	HRESULT hr;
-
-	ASSERT(!m_hEvtReset);
-	m_hEvtReset = CreateEvent(NULL, TRUE, FALSE, NULL);
-	ASSERT(m_hEvtReset);
+	CAutoLock cRenderLock(&m_RenderLock);
 
 	// Reset DXVA Manager, and get new buffers
-	hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
+	HRESULT hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
 
 	// Not necessary, but Microsoft documentation say Presenter should send this message...
 	if (m_pSink) {
 		EXECUTE_ASSERT(S_OK == (hr = m_pSink->Notify(EC_DISPLAY_CHANGED, 0, 0)));
 	}
-
-	m_RenderLock.Unlock();
-	EXECUTE_ASSERT(WAIT_OBJECT_0 == WaitForSingleObject(m_hEvtReset, INFINITE));
-	EXECUTE_ASSERT(CloseHandle(m_hEvtReset));
-	m_hEvtReset = NULL;
 }
 
 void CEVRAllocatorPresenter::RemoveAllSamples()
