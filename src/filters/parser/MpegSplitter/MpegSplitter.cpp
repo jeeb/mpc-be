@@ -914,9 +914,10 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			pTI = GetFilterFromPin(m_pInput->GetConnected());
 
 			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
-				if (CComQIPtr<IVTSReader> VTSREader = pFilter) {
-					rt_IfoDuration	= VTSREader->GetDuration();
-					IfoASpect		= VTSREader->GetAspect();
+				if (CComQIPtr<IVTSReader> VTSReader = pFilter) {
+					rt_IfoDuration			= VTSReader->GetDuration();
+					IfoASpect				= VTSReader->GetAspect();
+					m_pFile->m_bIsBadPacked	= FALSE;
 				}
 			}
 		}
@@ -1178,7 +1179,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	if (rt <= UNITS || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
-		if (m_rtDuration && m_pFile->bIsBadPacked) {
+		if (m_rtDuration && m_pFile->m_bIsBadPacked) {
 			SimpleSeek;
 		}
 	} else {
@@ -1207,7 +1208,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		REFERENCE_TIME rtmax	= rt - UNITS;
 		REFERENCE_TIME rtmin	= rtmax - UNITS/2;
 
-		if (!m_pFile->bIsBadPacked) {
+		if (!m_pFile->m_bIsBadPacked) {
 			POSITION pos = pMasterStream->GetHeadPosition();
 			while (pos) {
 				DWORD TrackNum = pMasterStream->GetNext(pos);

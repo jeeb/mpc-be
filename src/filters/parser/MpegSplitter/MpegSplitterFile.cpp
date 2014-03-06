@@ -41,7 +41,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_AlternativeDuration(AlternativeDuration)
 	, m_SubEmptyPin(SubEmptyPin)
 	, m_bOpeningCompleted(FALSE)
-	, bIsBadPacked(FALSE)
+	, m_bIsBadPacked(FALSE)
 {
 	memset(m_psm, 0, sizeof(m_psm));
 	if (SUCCEEDED(hr)) {
@@ -237,7 +237,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (audioCount && videoCount) {
-		bIsBadPacked = (audioCount > videoCount * 5);
+		m_bIsBadPacked = (audioCount > videoCount * 5);
 	}
 
 	if (m_SubEmptyPin) {
