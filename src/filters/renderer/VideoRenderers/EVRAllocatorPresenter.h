@@ -182,7 +182,8 @@ namespace DSObjects
 		bool									m_bEvtQuit;
 		HANDLE									m_hEvtFlush;		// Discard all buffers
 		bool									m_bEvtFlush;
-		HANDLE                                  m_hEvtRenegotiate;
+		HANDLE									m_hEvtRenegotiate;
+		HANDLE									m_hEvtReset;
 
 		COuterEVR*								m_pOuterEVR;
 		CComPtr<IMFClock>						m_pClock;

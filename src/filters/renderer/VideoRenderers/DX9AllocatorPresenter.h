@@ -232,7 +232,6 @@ namespace DSObjects
 		LONGLONG				m_DetectedFrameTimeHistory[60];
 		double					m_DetectedFrameTimeHistoryHistory[500];
 		int						m_DetectedFrameTimePos;
-		int						m_bInterlaced;
 
 		double					m_TextScale;
 

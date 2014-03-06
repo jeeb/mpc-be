@@ -70,6 +70,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_hEvtFlush(NULL)
 	, m_hEvtQuit(NULL)
 	, m_hEvtRenegotiate(NULL)
+	, m_hEvtReset(NULL)
 	, m_bEvtQuit(false)
 	, m_bEvtFlush(false)
 	, m_ModeratedTime(0)
@@ -115,7 +116,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	ZeroMemory(m_VSyncOffsetHistory, sizeof(m_VSyncOffsetHistory));
 	ResetStats();
 
-	if (FAILED (hr)) {
+	if (FAILED(hr)) {
 		_Error += L"DX9AllocatorPresenter failed\n";
 		return;
 	}
@@ -303,7 +304,7 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuterEVR);
 		CComQIPtr<IBaseFilter> pBF = pUnk;
 
-		if (FAILED (hr)) {
+		if (FAILED(hr)) {
 			break;
 		}
 
@@ -1070,6 +1071,10 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		m_bChangeMT = true;
 	}
 
+	if (m_hEvtReset) {// when in a complete reset, keep the main thread on hold until the mixer is alive again
+		SetEvent(m_hEvtReset);
+	}
+
 	return hr;
 }
 
@@ -1087,20 +1092,20 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 	bool bDoneSomething = false;
 
 	while (SUCCEEDED(hr)) {
-		CComPtr<IMFSample>		pSample;
+		CComPtr<IMFSample> pSample;
 
-		if (FAILED (GetFreeSample (&pSample))) {
+		if (FAILED(GetFreeSample(&pSample))) {
 			m_bWaitingSample = true;
 			break;
 		}
 
-		memset (&Buffer, 0, sizeof(Buffer));
+		memset(&Buffer, 0, sizeof(Buffer));
 		Buffer.pSample	= pSample;
-		pSample->GetUINT32 (GUID_SURFACE_INDEX, &dwSurface);
+		pSample->GetUINT32(GUID_SURFACE_INDEX, &dwSurface);
 
 		{
 			llClockBefore = GetRenderersData()->GetPerfCounter();
-			hr = m_pMixer->ProcessOutput (0 , 1, &Buffer, &dwStatus);
+			hr = m_pMixer->ProcessOutput(0 , 1, &Buffer, &dwStatus);
 			llClockAfter = GetRenderersData()->GetPerfCounter();
 		}
 
@@ -1126,15 +1131,15 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 			rcTearing.top		= 0;
 			rcTearing.right		= rcTearing.left + 4;
 			rcTearing.bottom	= m_NativeVideoSize.cy;
-			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 
-			rcTearing.left	= (rcTearing.right + 15) % m_NativeVideoSize.cx;
-			rcTearing.right	= rcTearing.left + 4;
-			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
-			m_nTearingPos = (m_nTearingPos + 7) % m_NativeVideoSize.cx;
+			rcTearing.left		= (rcTearing.right + 15) % m_NativeVideoSize.cx;
+			rcTearing.right		= rcTearing.left + 4;
+			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
+			m_nTearingPos		= (m_nTearingPos + 7) % m_NativeVideoSize.cx;
 		}
 
-		TRACE_EVR ("EVR: Get from Mixer : %d  (%I64d) (%I64d)\n", dwSurface, nsSampleTime, m_rtTimePerFrame ? nsSampleTime/m_rtTimePerFrame : 0);
+		TRACE_EVR ("EVR: Get from Mixer : %d  (%I64d) (%I64d)\n", dwSurface, nsSampleTime, m_rtTimePerFrame ? nsSampleTime / m_rtTimePerFrame : 0);
 
 		MoveToScheduledList (pSample, false);
 		bDoneSomething = true;
@@ -1178,6 +1183,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitServicePointers(/* [in] */ __in  IMFTop
 		return hr;
 	}
 
+	ASSERT(!m_pSink);
 	hr = pLookup->LookupService(MF_SERVICE_LOOKUP_GLOBAL, 0, MR_VIDEO_RENDER_SERVICE, __uuidof(IMediaEventSink ), (void**)&m_pSink, &dwObjects);
 	if (FAILED(hr)) {
 		ASSERT(0);
@@ -1185,7 +1191,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitServicePointers(/* [in] */ __in  IMFTop
 		return hr;
 	}
 
-    ASSERT(!m_pClock);
+	ASSERT(!m_pClock);
 	hr = pLookup->LookupService(MF_SERVICE_LOOKUP_GLOBAL, 0, MR_VIDEO_RENDER_SERVICE, __uuidof(IMFClock ), (void**)&m_pClock, &dwObjects);
 	if (FAILED(hr)) {	// IMFClock can't be guaranteed to exist during first initialization. After negotiating the media type, it should initialize okay.
 		return S_OK;
@@ -1399,13 +1405,13 @@ STDMETHODIMP CEVRAllocatorPresenter::DisableImageExport(BOOL bDisable)
 // IDirect3DDeviceManager9
 STDMETHODIMP CEVRAllocatorPresenter::ResetDevice(IDirect3DDevice9 *pDevice,UINT resetToken)
 {
-	HRESULT hr = m_pD3DManager->ResetDevice (pDevice, resetToken);
+	HRESULT hr = m_pD3DManager->ResetDevice(pDevice, resetToken);
 	return hr;
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::OpenDeviceHandle(HANDLE *phDevice)
 {
-	HRESULT hr = m_pD3DManager->OpenDeviceHandle (phDevice);
+	HRESULT hr = m_pD3DManager->OpenDeviceHandle(phDevice);
 	return hr;
 }
 
@@ -1515,7 +1521,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 
 DWORD WINAPI CEVRAllocatorPresenter::GetMixerThreadStatic(LPVOID lpParam)
 {
-	SetThreadName(DWORD(-1), "CEVRPresenter::MixerThread");
+	SetThreadName(DWORD_MAX, "CEVRPresenter::MixerThread");
 	CEVRAllocatorPresenter*	pThis = (CEVRAllocatorPresenter*)lpParam;
 	pThis->GetMixerThread();
 	return 0;
@@ -1523,7 +1529,7 @@ DWORD WINAPI CEVRAllocatorPresenter::GetMixerThreadStatic(LPVOID lpParam)
 
 DWORD WINAPI CEVRAllocatorPresenter::PresentThread(LPVOID lpParam)
 {
-	SetThreadName(DWORD(-1), "CEVRPresenter::PresentThread");
+	SetThreadName(DWORD_MAX, "CEVRPresenter::PresentThread");
 	CEVRAllocatorPresenter* pThis = (CEVRAllocatorPresenter*)lpParam;
 	pThis->RenderThread();
 	return 0;
@@ -1554,31 +1560,26 @@ bool ExtractInterlaced(const AM_MEDIA_TYPE* pmt)
 
 void CEVRAllocatorPresenter::GetMixerThread()
 {
-	HANDLE				hEvts[]		= { m_hEvtQuit};
-	bool				bQuit		= false;
-	TIMECAPS			tc;
-	DWORD				dwResolution;
-	DWORD				dwUser = 0;
-
-	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
-	//HANDLE	hAvrt;
-	//DWORD		dwTaskIndex = 0;
-	//if (pfAvSetMmThreadCharacteristicsW)
-	//	hAvrt = pfAvSetMmThreadCharacteristicsW (L"Playback", &dwTaskIndex);
-	//if (pfAvSetMmThreadPriority)
-	//	pfAvSetMmThreadPriority (hAvrt, AVRT_PRIORITY_HIGH /*AVRT_PRIORITY_CRITICAL*/);
+	bool		bQuit	= false;
+	TIMECAPS	tc;
+	DWORD		dwResolution;
+	DWORD		dwUser	= 0;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
-	dwUser		= timeBeginPeriod(dwResolution);
+	dwResolution	= min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	dwUser			= timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
-		DWORD dwObject = WaitForMultipleObjects (_countof(hEvts), hEvts, FALSE, 1);
+		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
 		switch (dwObject) {
 			case WAIT_OBJECT_0 :
 				bQuit = true;
 				break;
 			case WAIT_TIMEOUT : {
+				if (m_nRenderState == Stopped) {
+					continue;// nothing sensible to do here
+				}
+
 				bool bDoneSomething = false;
 				{
 					CAutoLock AutoLock(&m_ImageProcessingLock);
@@ -1596,8 +1597,6 @@ void CEVRAllocatorPresenter::GetMixerThread()
 						SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
 
 						ExtractAvgTimePerFrame(&mt, m_rtTimePerFrame);
-
-						m_bInterlaced = ExtractInterlaced(&mt);
 
 						CComPtr<IPin> pPinTo;
 						if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
@@ -1629,7 +1628,6 @@ void CEVRAllocatorPresenter::GetMixerThread()
 	}
 
 	timeEndPeriod (dwResolution);
-	//	if (pfAvRevertMmThreadCharacteristics) pfAvRevertMmThreadCharacteristics (hAvrt);
 }
 
 void ModerateFloat(double& Value, double Target, double& ValuePrim, double ChangeSpeed)
@@ -1904,7 +1902,7 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
 
 void CEVRAllocatorPresenter::RenderThread()
 {
-	HANDLE		hEvts[]		= { m_hEvtQuit, m_hEvtFlush};
+	HANDLE		hEvts[]		= { m_hEvtQuit, m_hEvtFlush };
 	bool		bQuit		= false;
 	TIMECAPS	tc;
 	DWORD		dwResolution;
@@ -1935,7 +1933,7 @@ void CEVRAllocatorPresenter::RenderThread()
 		if (!s.m_AdvRendSets.iVMR9VSyncAccurate && NextSleepTime == 0) {
 			NextSleepTime = 1;
 		}
-		dwObject = WaitForMultipleObjects (_countof(hEvts), hEvts, FALSE, max(NextSleepTime < 0 ? 1 : NextSleepTime, 0));
+		dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, max(NextSleepTime < 0 ? 1 : NextSleepTime, 0));
         if (m_hEvtRenegotiate) {
             CAutoLock Lock(&m_csExternalMixerLock);
             CAutoLock cRenderLock(&m_RenderLock);
@@ -1977,14 +1975,14 @@ void CEVRAllocatorPresenter::RenderThread()
 
 				//			TRACE_EVR ("EVR: RenderThread ==>> Waiting buffer\n");
 
-				//			if (WaitForMultipleObjects (_countof(hEvtsBuff), hEvtsBuff, FALSE, INFINITE) == WAIT_OBJECT_0+2)
+				//			if (WaitForMultipleObjects(_countof(hEvtsBuff), hEvtsBuff, FALSE, INFINITE) == WAIT_OBJECT_0+2)
 				{
 					CComPtr<IMFSample>		pMFSample;
 					LONGLONG	llPerf = GetRenderersData()->GetPerfCounter();
 					UNREFERENCED_PARAMETER(llPerf);
 					int nSamplesLeft = 0;
 					if (SUCCEEDED(GetScheduledSample(&pMFSample, nSamplesLeft))) {
-						//					pMFSample->GetUINT32 (GUID_SURFACE_INDEX, (UINT32*)&m_nCurSurface);
+						//					pMFSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32*)&m_nCurSurface);
 						m_pCurrentDisplaydSample = pMFSample;
 
 						bool bValidSampleTime = true;
@@ -2259,18 +2257,10 @@ void CEVRAllocatorPresenter::RenderThread()
 
 void CEVRAllocatorPresenter::VSyncThread()
 {
-	HANDLE				hEvts[]		= { m_hEvtQuit };
-	bool				bQuit		= false;
-	TIMECAPS			tc;
-	DWORD				dwResolution;
-	DWORD				dwUser		= 0;
-
-	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
-	//DWORD				dwTaskIndex = 0;
-	//if (pfAvSetMmThreadCharacteristicsW)
-	//	hAvrt = pfAvSetMmThreadCharacteristicsW (L"Playback", &dwTaskIndex);
-	//if (pfAvSetMmThreadPriority)
-	//	pfAvSetMmThreadPriority (hAvrt, AVRT_PRIORITY_HIGH /*AVRT_PRIORITY_CRITICAL*/);
+	bool		bQuit	= false;
+	TIMECAPS	tc;
+	DWORD		dwResolution;
+	DWORD		dwUser	= 0;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
 	dwResolution	= min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
@@ -2280,7 +2270,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 	CRenderersSettings& s	= GetRenderersSettings();
 
 	while (!bQuit) {
-		DWORD dwObject = WaitForMultipleObjects (_countof(hEvts), hEvts, FALSE, 1);
+		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
 		switch (dwObject) {
 			case WAIT_OBJECT_0 :
 				bQuit = true;
@@ -2414,12 +2404,11 @@ void CEVRAllocatorPresenter::VSyncThread()
 	}
 
 	timeEndPeriod (dwResolution);
-	//if (pfAvRevertMmThreadCharacteristics) pfAvRevertMmThreadCharacteristics (hAvrt);
 }
 
 DWORD WINAPI CEVRAllocatorPresenter::VSyncThreadStatic(LPVOID lpParam)
 {
-	SetThreadName(DWORD(-1), "CEVRAllocatorPresenter::VSyncThread");
+	SetThreadName(DWORD_MAX, "CEVRAllocatorPresenter::VSyncThread");
 	CEVRAllocatorPresenter* pThis = (CEVRAllocatorPresenter*)lpParam;
 	pThis->VSyncThread();
 	return 0;
@@ -2427,15 +2416,26 @@ DWORD WINAPI CEVRAllocatorPresenter::VSyncThreadStatic(LPVOID lpParam)
 
 void CEVRAllocatorPresenter::OnResetDevice()
 {
+	m_RenderLock.Lock();
+
 	HRESULT hr;
+
+	ASSERT(!m_hEvtReset);
+	m_hEvtReset = CreateEvent(NULL, TRUE, FALSE, NULL);
+	ASSERT(m_hEvtReset);
 
 	// Reset DXVA Manager, and get new buffers
 	hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
 
 	// Not necessary, but Microsoft documentation say Presenter should send this message...
 	if (m_pSink) {
-		m_pSink->Notify(EC_DISPLAY_CHANGED, 0, 0);
+		EXECUTE_ASSERT(S_OK == (hr = m_pSink->Notify(EC_DISPLAY_CHANGED, 0, 0)));
 	}
+
+	m_RenderLock.Unlock();
+	EXECUTE_ASSERT(WAIT_OBJECT_0 == WaitForSingleObject(m_hEvtReset, INFINITE));
+	EXECUTE_ASSERT(CloseHandle(m_hEvtReset));
+	m_hEvtReset = NULL;
 }
 
 void CEVRAllocatorPresenter::RemoveAllSamples()
