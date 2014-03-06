@@ -2242,30 +2242,41 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	AVPacket		avpkt;
 	av_init_packet(&avpkt);
 
-	while (nSize > 0 || bFlush) {
-		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
-		
-		if (!bFlush) {
-			if (nSize + FF_INPUT_BUFFER_PADDING_SIZE > m_nFFBufferSize) {
-				m_nFFBufferSize	= nSize + FF_INPUT_BUFFER_PADDING_SIZE;
-				m_pFFBuffer		= (BYTE*)av_realloc_f(m_pFFBuffer, m_nFFBufferSize, 1);
+	BYTE *pDataBuffer = NULL;
+	if (!bFlush && nSize > 0) {
+		// code from LAV
+		if (!(m_pAVCtx->active_thread_type & FF_THREAD_FRAME) || m_pParser) {
+			// Copy bitstream into temporary buffer to ensure overread protection
+			// Verify buffer size
+			if (nSize > m_nFFBufferSize) {
+				m_nFFBufferSize	= nSize;
+				m_pFFBuffer		= (BYTE *)av_realloc_f(m_pFFBuffer, m_nFFBufferSize + FF_INPUT_BUFFER_PADDING_SIZE, 1);
 				if (!m_pFFBuffer) {
 					m_nFFBufferSize = 0;
 					return E_OUTOFMEMORY;
 				}
 			}
-
-			// Required number of additionally allocated bytes at the end of the input bitstream for decoding.
-			// This is mainly needed because some optimized bitstream readers read
-			// 32 or 64 bit at once and could read over the end.
-			// Note: If the first 23 bits of the additional bytes are not 0, then damaged
-			// MPEG bitstreams could cause overread and segfault.
-			memcpy_sse(m_pFFBuffer, pDataIn, nSize);
+      
+			memcpy(m_pFFBuffer, pDataIn, nSize);
 			memset(m_pFFBuffer + nSize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+			pDataBuffer = m_pFFBuffer;
+		} else {
+			pDataBuffer = pDataIn;
+		}
+	}
 
-			avpkt.data	= m_pFFBuffer;
+	while (nSize > 0 || bFlush) {
+		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
+		
+		if (!bFlush) {
+			avpkt.data	= pDataBuffer;
 			avpkt.size	= nSize;
 			avpkt.pts	= rtStartIn;
+			if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
+				avpkt.duration = (int)(rtStopIn - rtStartIn);
+			} else {
+				avpkt.duration = 0;
+			}
 			avpkt.flags	= AV_PKT_FLAG_KEY;
 		} else {
 			avpkt.data	= NULL;
@@ -2283,8 +2294,8 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::SoftwareDecode() - could not process buffer, starving?"));
 				break;
 			} else if (used_bytes > 0) {
-				nSize	-= used_bytes;
-				pDataIn	+= used_bytes;
+				nSize		-= used_bytes;
+				pDataBuffer	+= used_bytes;
 			}
 
 			// Update start time cache
@@ -2310,9 +2321,9 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			if (pOut_size > 0 || bFlush) {
 
 				if (pOut && pOut_size > 0) {
-					if (pOut_size + FF_INPUT_BUFFER_PADDING_SIZE > m_nFFBufferSize2) {
-						m_nFFBufferSize2	= pOut_size + FF_INPUT_BUFFER_PADDING_SIZE;
-						m_pFFBuffer2		= (BYTE *)av_realloc_f(m_pFFBuffer2, m_nFFBufferSize2, 1);
+					if (pOut_size > m_nFFBufferSize2) {
+						m_nFFBufferSize2	= pOut_size;
+						m_pFFBuffer2		= (BYTE *)av_realloc_f(m_pFFBuffer2, m_nFFBufferSize2 + FF_INPUT_BUFFER_PADDING_SIZE, 1);
 						if (!m_pFFBuffer2) {
 							m_nFFBufferSize2 = 0;
 							return E_OUTOFMEMORY;
