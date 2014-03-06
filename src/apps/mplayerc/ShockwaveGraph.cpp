@@ -72,98 +72,101 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 		return E_FAIL;
 	}
 
-	HANDLE m_hFile = CreateFile(lpcwstrFile, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
-											 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY|FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	if (!::PathIsURL(lpcwstrFile)) {
+		// handle only local files
+		HANDLE m_hFile = CreateFile(lpcwstrFile, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+												 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		BYTE Buff[128] = {0};
-		ReadBuffer(m_hFile, Buff, 3);	// Signature
-		if (memcmp(Buff, "CWS", 3) == 0 || memcmp(Buff, "FWS", 3) == 0) {
-			CGolombBuffer gb(NULL, 0);
+		if (m_hFile != INVALID_HANDLE_VALUE) {
+			BYTE Buff[128] = {0};
+			ReadBuffer(m_hFile, Buff, 3);	// Signature
+			if (memcmp(Buff, "CWS", 3) == 0 || memcmp(Buff, "FWS", 3) == 0) {
+				CGolombBuffer gb(NULL, 0);
 
-			LARGE_INTEGER size = {0};
-			GetFileSizeEx(m_hFile, &size);
+				LARGE_INTEGER size = {0};
+				GetFileSizeEx(m_hFile, &size);
 
-			BYTE ver = 0;
-			ReadBuffer(m_hFile, &ver, 1);
-			DWORD flen = 0;
-			ReadBuffer(m_hFile, (BYTE*)(&flen), sizeof(flen));
-			flen -= 8;
+				BYTE ver = 0;
+				ReadBuffer(m_hFile, &ver, 1);
+				DWORD flen = 0;
+				ReadBuffer(m_hFile, (BYTE*)(&flen), sizeof(flen));
+				flen -= 8;
 
-			CAtlArray<BYTE> DecompData;
+				CAtlArray<BYTE> DecompData;
 
-			if (memcmp(Buff, "CWS", 3) == 0) {
-				if (size.QuadPart < 5*MEGABYTE) {
+				if (memcmp(Buff, "CWS", 3) == 0) {
+					if (size.QuadPart < 5 * MEGABYTE) {
 
-					DecompData.SetCount(size.QuadPart - 8);
-					DWORD size = ReadBuffer(m_hFile, DecompData.GetData(), DecompData.GetCount());
+						DecompData.SetCount(size.QuadPart - 8);
+						DWORD size = ReadBuffer(m_hFile, DecompData.GetData(), DecompData.GetCount());
 
-					if (size == DecompData.GetCount()) {
-						// decompress
-						for (;;) {
-							int res;
-							z_stream d_stream;
+						if (size == DecompData.GetCount()) {
+							// decompress
+							for (;;) {
+								int res;
+								z_stream d_stream;
 
-							d_stream.zalloc	= (alloc_func)0;
-							d_stream.zfree	= (free_func)0;
-							d_stream.opaque	= (voidpf)0;
+								d_stream.zalloc	= (alloc_func)NULL;
+								d_stream.zfree	= (free_func)NULL;
+								d_stream.opaque	= (voidpf)NULL;
 
-							if (Z_OK != (res = inflateInit(&d_stream))) {
-								DecompData.RemoveAll();
-								break;
-							}
-
-							d_stream.next_in	= DecompData.GetData();
-							d_stream.avail_in	= (uInt)DecompData.GetCount();
-
-							BYTE* dst = NULL;
-							int n = 0;
-							do {
-								dst = (BYTE*)realloc(dst, ++n*1000);
-								d_stream.next_out	= &dst[(n-1)*1000];
-								d_stream.avail_out	= 1000;
-								if (Z_OK != (res = inflate(&d_stream, Z_NO_FLUSH)) && Z_STREAM_END != res) {
+								if (Z_OK != (res = inflateInit(&d_stream))) {
 									DecompData.RemoveAll();
-									free(dst);
 									break;
 								}
-							} while (0 == d_stream.avail_out && 0 != d_stream.avail_in && Z_STREAM_END != res);
 
-							inflateEnd(&d_stream);
+								d_stream.next_in	= DecompData.GetData();
+								d_stream.avail_in	= (uInt)DecompData.GetCount();
 
-							DecompData.SetCount(d_stream.total_out);
-							memcpy(DecompData.GetData(), dst, DecompData.GetCount());
+								BYTE* dst = NULL;
+								int n = 0;
+								do {
+									dst = (BYTE*)realloc(dst, ++n * 1000);
+									d_stream.next_out	= &dst[(n - 1) * 1000];
+									d_stream.avail_out	= 1000;
+									if (Z_OK != (res = inflate(&d_stream, Z_NO_FLUSH)) && Z_STREAM_END != res) {
+										DecompData.RemoveAll();
+										free(dst);
+										break;
+									}
+								} while (0 == d_stream.avail_out && 0 != d_stream.avail_in && Z_STREAM_END != res);
 
-							free(dst);
+								inflateEnd(&d_stream);
 
-							break;
+								DecompData.SetCount(d_stream.total_out);
+								memcpy(DecompData.GetData(), dst, DecompData.GetCount());
+
+								free(dst);
+
+								break;
+							}
+						}
+
+						if (flen == DecompData.GetCount()) {
+							gb.Reset(DecompData.GetData(), min(_countof(Buff), DecompData.GetCount()));
 						}
 					}
 
-					if (flen == DecompData.GetCount()) {
-						gb.Reset(DecompData.GetData(), min(_countof(Buff), DecompData.GetCount()));
+				} else if (memcmp(Buff, "FWS", 3) == 0) {
+					DWORD dwRead = ReadBuffer(m_hFile, Buff, min(_countof(Buff), size.QuadPart));
+					if (dwRead) {
+						gb.Reset(Buff, dwRead);
 					}
 				}
 
-			} else if (memcmp(Buff, "FWS", 3) == 0) {
-				DWORD dwRead = ReadBuffer(m_hFile, Buff, min(_countof(Buff), size.QuadPart));
-				if (dwRead) {
-					gb.Reset(Buff, dwRead);
+				if (gb.GetSize() > 1) {
+					int Nbits	= (int)gb.BitRead(5);
+					UINT64 Xmin = gb.BitRead(Nbits);
+					UINT64 Xmax = gb.BitRead(Nbits);
+					UINT64 Ymin = gb.BitRead(Nbits);
+					UINT64 Ymax = gb.BitRead(Nbits);
+
+					vsize = CSize((Xmax-Xmin)/20, (Ymax-Ymin)/20);
 				}
 			}
 
-			if (gb.GetSize() > 1) {
-				int Nbits	= (int)gb.BitRead(5);
-				UINT64 Xmin = gb.BitRead(Nbits);
-				UINT64 Xmax = gb.BitRead(Nbits);
-				UINT64 Ymin = gb.BitRead(Nbits);
-				UINT64 Ymax = gb.BitRead(Nbits);
-
-				vsize = CSize((Xmax-Xmin)/20, (Ymax-Ymin)/20);
-			}
+			CloseHandle(m_hFile);
 		}
-
-		CloseHandle(m_hFile);
 	}
 
 	// do not trust this value :)
