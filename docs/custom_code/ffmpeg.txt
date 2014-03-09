@@ -21,8 +21,6 @@
 * libavcodec/vc1dec.c
 * libavcodec/vorbis.c
 
-* libavfilter/avfiltergraph.c 
-
 * libavutil/common.h
 * libavutil/eval.c
 * libavutil/file_open.c

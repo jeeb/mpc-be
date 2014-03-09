@@ -2419,6 +2419,9 @@
     <ClCompile Include="libavfilter\formats.c">
       <Filter>libavfilter</Filter>
     </ClCompile>
+    <ClCompile Include="libavfilter\pthread.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
     <ClCompile Include="libavfilter\video.c">
       <Filter>libavfilter</Filter>
     </ClCompile>

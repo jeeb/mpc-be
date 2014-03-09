@@ -819,6 +819,7 @@
     <ClCompile Include="libavfilter\buffersink.c" />
     <ClCompile Include="libavfilter\buffersrc.c" />
     <ClCompile Include="libavfilter\formats.c" />
+    <ClCompile Include="libavfilter\pthread.c" />
     <ClCompile Include="libavfilter\video.c" />
     <ClCompile Include="libavresample\audio_convert.c" />
     <ClCompile Include="libavresample\audio_data.c" />

@@ -437,6 +437,7 @@ SRCS_C = \
 	libavfilter/buffersink.c \
 	libavfilter/buffersrc.c \
 	libavfilter/formats.c \
+	libavfilter/pthread.c \
 	libavfilter/video.c \
 	libavresample/audio_convert.c \
 	libavresample/audio_data.c \
