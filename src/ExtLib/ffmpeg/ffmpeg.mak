@@ -430,8 +430,10 @@ SRCS_C = \
 	libavfilter/af_atempo.c \
 	libavfilter/af_biquads.c \
 	libavfilter/audio.c \
+	libavfilter/avcodec.c \
 	libavfilter/avfilter.c \
 	libavfilter/avfiltergraph.c \
+	libavfilter/buffer.c \
 	libavfilter/buffersink.c \
 	libavfilter/buffersrc.c \
 	libavfilter/formats.c \

@@ -61,7 +61,9 @@ static const AVClass filtergraph_class = {
     .category   = AV_CLASS_CATEGORY_FILTER,
 };
 
-#if !HAVE_THREADS
+// ==> Start patch MPC
+//#if !HAVE_THREADS
+// ==> End patch MPC
 void ff_graph_thread_free(AVFilterGraph *graph)
 {
 }
@@ -72,7 +74,9 @@ int ff_graph_thread_init(AVFilterGraph *graph)
     graph->nb_threads  = 1;
     return 0;
 }
-#endif
+// ==> Start patch MPC
+//#endif
+// ==> End patch MPC
 
 AVFilterGraph *avfilter_graph_alloc(void)
 {

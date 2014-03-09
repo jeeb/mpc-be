@@ -345,6 +345,7 @@
     <ClInclude Include="libavcodec\xiph.h" />
     <ClInclude Include="libavcodec\xvmc_internal.h" />
     <ClInclude Include="libavfilter\audio.h" />
+    <ClInclude Include="libavfilter\avcodec.h" />
     <ClInclude Include="libavfilter\avfilter.h" />
     <ClInclude Include="libavfilter\avfiltergraph.h" />
     <ClInclude Include="libavfilter\buffersink.h" />
@@ -811,8 +812,10 @@
     <ClCompile Include="libavfilter\af_atempo.c" />
     <ClCompile Include="libavfilter\af_biquads.c" />
     <ClCompile Include="libavfilter\audio.c" />
+    <ClCompile Include="libavfilter\avcodec.c" />
     <ClCompile Include="libavfilter\avfilter.c" />
     <ClCompile Include="libavfilter\avfiltergraph.c" />
+    <ClCompile Include="libavfilter\buffer.c" />
     <ClCompile Include="libavfilter\buffersink.c" />
     <ClCompile Include="libavfilter\buffersrc.c" />
     <ClCompile Include="libavfilter\formats.c" />

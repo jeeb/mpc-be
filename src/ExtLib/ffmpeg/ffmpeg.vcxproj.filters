@@ -1006,6 +1006,9 @@
     <ClInclude Include="libavfilter\audio.h">
       <Filter>libavfilter</Filter>
     </ClInclude>
+    <ClInclude Include="libavfilter\avcodec.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
     <ClInclude Include="libavfilter\avfilter.h">
       <Filter>libavfilter</Filter>
     </ClInclude>
@@ -2395,10 +2398,16 @@
     <ClCompile Include="libavfilter\audio.c">
       <Filter>libavfilter</Filter>
     </ClCompile>
+    <ClCompile Include="libavfilter\avcodec.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
     <ClCompile Include="libavfilter\avfilter.c">
       <Filter>libavfilter</Filter>
     </ClCompile>
     <ClCompile Include="libavfilter\avfiltergraph.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\buffer.c">
       <Filter>libavfilter</Filter>
     </ClCompile>
     <ClCompile Include="libavfilter\buffersink.c">

@@ -785,4 +785,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_MPEG1_XVMC_HWACCEL 0
 #define CONFIG_MPEG2_XVMC_HWACCEL 0
 
+#define CONFIG_ATEMPO_FILTER 1
+#define CONFIG_LOWPASS_FILTER 1
+
 #endif /* FFMPEG_CONFIG_H */
