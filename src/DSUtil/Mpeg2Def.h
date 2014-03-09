@@ -156,7 +156,7 @@ enum MPEG2_DESCRIPTOR {
 };
 
 enum MPEG_TYPES {
-	mpeg_us,
+	mpeg_invalid,
 	mpeg_ps,
 	mpeg_ts,
 	mpeg_es,

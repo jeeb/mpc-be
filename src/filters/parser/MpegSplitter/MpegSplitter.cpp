@@ -629,7 +629,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 	HRESULT hr;
 	BYTE b;
 
-	if (m_pFile->m_type == mpeg_ps || m_pFile->m_type == mpeg_es) {
+	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps || m_pFile->m_type == MPEG_TYPES::mpeg_es) {
 		if (!m_pFile->NextMpegStartCode(b)) {
 			return S_FALSE;
 		}
@@ -677,7 +677,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			}
 			m_pFile->Seek(pos + h.len);
 		}
-	} else if (m_pFile->m_type == mpeg_ts) {
+	} else if (m_pFile->m_type == MPEG_TYPES::mpeg_ts) {
 		CMpegSplitterFile::trhdr h;
 		if (m_pFile->Read(h) == -1) {
 			return S_FALSE;
@@ -733,7 +733,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		}
 
 		m_pFile->Seek(h.next);
-	} else if (m_pFile->m_type == mpeg_pva) {
+	} else if (m_pFile->m_type == MPEG_TYPES::mpeg_pva) {
 		CMpegSplitterFile::pvahdr h;
 		if (!m_pFile->Read(h)) {
 			return S_FALSE;
@@ -909,7 +909,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	REFERENCE_TIME	rt_IfoDuration	= 0;
 	AV_Rational		IfoASpect		= {0, 0};
-	if (m_pFile->m_type == mpeg_ps) {
+	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps) {
 		if (m_pInput && m_pInput->IsConnected() && (GetCLSID(m_pInput->GetConnected()) == __uuidof(CVTSReader))) { // MPC VTS Reader
 			pTI = GetFilterFromPin(m_pInput->GetConnected());
 
@@ -1218,7 +1218,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					m_pFile->Seek(seekpos);
 					__int64 curpos = seekpos;
 
-					if (m_pFile->m_type == mpeg_ts) {
+					if (m_pFile->m_type == MPEG_TYPES::mpeg_ts) {
 						double div = 1.0;
 						for (;;) {
 							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
