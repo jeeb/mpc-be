@@ -32,7 +32,7 @@
 #define WM_HIDE			(WM_USER + 1001)
 #define WM_OSD_DRAW		(WM_USER + 1002)
 
-typedef enum {
+enum OSD_COLORS {
 	OSD_TRANSPARENT,
 	OSD_BACKGROUND,
 	OSD_BORDER,
@@ -41,21 +41,21 @@ typedef enum {
 	OSD_CURSOR,
 	OSD_DEBUGCLR,
 	OSD_LAST
-} OSD_COLORS;
+};
 
-typedef enum {
+enum OSD_MESSAGEPOS {
 	OSD_NOMESSAGE,
 	OSD_TOPLEFT,
 	OSD_TOPRIGHT,
 	OSD_DEBUG,
-} OSD_MESSAGEPOS;
+};
 
-typedef enum {
+enum OSD_TYPE {
 	OSD_TYPE_NONE,
 	OSD_TYPE_BITMAP,
 	OSD_TYPE_MADVR,
 	OSD_TYPE_GDI
-} OSD_TYPE;
+};
 
 class CVMROSD : public CWnd
 {
@@ -183,7 +183,6 @@ private :
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);
 	BOOL PreTranslateMessage(MSG* pMsg);
-	int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	void OnPaint();
 	BOOL OnEraseBkgnd(CDC* pDC);
 
@@ -192,5 +191,4 @@ protected:
 public:
 	afx_msg void OnHide();
 	afx_msg void OnDrawWnd();
-	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 };

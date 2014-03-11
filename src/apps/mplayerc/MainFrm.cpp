@@ -1578,11 +1578,11 @@ void CMainFrame::DestroyFlyBar()
 void CMainFrame::CreateOSDBar()
 {
 	DWORD exstyle = WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED;
-	if (!m_OSD.CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
+	if (!m_OSD.CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), &m_wndView, 0, NULL)) {
 		TRACE(_T("Failed to create OSD Window\n"));
 		return;
 	}
-	m_OSD.SetLayeredWindowAttributes(RGB(255,0,255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
+	m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
 
 	m_pOSDWnd = &m_wndView;
 	if (AfxGetAppSettings().fShowOSD) {
@@ -1592,11 +1592,7 @@ void CMainFrame::CreateOSDBar()
 
 bool CMainFrame::OSDBarSetPos()
 {
-	if (!m_OSD || !(::IsWindow(m_OSD.GetSafeHwnd()))) {
-		return false;
-	}
-
-	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
+	if (!m_OSD || !(::IsWindow(m_OSD.GetSafeHwnd())) || m_OSD.GetOSDType() != OSD_TYPE_GDI) {
 		return false;
 	}
 

@@ -98,7 +98,8 @@ CVMROSD::CVMROSD()
 		DeleteObject(hBmp);
 	}
 
-	//Gdiplus::GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
+	// GDI+ handling
+	// Gdiplus::GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 }
 
 CVMROSD::~CVMROSD()
@@ -113,7 +114,8 @@ CVMROSD::~CVMROSD()
 		delete m_pButtonsImages;
 	}
 
-	//Gdiplus::GdiplusShutdown(m_gdiplusToken);
+	// GDI+ handling
+	// Gdiplus::GdiplusShutdown(m_gdiplusToken);
 }
 
 IMPLEMENT_DYNAMIC(CVMROSD, CWnd)
@@ -124,7 +126,6 @@ BEGIN_MESSAGE_MAP(CVMROSD, CWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
-	ON_WM_WINDOWPOSCHANGED()
 END_MESSAGE_MAP()
 
 void CVMROSD::OnHide()
@@ -135,19 +136,6 @@ void CVMROSD::OnHide()
 void CVMROSD::OnDrawWnd()
 {
 	DrawWnd();
-}
-
-void CVMROSD::OnWindowPosChanged(WINDOWPOS* lpwndpos)
-{
-	__super::OnWindowPosChanged(lpwndpos);
-
-	if ((lpwndpos->flags & SWP_HIDEWINDOW) && m_pWnd) {
-		SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE);
-
-		if (!m_bVisibleMessage) {
-			m_strMessage.Empty();
-		}
-	}
 }
 
 void CVMROSD::OnSize(UINT nType, int cx, int cy)
@@ -180,20 +168,20 @@ void CVMROSD::UpdateBitmap()
 
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
 
-	if (m_MemDC.CreateCompatibleDC (pDC)) {
+	if (m_MemDC.CreateCompatibleDC(pDC)) {
 		BITMAPINFO	bmi = {0};
 		HBITMAP		hbmpRender;
 
-		ZeroMemory( &bmi.bmiHeader, sizeof(BITMAPINFOHEADER) );
-		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth = m_rectWnd.Width();
-		bmi.bmiHeader.biHeight = - (int) m_rectWnd.Height(); // top-down
-		bmi.bmiHeader.biPlanes = 1;
-		bmi.bmiHeader.biBitCount = 32;
-		bmi.bmiHeader.biCompression = BI_RGB;
+		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
+		bmi.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
+		bmi.bmiHeader.biWidth		= m_rectWnd.Width();
+		bmi.bmiHeader.biHeight		= -m_rectWnd.Height(); // top-down
+		bmi.bmiHeader.biPlanes		= 1;
+		bmi.bmiHeader.biBitCount	= 32;
+		bmi.bmiHeader.biCompression	= BI_RGB;
 
-		hbmpRender = CreateDIBSection( m_MemDC, &bmi, DIB_RGB_COLORS, NULL, NULL, NULL );
-		m_MemDC.SelectObject (hbmpRender);
+		hbmpRender = CreateDIBSection(m_MemDC, &bmi, DIB_RGB_COLORS, NULL, NULL, NULL);
+		m_MemDC.SelectObject(hbmpRender);
 
 		if (::GetObject(hbmpRender, sizeof(BITMAP), &m_BitmapInfo) != 0) {
 			// Configure the VMR's bitmap structure
@@ -376,8 +364,8 @@ void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPo
 	m_rectCursor.top		= rect->top   + (rect->Height() - SLIDER_CURSOR_HEIGHT) / 2;
 	m_rectCursor.bottom		= m_rectCursor.top + SLIDER_CURSOR_HEIGHT;
 
-	DrawRect (rect, &m_brushBack, &m_penBorder);
-	DrawRect (&m_rectBar, &m_brushBar);
+	DrawRect(rect, &m_brushBack, &m_penBorder);
+	DrawRect(&m_rectBar, &m_brushBar);
 
 	if (AfxGetAppSettings().fChapterMarker) {
 		CAutoLock lock(&m_CBLock);
@@ -403,50 +391,50 @@ void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPo
 		}
 	}
 
-	DrawRect (&m_rectCursor, NULL, &m_penCursor);
+	DrawRect(&m_rectCursor, NULL, &m_penCursor);
 }
 
 void CVMROSD::DrawFlyBar(CRect* rect)
 {
 	icoExit = m_pButtonsImages->ExtractIcon(0);
-	DrawIconEx(m_MemDC, m_rectWnd.right-34, 10, icoExit, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit, 0, 0, 0, NULL, DI_NORMAL);
 	DestroyIcon(icoExit);
 
 	icoClose = m_pButtonsImages->ExtractIcon(23);
-	DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose, 0, 0, 0, NULL, DI_NORMAL);
 	DestroyIcon(icoClose);
 
 	if (bMouseOverExitButton) {
 		icoExit_a = m_pButtonsImages->ExtractIcon(1);
-		DrawIconEx(m_MemDC, m_rectWnd.right-34, 10, icoExit_a, 0, 0, 0, NULL, DI_NORMAL);
+		DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit_a, 0, 0, 0, NULL, DI_NORMAL);
 		DestroyIcon(icoExit_a);
 	}
 	if (bMouseOverCloseButton) {
 		icoClose_a = m_pButtonsImages->ExtractIcon(24);
-		DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose_a, 0, 0, 0, NULL, DI_NORMAL);
+		DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose_a, 0, 0, 0, NULL, DI_NORMAL);
 		DestroyIcon(icoClose_a);
 	}
 }
 
 void CVMROSD::DrawMessage()
 {
-	if (m_BitmapInfo.bmWidth*m_BitmapInfo.bmHeight*(m_BitmapInfo.bmBitsPixel/8) == 0) {
+	if (m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3) == 0) {
 		return;
 	}
 
 	if (m_nMessagePos != OSD_NOMESSAGE) {
-		CRect		rectText (0,0,0,0);
-		CRect		rectMessages;
+		CRect rectText(0, 0, 0, 0);
+		CRect rectMessages;
 
-		m_MemDC.DrawText (m_strMessage, &rectText, DT_CALCRECT);
+		m_MemDC.DrawText(m_strMessage, &rectText, DT_CALCRECT);
 		rectText.InflateRect(20, 10);
 		switch (m_nMessagePos) {
 			case OSD_TOPLEFT :
-				rectMessages = CRect  (10, 10, min((rectText.right + 10),(m_rectWnd.right - 10)), (rectText.bottom + 12));
+				rectMessages = CRect(10, 10, min((rectText.right + 10), (m_rectWnd.right - 10)), (rectText.bottom + 12));
 				break;
 			case OSD_TOPRIGHT :
 			default :
-				rectMessages = CRect  (max(10,m_rectWnd.right-10-rectText.Width()), 10, m_rectWnd.right-10, rectText.bottom + 10);
+				rectMessages = CRect(max(10, m_rectWnd.right - 10 - rectText.Width()), 10, m_rectWnd.right-10, rectText.bottom + 10);
 				break;
 		}
 
@@ -456,84 +444,84 @@ void CVMROSD::DrawMessage()
 		//m_MemDC.SelectClipPath(RGN_COPY);
 
 		int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
-		R = GetRValue((AfxGetAppSettings().clrGrad1ABGR));
-		G = GetGValue((AfxGetAppSettings().clrGrad1ABGR));
-		B = GetBValue((AfxGetAppSettings().clrGrad1ABGR));
-		R1 = GetRValue((AfxGetAppSettings().clrGrad2ABGR));
-		G1 = GetGValue((AfxGetAppSettings().clrGrad2ABGR));
-		B1 = GetBValue((AfxGetAppSettings().clrGrad2ABGR));
-		R_ = (R+32>=255?255:R+32);
-		R1_ = (R1+32>=255?255:R1+32);
-		G_ = (G+32>=255?255:G+32);
-		G1_ = (G1+32>=255?255:G1+32);
-		B_ = (B+32>=255?255:B+32);
-		B1_ = (B1+32>=255?255:B1+32);
-		m_OSD_Transparent	=	AfxGetAppSettings().nOSDTransparent;
+		R	= GetRValue((AfxGetAppSettings().clrGrad1ABGR));
+		G	= GetGValue((AfxGetAppSettings().clrGrad1ABGR));
+		B	= GetBValue((AfxGetAppSettings().clrGrad1ABGR));
+		R1	= GetRValue((AfxGetAppSettings().clrGrad2ABGR));
+		G1	= GetGValue((AfxGetAppSettings().clrGrad2ABGR));
+		B1	= GetBValue((AfxGetAppSettings().clrGrad2ABGR));
+		R_	= (R + 32 >= 255 ? 255 : R + 32);
+		R1_	= (R1 + 32 >= 255 ? 255 : R1 + 32);
+		G_	= (G + 32 >= 255 ? 255 : G + 32);
+		G1_	= (G1 + 32 >= 255 ? 255 : G1 + 32);
+		B_	= (B + 32 >= 255 ? 255 : B + 32);
+		B1_	= (B1 + 32 >= 255 ? 255 : B1 + 32);
+		m_OSD_Transparent = AfxGetAppSettings().nOSDTransparent;
 		int iBorder = AfxGetAppSettings().nOSDBorder;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 		TRIVERTEX tv[2] = {
-					{rectMessages.left, rectMessages.top, R*256, G*256, B*256, m_OSD_Transparent*256},
-					{rectMessages.right, rectMessages.bottom, R1*256, G1*256, B1*256, m_OSD_Transparent*256},
-				};
+			{rectMessages.left, rectMessages.top, R * 256, G * 256, B * 256, m_OSD_Transparent * 256},
+			{rectMessages.right, rectMessages.bottom, R1 * 256, G1 * 256, B1 * 256, m_OSD_Transparent * 256},
+		};
 		m_MemDC.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
-		if (iBorder>0) {
+		if (iBorder > 0) {
 			GRADIENT_RECT gr2[1] = {{0, 1}};
 			TRIVERTEX tv2[2] = {
-					{rectMessages.left, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-					{rectMessages.left+iBorder, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-				};
+				{rectMessages.left, rectMessages.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+				{rectMessages.left+iBorder, rectMessages.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
+			};
 			m_MemDC.GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
 
 			GRADIENT_RECT gr3[1] = {{0, 1}};
 			TRIVERTEX tv3[2] = {
-			{rectMessages.right, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-			{rectMessages.right-iBorder, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-				};
+				{rectMessages.right, rectMessages.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+				{rectMessages.right-iBorder, rectMessages.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
+			};
 			m_MemDC.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
 
 			GRADIENT_RECT gr4[1] = {{0, 1}};
 			TRIVERTEX tv4[2] = {
-			{rectMessages.left, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-			{rectMessages.right, rectMessages.top+iBorder, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-				};
+				{rectMessages.left, rectMessages.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+				{rectMessages.right, rectMessages.top+iBorder, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+			};
 			m_MemDC.GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
 
 			GRADIENT_RECT gr5[1] = {{0, 1}};
 			TRIVERTEX tv5[2] = {
-			{rectMessages.left, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-			{rectMessages.right, rectMessages.bottom-iBorder, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-				};
+				{rectMessages.left, rectMessages.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
+				{rectMessages.right, rectMessages.bottom-iBorder, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
+			};
 			m_MemDC.GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
 		}
 
 		DWORD uFormat = DT_LEFT|DT_VCENTER|DT_NOPREFIX;
 
-		if (rectText.right +10 >= (rectMessages.right)) {
+		if (rectText.right + 10 >= (rectMessages.right)) {
 			uFormat = uFormat|DT_END_ELLIPSIS;
 		}
 
 		CRect r;
 		if (AfxGetAppSettings().fFontShadow) {
-			r = rectMessages;
-			r.left += 12;
-			r.top += 7;
-			m_MemDC.SetTextColor(RGB(16,24,32));
-			m_MemDC.DrawText (m_strMessage, &r, uFormat);
+			r		= rectMessages;
+			r.left	+= 12;
+			r.top	+= 7;
+			m_MemDC.SetTextColor(RGB(16, 24, 32));
+			m_MemDC.DrawText(m_strMessage, &r, uFormat);
 		}
 
-		r = rectMessages;
-		r.left += 10;
-		r.top += 5;
+		r		= rectMessages;
+		r.left	+= 10;
+		r.top	+= 5;
 		m_MemDC.SetTextColor(AfxGetAppSettings().clrFontABGR);
-		m_MemDC.DrawText (m_strMessage, &r, uFormat);
+		m_MemDC.DrawText(m_strMessage, &r, uFormat);
 	}
 }
 
 void CVMROSD::DrawDebug()
 {
-	if ( !m_debugMessages.IsEmpty() ) {
+	if (!m_debugMessages.IsEmpty()) {
 		CString msg, tmp;
 		POSITION pos;
 		pos = m_debugMessages.GetHeadPosition();
@@ -541,12 +529,12 @@ void CVMROSD::DrawDebug()
 
 		while (pos) {
 			tmp = m_debugMessages.GetNext(pos);
-			if ( !tmp.IsEmpty() ) {
+			if (!tmp.IsEmpty()) {
 				msg.AppendFormat(_T("\r\n%s"), tmp);
 			}
 		}
 
-		CRect rectText(0,0,0,0);
+		CRect rectText(0, 0, 0, 0);
 		CRect rectMessages;
 		m_MemDC.DrawText(msg, &rectText, DT_CALCRECT);
 		rectText.InflateRect(20, 10);
@@ -565,12 +553,13 @@ void CVMROSD::DrawDebug()
 void CVMROSD::InvalidateVMROSD()
 {
 	CAutoLock Lock(&m_Lock);
+
 	CalcRect();
-	if (m_BitmapInfo.bmWidth*m_BitmapInfo.bmHeight*(m_BitmapInfo.bmBitsPixel/8) == 0) {
+	if (m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3) == 0) {
 		return;
 	}
 
-	memsetd(m_BitmapInfo.bmBits, 0xff000000, m_BitmapInfo.bmWidth*m_BitmapInfo.bmHeight*(m_BitmapInfo.bmBitsPixel/8));
+	memsetd(m_BitmapInfo.bmBits, 0xff000000, m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3));
 
 	if (m_bSeekBarVisible) {
 		DrawSlider(&m_rectSeekBar, m_llSeekMin, m_llSeekMax, m_llSeekPos);
@@ -660,7 +649,7 @@ bool CVMROSD::OnMouseMove(UINT nFlags, CPoint point)
 
 bool CVMROSD::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	bool		bRet = false;
+	bool bRet = false;
 
 	if (m_pVMB || m_pMFVMB) {
 		if (m_rectCursor.PtInRect (point)) {
@@ -680,7 +669,7 @@ bool CVMROSD::OnLButtonDown(UINT nFlags, CPoint point)
 
 bool CVMROSD::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	bool		bRet = false;
+	bool bRet = false;
 
 	if (m_pVMB || m_pMFVMB) {
 		m_bCursorMoving = false;
@@ -803,13 +792,11 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 			LOGFONT lf;
 			memset(&lf, 0, sizeof(lf));
 			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-			LPCTSTR fonts[] = {m_OSD_Font};
-			int fonts_size[] = {m_FontSize*10};
-			_tcscpy_s(lf.lfFaceName, fonts[0]);
-			lf.lfHeight = fonts_size[0];
-			lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+			lf.lfHeight			= m_FontSize * 10;
+			lf.lfQuality		= AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+			wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
 
-			m_MainFont.CreatePointFontIndirect(&lf,&m_MemDC);
+			m_MainFont.CreatePointFontIndirect(&lf, &m_MemDC);
 			m_MemDC.SelectObject(m_MainFont);
 		}
 
@@ -938,15 +925,6 @@ BOOL CVMROSD::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-int CVMROSD::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (CWnd::OnCreate(lpCreateStruct) == -1) {
-		return -1;
-	}
-
-	return 0;
-}
-
 BOOL CVMROSD::OnEraseBkgnd(CDC* pDC)
 {
 	return TRUE;
@@ -954,7 +932,6 @@ BOOL CVMROSD::OnEraseBkgnd(CDC* pDC)
 
 void CVMROSD::OnPaint()
 {
-	CPaintDC dc(this);
 	PostMessage(WM_OSD_DRAW);
 }
 
@@ -962,7 +939,7 @@ void CVMROSD::DrawWnd()
 {
 	CAutoLock Lock(&m_Lock);
 
-	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty()) {
+	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_nMessagePos == OSD_NOMESSAGE || m_strMessage.IsEmpty() ) {
 		return;
 	}
 
@@ -990,13 +967,11 @@ void CVMROSD::DrawWnd()
 	LOGFONT lf;
 	memset(&lf, 0, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-	LPCTSTR fonts[]		= {m_OSD_Font};
-	int fonts_size[]	= {m_FontSize*10};
-	lf.lfHeight			= fonts_size[0];
+	lf.lfHeight			= m_FontSize * 10;
 	lf.lfQuality		= AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
-	_tcscpy_s(lf.lfFaceName, fonts[0]);
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
 
-	m_MainFont.CreatePointFontIndirect(&lf,&temp_DC);
+	m_MainFont.CreatePointFontIndirect(&lf, &temp_DC);
 	temp_DC.SelectObject(m_MainFont);
 
 	CRect rectText;
@@ -1019,7 +994,7 @@ void CVMROSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
+	CRect wr(10 + rectMessages.left, 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
 	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, DEFFLAGS);
 
 	CRect rcBar;
@@ -1034,137 +1009,132 @@ void CVMROSD::DrawWnd()
 	mdc.SetBkMode(TRANSPARENT);
 	//mdc.FillSolidRect(rcBar, RGB(0,0,0)); // transparent color (LWA_COLORKEY)
 
-	if (m_nMessagePos != OSD_NOMESSAGE) {
+	if (m_MainFont.GetSafeHandle()) {
+		m_MainFont.DeleteObject();
+	}
 
-		if (m_MainFont.GetSafeHandle()) {
-			m_MainFont.DeleteObject();
-		}
-
-		m_MainFont.CreatePointFontIndirect(&lf,&mdc);
-		mdc.SelectObject(m_MainFont);
+	m_MainFont.CreatePointFontIndirect(&lf, &mdc);
+	mdc.SelectObject(m_MainFont);
 
 
-		int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
-		R	= GetRValue((AfxGetAppSettings().clrGrad1ABGR));
-		G	= GetGValue((AfxGetAppSettings().clrGrad1ABGR));
-		B	= GetBValue((AfxGetAppSettings().clrGrad1ABGR));
-		R1	= GetRValue((AfxGetAppSettings().clrGrad2ABGR));
-		G1	= GetGValue((AfxGetAppSettings().clrGrad2ABGR));
-		B1	= GetBValue((AfxGetAppSettings().clrGrad2ABGR));
-		R_	= (R+32  >= 255 ? 255 : R+32);
-		R1_	= (R1+32 >= 255 ? 255 : R1+32);
-		G_	= (G+32  >= 255 ? 255 : G+32);
-		G1_	= (G1+32 >= 255 ? 255 : G1+32);
-		B_	= (B+32  >= 255 ? 255 : B+32);
-		B1_	= (B1+32 >= 255 ? 255 : B1+32);
+	int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
+	R	= GetRValue((AfxGetAppSettings().clrGrad1ABGR));
+	G	= GetGValue((AfxGetAppSettings().clrGrad1ABGR));
+	B	= GetBValue((AfxGetAppSettings().clrGrad1ABGR));
+	R1	= GetRValue((AfxGetAppSettings().clrGrad2ABGR));
+	G1	= GetGValue((AfxGetAppSettings().clrGrad2ABGR));
+	B1	= GetBValue((AfxGetAppSettings().clrGrad2ABGR));
+	R_	= (R + 32  >= 255 ? 255 : R + 32);
+	R1_	= (R1 + 32 >= 255 ? 255 : R1 + 32);
+	G_	= (G + 32  >= 255 ? 255 : G + 32);
+	G1_	= (G1 + 32 >= 255 ? 255 : G1 + 32);
+	B_	= (B + 32  >= 255 ? 255 : B + 32);
+	B1_	= (B1 + 32 >= 255 ? 255 : B1 + 32);
 
-		m_OSD_Transparent	= 255;//AfxGetAppSettings().nOSDTransparent;
-		int iBorder			= AfxGetAppSettings().nOSDBorder;
+	m_OSD_Transparent	= 255;//AfxGetAppSettings().nOSDTransparent;
+	int iBorder			= AfxGetAppSettings().nOSDBorder;
 
-		GRADIENT_RECT gr[1] = {{0, 1}};
-		TRIVERTEX tv[2] = {
-			{rcBar.left, rcBar.top, R*256, G*256, B*256, m_OSD_Transparent*256},
-			{rcBar.right, rcBar.bottom, R1*256, G1*256, B1*256, m_OSD_Transparent*256},
+	GRADIENT_RECT gr[1] = {{0, 1}};
+	TRIVERTEX tv[2] = {
+		{rcBar.left, rcBar.top, R * 256, G * 256, B * 256, m_OSD_Transparent * 256},
+		{rcBar.right, rcBar.bottom, R1 * 256, G1 * 256, B1 * 256, m_OSD_Transparent * 256},
+	};
+	mdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
+	if (iBorder > 0) {
+		GRADIENT_RECT gr2[1] = {{0, 1}};
+		TRIVERTEX tv2[2] = {
+			{rcBar.left, rcBar.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+			{rcBar.left+iBorder, rcBar.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
 		};
-		mdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+		mdc.GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
 
-		if (iBorder > 0) {
-			GRADIENT_RECT gr2[1] = {{0, 1}};
-			TRIVERTEX tv2[2] = {
-				{rcBar.left, rcBar.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-				{rcBar.left+iBorder, rcBar.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-			};
-			mdc.GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
+		GRADIENT_RECT gr3[1] = {{0, 1}};
+		TRIVERTEX tv3[2] = {
+			{rcBar.right, rcBar.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+			{rcBar.right-iBorder, rcBar.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
+		};
+		mdc.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
 
-			GRADIENT_RECT gr3[1] = {{0, 1}};
-			TRIVERTEX tv3[2] = {
-				{rcBar.right, rcBar.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-				{rcBar.right-iBorder, rcBar.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-			};
-			mdc.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
+		GRADIENT_RECT gr4[1] = {{0, 1}};
+		TRIVERTEX tv4[2] = {
+			{rcBar.left, rcBar.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+			{rcBar.right, rcBar.top+iBorder, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
+		};
+		mdc.GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
 
-			GRADIENT_RECT gr4[1] = {{0, 1}};
-			TRIVERTEX tv4[2] = {
-				{rcBar.left, rcBar.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-				{rcBar.right, rcBar.top+iBorder, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-			};
-			mdc.GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
+		GRADIENT_RECT gr5[1] = {{0, 1}};
+		TRIVERTEX tv5[2] = {
+			{rcBar.left, rcBar.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
+			{rcBar.right, rcBar.bottom-iBorder, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
+		};
+		mdc.GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
+	}
 
-			GRADIENT_RECT gr5[1] = {{0, 1}};
-			TRIVERTEX tv5[2] = {
-				{rcBar.left, rcBar.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-				{rcBar.right, rcBar.bottom-iBorder, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-			};
-			mdc.GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
-		}
+	DWORD uFormat = DT_LEFT|DT_TOP|DT_END_ELLIPSIS|DT_NOPREFIX;
 
-		DWORD uFormat = DT_LEFT|DT_TOP|DT_END_ELLIPSIS|DT_NOPREFIX;
+	CRect r;
 
-		CRect r;
-
-		if (AfxGetAppSettings().fFontShadow) {
-			r			= rcBar;
-			r.left		= 12;
-			r.top		= 7;
-			r.bottom	+= rectText.Height();
-
-			mdc.SetTextColor(RGB(16,24,32));
-			mdc.DrawText(m_strMessage, &r, uFormat);
-		}
-
+	if (AfxGetAppSettings().fFontShadow) {
 		r			= rcBar;
-		r.left		= 10;
-		r.top		= 5;
+		r.left		= 12;
+		r.top		= 7;
 		r.bottom	+= rectText.Height();
 
-		mdc.SetTextColor(AfxGetAppSettings().clrFontABGR);
-		mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);
-
-		/*
-		// GDI+ handling
-
-		using namespace Gdiplus;
-		Graphics graphics(mdc.GetSafeHdc());
-		graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-		graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
-
-		CString ss(message);
-		CString f(m_OSD_Font);
-		Font font(mdc);
-
-		FontFamily fontFamily;
-		font.GetFamily(&fontFamily);
-
-		StringFormat strformat;
-		//strformat.SetAlignment((StringAlignment) 0);
-		//strformat.SetLineAlignment(StringAlignmentCenter);
-		strformat.SetFormatFlags(StringFormatFlagsNoWrap);
-		strformat.SetTrimming(StringTrimmingEllipsisCharacter);//SetFormatFlags(StringFormatFlagsLineLimit );
-		RectF p(r.left+10, r.top, r.Width(), r.Height());
-
-		REAL enSize = font.GetSize();
-
-		GraphicsPath path;
-		path.AddString(ss.AllocSysString(), ss.GetLength(), &fontFamily,
-		FontStyleRegular, enSize, p, &strformat );
-
-		Pen pen(Color(76,80,86), 5);
-		pen.SetLineJoin(LineJoinRound);
-		graphics.DrawPath(&pen, &path);
-
-		//for(int i=1; i<8; ++i)
-		//{
-		//	Pen pen(Color(32, 32, 28, 30), i);
-		//	pen.SetLineJoin(LineJoinRound);
-		//	graphics.DrawPath(&pen, &path);
-		//}
-
-
-		LinearGradientBrush brush(Gdiplus::Rect(r.left, r.top, r.Width(), r.Height()),
-			Color(255,255,255), Color(217,229,247), LinearGradientModeVertical);
-		graphics.FillPath(&brush, &path);
-		*/
+		mdc.SetTextColor(RGB(16, 24, 32));
+		mdc.DrawText(m_strMessage, &r, uFormat);
 	}
+
+	r			= rcBar;
+	r.left		= 10;
+	r.top		= 5;
+	r.bottom	+= rectText.Height();
+
+	mdc.SetTextColor(AfxGetAppSettings().clrFontABGR);
+	mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);
+
+	/*
+	// GDI+ handling
+
+	using namespace Gdiplus;
+	Graphics graphics(mdc.GetSafeHdc());
+	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+	graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
+
+	CString ss(message);
+	CString f(m_OSD_Font);
+	Font font(mdc);
+
+	FontFamily fontFamily;
+	font.GetFamily(&fontFamily);
+
+	StringFormat strformat;
+	//strformat.SetAlignment((StringAlignment) 0);
+	//strformat.SetLineAlignment(StringAlignmentCenter);
+	strformat.SetFormatFlags(StringFormatFlagsNoWrap);
+	strformat.SetTrimming(StringTrimmingEllipsisCharacter);//SetFormatFlags(StringFormatFlagsLineLimit );
+	RectF p(r.left+10, r.top, r.Width(), r.Height());
+
+	REAL enSize = font.GetSize();
+
+	GraphicsPath path;
+	path.AddString(ss.AllocSysString(), ss.GetLength(), &fontFamily, FontStyleRegular, enSize, p, &strformat);
+
+	Pen pen(Color(76,80,86), 5);
+	pen.SetLineJoin(LineJoinRound);
+	graphics.DrawPath(&pen, &path);
+
+	//for(int i=1; i<8; ++i)
+	//{
+	//	Pen pen(Color(32, 32, 28, 30), i);
+	//	pen.SetLineJoin(LineJoinRound);
+	//	graphics.DrawPath(&pen, &path);
+	//}
+
+
+	LinearGradientBrush brush(Gdiplus::Rect(r.left, r.top, r.Width(), r.Height()), Color(255, 255, 255), Color(217, 229, 247), LinearGradientModeVertical);
+	graphics.FillPath(&brush, &path);
+	*/
 
 	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
 
