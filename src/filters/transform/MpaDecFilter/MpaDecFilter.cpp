@@ -2139,30 +2139,34 @@ HRESULT CMpaDecFilter::StartStreaming()
 		m_bIsBitstreamOutputSupported = FALSE;
 
 		CMediaType outputMT;
-		CComPtr<IEnumFilters> pEnumFilters;
-		if (m_pGraph && SUCCEEDED(m_pGraph->EnumFilters(&pEnumFilters))) {
-			for (CComPtr<IBaseFilter> pBF; S_OK == pEnumFilters->Next(1, &pBF, 0); pBF = NULL) {
-		
-				if (IsAudioWaveRenderer(pBF)) {
-					BeginEnumPins(pBF, pEP, pPin) {
-						AM_MEDIA_TYPE mt;
+		outputMT.InitMediaType();
 
-						if (S_OK != pPin->ConnectionMediaType(&mt)) {
-							continue;
-						}
+		IBaseFilter* pBF = GetDownStreamFilter(this, GetDownStreamPin(this, m_pOutput->GetConnected()));
+		while (pBF) {
+			IPin* pPin = GetFirstPin(pBF, PINDIR_OUTPUT);
+			if (pPin) {
+				pBF = GetDownStreamFilter(pBF, pPin);
+			} else {
+				// found the last filter in the filter chain ...
+				BeginEnumPins(pBF, pEP, pPin) {
+					AM_MEDIA_TYPE mt;
 
-						if (mt.majortype == MEDIATYPE_Audio) {
-							outputMT = CMediaType(mt);
-						}
-
-						FreeMediaType(mt);
-
-						if (outputMT.pbFormat) {
-							break;
-						}
+					if (S_OK != pPin->ConnectionMediaType(&mt)) {
+						continue;
 					}
-					EndEnumPins
+
+					if (mt.majortype == MEDIATYPE_Audio) {
+						outputMT = CMediaType(mt);
+					}
+
+					FreeMediaType(mt);
+
+					if (outputMT.pbFormat) {
+						break;
+					}
 				}
+				EndEnumPins
+
 				if (outputMT.pbFormat) {
 					break;
 				}

@@ -55,6 +55,8 @@ extern bool				IsAudioWaveRenderer(IBaseFilter* pBF);
 
 extern IBaseFilter*		GetUpStreamFilter(IBaseFilter* pBF, IPin* pInputPin = NULL);
 extern IPin*			GetUpStreamPin(IBaseFilter* pBF, IPin* pInputPin = NULL);
+extern IBaseFilter*		GetDownStreamFilter(IBaseFilter* pBF, IPin* pInputPin = NULL);
+extern IPin*			GetDownStreamPin(IBaseFilter* pBF, IPin* pInputPin = NULL);
 extern IPin*			GetFirstPin(IBaseFilter* pBF, PIN_DIRECTION dir = PINDIR_INPUT);
 extern IPin*			GetFirstDisconnectedPin(IBaseFilter* pBF, PIN_DIRECTION dir);
 extern void				NukeDownstream(IBaseFilter* pBF, IFilterGraph* pFG);

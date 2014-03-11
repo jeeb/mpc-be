@@ -264,6 +264,30 @@ IPin* GetUpStreamPin(IBaseFilter* pBF, IPin* pInputPin)
 	return NULL;
 }
 
+IBaseFilter* GetDownStreamFilter(IBaseFilter* pBF, IPin* pInputPin)
+{
+	return GetFilterFromPin(GetDownStreamPin(pBF, pInputPin));
+}
+
+IPin* GetDownStreamPin(IBaseFilter* pBF, IPin* pInputPin)
+{
+	BeginEnumPins(pBF, pEP, pPin) {
+		if (!pInputPin || (pInputPin == pPin)) {
+			PIN_DIRECTION dir;
+			CComPtr<IPin> pPinConnectedTo;
+			if (SUCCEEDED(pPin->QueryDirection(&dir)) && dir == PINDIR_OUTPUT
+					&& SUCCEEDED(pPin->ConnectedTo(&pPinConnectedTo))) {
+				IPin* pRet = pPinConnectedTo.Detach();
+				pRet->Release();
+				return pRet;
+			}
+		}
+	}
+	EndEnumPins
+
+	return NULL;
+}
+
 IPin* GetFirstPin(IBaseFilter* pBF, PIN_DIRECTION dir)
 {
 	if (!pBF) {
