@@ -135,7 +135,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	MI.Close();
 
 	if (!MI_Text.Find(_T("Unable to load"))) {
-		MI_Text = _T("");
+		MI_Text.Empty();
 	}
 
 	LOGFONT lf;
@@ -151,7 +151,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	CDC* cDC = m_mediainfo.BeginPaint(&ps);
 
 	do {
-		_tcscpy_s(lf.lfFaceName, fonts[i]);
+		wcscpy_s(lf.lfFaceName, LF_FACESIZE, fonts[i]);
 		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
 		success = IsFontInstalled(fonts[i]) && m_pCFont->CreateFontIndirect(&lf);
 		i++;

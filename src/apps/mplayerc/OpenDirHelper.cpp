@@ -37,7 +37,7 @@ void COpenDirHelper::SetFont(HWND hwnd, LPTSTR FontName, int FontSize)
 	GetObject(GetWindowFont(hwnd), sizeof(lf), &lf);
 	lf.lfWeight = FW_REGULAR;
 	lf.lfHeight = (LONG)FontSize;
-	_tcscpy_s(lf.lfFaceName, FontName);
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, FontName);
 	hf = CreateFontIndirect(&lf);
 	SetBkMode(hdc,OPAQUE);
 
@@ -54,7 +54,7 @@ void COpenDirHelper::SetFont(HWND hwnd, LPTSTR FontName, int FontSize)
 LRESULT APIENTRY COpenDirHelper::CheckBoxSubclassProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	if (uMsg == WM_LBUTTONUP) {
-		if ((SendMessage(hwnd,BM_GETCHECK,0,0) )== 1) {
+		if ((SendMessage(hwnd, BM_GETCHECK, 0, 0)) == 1) {
 			m_incl_subdir = FALSE;
 		} else {
 			m_incl_subdir = TRUE;
@@ -86,25 +86,25 @@ int CALLBACK COpenDirHelper::BrowseCallbackProcDIR(HWND hwnd, UINT uMsg, LPARAM 
 		HWND id_cancel = GetDlgItem(hwnd, IDCANCEL);
 
 		GetWindowRect(hwnd, &Dialog);
-		MoveWindow(hwnd, Dialog.left, Dialog.top, Dialog.right-Dialog.left+50, Dialog.bottom-Dialog.top+70, TRUE);
+		MoveWindow(hwnd, Dialog.left, Dialog.top, Dialog.right - Dialog.left + 50, Dialog.bottom - Dialog.top + 70, TRUE);
 		GetWindowRect(hwnd, &Dialog);
 
 		GetClientRect(hwnd, &ClientArea);
 
 		GetWindowRect(ListView, &ListViewRect);
-		MoveWindow(ListView, ListViewRect.left-Dialog.left-3, ListViewRect.top-Dialog.top-75, ListViewRect.right-ListViewRect.left+49, ListViewRect.bottom-ListViewRect.top+115, TRUE);
+		MoveWindow(ListView, ListViewRect.left - Dialog.left - 3, ListViewRect.top - Dialog.top - 75, ListViewRect.right - ListViewRect.left + 49, ListViewRect.bottom - ListViewRect.top + 115, TRUE);
 		GetWindowRect(ListView, &ListViewRect);
 
 		GetWindowRect(id_ok, &ButtonRect);
-		MoveWindow(id_ok, ButtonRect.left-Dialog.left+49, ButtonRect.top-Dialog.top+40, ButtonRect.right-ButtonRect.left, ButtonRect.bottom-ButtonRect.top, TRUE);
+		MoveWindow(id_ok, ButtonRect.left - Dialog.left + 49, ButtonRect.top - Dialog.top + 40, ButtonRect.right - ButtonRect.left, ButtonRect.bottom - ButtonRect.top, TRUE);
 
 		GetWindowRect(id_cancel, &ButtonRect);
-		MoveWindow(id_cancel, ButtonRect.left-Dialog.left+49, ButtonRect.top-Dialog.top+40, ButtonRect.right-ButtonRect.left, ButtonRect.bottom-ButtonRect.top, TRUE);
+		MoveWindow(id_cancel, ButtonRect.left - Dialog.left + 49, ButtonRect.top - Dialog.top + 40, ButtonRect.right - ButtonRect.left, ButtonRect.bottom - ButtonRect.top, TRUE);
 
-		SetWindowPos(checkbox, HWND_BOTTOM, ListViewRect.left-Dialog.left-3, ClientArea.bottom - 35, 180, 27, SWP_SHOWWINDOW);
+		SetWindowPos(checkbox, HWND_BOTTOM, ListViewRect.left-Dialog.left - 3, ClientArea.bottom - 35, 180, 27, SWP_SHOWWINDOW);
 		SetFont(checkbox, _T("Tahoma"), 13);
 
-		CBProc = (WNDPROC) SetWindowLongPtr(checkbox, GWLP_WNDPROC, (LONG_PTR) CheckBoxSubclassProc);
+		CBProc = (WNDPROC)SetWindowLongPtr(checkbox, GWLP_WNDPROC, (LONG_PTR)CheckBoxSubclassProc);
 		SendMessage(checkbox, BM_SETCHECK, (WPARAM)m_incl_subdir, 0);
 	}
 
@@ -121,10 +121,10 @@ void COpenDirHelper::RecurseAddDir(CString path, CAtlList<CString>* sl)
 		do {
 			CString f_name = fd.cFileName;
 
-			if ((fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) && (f_name!=_T(".")) && (f_name!=_T(".."))) {
+			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (f_name!=_T(".")) && (f_name!=_T(".."))) {
 				CString fullpath = path + f_name;
 
-				if (fullpath[fullpath.GetLength()-1] != '\\') {
+				if (fullpath[fullpath.GetLength() - 1] != '\\') {
 					fullpath += '\\';
 				}
 
