@@ -51,7 +51,6 @@ private:
 	void DrawButton(CDC *pDC, int x, int y, int z);
 	void UpdateWnd(CPoint point);
 	void DrawWnd();
-	void Destroy();
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

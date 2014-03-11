@@ -63,11 +63,6 @@ CFlyBar::CFlyBar() :
 
 CFlyBar::~CFlyBar()
 {
-	Destroy();
-}
-
-void CFlyBar::Destroy()
-{
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
 	}
@@ -139,7 +134,7 @@ int CFlyBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_tooltip.Create(this, TTS_ALWAYSTIP);
 	EnableToolTips(true);
 
-	m_tooltip.AddTool(this, _T(""));
+	m_tooltip.AddTool(this, L"");
 	m_tooltip.Activate(TRUE);
 
 	m_tooltip.SetDelayTime(TTDT_AUTOPOP, -1);
@@ -154,13 +149,13 @@ void CFlyBar::CalcButtonsRect()
 	CRect rcBar;
 	GetWindowRect(&rcBar);
 
-	r_ExitIcon		= CRect(rcBar.right-5-(iw),	rcBar.top+5, rcBar.right-5, rcBar.bottom-5);
-	r_MinIcon		= CRect(rcBar.right-5-(iw*3), rcBar.top+5, rcBar.right-5-(iw*2), rcBar.bottom-5);
-	r_RestoreIcon	= CRect(rcBar.right-5-(iw*2), rcBar.top+5, rcBar.right-5-(iw), rcBar.bottom-5);
-	r_SettingsIcon	= CRect(rcBar.right-5-(iw*7), rcBar.top+5, rcBar.right-5-(iw*6), rcBar.bottom-5);
-	r_InfoIcon		= CRect(rcBar.right-5-(iw*6), rcBar.top+5, rcBar.right-5-(iw*5), rcBar.bottom-5);
-	r_FSIcon		= CRect(rcBar.right-5-(iw*4), rcBar.top+5, rcBar.right-5-(iw*3), rcBar.bottom-5);
-	r_LockIcon		= CRect(rcBar.right-5-(iw*9), rcBar.top+5, rcBar.right-5-(iw*8), rcBar.bottom-5);
+	r_ExitIcon		= CRect(rcBar.right - 5 - (iw),     rcBar.top + 5, rcBar.right - 5,            rcBar.bottom - 5);
+	r_MinIcon		= CRect(rcBar.right - 5 - (iw * 3), rcBar.top + 5, rcBar.right - 5 - (iw * 2), rcBar.bottom - 5);
+	r_RestoreIcon	= CRect(rcBar.right - 5 - (iw * 2), rcBar.top + 5, rcBar.right - 5 - (iw),     rcBar.bottom - 5);
+	r_SettingsIcon	= CRect(rcBar.right - 5 - (iw * 7), rcBar.top + 5, rcBar.right - 5 - (iw * 6), rcBar.bottom - 5);
+	r_InfoIcon		= CRect(rcBar.right - 5 - (iw * 6), rcBar.top + 5, rcBar.right - 5 - (iw * 5), rcBar.bottom - 5);
+	r_FSIcon		= CRect(rcBar.right - 5 - (iw * 4), rcBar.top + 5, rcBar.right - 5 - (iw * 3), rcBar.bottom - 5);
+	r_LockIcon		= CRect(rcBar.right - 5 - (iw * 9), rcBar.top + 5, rcBar.right - 5 - (iw * 8), rcBar.bottom - 5);
 }
 
 void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
@@ -220,10 +215,11 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 {
 	SetCursor(LoadCursor(NULL, IDC_HAND));
+
 	TRACKMOUSEEVENT tme;
-	tme.cbSize = sizeof(tme);
-	tme.hwndTrack = GetSafeHwnd();
-	tme.dwFlags = TME_LEAVE;
+	tme.cbSize		= sizeof(tme);
+	tme.hwndTrack	= GetSafeHwnd();
+	tme.dwFlags		= TME_LEAVE;
 	TrackMouseEvent(&tme);
 
 	UpdateWnd(point);
@@ -252,7 +248,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	} else if (r_RestoreIcon.PtInRect(point)) {
 		WINDOWPLACEMENT wp;
 		pFrame->GetWindowPlacement(&wp);
-		wp.showCmd == SW_SHOWMAXIMIZED ? str2 = ResStr(IDS_TOOLTIP_RESTORE) : str2 = ResStr(IDS_TOOLTIP_MAXIMIZE);
+		str2 = (wp.showCmd == SW_SHOWMAXIMIZED) ? ResStr(IDS_TOOLTIP_RESTORE) : ResStr(IDS_TOOLTIP_MAXIMIZE);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
@@ -268,20 +264,20 @@ void CFlyBar::UpdateWnd(CPoint point)
 		}
 		bt_idx = 4;
 	} else if (r_FSIcon.PtInRect(point)) {
-		pFrame->m_fFullScreen ? str2 = ResStr(IDS_TOOLTIP_WINDOW) : str2 = ResStr(IDS_TOOLTIP_FULLSCREEN);
+		str2 = pFrame->m_fFullScreen ? ResStr(IDS_TOOLTIP_WINDOW) : ResStr(IDS_TOOLTIP_FULLSCREEN);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
 		bt_idx = 5;
 	} else if (r_LockIcon.PtInRect(point)) {
-		AfxGetAppSettings().fFlybarOnTop ? str2 = ResStr(IDS_TOOLTIP_UNLOCK) : str2 = ResStr(IDS_TOOLTIP_LOCK);
+		str2 = AfxGetAppSettings().fFlybarOnTop ? ResStr(IDS_TOOLTIP_UNLOCK) : ResStr(IDS_TOOLTIP_LOCK);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
 		bt_idx = 6;
 	} else {
 		if (str.GetLength() > 0) {
-			m_tooltip.UpdateTipText(_T(""), this);
+			m_tooltip.UpdateTipText(L"", this);
 		}
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		bt_idx = -1;
@@ -296,7 +292,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	CPoint p;
 	p.x = max(0, min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
 	int iCursorHeight = 24;
-	m_tooltip.SetWindowPos(NULL, p.x, point.y + iCursorHeight, r_tooltip.Width(), iCursorHeight, SWP_NOACTIVATE|SWP_NOZORDER);
+	m_tooltip.SetWindowPos(NULL, p.x, point.y + iCursorHeight, r_tooltip.Width(), iCursorHeight, SWP_NOACTIVATE | SWP_NOZORDER);
 
 	Invalidate();
 }
@@ -309,30 +305,28 @@ void CFlyBar::OnPaint()
 
 void CFlyBar::DrawWnd()
 {
-	CClientDC dc (this);
-
+	CClientDC dc(this);
 	if (IsWindowVisible()) {
-
 		AppSettings& s = AfxGetAppSettings();
 
 		CRect rcBar;
 		GetClientRect(&rcBar);
 		int x = rcBar.Width();
 
-		CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
+		CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 		WINDOWPLACEMENT wp;
 		pFrame->GetWindowPlacement(&wp);
 
-		OAFilterState fs	= pFrame->GetMediaState();
+		OAFilterState fs = pFrame->GetMediaState();
 		CDC mdc;
 		mdc.CreateCompatibleDC(&dc);
 		CBitmap bm;
 		bm.CreateCompatibleBitmap(&dc, x, rcBar.Height());
 		CBitmap* pOldBm = mdc.SelectObject(&bm);
 		mdc.SetBkMode(TRANSPARENT);
-		mdc.FillSolidRect(rcBar, RGB(0,0,0));
+		mdc.FillSolidRect(rcBar, RGB(0, 0, 0));
 
-		int sep[][2] = {{0,1},{13,14},{15,16},{12,12},{10,11},{17,18},{5,6},{7,7},{21,22},{4,4},{2,3},{8,9},{19,20}};
+		int sep[][2] = {{0, 1}, {13, 14}, {15, 16}, {12, 12}, {10, 11}, {17, 18}, {5, 6}, {7, 7}, {21, 22}, {4, 4}, {2, 3}, {8, 9}, {19, 20}};
 
 		for (int i = 0; i < 2; i++) {
 
