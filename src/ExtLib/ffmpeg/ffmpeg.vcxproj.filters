@@ -2395,6 +2395,9 @@
     <ClCompile Include="libavfilter\af_biquads.c">
       <Filter>libavfilter</Filter>
     </ClCompile>
+    <ClCompile Include="libavfilter\allfilters.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
     <ClCompile Include="libavfilter\audio.c">
       <Filter>libavfilter</Filter>
     </ClCompile>
