@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include "VMROSD.h"
+#include "OSD.h"
 
 #define DEFFLAGS				SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS
 
@@ -31,7 +31,7 @@
 #define SLIDER_CHAP_HEIGHT		10
 
 
-CVMROSD::CVMROSD()
+COSD::COSD()
 	: m_nMessagePos(OSD_NOMESSAGE)
 	, m_bSeekBarVisible(false)
 	, m_bFlyBarVisible(false)
@@ -102,7 +102,7 @@ CVMROSD::CVMROSD()
 	// Gdiplus::GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 }
 
-CVMROSD::~CVMROSD()
+COSD::~COSD()
 {
 	Stop();
 
@@ -118,9 +118,9 @@ CVMROSD::~CVMROSD()
 	// Gdiplus::GdiplusShutdown(m_gdiplusToken);
 }
 
-IMPLEMENT_DYNAMIC(CVMROSD, CWnd)
+IMPLEMENT_DYNAMIC(COSD, CWnd)
 
-BEGIN_MESSAGE_MAP(CVMROSD, CWnd)
+BEGIN_MESSAGE_MAP(COSD, CWnd)
 	ON_MESSAGE_VOID(WM_HIDE, OnHide)
 	ON_MESSAGE_VOID(WM_OSD_DRAW, OnDrawWnd)
 	ON_WM_CREATE()
@@ -128,17 +128,17 @@ BEGIN_MESSAGE_MAP(CVMROSD, CWnd)
 	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
-void CVMROSD::OnHide()
+void COSD::OnHide()
 {
 	ShowWindow(SW_HIDE);
 }
 
-void CVMROSD::OnDrawWnd()
+void COSD::OnDrawWnd()
 {
 	DrawWnd();
 }
 
-void CVMROSD::OnSize(UINT nType, int cx, int cy)
+void COSD::OnSize(UINT nType, int cx, int cy)
 {
 	if (m_pWnd && (m_pVMB || m_pMFVMB)) {
 		if (m_bSeekBarVisible || m_bFlyBarVisible) {
@@ -153,7 +153,7 @@ void CVMROSD::OnSize(UINT nType, int cx, int cy)
 	}
 }
 
-void CVMROSD::UpdateBitmap()
+void COSD::UpdateBitmap()
 {
 	CAutoLock Lock(&m_Lock);
 
@@ -220,7 +220,7 @@ void CVMROSD::UpdateBitmap()
 	::ReleaseDC(m_pWnd->m_hWnd, pDC->m_hDC);
 }
 
-void CVMROSD::Reset()
+void COSD::Reset()
 {
 	m_bShowMessage	= true;
 
@@ -230,7 +230,7 @@ void CVMROSD::Reset()
 	m_strMessageCashed.Empty();
 }
 
-void CVMROSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
+void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 {
 	m_pVMB			= pVMB;
 	m_pMFVMB		= NULL;
@@ -243,7 +243,7 @@ void CVMROSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 	UpdateBitmap();
 }
 
-void CVMROSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
+void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 {
 	m_pMFVMB		= pMFVMB;
 	m_pVMB			= NULL;
@@ -256,7 +256,7 @@ void CVMROSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 	UpdateBitmap();
 }
 
-void CVMROSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
+void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 {
 	m_pMFVMB		= NULL;
 	m_pVMB			= NULL;
@@ -267,7 +267,7 @@ void CVMROSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 	Reset();
 }
 
-void CVMROSD::Start(CWnd* pWnd)
+void COSD::Start(CWnd* pWnd)
 {
 	m_pMFVMB	= NULL;
 	m_pVMB		= NULL;
@@ -278,7 +278,7 @@ void CVMROSD::Start(CWnd* pWnd)
 	Reset();
 }
 
-void CVMROSD::Stop()
+void COSD::Stop()
 {
 	if (m_pWnd) {
 		::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
@@ -303,7 +303,7 @@ void CVMROSD::Stop()
 	Reset();
 }
 
-void CVMROSD::CalcRect()
+void COSD::CalcRect()
 {
 	if (m_pWnd) {
 		m_pWnd->GetClientRect(&m_rectWnd);
@@ -330,7 +330,7 @@ void CVMROSD::CalcRect()
 	}
 }
 
-void CVMROSD::DrawRect(CRect* rect, CBrush* pBrush, CPen* pPen)
+void COSD::DrawRect(CRect* rect, CBrush* pBrush, CPen* pPen)
 {
 	if (pPen) {
 		m_MemDC.SelectObject(pPen);
@@ -347,7 +347,7 @@ void CVMROSD::DrawRect(CRect* rect, CBrush* pBrush, CPen* pPen)
 	m_MemDC.Rectangle(rect);
 }
 
-void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
+void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 {
 	m_rectBar.left		= rect->left  + 10;
 	m_rectBar.right		= rect->right - 10;
@@ -394,7 +394,7 @@ void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPo
 	DrawRect(&m_rectCursor, NULL, &m_penCursor);
 }
 
-void CVMROSD::DrawFlyBar(CRect* rect)
+void COSD::DrawFlyBar(CRect* rect)
 {
 	icoExit = m_pButtonsImages->ExtractIcon(0);
 	DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit, 0, 0, 0, NULL, DI_NORMAL);
@@ -416,7 +416,7 @@ void CVMROSD::DrawFlyBar(CRect* rect)
 	}
 }
 
-void CVMROSD::DrawMessage()
+void COSD::DrawMessage()
 {
 	if (m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3) == 0) {
 		return;
@@ -519,7 +519,7 @@ void CVMROSD::DrawMessage()
 	}
 }
 
-void CVMROSD::DrawDebug()
+void COSD::DrawDebug()
 {
 	if (!m_debugMessages.IsEmpty()) {
 		CString msg, tmp;
@@ -550,7 +550,7 @@ void CVMROSD::DrawDebug()
 	}
 }
 
-void CVMROSD::InvalidateVMROSD()
+void COSD::InvalidateVMROSD()
 {
 	CAutoLock Lock(&m_Lock);
 
@@ -578,7 +578,7 @@ void CVMROSD::InvalidateVMROSD()
 	}
 }
 
-void CVMROSD::UpdateSeekBarPos(CPoint point)
+void COSD::UpdateSeekBarPos(CPoint point)
 {
 	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax-m_llSeekMin) / (m_rectBar.Width() - SLIDER_CURSOR_WIDTH);
 	m_llSeekPos = max (m_llSeekPos, m_llSeekMin);
@@ -589,7 +589,7 @@ void CVMROSD::UpdateSeekBarPos(CPoint point)
 	}
 }
 
-bool CVMROSD::OnMouseMove(UINT nFlags, CPoint point)
+bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 {
 	bool		bRet = false;
 
@@ -647,7 +647,7 @@ bool CVMROSD::OnMouseMove(UINT nFlags, CPoint point)
 	return bRet;
 }
 
-bool CVMROSD::OnLButtonDown(UINT nFlags, CPoint point)
+bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
@@ -667,7 +667,7 @@ bool CVMROSD::OnLButtonDown(UINT nFlags, CPoint point)
 	return bRet;
 }
 
-bool CVMROSD::OnLButtonUp(UINT nFlags, CPoint point)
+bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
@@ -692,40 +692,40 @@ bool CVMROSD::OnLButtonUp(UINT nFlags, CPoint point)
 	return bRet;
 }
 
-__int64 CVMROSD::GetPos() const
+__int64 COSD::GetPos() const
 {
 	return m_llSeekPos;
 }
 
-void CVMROSD::SetPos(__int64 pos)
+void COSD::SetPos(__int64 pos)
 {
 	m_llSeekPos = pos;
 }
 
-void CVMROSD::SetRange(__int64 start,  __int64 stop)
+void COSD::SetRange(__int64 start,  __int64 stop)
 {
 	m_llSeekMin	= start;
 	m_llSeekMax = stop;
 }
 
-void CVMROSD::GetRange(__int64& start, __int64& stop)
+void COSD::GetRange(__int64& start, __int64& stop)
 {
 	start	= m_llSeekMin;
 	stop	= m_llSeekMax;
 }
 
-void CVMROSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
+void COSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
 {
-	CVMROSD* pVMROSD = (CVMROSD*)nIDEvent;
+	COSD* pOSD = (COSD*)nIDEvent;
 
-	if (pVMROSD) {
-		pVMROSD->SetVisible(false);
-		pVMROSD->ClearMessage();
+	if (pOSD) {
+		pOSD->SetVisible(false);
+		pOSD->ClearMessage();
 	}
 	::KillTimer(hWnd, nIDEvent);
 }
 
-void CVMROSD::ClearMessage(bool hide)
+void COSD::ClearMessage(bool hide)
 {
 	CAutoLock Lock(&m_Lock);
 
@@ -755,7 +755,7 @@ void CVMROSD::ClearMessage(bool hide)
 	}
 }
 
-void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, int FontSize, CString OSD_Font)
+void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, int FontSize, CString OSD_Font)
 {
 	if (!m_bShowMessage) {
 		return;
@@ -846,7 +846,7 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 	}
 }
 
-void CVMROSD::DebugMessage(LPCTSTR format, ...)
+void COSD::DebugMessage(LPCTSTR format, ...)
 {
 	CString tmp;
 	va_list argList;
@@ -857,7 +857,7 @@ void CVMROSD::DebugMessage(LPCTSTR format, ...)
 	DisplayMessage(OSD_DEBUG, tmp);
 }
 
-void CVMROSD::HideMessage(bool hide)
+void COSD::HideMessage(bool hide)
 {
 	if (m_pVMB || m_pMFVMB) {
 		if (hide) {
@@ -877,10 +877,9 @@ void CVMROSD::HideMessage(bool hide)
 	}
 }
 
-void CVMROSD::HideExclusiveBars()
+void COSD::HideExclusiveBars()
 {
 	if (m_pVMB || m_pMFVMB) {
-
 		if (m_bFlyBarVisible || m_bSeekBarVisible) {
 			m_bFlyBarVisible	= false;
 			m_bSeekBarVisible	= false;
@@ -893,7 +892,7 @@ void CVMROSD::HideExclusiveBars()
 	}
 }
 
-BOOL CVMROSD::PreTranslateMessage(MSG* pMsg)
+BOOL COSD::PreTranslateMessage(MSG* pMsg)
 {
 
 	if (m_pWnd) {
@@ -914,7 +913,7 @@ BOOL CVMROSD::PreTranslateMessage(MSG* pMsg)
 	return CWnd::PreTranslateMessage(pMsg);
 }
 
-BOOL CVMROSD::PreCreateWindow(CREATESTRUCT& cs)
+BOOL COSD::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (!CWnd::PreCreateWindow(cs)) {
 		return FALSE;
@@ -925,17 +924,17 @@ BOOL CVMROSD::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-BOOL CVMROSD::OnEraseBkgnd(CDC* pDC)
+BOOL COSD::OnEraseBkgnd(CDC* pDC)
 {
 	return TRUE;
 }
 
-void CVMROSD::OnPaint()
+void COSD::OnPaint()
 {
 	PostMessage(WM_OSD_DRAW);
 }
 
-void CVMROSD::DrawWnd()
+void COSD::DrawWnd()
 {
 	CAutoLock Lock(&m_Lock);
 
@@ -1143,7 +1142,7 @@ void CVMROSD::DrawWnd()
 	mdc.DeleteDC();
 }
 
-void CVMROSD::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
+void COSD::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 {
 	CAutoLock lock(&m_CBLock);
 

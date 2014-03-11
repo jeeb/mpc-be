@@ -57,11 +57,11 @@ enum OSD_TYPE {
 	OSD_TYPE_GDI
 };
 
-class CVMROSD : public CWnd
+class COSD : public CWnd
 {
 public:
-	CVMROSD();
-	~CVMROSD();
+	COSD();
+	~COSD();
 	void Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB);
 	void Start(CWnd* pWnd, IMFVideoMixerBitmap* pVMB);
 	void Start(CWnd* pWnd, IMadVRTextOsd* pMVTO);
@@ -95,7 +95,7 @@ public:
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
 
-	DECLARE_DYNAMIC(CVMROSD)
+	DECLARE_DYNAMIC(COSD)
 
 private :
 	CComPtr<IVMRMixerBitmap9>		m_pVMB;

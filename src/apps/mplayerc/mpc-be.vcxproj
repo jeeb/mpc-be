@@ -175,6 +175,7 @@
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="CShockwaveFlash.cpp" />
+    <ClCompile Include="OSD.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
     <ClCompile Include="PPageFiltersPerformance.cpp" />
@@ -275,7 +276,6 @@
     <ClCompile Include="TunerScanDlg.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="vkCodes.cpp" />
-    <ClCompile Include="VMROSD.cpp" />
     <ClCompile Include="WebClient.cpp" />
     <ClCompile Include="WebServer.cpp" />
     <ClCompile Include="WinDebugMonitor.cpp" />
@@ -289,6 +289,7 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="CShockwaveFlash.h" />
+    <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerVimeo.h" />
     <ClInclude Include="PlayerYouTube.h" />
@@ -393,7 +394,6 @@
     <ClInclude Include="..\..\..\include\Version.h" />
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="vkCodes.h" />
-    <ClInclude Include="VMROSD.h" />
     <ClInclude Include="WebClient.h" />
     <ClInclude Include="WebServer.h" />
     <ClInclude Include="WinDebugMonitor.h" />

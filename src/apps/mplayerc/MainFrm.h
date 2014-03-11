@@ -62,7 +62,7 @@
 #include <evr.h>
 #include <evr9.h>
 #include <Il21dec.h>
-#include "VMROSD.h"
+#include "OSD.h"
 #include "LcdSupport.h"
 #include "MpcApi.h"
 #include "../../filters/renderer/SyncClock/SyncClock.h"
@@ -1054,7 +1054,7 @@ public:
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
-	CVMROSD		m_OSD;
+	COSD		m_OSD;
 
 	bool		m_bRemainingTime;
 	bool		m_bOSDLocalTime;

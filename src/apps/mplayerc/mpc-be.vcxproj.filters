@@ -294,9 +294,6 @@
     <ClCompile Include="TunerScanDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VMROSD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WebClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -343,6 +340,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WinDebugMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OSD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -635,9 +635,6 @@
     <ClInclude Include="..\..\..\include\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VMROSD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WebClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -684,6 +681,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerVimeo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OSD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
