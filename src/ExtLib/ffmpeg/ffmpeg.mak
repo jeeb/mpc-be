@@ -243,6 +243,7 @@ SRCS_C = \
 	libavcodec/metasound.c \
 	libavcodec/metasound_data.c \
 	libavcodec/mjpeg.c \
+	libavcodec/mjpeg_parser.c \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
 	libavcodec/mlp.c \
