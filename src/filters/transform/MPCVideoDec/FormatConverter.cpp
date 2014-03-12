@@ -380,7 +380,7 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 
 int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 {
-	if (!m_pSwsContext || pFrame->format != m_FProps.avpixfmt || pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
+	if (!m_pSwsContext || FormatChanged(&m_FProps.avpixfmt, (AVPixelFormat*)&pFrame->format) || pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
 		// update the basic properties
 		m_FProps.avpixfmt	= (AVPixelFormat)pFrame->format;
 		m_FProps.width		= pFrame->width;
@@ -470,4 +470,17 @@ void CFormatConverter::Cleanup()
 	}
 	av_freep(&m_pAlignedBuffer);
 	m_nAlignedBufferSize = 0;
+}
+
+bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
+{
+	if (*fmt1 == AV_PIX_FMT_NONE || *fmt2 == AV_PIX_FMT_NONE) {
+		return true;
+	}
+	const AVPixFmtDescriptor* av_pfdesc_fmt1 = av_pix_fmt_desc_get(*fmt1);
+	const AVPixFmtDescriptor* av_pfdesc_fmt2 = av_pix_fmt_desc_get(*fmt2);
+	return av_pfdesc_fmt1->log2_chroma_h != av_pfdesc_fmt2->log2_chroma_h
+			|| av_pfdesc_fmt1->log2_chroma_w != av_pfdesc_fmt2->log2_chroma_w
+			|| av_pfdesc_fmt1->nb_components != av_pfdesc_fmt2->nb_components
+			|| av_pfdesc_fmt1->comp->depth_minus1 != av_pfdesc_fmt2->comp->depth_minus1;
 }

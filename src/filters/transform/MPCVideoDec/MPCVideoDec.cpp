@@ -2389,7 +2389,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			rtStart = m_rtPrevStop;
 		} else if ((m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40) && avpkt.data) {
 			rtStart = m_pFrame->pkt_pts;
-			rtStart = (rtStart == INVALID_TIME) ? m_rtPrevStop : (10000i64*process_rv_timestamp(&rm, m_nCodecId, avpkt.data, (rtStart + m_rtStart)/10000i64) - m_rtStart);
+			rtStart = (rtStart == INVALID_TIME) ? m_rtPrevStop : (10000i64 * process_rv_timestamp(&rm, m_nCodecId, avpkt.data, (rtStart + m_rtStart) / 10000i64) - m_rtStart);
 		} else if (!PULLDOWN_FLAG) {
 			rtStart = m_pFrame->pkt_pts;
 		}
@@ -2405,10 +2405,12 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			continue;
 		}
 
-		if (m_PixelFormat != m_pFrame->format) {
+		/*
+		if (m_FormatConverter.FormatChanged(&m_PixelFormat, (AVPixelFormat*)&m_pFrame->format)) {
 			ChangeOutputMediaFormat(2);
 		}
 		m_PixelFormat = (AVPixelFormat)m_pFrame->format;
+		*/
 
 		CComPtr<IMediaSample>	pOut;
 		BYTE*					pDataOut = NULL;
@@ -2484,10 +2486,10 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 		CAutoLock cObjectLock(m_pLock);
 		BuildOutputFormat();
 
-		CComQIPtr<IPin> pPin = m_pOutput->GetConnected();
-		CComQIPtr<IBaseFilter> pBF = GetFilterFromPin(pPin);
-		if (IsVideoRenderer(pBF)) {
-			hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)(IPin*)pPin, NULL);
+		IPin* pPin = m_pOutput->GetConnected();
+		if (IsVideoRenderer(GetFilterFromPin(pPin))) {
+			hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)pPin, NULL);
+			SleepEx(100, FALSE);
 			if (S_OK != hr) {
 				hr = E_FAIL;
 			}

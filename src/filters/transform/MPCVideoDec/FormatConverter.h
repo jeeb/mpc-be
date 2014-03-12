@@ -151,4 +151,6 @@ public:
 	int  Converting(BYTE* dst, AVFrame* pFrame);
 
 	void Cleanup();
+
+	bool FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2);
 };
