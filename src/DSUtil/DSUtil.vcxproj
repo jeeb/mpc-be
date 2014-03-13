@@ -125,7 +125,6 @@
     <ClCompile Include="HdmvClipInfo.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MediaTypeEx.cpp" />
-    <ClCompile Include="MediaTypes.cpp" />
     <ClCompile Include="MPCSocket.cpp" />
     <ClCompile Include="NullRenderers.cpp" />
     <ClCompile Include="Packet.cpp" />
@@ -158,7 +157,6 @@
     <ClInclude Include="HdmvClipInfo.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MediaTypeEx.h" />
-    <ClInclude Include="MediaTypes.h" />
     <ClInclude Include="MPCSocket.h" />
     <ClInclude Include="Mpeg2Def.h" />
     <ClInclude Include="NALBitstream.h" />

@@ -35,9 +35,6 @@
     <ClCompile Include="MediaTypeEx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MediaTypes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NullRenderers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -113,9 +110,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MediaTypeEx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Mpeg2Def.h">

@@ -2340,16 +2340,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 	}
 
-	// TODO - make optional RoQ A/V decoder
-	pFGF = DNew CFGFilterInternal<CRoQVideoDecoder>(RoQVideoDecoderName, MERIT64_ABOVE_DSHOW);
-	m_transform.AddTail(pFGF);
-
-	if (!IsPreview) {
-		pFGF = DNew CFGFilterInternal<CRoQAudioDecoder>(RoQAudioDecoderName, MERIT64_ABOVE_DSHOW);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RoQA);
-		m_transform.AddTail(pFGF);
-	}
-
 	if (!IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_REAL]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
@@ -2566,6 +2556,17 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG1Packet);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG1Payload);
 	m_transform.AddTail(pFGF);
+
+	// TODO - make optional RoQ A/V decoder
+	pFGF = DNew CFGFilterInternal<CRoQVideoDecoder>(RoQVideoDecoderName, MERIT64_ABOVE_DSHOW);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RoQV);
+	m_transform.AddTail(pFGF);
+
+	if (!IsPreview) {
+		pFGF = DNew CFGFilterInternal<CRoQAudioDecoder>(RoQAudioDecoderName, MERIT64_ABOVE_DSHOW);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RoQA);
+		m_transform.AddTail(pFGF);
+	}
 
 	// Blocked filters
 

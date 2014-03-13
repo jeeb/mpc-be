@@ -843,8 +843,6 @@ HRESULT CRoQVideoDecoder::GetMediaType(int iPosition, CMediaType* pmt)
 	memset(vih, 0, sizeof(VIDEOINFOHEADER));
 	vih->bmiHeader = bihOut;
 
-	CorrectMediaType(pmt);
-
 	return S_OK;
 }
 

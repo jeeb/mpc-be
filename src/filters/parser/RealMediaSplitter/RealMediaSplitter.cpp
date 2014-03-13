@@ -26,7 +26,6 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/MediaTypes.h"
 #include "RealMediaSplitter.h"
 #include "../../../Subtitles/SubtitleInputPin.h"
 

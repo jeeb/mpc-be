@@ -31,7 +31,6 @@
 #include <emmintrin.h>
 
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/MediaTypes.h"
 #include "../../../DSUtil/GolombBuffer.h"
 
 #ifdef REGISTER_FILTER

@@ -34,7 +34,6 @@
 
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/SysVersion.h"
-#include "../../../DSUtil/MediaTypes.h"
 #include "../../../DSUtil/WinAPIUtils.h"
 #include "../../parser/MpegSplitter/MpegSplitter.h"
 #include "DXVADecoderH264.h"

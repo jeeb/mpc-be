@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "DeinterlacerFilter.h"
-#include "../../DSUtil/MediaTypes.h"
+//#include "../../DSUtil/MediaTypes.h"
 #include <moreuuids.h>
 
 CDeinterlacerFilter::CDeinterlacerFilter(LPUNKNOWN punk, HRESULT* phr)
@@ -165,7 +165,6 @@ HRESULT CDeinterlacerFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	}
 
 	*pmt = m_pInput->CurrentMediaType();
-	CorrectMediaType(pmt);
 
 	return S_OK;
 }
