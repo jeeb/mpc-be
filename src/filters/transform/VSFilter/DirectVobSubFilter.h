@@ -27,13 +27,34 @@
 #include "../../../Subtitles/VobSubFile.h"
 #include "../../../Subtitles/RTS.h"
 #include "../../../Subtitles/SupSubFile.h"
+#include <moreuuids.h>
 
-typedef struct {
+struct SystrayIconData {
 	HWND hSystrayWnd;
 	IFilterGraph* graph;
 	IDirectVobSub* dvs;
 	bool fRunOnce, fShowIcon;
-} SystrayIconData;
+};
+
+static VIDEO_OUTPUT_FORMATS VSFilterDefaultFormats[] = {
+	{&MEDIASUBTYPE_P010,   2, 24, FCC('P010')},
+	{&MEDIASUBTYPE_P016,   2, 24, FCC('P016')},
+	{&MEDIASUBTYPE_NV12,   3, 12, FCC('NV12')},
+	{&MEDIASUBTYPE_YV12,   3, 12, FCC('YV12')},
+	{&MEDIASUBTYPE_YUY2,   1, 16, FCC('YUY2')},
+	{&MEDIASUBTYPE_I420,   3, 12, FCC('I420')},
+	{&MEDIASUBTYPE_IYUV,   3, 12, FCC('IYUV')},
+	{&MEDIASUBTYPE_ARGB32, 1, 32, BI_RGB},
+	{&MEDIASUBTYPE_RGB32,  1, 32, BI_RGB},
+	{&MEDIASUBTYPE_RGB24,  1, 24, BI_RGB},
+	{&MEDIASUBTYPE_RGB565, 1, 16, BI_RGB},
+	{&MEDIASUBTYPE_RGB555, 1, 16, BI_RGB},
+	{&MEDIASUBTYPE_ARGB32, 1, 32, BI_BITFIELDS},
+	{&MEDIASUBTYPE_RGB32,  1, 32, BI_BITFIELDS},
+	{&MEDIASUBTYPE_RGB24,  1, 24, BI_BITFIELDS},
+	{&MEDIASUBTYPE_RGB565, 1, 16, BI_BITFIELDS},
+	{&MEDIASUBTYPE_RGB555, 1, 16, BI_BITFIELDS},
+};
 
 /* This is for graphedit */
 
@@ -76,7 +97,6 @@ public:
 
 	// CTransformFilter
 	HRESULT SetMediaType(PIN_DIRECTION dir, const CMediaType* pMediaType),
-			CheckConnect(PIN_DIRECTION dir, IPin* pPin),
 			CompleteConnect(PIN_DIRECTION dir, IPin* pReceivePin),
 			BreakConnect(PIN_DIRECTION dir),
 			StartStreaming(),
@@ -126,7 +146,8 @@ public:
 	STDMETHODIMP GetClassID(CLSID* pClsid);
 
 protected:
-	HRESULT ChangeMediaType(int iPosition);
+	VIDEO_OUTPUT_FORMATS*	m_pVideoOutputFormat;
+	int						m_nVideoOutputCount;
 
 	HDC m_hdc;
 	HBITMAP m_hbm;

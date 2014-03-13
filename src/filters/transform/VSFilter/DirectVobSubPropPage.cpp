@@ -28,7 +28,7 @@
 #include "StyleEditorDialog.h"
 
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/MediaTypes.h"
+//#include "../../../DSUtil/MediaTypes.h"
 
 #include <Version.h>
 
@@ -65,7 +65,7 @@ STDMETHODIMP CDVSBasePPage::GetPageInfo(LPPROPPAGEINFO pPageInfo)
 	}
 
 	WCHAR wszTitle[STR_MAX_LENGTH];
-	wcscpy_s(wszTitle, str);
+	wcscpy_s(wszTitle, STR_MAX_LENGTH, str);
 
 	CheckPointer(pPageInfo, E_POINTER);
 
@@ -940,15 +940,17 @@ void CDVSColorPPage::UpdateObjectData(bool fSave)
 
 void CDVSColorPPage::UpdateControlData(bool fSave)
 {
+	int nCountFmts = _countof(VSFilterDefaultFormats);
+
 	if (fSave) {
-		if ((UINT)m_preflist.GetCount() == VIHSIZE) {
-			BYTE* pData = DNew BYTE[VIHSIZE];
+		if ((UINT)m_preflist.GetCount() == nCountFmts) {
+			BYTE* pData = DNew BYTE[nCountFmts];
 
 			for (ptrdiff_t i = 0; i < m_preflist.GetCount(); i++) {
 				pData[i] = (BYTE)m_preflist.GetItemData(i);
 			}
 
-			theApp.WriteProfileBinary(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_COLORFORMATS), pData, VIHSIZE);
+			theApp.WriteProfileBinary(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_COLORFORMATS), pData, nCountFmts);
 
 			delete [] pData;
 		} else {
@@ -960,27 +962,32 @@ void CDVSColorPPage::UpdateControlData(bool fSave)
 		m_preflist.ResetContent();
 		m_dynchglist.ResetContent();
 
-		BYTE* pData = NULL;
-		UINT nSize;
+		BYTE* pData	= NULL;
+		UINT nSize	= 0;
 
 		if (!theApp.GetProfileBinary(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_COLORFORMATS), &pData, &nSize)
-				|| !pData || nSize != VIHSIZE) {
+				|| !pData || nSize != nCountFmts) {
 			if (pData) {
 				delete [] pData, pData = NULL;
 			}
 
-			nSize = VIHSIZE;
-			pData = DNew BYTE[VIHSIZE];
-			for (size_t i = 0; i < VIHSIZE; i++) {
+			nSize = nCountFmts;
+			pData = DNew BYTE[nCountFmts];
+			for (UINT i = 0; i < nSize; i++) {
 				pData[i] = i;
 			}
 		}
 
 		if (pData) {
-			for (ptrdiff_t i = 0; i < (int)nSize; i++) {
-				m_dynchglist.AddString(VIH2String(pData[i]));
+			for (UINT i = 0; i < nSize; i++) {
+				CString guid = GetGUIDString(*VSFilterDefaultFormats[i].subtype);
+				if (!guid.Left(13).CompareNoCase(_T("MEDIASUBTYPE_"))) {
+					guid = guid.Mid(13);
+				}
+
+				m_dynchglist.AddString(guid);
 				m_dynchglist.SetItemData(i, pData[i]);
-				m_preflist.AddString(VIH2String(pData[i]));
+				m_preflist.AddString(guid);
 				m_preflist.SetItemData(i, pData[i]);
 			}
 

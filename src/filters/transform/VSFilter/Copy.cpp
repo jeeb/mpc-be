@@ -24,7 +24,6 @@
 #include "DirectVobSubFilter.h"
 #include "Scale2x.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/MediaTypes.h"
 #include "..//MPCVideoDec/memcpy_sse.h"
 
 #include <InitGuid.h>
@@ -195,11 +194,20 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 	CString msg, tmp;
 
 	if (m_fOSD) {
+		CString input = GetGUIDString(m_pInput->CurrentMediaType().subtype);
+		if (!input.Left(13).CompareNoCase(_T("MEDIASUBTYPE_"))) {
+			input = input.Mid(13);
+		}
+		CString output = GetGUIDString(m_pOutput->CurrentMediaType().subtype);
+		if (!output.Left(13).CompareNoCase(_T("MEDIASUBTYPE_"))) {
+			output = output.Mid(13);
+		}
+
 		tmp.Format(_T("in: %dx%d %s\nout: %dx%d %s\n"),
 				   m_w, m_h,
-				   Subtype2String(m_pInput->CurrentMediaType().subtype),
+				   input,
 				   bihOut.biWidth, bihOut.biHeight,
-				   Subtype2String(m_pOutput->CurrentMediaType().subtype));
+				   output);
 		msg += tmp;
 
 		tmp.Format(_T("real fps: %.3f, current fps: %.3f\nmedia time: %d, subtitle time: %d [ms]\nframe number: %d (calculated)\nrate: %.4f\n"),
