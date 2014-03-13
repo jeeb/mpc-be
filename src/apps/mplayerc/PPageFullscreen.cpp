@@ -544,10 +544,10 @@ void CPPageFullscreen::ModesUpdate()
 	CString strCur;
 	GetCurDispModeString(strCur);
 
-	CString strDevice = m_MonitorDeviceName[m_iMonitorType];
-	CString MonitorName;
-	UINT16 MonitorHorRes, MonitorVerRes;
-	ReadDisplay(strDevice, &MonitorName, &MonitorHorRes, &MonitorVerRes);
+	//CString strDevice = m_MonitorDeviceName[m_iMonitorType];
+	//CString MonitorName;
+	//UINT16 MonitorHorRes, MonitorVerRes;
+	//ReadDisplay(strDevice, &MonitorName, &MonitorHorRes, &MonitorVerRes);
 
 	str = m_MonitorDisplayNames[m_iMonitorType];
 	if (str.GetLength() == 14) { m_f_hmonitor = str.Left(7); }
@@ -590,12 +590,6 @@ void CPPageFullscreen::ModesUpdate()
 		}
 		if (dm.bpp != 32 || dm.size.cx < 640) {
 			continue; // skip low resolution and non 32bpp mode
-		}
-
-		if ((MonitorHorRes && MonitorVerRes)
-				&& (MonitorHorRes != dm.size.cx)
-				&& (MonitorVerRes != dm.size.cy)) {
-			continue;
 		}
 
 		int j = 0;
