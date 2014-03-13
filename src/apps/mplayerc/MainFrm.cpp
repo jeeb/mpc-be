@@ -1577,7 +1577,7 @@ void CMainFrame::DestroyFlyBar()
 
 void CMainFrame::CreateOSDBar()
 {
-	DWORD exstyle = WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED;
+	DWORD exstyle = WS_EX_TRANSPARENT | WS_EX_LAYERED;
 	if (!m_OSD.CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), &m_wndView, 0, NULL)) {
 		TRACE(_T("Failed to create OSD Window\n"));
 		return;

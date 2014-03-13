@@ -120,7 +120,6 @@ private :
 	CBrush	m_debugBrushBack;
 	int		m_FontSize;
 	CString	m_OSD_Font;
-	int		m_OSD_Transparent;
 
 	CRect		m_rectWnd;
 	COLORREF	m_Color[OSD_LAST];
@@ -176,6 +175,8 @@ private :
 	void Reset();
 
 	void DrawWnd();
+
+	void GradientFill(CDC* pDc, CRect* rc);
 
 	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
 	// ULONG_PTR m_gdiplusToken;

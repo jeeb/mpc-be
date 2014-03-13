@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "OSD.h"
 
-#define DEFFLAGS				SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS
+#define DEFFLAGS				SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS
 
 #define SEEKBAR_HEIGHT			60
 #define SLIDER_BAR_HEIGHT		10
@@ -29,7 +29,6 @@
 #define SLIDER_CURSOR_WIDTH		15
 #define SLIDER_CHAP_WIDTH		4
 #define SLIDER_CHAP_HEIGHT		10
-
 
 COSD::COSD()
 	: m_nMessagePos(OSD_NOMESSAGE)
@@ -41,7 +40,6 @@ COSD::COSD()
 	, m_pMVTO(NULL)
 	, m_pWnd(NULL)
 	, m_FontSize(0)
-	, m_OSD_Transparent(0)
 	, bMouseOverExitButton(false)
 	, bMouseOverCloseButton(false)
 	, m_bShowMessage(true)
@@ -67,7 +65,7 @@ COSD::COSD()
 
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
 
-	m_MainWndRect = m_MainWndRectCashed = CRect(0,0,0,0);
+	m_MainWndRect = m_MainWndRectCashed = CRect(0, 0, 0, 0);
 
 	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 	BITMAP bm = { 0 };
@@ -130,7 +128,7 @@ END_MESSAGE_MAP()
 
 void COSD::OnHide()
 {
-	ShowWindow(SW_HIDE);
+	SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW | SWP_NOZORDER);
 }
 
 void COSD::OnDrawWnd()
@@ -443,58 +441,7 @@ void COSD::DrawMessage()
 		//m_MemDC.EndPath();
 		//m_MemDC.SelectClipPath(RGN_COPY);
 
-		int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
-		R	= GetRValue((AfxGetAppSettings().clrGrad1ABGR));
-		G	= GetGValue((AfxGetAppSettings().clrGrad1ABGR));
-		B	= GetBValue((AfxGetAppSettings().clrGrad1ABGR));
-		R1	= GetRValue((AfxGetAppSettings().clrGrad2ABGR));
-		G1	= GetGValue((AfxGetAppSettings().clrGrad2ABGR));
-		B1	= GetBValue((AfxGetAppSettings().clrGrad2ABGR));
-		R_	= (R + 32 >= 255 ? 255 : R + 32);
-		R1_	= (R1 + 32 >= 255 ? 255 : R1 + 32);
-		G_	= (G + 32 >= 255 ? 255 : G + 32);
-		G1_	= (G1 + 32 >= 255 ? 255 : G1 + 32);
-		B_	= (B + 32 >= 255 ? 255 : B + 32);
-		B1_	= (B1 + 32 >= 255 ? 255 : B1 + 32);
-		m_OSD_Transparent = AfxGetAppSettings().nOSDTransparent;
-		int iBorder = AfxGetAppSettings().nOSDBorder;
-
-		GRADIENT_RECT gr[1] = {{0, 1}};
-		TRIVERTEX tv[2] = {
-			{rectMessages.left, rectMessages.top, R * 256, G * 256, B * 256, m_OSD_Transparent * 256},
-			{rectMessages.right, rectMessages.bottom, R1 * 256, G1 * 256, B1 * 256, m_OSD_Transparent * 256},
-		};
-		m_MemDC.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-
-		if (iBorder > 0) {
-			GRADIENT_RECT gr2[1] = {{0, 1}};
-			TRIVERTEX tv2[2] = {
-				{rectMessages.left, rectMessages.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-				{rectMessages.left+iBorder, rectMessages.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-			};
-			m_MemDC.GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
-
-			GRADIENT_RECT gr3[1] = {{0, 1}};
-			TRIVERTEX tv3[2] = {
-				{rectMessages.right, rectMessages.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-				{rectMessages.right-iBorder, rectMessages.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-			};
-			m_MemDC.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
-
-			GRADIENT_RECT gr4[1] = {{0, 1}};
-			TRIVERTEX tv4[2] = {
-				{rectMessages.left, rectMessages.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-				{rectMessages.right, rectMessages.top+iBorder, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-			};
-			m_MemDC.GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
-
-			GRADIENT_RECT gr5[1] = {{0, 1}};
-			TRIVERTEX tv5[2] = {
-				{rectMessages.left, rectMessages.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-				{rectMessages.right, rectMessages.bottom-iBorder, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-			};
-			m_MemDC.GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
-		}
+		GradientFill(&m_MemDC, &rectMessages);
 
 		DWORD uFormat = DT_LEFT|DT_VCENTER|DT_NOPREFIX;
 
@@ -840,7 +787,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
 			}
 
-			SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			SetWindowPos(&wndTop, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			PostMessage(WM_OSD_DRAW);
 		}
 	}
@@ -870,7 +817,7 @@ void COSD::HideMessage(bool hide)
 			ClearMessage(true);
 		} else {
 			if (m_bVisibleMessage) {
-				SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+				SetWindowPos(&wndTop, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			}
 			PostMessage(WM_OSD_DRAW);
 		}
@@ -994,7 +941,7 @@ void COSD::DrawWnd()
 	temp_DC.DeleteDC();
 
 	CRect wr(10 + rectMessages.left, 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
-	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, DEFFLAGS);
+	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, DEFFLAGS | SWP_NOZORDER);
 
 	CRect rcBar;
 	GetClientRect(&rcBar);
@@ -1015,62 +962,9 @@ void COSD::DrawWnd()
 	m_MainFont.CreatePointFontIndirect(&lf, &mdc);
 	mdc.SelectObject(m_MainFont);
 
+	GradientFill(&mdc, &rcBar);
 
-	int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
-	R	= GetRValue((AfxGetAppSettings().clrGrad1ABGR));
-	G	= GetGValue((AfxGetAppSettings().clrGrad1ABGR));
-	B	= GetBValue((AfxGetAppSettings().clrGrad1ABGR));
-	R1	= GetRValue((AfxGetAppSettings().clrGrad2ABGR));
-	G1	= GetGValue((AfxGetAppSettings().clrGrad2ABGR));
-	B1	= GetBValue((AfxGetAppSettings().clrGrad2ABGR));
-	R_	= (R + 32  >= 255 ? 255 : R + 32);
-	R1_	= (R1 + 32 >= 255 ? 255 : R1 + 32);
-	G_	= (G + 32  >= 255 ? 255 : G + 32);
-	G1_	= (G1 + 32 >= 255 ? 255 : G1 + 32);
-	B_	= (B + 32  >= 255 ? 255 : B + 32);
-	B1_	= (B1 + 32 >= 255 ? 255 : B1 + 32);
-
-	m_OSD_Transparent	= 255;//AfxGetAppSettings().nOSDTransparent;
-	int iBorder			= AfxGetAppSettings().nOSDBorder;
-
-	GRADIENT_RECT gr[1] = {{0, 1}};
-	TRIVERTEX tv[2] = {
-		{rcBar.left, rcBar.top, R * 256, G * 256, B * 256, m_OSD_Transparent * 256},
-		{rcBar.right, rcBar.bottom, R1 * 256, G1 * 256, B1 * 256, m_OSD_Transparent * 256},
-	};
-	mdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-
-	if (iBorder > 0) {
-		GRADIENT_RECT gr2[1] = {{0, 1}};
-		TRIVERTEX tv2[2] = {
-			{rcBar.left, rcBar.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-			{rcBar.left+iBorder, rcBar.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-		};
-		mdc.GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
-
-		GRADIENT_RECT gr3[1] = {{0, 1}};
-		TRIVERTEX tv3[2] = {
-			{rcBar.right, rcBar.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-			{rcBar.right-iBorder, rcBar.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-		};
-		mdc.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
-
-		GRADIENT_RECT gr4[1] = {{0, 1}};
-		TRIVERTEX tv4[2] = {
-			{rcBar.left, rcBar.top, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-			{rcBar.right, rcBar.top+iBorder, R_ * 256, G_ * 256, B_ * 256, m_OSD_Transparent * 256},
-		};
-		mdc.GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
-
-		GRADIENT_RECT gr5[1] = {{0, 1}};
-		TRIVERTEX tv5[2] = {
-			{rcBar.left, rcBar.bottom, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-			{rcBar.right, rcBar.bottom-iBorder, R1_ * 256, G1_ * 256, B1_ * 256, m_OSD_Transparent * 256},
-		};
-		mdc.GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
-	}
-
-	DWORD uFormat = DT_LEFT|DT_TOP|DT_END_ELLIPSIS|DT_NOPREFIX;
+	DWORD uFormat = DT_LEFT | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX;
 
 	CRect r;
 
@@ -1149,5 +1043,64 @@ void COSD::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 	if (pCB) {
 		m_pChapterBag.Release();
 		pCB.CopyTo(&m_pChapterBag);
+	}
+}
+
+void COSD::GradientFill(CDC* pDc, CRect* rc)
+{
+	const AppSettings& s = AfxGetAppSettings();
+
+	int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
+	R	= GetRValue(s.clrGrad1ABGR);
+	G	= GetGValue(s.clrGrad1ABGR);
+	B	= GetBValue(s.clrGrad1ABGR);
+	R1	= GetRValue(s.clrGrad2ABGR);
+	G1	= GetGValue(s.clrGrad2ABGR);
+	B1	= GetBValue(s.clrGrad2ABGR);
+	R_	= min(R + 32, 255);
+	R1_	= min(R1 + 32, 255);
+	G_	= min(G + 32, 255);
+	G1_	= min(G1 + 32, 255);
+	B_	= min(B + 32, 255);
+	B1_	= min(B1 + 32, 255);
+
+	int nOSDTransparent	= s.nOSDTransparent;
+	int nOSDBorder		= s.nOSDBorder;
+
+	GRADIENT_RECT gr[1] = {{0, 1}};
+	TRIVERTEX tv[2] = {
+		{rc->left, rc->top, R * 256, G * 256, B * 256, nOSDTransparent * 256},
+		{rc->right, rc->bottom, R1 * 256, G1 * 256, B1 * 256, nOSDTransparent * 256},
+	};
+	pDc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
+	if (nOSDBorder > 0) {
+		GRADIENT_RECT gr2[1] = {{0, 1}};
+		TRIVERTEX tv2[2] = {
+			{rc->left, rc->top, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
+			{rc->left + nOSDBorder, rc->bottom, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
+		};
+		pDc->GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
+
+		GRADIENT_RECT gr3[1] = {{0, 1}};
+		TRIVERTEX tv3[2] = {
+			{rc->right, rc->top, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
+			{rc->right - nOSDBorder, rc->bottom, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
+		};
+		pDc->GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
+
+		GRADIENT_RECT gr4[1] = {{0, 1}};
+		TRIVERTEX tv4[2] = {
+			{rc->left, rc->top, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
+			{rc->right, rc->top + nOSDBorder, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
+		};
+		pDc->GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
+
+		GRADIENT_RECT gr5[1] = {{0, 1}};
+		TRIVERTEX tv5[2] = {
+			{rc->left, rc->bottom, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
+			{rc->right, rc->bottom - nOSDBorder, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
+		};
+		pDc->GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
 	}
 }
