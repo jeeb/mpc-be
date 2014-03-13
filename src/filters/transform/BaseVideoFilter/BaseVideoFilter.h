@@ -23,18 +23,25 @@
 
 bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch);
 
-typedef struct {
+struct VIDEO_OUTPUT_FORMATS {
 	const GUID*		subtype;
 	WORD			biPlanes;
 	WORD			biBitCount;
 	DWORD			biCompression;
-} VIDEO_OUTPUT_FORMATS;
 
-typedef enum {
+	bool operator == (const struct VIDEO_OUTPUT_FORMATS& fmt) const {
+		return (subtype == fmt.subtype
+				&& biPlanes == fmt.biPlanes
+				&& biBitCount == fmt.biBitCount
+				&& biCompression == fmt.biCompression);
+	}
+};
+
+enum DECODER_MODE {
 	MODE_SOFTWARE,
 	MODE_DXVA1,
 	MODE_DXVA2
-} DECODER_MODE;
+};
 
 class CBaseVideoFilter : public CTransformFilter
 {

@@ -24,7 +24,6 @@
 #include <memory.h>
 #include "BaseVideoFilter.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/MediaTypes.h"
 #include "../MPCVideoDec/memcpy_sse.h"
 
 #include <InitGuid.h>
@@ -572,7 +571,6 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	((VIDEOINFOHEADER*)pmt->Format())->dwBitRate       = ((VIDEOINFOHEADER*)mt.Format())->dwBitRate;
 	((VIDEOINFOHEADER*)pmt->Format())->dwBitErrorRate  = ((VIDEOINFOHEADER*)mt.Format())->dwBitErrorRate;
 
-	CorrectMediaType(pmt);
 	pmt->SetSampleSize(bihOut.biSizeImage);
 
 	if (!vsfilter) {
