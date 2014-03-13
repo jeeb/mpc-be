@@ -62,6 +62,9 @@ class COSD : public CWnd
 public:
 	COSD();
 	~COSD();
+
+	HRESULT Create(CWnd* pWnd);
+
 	void Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB);
 	void Start(CWnd* pWnd, IMFVideoMixerBitmap* pVMB);
 	void Start(CWnd* pWnd, IMadVRTextOsd* pMVTO);

@@ -1482,18 +1482,9 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 void CMainFrame::CreateFlyBar()
 {
 	if (AfxGetAppSettings().fFlybar) {
-		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
-			TRACE(_T("Failed to create Flybar Window\n"));
-			return;
+		if (SUCCEEDED(m_wndFlyBar.Create(this))) {
+			SetTimer(TIMER_FLYBARWINDOWHIDER, 250, NULL);
 		}
-		SetWindowLongPtr(m_wndFlyBar.m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
-		m_wndFlyBar.SetLayeredWindowAttributes(RGB(255,0,255), 150, LWA_ALPHA | LWA_COLORKEY);
-
-		if (AfxGetAppSettings().fFlybarOnTop) {
-			m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
-		}
-		SetTimer(TIMER_FLYBARWINDOWHIDER, 250, NULL);
-		//m_wndFlyBar.Invalidate();
 	}
 }
 
@@ -1539,13 +1530,14 @@ bool CMainFrame::FlyBarSetPos()
 	CRect r_wndView;
 	m_wndView.GetWindowRect(&r_wndView);
 
-	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
+	const AppSettings& s = AfxGetAppSettings();
+	if (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
 
 		int pos = (m_wndFlyBar.iw * 9) + 10;
 		m_wndFlyBar.MoveWindow(r_wndView.right - 10 - pos, r_wndView.top + 10, pos, m_wndFlyBar.iw + 10);
 		m_wndFlyBar.CalcButtonsRect();
 		if (r_wndView.Height() > 40 && r_wndView.Width() > 236) {
-			if (AfxGetAppSettings().fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {
+			if (s.fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
 			}
 			return true;
@@ -1577,16 +1569,8 @@ void CMainFrame::DestroyFlyBar()
 
 void CMainFrame::CreateOSDBar()
 {
-	DWORD exstyle = WS_EX_TRANSPARENT | WS_EX_LAYERED;
-	if (!m_OSD.CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), &m_wndView, 0, NULL)) {
-		TRACE(_T("Failed to create OSD Window\n"));
-		return;
-	}
-	m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
-
-	m_pOSDWnd = &m_wndView;
-	if (AfxGetAppSettings().fShowOSD) {
-		m_OSD.Start(m_pOSDWnd);
+	if (SUCCEEDED(m_OSD.Create(&m_wndView))) {
+		m_pOSDWnd = &m_wndView;
 	}
 }
 

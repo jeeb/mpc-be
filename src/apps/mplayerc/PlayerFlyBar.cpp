@@ -68,6 +68,21 @@ CFlyBar::~CFlyBar()
 	}
 }
 
+HRESULT CFlyBar::Create(CWnd* pWnd)
+{
+	if (!CreateEx(WS_EX_TOPMOST | WS_EX_LAYERED, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
+		DbgLog((LOG_TRACE, 3, L"Failed to create Flybar Window"));
+		return E_FAIL;
+	}
+	SetLayeredWindowAttributes(RGB(255, 0, 255), 150, LWA_ALPHA | LWA_COLORKEY);
+
+	if (AfxGetAppSettings().fFlybarOnTop) {
+		ShowWindow(SW_SHOWNOACTIVATE);
+	}
+
+	return S_OK;
+}
+
 IMPLEMENT_DYNAMIC(CFlyBar, CWnd)
 
 BEGIN_MESSAGE_MAP(CFlyBar, CWnd)

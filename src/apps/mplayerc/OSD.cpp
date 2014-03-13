@@ -116,6 +116,23 @@ COSD::~COSD()
 	// Gdiplus::GdiplusShutdown(m_gdiplusToken);
 }
 
+HRESULT COSD::Create(CWnd* pWnd)
+{
+	DWORD exstyle = WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED;
+	if (!CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
+		DbgLog((LOG_TRACE, 3, L"Failed to create OSD Window"));
+		return E_FAIL;
+	}
+
+	const AppSettings& s = AfxGetAppSettings();
+	SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - s.nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
+	if (s.fShowOSD) {
+		Start(pWnd);
+	}
+
+	return S_OK;
+}
+
 IMPLEMENT_DYNAMIC(COSD, CWnd)
 
 BEGIN_MESSAGE_MAP(COSD, CWnd)

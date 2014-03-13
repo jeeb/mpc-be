@@ -26,7 +26,9 @@ class CFlyBar : public CWnd
 {
 public:
 	CFlyBar();
-	virtual ~CFlyBar();
+	~CFlyBar();
+
+	HRESULT Create(CWnd* pWnd);
 
 	int iw;
 
