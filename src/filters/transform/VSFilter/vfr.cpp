@@ -27,7 +27,6 @@
 #include <string.h>
 #include <vector>
 
-
 // Work with seconds per frame (spf) here instead of fps since that's more natural for the translation we're doing
 
 class TimecodesV1 : public VFRTranslator

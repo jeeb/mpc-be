@@ -17,7 +17,6 @@
 
 #include "stdafx.h"
 
-
 void AvgLines8(BYTE* dst, DWORD h, DWORD pitch)
 {
 	if (h <= 1) {

@@ -22,16 +22,12 @@
 #include "stdafx.h"
 #include <commdlg.h>
 #include <afxdlgs.h>
+#include <Version.h>
 #include "DirectVobSubFilter.h"
 #include "DirectVobSubPropPage.h"
 #include "VSFilter.h"
 #include "StyleEditorDialog.h"
-
 #include "../../../DSUtil/DSUtil.h"
-//#include "../../../DSUtil/MediaTypes.h"
-
-#include <Version.h>
-
 
 BOOL WINAPI MyGetDialogSize(int iResourceID, DLGPROC pDlgProc, LPARAM lParam, SIZE* pResult)
 {

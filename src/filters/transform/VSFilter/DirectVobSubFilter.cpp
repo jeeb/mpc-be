@@ -23,6 +23,7 @@
 #include <atlpath.h>
 #include <math.h>
 #include <time.h>
+#include <InitGuid.h>
 #include "DirectVobSubFilter.h"
 #include "TextInputPin.h"
 #include "DirectVobSubPropPage.h"
@@ -33,8 +34,6 @@
 #include "../../../DSUtil/WinAPIUtils.h"
 #include "../../../SubPic/MemSubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
-
-#include <InitGuid.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
