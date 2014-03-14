@@ -78,7 +78,6 @@ public:
 	void HideExclusiveBars();
 
 	void EnableShowMessage(bool bValue = true)	{ m_bShowMessage = bValue; };
-	void SetVisible(bool bValue)				{ m_bVisibleMessage = bValue; };
 
 	__int64 GetPos() const;
 	void SetPos(__int64 pos);
@@ -149,15 +148,14 @@ private :
 	HICON	icoClose_a;
 
 	bool	m_bShowMessage;
-	bool	m_bVisibleMessage;
 
 	CRect	m_MainWndRect;
-	CRect	m_MainWndRectCashed;
+
+	const CWnd*		m_pWndInsertAfter;
 
 	OSD_TYPE		m_OSDType;
 
 	CString			m_strMessage;
-	CString			m_strMessageCashed;
 	OSD_MESSAGEPOS	m_nMessagePos;
 	CList<CString>	m_debugMessages;
 

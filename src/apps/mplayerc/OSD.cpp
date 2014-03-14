@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "OSD.h"
+#include "../../DSUtil/SysVersion.h"
 
 #define DEFFLAGS				SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS
 
@@ -43,10 +44,14 @@ COSD::COSD()
 	, bMouseOverExitButton(false)
 	, bMouseOverCloseButton(false)
 	, m_bShowMessage(true)
-	, m_bVisibleMessage(false)
 	, m_OSDType(OSD_TYPE_NONE)
 	, m_pChapterBag(NULL)
+	, m_pWndInsertAfter(NULL)
 {
+	if (IsWinEightOrLater()) {
+		m_pWndInsertAfter = &wndTop;
+	}
+
 	m_Color[OSD_TRANSPARENT]	= RGB(  0,   0,   0);
 	m_Color[OSD_BACKGROUND]		= RGB( 32,  40,  48);
 	m_Color[OSD_BORDER]			= RGB( 48,  56,  62);
@@ -65,7 +70,7 @@ COSD::COSD()
 
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
 
-	m_MainWndRect = m_MainWndRectCashed = CRect(0, 0, 0, 0);
+	m_MainWndRect = CRect(0, 0, 0, 0);
 
 	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 	BITMAP bm = { 0 };
@@ -118,8 +123,13 @@ COSD::~COSD()
 
 HRESULT COSD::Create(CWnd* pWnd)
 {
-	DWORD exstyle = WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED;
-	if (!CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
+	DWORD dwStyleEx	= WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED;
+	DWORD dwStyle	= WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	if (IsWinEightOrLater()) {
+		dwStyleEx	= WS_EX_TRANSPARENT | WS_EX_LAYERED;
+		dwStyle		= WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	}
+	if (!CreateEx(dwStyleEx, AfxRegisterWndClass(0), NULL, dwStyle, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
 		DbgLog((LOG_TRACE, 3, L"Failed to create OSD Window"));
 		return E_FAIL;
 	}
@@ -145,7 +155,7 @@ END_MESSAGE_MAP()
 
 void COSD::OnHide()
 {
-	SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW | SWP_NOZORDER);
+	ShowWindow(SW_HIDE);
 }
 
 void COSD::OnDrawWnd()
@@ -241,17 +251,15 @@ void COSD::Reset()
 
 	m_MainWndRect.SetRectEmpty();
 	m_strMessage.Empty();
-	m_MainWndRectCashed.SetRectEmpty();
-	m_strMessageCashed.Empty();
 }
 
 void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 {
-	m_pVMB			= pVMB;
-	m_pMFVMB		= NULL;
-	m_pMVTO			= NULL;
-	m_pWnd			= pWnd;
-	m_OSDType		= OSD_TYPE_BITMAP;
+	m_pVMB		= pVMB;
+	m_pMFVMB	= NULL;
+	m_pMVTO		= NULL;
+	m_pWnd		= pWnd;
+	m_OSDType	= OSD_TYPE_BITMAP;
 
 	Reset();
 
@@ -260,11 +268,11 @@ void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 
 void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 {
-	m_pMFVMB		= pMFVMB;
-	m_pVMB			= NULL;
-	m_pMVTO			= NULL;
-	m_pWnd			= pWnd;
-	m_OSDType		= OSD_TYPE_BITMAP;
+	m_pMFVMB	= pMFVMB;
+	m_pVMB		= NULL;
+	m_pMVTO		= NULL;
+	m_pWnd		= pWnd;
+	m_OSDType	= OSD_TYPE_BITMAP;
 
 	Reset();
 
@@ -273,11 +281,11 @@ void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 
 void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 {
-	m_pMFVMB		= NULL;
-	m_pVMB			= NULL;
-	m_pMVTO			= pMVTO;
-	m_pWnd			= pWnd;
-	m_OSDType		= OSD_TYPE_MADVR;
+	m_pMFVMB	= NULL;
+	m_pVMB		= NULL;
+	m_pMVTO		= pMVTO;
+	m_pWnd		= pWnd;
+	m_OSDType	= OSD_TYPE_MADVR;
 
 	Reset();
 }
@@ -683,7 +691,6 @@ void COSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
 	COSD* pOSD = (COSD*)nIDEvent;
 
 	if (pOSD) {
-		pOSD->SetVisible(false);
 		pOSD->ClearMessage();
 	}
 	::KillTimer(hWnd, nIDEvent);
@@ -696,8 +703,6 @@ void COSD::ClearMessage(bool hide)
 	if (m_bSeekBarVisible || m_bFlyBarVisible) {
 		return;
 	}
-
-	m_strMessageCashed.Empty();
 
 	if (!hide) {
 		m_nMessagePos = OSD_NOMESSAGE;
@@ -712,10 +717,8 @@ void COSD::ClearMessage(bool hide)
 		m_pMFVMB->ClearAlphaBitmap();
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdClearMessage();
-	} else {
-		if (::IsWindow(m_hWnd) && IsWindowVisible()) {
-			PostMessage(WM_HIDE);
-		}
+	} else if (::IsWindow(m_hWnd) && IsWindowVisible()) {
+		PostMessage(WM_HIDE);
 	}
 }
 
@@ -800,11 +803,10 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 		if (m_pWnd) {
 			::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
 			if (nDuration != -1) {
-				m_bVisibleMessage = true;
 				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
 			}
 
-			SetWindowPos(&wndTop, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			PostMessage(WM_OSD_DRAW);
 		}
 	}
@@ -833,8 +835,8 @@ void COSD::HideMessage(bool hide)
 		if (hide) {
 			ClearMessage(true);
 		} else {
-			if (m_bVisibleMessage) {
-				SetWindowPos(&wndTop, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			if (!m_strMessage.IsEmpty()) {
+				SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			}
 			PostMessage(WM_OSD_DRAW);
 		}
@@ -895,6 +897,7 @@ BOOL COSD::OnEraseBkgnd(CDC* pDC)
 
 void COSD::OnPaint()
 {
+	CPaintDC dc(this);
 	PostMessage(WM_OSD_DRAW);
 }
 
@@ -902,17 +905,8 @@ void COSD::DrawWnd()
 {
 	CAutoLock Lock(&m_Lock);
 
-	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_nMessagePos == OSD_NOMESSAGE || m_strMessage.IsEmpty() ) {
+	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty() || m_nMessagePos == OSD_NOMESSAGE) {
 		return;
-	}
-
-	if (m_strMessageCashed == m_strMessage && m_MainWndRectCashed == m_MainWndRect) {
-		return;
-	}
-
-	if (IsWindowVisible() && IsWindowEnabled()) {
-		m_strMessageCashed	= m_strMessage;
-		m_MainWndRectCashed	= m_MainWndRect;
 	}
 
 	CClientDC dc(this);
@@ -957,7 +951,11 @@ void COSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	CRect wr(10 + rectMessages.left, 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
+	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
+	if (IsWinEightOrLater()) {
+		wr.left	-= m_MainWndRect.left;
+		wr.top	-= m_MainWndRect.top;
+	}
 	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, DEFFLAGS | SWP_NOZORDER);
 
 	CRect rcBar;

@@ -1768,7 +1768,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	__super::OnSize(nType, cx, cy);
 
 	if (m_OSD && m_OSD.IsWindowVisible() && AfxGetAppSettings().IsD3DFullscreen()) {
-		m_OSD.OnSize (nType, cx, cy);
+		m_OSD.OnSize(nType, cx, cy);
 	}
 	if (nType == SIZE_RESTORED && m_fTrayIcon) {
 		ShowWindow(SW_SHOW);
@@ -1797,8 +1797,10 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		}
 	}
 
-	FlyBarSetPos();
-	OSDBarSetPos();
+	if (nType != SIZE_MINIMIZED) {
+		FlyBarSetPos();
+		OSDBarSetPos();
+	}
 }
 
 void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
@@ -2165,11 +2167,12 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				} else if (!r_ShowFlybar.PtInRect(p) && m_wndFlyBar.IsWindowVisible() && !AfxGetAppSettings().fFlybarOnTop) {
 					m_wndFlyBar.ShowWindow(SW_HIDE);
 				}
+				OSDBarSetPos();
 
 			} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_HIDE);
+				OSDBarSetPos();
 			}
-			OSDBarSetPos();
 			break;
 		case TIMER_STREAMPOSPOLLER:
 			if (m_iMediaLoadState == MLS_LOADED) {
