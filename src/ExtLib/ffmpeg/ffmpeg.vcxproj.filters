@@ -142,6 +142,9 @@
     <None Include="libavcodec\x86\sbrdsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\ttadsp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\v210.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -164,6 +167,9 @@
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\vp8dsp_loopfilter.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
+    <None Include="libavcodec\x86\vp9intrapred.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\vp9itxfm.asm">
@@ -216,12 +222,6 @@
     </None>
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
-    </None>
-    <None Include="libavcodec\x86\vp9intrapred.asm">
-      <Filter>libavcodec\x86</Filter>
-    </None>
-    <None Include="libavcodec\x86\ttadsp.asm">
-      <Filter>libavcodec\x86</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -895,6 +895,9 @@
     <ClInclude Include="libavcodec\ttadata.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\ttadsp.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\twinvq.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -1144,6 +1147,9 @@
     <ClInclude Include="libavutil\dict.h">
       <Filter>libavutil</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\downmix_info.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\error.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -1263,12 +1269,6 @@
     </ClInclude>
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\ttadsp.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavutil\downmix_info.h">
-      <Filter>libavutil</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1391,6 +1391,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\snowdsp.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\ttadsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\v210-init.c">
@@ -1966,6 +1969,9 @@
     <ClCompile Include="libavcodec\mjpeg.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\mjpeg_parser.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\mjpegbdec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2263,6 +2269,9 @@
     <ClCompile Include="libavcodec\ttadata.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\ttadsp.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\twinvq.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2500,6 +2509,9 @@
     <ClCompile Include="libavutil\dict.c">
       <Filter>libavutil</Filter>
     </ClCompile>
+    <ClCompile Include="libavutil\downmix_info.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
     <ClCompile Include="libavutil\error.c">
       <Filter>libavutil</Filter>
     </ClCompile>
@@ -2605,6 +2617,9 @@
     <ClCompile Include="libswscale\x86\yuv2rgb_template.c">
       <Filter>libswscale\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libswscale\bayer_template.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
     <ClCompile Include="libswscale\input.c">
       <Filter>libswscale</Filter>
     </ClCompile>
@@ -2630,18 +2645,6 @@
       <Filter>libswscale</Filter>
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
-      <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\ttadsp.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
-    <ClCompile Include="libavutil\downmix_info.c">
-      <Filter>libavutil</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\ttadsp_init.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="libswscale\bayer_template.c">
       <Filter>libswscale</Filter>
     </ClCompile>
   </ItemGroup>
