@@ -97,7 +97,7 @@ CString CDVBChannel::ToString()
 {
 	CString		strValue;
 
-	strValue.AppendFormat (_T("%d|%s|%ld|%d|%d|%d|%d|%ld|%ld|%ld|%ld|%ld|%ld|%d|%ld|%d|%ld"),
+	strValue.AppendFormat (_T("%d|%s|%lu|%d|%d|%d|%d|%lu|%lu|%lu|%lu|%lu|%lu|%d|%d|%d|%d"),
 						   FORMAT_VERSION_CURRENT,
 						   m_strName,
 						   m_ulFrequency,
@@ -117,11 +117,11 @@ CString CDVBChannel::ToString()
 						   m_nSubtitleCount);
 
 	for (int i=0; i<m_nAudioCount; i++) {
-		strValue.AppendFormat (_T("|%ld|%d|%d|%s"), m_Audios[i].PID, m_Audios[i].Type, m_Audios[i].PesType, m_Audios[i].Language);
+		strValue.AppendFormat (_T("|%lu|%d|%d|%s"), m_Audios[i].PID, m_Audios[i].Type, m_Audios[i].PesType, m_Audios[i].Language);
 	}
 
 	for (int i=0; i<m_nSubtitleCount; i++) {
-		strValue.AppendFormat (_T("|%ld|%d|%d|%s"), m_Subtitles[i].PID, m_Subtitles[i].Type, m_Subtitles[i].PesType, m_Subtitles[i].Language);
+		strValue.AppendFormat (_T("|%lu|%d|%d|%s"), m_Subtitles[i].PID, m_Subtitles[i].Type, m_Subtitles[i].PesType, m_Subtitles[i].Language);
 	}
 
 	return strValue;

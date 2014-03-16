@@ -203,7 +203,7 @@ LRESULT CTunerScanDlg::OnNewChannel(WPARAM wParam, LPARAM lParam)
 
 		m_ChannelList.SetItemText (nItem, TSCC_NAME, Channel.GetName());
 
-		strTemp.Format(_T("%d"), Channel.GetFrequency());
+		strTemp.Format(_T("%lu"), Channel.GetFrequency());
 		m_ChannelList.SetItemText (nItem, TSCC_FREQUENCY, strTemp);
 
 		strTemp = Channel.IsEncrypted() ? ResStr(IDS_DVB_CHANNEL_ENCRYPTED) : ResStr(IDS_DVB_CHANNEL_NOT_ENCRYPTED);

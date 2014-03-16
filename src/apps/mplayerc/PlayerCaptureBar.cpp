@@ -1038,7 +1038,7 @@ void CPlayerCaptureDialog::SetupVideoControls(
 						str = _T("SCART");
 						break;
 					default:
-						str.Format(_T("PhysicalType %d"), PhysicalType);
+						str.Format(_T("PhysicalType %ld"), PhysicalType);
 						break;
 				}
 

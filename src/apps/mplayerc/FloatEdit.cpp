@@ -130,7 +130,7 @@ bool CHexEdit::GetDWORD(DWORD& dw)
 DWORD CHexEdit::operator = (DWORD dw)
 {
 	CString s;
-	s.Format(_T("%08x"), dw);
+	s.Format(_T("%08lx"), dw);
 	SetWindowText(s);
 
 	return(dw);
