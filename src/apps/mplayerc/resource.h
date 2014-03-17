@@ -1237,6 +1237,11 @@
 #define IDS_AG_VIDEOFILES               33448
 #define IDS_VOLUME_OSD_MUTE             33449
 #define IDS_COPY_TO_CLIPBOARD           33450
+// stereoscopic subtitles
+#define IDS_SUBTITLES_STEREO              34000
+#define IDS_SUBTITLES_STEREO_DONTUSE      34001
+#define IDS_SUBTITLES_STEREO_SIDEBYSIDE   34002
+#define IDS_SUBTITLES_STEREO_TOPANDBOTTOM 34003
 // video files
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002

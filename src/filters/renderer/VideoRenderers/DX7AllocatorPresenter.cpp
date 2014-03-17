@@ -417,8 +417,7 @@ STDMETHODIMP_(bool) CDX7AllocatorPresenter::Paint(bool fAll)
 			}
 		}
 
-		// paint the text on the backbuffer
-
+		// paint subtitles on the backbuffer
 		AlphaBltSubPic(rSrcPri.Size());
 	}
 

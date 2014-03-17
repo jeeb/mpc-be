@@ -53,7 +53,7 @@ IMemInputPinCVtbl*	g_pMemInputPinCVtbl = NULL;
 // Aleksoid : validate Pin
 IPinC*				g_pPin				= NULL;
 
-BOOL				g_bGetFrameType		= FALSE;
+volatile BOOL		g_bGetFrameType		= FALSE;
 FF_FIELD_TYPE		g_nFrameType		= PICT_NONE;
 
 typedef struct {

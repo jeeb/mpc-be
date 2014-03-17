@@ -75,6 +75,11 @@ public:
 	// Subtitle position settings
 	int bPositionRelative;
 
+	// Stereoscopic Subtitles
+	BOOL bStereoDisabled;
+	BOOL bSideBySide;
+	BOOL bTopAndBottom;
+
 	class CAdvRendererSettings
 	{
 	public:

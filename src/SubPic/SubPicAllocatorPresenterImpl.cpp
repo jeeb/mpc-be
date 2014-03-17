@@ -61,26 +61,47 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID r
 
 void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(CSize size, SubPicDesc* pTarget)
 {
-	CRenderersSettings& s = GetRenderersSettings();
-
 	CComPtr<ISubPic> pSubPic;
 	if (m_pSubPicQueue->LookupSubPic(m_rtNow, pSubPic)) {
-		CRect rcSource, rcDest;
-		if (SUCCEEDED (pSubPic->GetSourceAndDest(&size, rcSource, rcDest))) {
+		CRect rcSubs(CPoint(0, 0), size);
 
-			if (s.bPositionRelative) {
-				rcDest = CRect (rcDest.left		* m_VideoRect.Width()	/ m_WindowRect.Width(),
-								rcDest.top		* m_VideoRect.Height()	/ m_WindowRect.Height(),
-								rcDest.right	* m_VideoRect.Width()	/ m_WindowRect.Width(),
-								rcDest.bottom	* m_VideoRect.Height()	/ m_WindowRect.Height()
-				);
-				rcDest.left		+= m_VideoRect.left;
-				rcDest.right	+= m_VideoRect.left;
-				rcDest.top		+= m_VideoRect.top;
-				rcDest.bottom	+= m_VideoRect.top;
-			}
-			pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
+		CRenderersSettings& s = GetRenderersSettings();
+		if (s.bSideBySide) {
+			CRect rcTemp(CPoint(0, 0), size);
+			rcTemp.right -= rcTemp.Width() / 2;
+			AlphaBlt(rcTemp, pSubPic, pTarget);
+			rcSubs.left += rcSubs.Width() / 2;
+		} else if (s.bTopAndBottom) {
+			CRect rcTemp(CPoint(0, 0), size);
+			rcTemp.bottom -= rcTemp.Height() / 2;
+			AlphaBlt(rcTemp, pSubPic, pTarget);
+			rcSubs.top += rcSubs.Height() / 2;
 		}
+
+		AlphaBlt(rcSubs, pSubPic, pTarget);
+	}
+}
+
+void CSubPicAllocatorPresenterImpl::AlphaBlt(CRect r, ISubPic* pSubPic, SubPicDesc* pTarget)
+{
+	CRect rcSource, rcDest;
+	if (SUCCEEDED(pSubPic->GetSourceAndDest(&r.Size(), rcSource, rcDest))) {
+		rcDest.OffsetRect(r.left, r.top);
+
+		CRenderersSettings& s = GetRenderersSettings();
+		if (s.bPositionRelative) {
+			rcDest = CRect(rcDest.left		* m_VideoRect.Width()	/ m_WindowRect.Width(),
+							rcDest.top		* m_VideoRect.Height()	/ m_WindowRect.Height(),
+							rcDest.right	* m_VideoRect.Width()	/ m_WindowRect.Width(),
+							rcDest.bottom	* m_VideoRect.Height()	/ m_WindowRect.Height()
+			);
+			rcDest.left		+= m_VideoRect.left;
+			rcDest.right	+= m_VideoRect.left;
+			rcDest.top		+= m_VideoRect.top;
+			rcDest.bottom	+= m_VideoRect.top;
+		}
+
+		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
 }
 

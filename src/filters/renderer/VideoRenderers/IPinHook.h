@@ -74,9 +74,9 @@ interface IMemInputPinC {
 
 extern bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPin);
 extern void UnhookNewSegmentAndReceive();
-extern REFERENCE_TIME	g_tSegmentStart, g_tSampleStart;
 
-extern BOOL g_bGetFrameType;
+extern REFERENCE_TIME	g_tSegmentStart, g_tSampleStart;
+extern volatile BOOL	g_bGetFrameType;
 extern FF_FIELD_TYPE	g_nFrameType;
 
 //

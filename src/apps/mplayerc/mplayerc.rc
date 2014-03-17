@@ -3521,6 +3521,14 @@ BEGIN
     IDS_EXTERNAL                    "external"
 END
 
+STRINGTABLE
+BEGIN
+    IDS_SUBTITLES_STEREO                "Stereoscopic subtitles"
+    IDS_SUBTITLES_STEREO_DONTUSE        "Don't use"
+    IDS_SUBTITLES_STEREO_SIDEBYSIDE     "Side by Side"
+    IDS_SUBTITLES_STEREO_TOPANDBOTTOM   "Top and Bottom"
+END
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 

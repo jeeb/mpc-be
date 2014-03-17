@@ -1676,6 +1676,11 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, r.iEvrBuffers);
 
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, r.D3D9RenderDevice);
+
+		// Stereoscopic Subtitles
+		pApp->WriteProfileInt(IDS_R_SETTINGS, L"StereoDisabled", r.bStereoDisabled);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, L"SideBySide", r.bSideBySide);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, L"TopAndBottom", r.bTopAndBottom);
 	} else {
 		r.iAPSurfaceUsage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D));
 		//fVMRSyncFix = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRSYNCFIX, FALSE);
@@ -1738,6 +1743,11 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
 		r.iEvrBuffers		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, 5);
 		r.D3D9RenderDevice	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
+
+		// Stereoscopic Subtitles
+		r.bStereoDisabled	= pApp->GetProfileInt(IDS_R_SETTINGS, L"StereoDisabled", TRUE);
+		r.bSideBySide		= pApp->GetProfileInt(IDS_R_SETTINGS, L"SideBySide", FALSE);
+		r.bTopAndBottom		= pApp->GetProfileInt(IDS_R_SETTINGS, L"TopAndBottom", FALSE);
 	}
 }
 

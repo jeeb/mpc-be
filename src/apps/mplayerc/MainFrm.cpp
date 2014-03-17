@@ -9498,14 +9498,16 @@ void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlaySubtitles(UINT nID)
 {
-	int i = (int)nID - (7 + ID_SUBTITLES_SUBITEM_START); // currently the subtitles submenu contains 5 items, apart from the actual subtitles list
+	int i = (int)nID - (10 + ID_SUBTITLES_SUBITEM_START); // currently the subtitles submenu contains 5 items, apart from the actual subtitles list
 
-	if (i == -7) {
+	AppSettings& s = AfxGetAppSettings();
+
+	if (i == -10) {
 		// options
 		ShowOptions(CPPageSubtitles::IDD);
-	} else if (i == -6) {
+	} else if (i == -9) {
 		OnFileLoadSubtitle();
-	} else if (i == -5) {
+	} else if (i == -8) {
 		// styles
 		int i = m_iSubtitleSel;
 
@@ -9562,19 +9564,19 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 
 			i -= pSubStream->GetStreamCount();
 		}
-	} else if (i == -4) {
+	} else if (i == -7) {
 		// reload
 		ReloadSubtitle();
-	} else if (i == -3) {
+	} else if (i == -6) {
 
 		OnNavMixStreamSubtitleSelectSubMenu(-1, 2);
 
-	} else if (i == -2) {
+	} else if (i == -5) {
 		// override default style
 		// TODO: default subtitles style toggle here
-		AfxGetAppSettings().fUseDefaultSubtitlesStyle = !AfxGetAppSettings().fUseDefaultSubtitlesStyle;
+		s.fUseDefaultSubtitlesStyle = !s.fUseDefaultSubtitlesStyle;
 		UpdateSubtitle();
-	} else if (i == -1) {
+	} else if (i == -4) {
 		if (b_UseVSFilter) {
 			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 			if (pDVS) {
@@ -9586,11 +9588,47 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 			return;
 		}
 
-		AfxGetAppSettings().fForcedSubtitles = !AfxGetAppSettings().fForcedSubtitles;
-		g_bForcedSubtitle = AfxGetAppSettings().fForcedSubtitles;
+		s.fForcedSubtitles = !s.fForcedSubtitles;
+		g_bForcedSubtitle = s.fForcedSubtitles;
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
 		}
+	} else if (i == -3) {
+		s.m_RenderersSettings.bStereoDisabled	= TRUE;
+		s.m_RenderersSettings.bSideBySide		= FALSE;
+		s.m_RenderersSettings.bTopAndBottom		= FALSE;
+
+		if (m_pCAP) {
+			m_pCAP->Invalidate();
+		}
+
+		CString osd = ResStr(IDS_SUBTITLES_STEREO);
+		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
+		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
+	} else if (i == -2) {
+		s.m_RenderersSettings.bStereoDisabled	= FALSE;
+		s.m_RenderersSettings.bSideBySide		= TRUE;
+		s.m_RenderersSettings.bTopAndBottom		= FALSE;
+
+		if (m_pCAP) {
+			m_pCAP->Invalidate();
+		}
+
+		CString osd = ResStr(IDS_SUBTITLES_STEREO);
+		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
+		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
+	} else if (i == -1) {
+		s.m_RenderersSettings.bStereoDisabled	= FALSE;
+		s.m_RenderersSettings.bSideBySide		= FALSE;
+		s.m_RenderersSettings.bTopAndBottom		= TRUE;
+
+		if (m_pCAP) {
+			m_pCAP->Invalidate();
+		}
+
+		CString osd = ResStr(IDS_SUBTITLES_STEREO);
+		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
+		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
 	}
 }
 
@@ -9633,17 +9671,17 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (7 + ID_SUBTITLES_SUBITEM_START);
+	int i = (int)nID - (10 + ID_SUBTITLES_SUBITEM_START);
 
 	AppSettings& s = AfxGetAppSettings();
 
 	pCmdUI->Enable(m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
 
-	if (i == -7) {
+	if (i == -10) {
 		pCmdUI->Enable(GetPlaybackMode() == PM_NONE || (m_pCAP && !b_UseVSFilter && !m_fAudioOnly)) ;
-	} else if (i == -6) {
+	} else if (i == -9) {
 		pCmdUI->Enable((m_pCAP || b_UseVSFilter) && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
-	} else if (i == -5) {
+	} else if (i == -8) {
 		// styles
 		pCmdUI->Enable(FALSE);
 
@@ -9667,13 +9705,13 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 
 			i -= pSubStream->GetStreamCount();
 		}
-	} else if (i == -4) {
+	} else if (i == -7) {
 		if (b_UseVSFilter) {
 			pCmdUI->SetCheck(FALSE);
 			pCmdUI->Enable(FALSE);
 			return;
 		}
-	} else if (i == -3) {
+	} else if (i == -6) {
 		// enabled
 		if (b_UseVSFilter) {
 			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
@@ -9687,7 +9725,7 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 			return;
 		}
 		pCmdUI->SetCheck(s.fEnableSubtitles);
-	} else if (i == -2) {
+	} else if (i == -5) {
 		// override
 		if (b_UseVSFilter) {
 			pCmdUI->SetCheck(FALSE);
@@ -9698,7 +9736,7 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		// TODO: foxX - default subtitles style toggle here; still wip
 		pCmdUI->SetCheck(s.fUseDefaultSubtitlesStyle);
 		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
-	} else if (i == -1) {
+	} else if (i == -4) {
 		if (b_UseVSFilter) {
 			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 			bool fOnlyShowForcedSubs = false;
@@ -9714,6 +9752,27 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 
 		pCmdUI->SetCheck(s.fForcedSubtitles);
 		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
+	} else if (i == -3) {
+		if (s.m_RenderersSettings.bStereoDisabled) {
+			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
+		}
+		pCmdUI->Enable(TRUE);
+		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !b_UseVSFilter && !m_fAudioOnly && GetPlaybackMode() != PM_DVD;
+		//pCmdUI->Enable(bEnabled);
+	} else if (i == -2) {
+		if (s.m_RenderersSettings.bSideBySide) {
+			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
+		}
+		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !b_UseVSFilter && !m_fAudioOnly && GetPlaybackMode() != PM_DVD;
+		//pCmdUI->Enable(bEnabled);
+		pCmdUI->Enable(TRUE);
+	} else if (i == -1) {
+		if (s.m_RenderersSettings.bTopAndBottom) {
+			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
+		}
+		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !b_UseVSFilter && !m_fAudioOnly && GetPlaybackMode() != PM_DVD;
+		//pCmdUI->Enable(bEnabled);
+		pCmdUI->Enable(TRUE);
 	}
 }
 
@@ -15674,6 +15733,14 @@ void CMainFrame::SetupSubtitlesSubMenu()
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_ENABLE));
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_DEFAULT_STYLE));
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_FORCED));
+	pSub->AppendMenu(MF_SEPARATOR);
+
+	CMenu subMenu;
+	subMenu.CreatePopupMenu();
+	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
+	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
+	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
+	pSub->AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)subMenu.Detach(), ResStr(IDS_SUBTITLES_STEREO));
 }
 
 void CMainFrame::SetupNavMixSubtitleSubMenu()
