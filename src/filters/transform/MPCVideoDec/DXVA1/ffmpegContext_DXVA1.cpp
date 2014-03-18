@@ -112,7 +112,7 @@ HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DXVA_PicParams_H264*
 	H264Context*	h = (H264Context*)pAVCtx->priv_data;
 	SPS*			cur_sps = &h->sps;
 	PPS*			cur_pps = &h->pps;
-	const			Picture *current_picture = h->cur_pic_ptr;
+	const			H264Picture *current_picture = h->cur_pic_ptr;
 	HRESULT			hr = E_FAIL;
 
 	if (cur_sps && cur_pps) {
@@ -207,7 +207,7 @@ void FFH264UpdateRefFramesList(DXVA_PicParams_H264* pDXVAPicParams, struct AVCod
 	H264Context*	h = (H264Context*)pAVCtx->priv_data;
 	UINT			nUsedForReferenceFlags = 0;
 	int				i, j;
-	Picture*		pic;
+	H264Picture*	pic;
 	UCHAR			AssociatedFlag;
 
 	for (i = 0, j = 0; i < 16; i++) {
