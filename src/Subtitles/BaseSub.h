@@ -41,4 +41,12 @@ public:
 
 protected :
 	SUBTITLE_TYPE			m_nType;
+
+	// PGS/DVB
+	BOOL					m_bResizedRender;
+	SubPicDesc				m_spd;
+	CAutoVectorPtr<BYTE>	m_pTempSpdBuff;
+
+	void					InitSpd(SubPicDesc& spd, int nWidth, int nHeight);
+	void					FinalizeRender(SubPicDesc& spd);
 };

@@ -30,25 +30,22 @@
 
 CHdmvSub::CHdmvSub(void)
 	: CBaseSub(ST_HDMV)
+	, m_nColorNumber(0)
+	, m_nCurSegment(NO_SEGMENT)
+	, m_pSegBuffer(NULL)
+	, m_nTotalSegBuffer(0)
+	, m_nSegBufferPos(0)
+	, m_nSegSize(0)
+	, m_pCurrentWindow(NULL)
 {
-	m_nColorNumber				= 0;
-
-	m_nCurSegment				= NO_SEGMENT;
-	m_pSegBuffer				= NULL;
-	m_nTotalSegBuffer			= 0;
-	m_nSegBufferPos				= 0;
-	m_nSegSize					= 0;
-	m_pCurrentWindow			= NULL;
-
-	memset(&m_VideoDescriptor, 0, sizeof(VIDEO_DESCRIPTOR));
+	memset(&m_VideoDescriptor, 0, sizeof(m_VideoDescriptor));
 }
 
 CHdmvSub::~CHdmvSub()
 {
 	Reset();
 
-	delete[] m_pSegBuffer;
-
+	SAFE_DELETE_ARRAY(m_pSegBuffer);
 	SAFE_DELETE_ARRAY(m_DefaultCLUT.Palette);
 
 	for (int i = 0; i < _countof(m_CLUT); i++) {
@@ -59,7 +56,7 @@ CHdmvSub::~CHdmvSub()
 void CHdmvSub::AllocSegment(int nSize)
 {
 	if (nSize > m_nTotalSegBuffer) {
-		delete[] m_pSegBuffer;
+		delete [] m_pSegBuffer;
 		m_pSegBuffer		= DNew BYTE[nSize];
 		m_nTotalSegBuffer	= nSize;
 	}
@@ -350,28 +347,9 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 		CompositionObject* pObject = m_pObjects.GetAt (pos);
 
 		if (pObject && rt >= pObject->m_rtStart && rt < pObject->m_rtStop) {
-
-			{
-				// To fit in current surface size on render - looks very crooked, but better then nothing ...
-				int delta_y = (m_VideoDescriptor.nVideoHeight - (pObject->m_vertical_position + pObject->m_height)) * spd.h / m_VideoDescriptor.nVideoHeight;
-				if (spd.w < (pObject->m_horizontal_position + pObject->m_width)) {
-					pObject->m_horizontal_position = max(0, spd.w / 2 - pObject->m_width / 2);
-					if (spd.w < (pObject->m_horizontal_position + pObject->m_width)) {
-						pObject->m_horizontal_position = max(0, spd.w - pObject->m_width - 10);
-					}
-				}
-
-				if (spd.h < (pObject->m_vertical_position + pObject->m_height)) {
-					pObject->m_vertical_position = max(0, spd.h - pObject->m_height - delta_y);
-					if (spd.h < (pObject->m_vertical_position + pObject->m_height)) {
-						pObject->m_vertical_position = max(0, spd.h - pObject->m_height - 10);
-					}
-				}
-			}
-
 			if (pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
-					spd.w >= (pObject->m_horizontal_position + pObject->m_width) &&
-					spd.h >= (pObject->m_vertical_position + pObject->m_height)) {
+					m_VideoDescriptor.nVideoWidth >= (pObject->m_horizontal_position + pObject->m_width) &&
+					m_VideoDescriptor.nVideoHeight >= (pObject->m_vertical_position + pObject->m_height)) {
 
 				if (g_bForcedSubtitle && !pObject->m_forced_on_flag) {
 					TRACE_HDMVSUB(_T("CHdmvSub::Render() : skip non forced subtitle - forced = %d, %I64d = %s"), pObject->m_forced_on_flag, rt, ReftimeToString(rt));
@@ -392,24 +370,31 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 				bbox.right	= max(pObject->m_horizontal_position + pObject->m_width, bbox.right);
 				bbox.bottom	= max(pObject->m_vertical_position + pObject->m_height, bbox.bottom);
 
-				ASSERT(spd.h>=0);
 				bbox.left	= bbox.left > 0 ? bbox.left : 0;
 				bbox.top	= bbox.top > 0 ? bbox.top : 0;
-				bbox.right	= bbox.right < spd.w ? bbox.right : spd.w;
-				bbox.bottom	= bbox.bottom < spd.h ? bbox.bottom : spd.h;
+				if (m_VideoDescriptor.nVideoWidth > spd.w) {
+					bbox.left	= MulDiv(bbox.left, spd.w, m_VideoDescriptor.nVideoWidth);
+					bbox.right	= MulDiv(bbox.right, spd.w, m_VideoDescriptor.nVideoWidth);
+				}
+				if (m_VideoDescriptor.nVideoHeight > spd.h) {
+					bbox.top	= MulDiv(bbox.top, spd.h, m_VideoDescriptor.nVideoHeight);
+					bbox.bottom	= MulDiv(bbox.bottom, spd.h, m_VideoDescriptor.nVideoHeight);
+				}
 
 				TRACE_HDMVSUB(_T("CHdmvSub::Render() : size = %ld, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %s\n"),
 								pObject->GetRLEDataSize(),
 								pObject->m_width, pObject->m_height, spd.w, spd.h,
 								rt, ReftimeToString(rt));
 
-				pObject->RenderHdmv(spd);
-
+				InitSpd(spd, m_VideoDescriptor.nVideoWidth, m_VideoDescriptor.nVideoHeight);
+				pObject->RenderHdmv(spd, m_bResizedRender ? &m_spd : NULL);
 			}
 		}
 
 		m_pObjects.GetNext(pos);
 	}
+
+	FinalizeRender(spd);
 }
 
 HRESULT CHdmvSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)

@@ -375,14 +375,8 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 						pObject->m_height	= pRegion->height;
 						pObject->SetPalette(pCLUT->size, pCLUT->palette, m_Display.width > 720);
 						
-						if (m_Display.width > spd.w) {
-							nX = max(10, nX - (m_Display.width - spd.w));
-						}
-						if (m_Display.height > spd.h) {
-							nY = max(10, nY - (m_Display.height - spd.h));
-						}
-						
-						pObject->RenderDvb(spd, nX, nY);
+						InitSpd(spd, m_Display.width, m_Display.height);
+						pObject->RenderDvb(spd, nX, nY, m_bResizedRender ? &m_spd : NULL);
 						TRACE_DVB(_T(" --> %d/%d - %d/%d\n"), nRegion, pPage->regionsPos.GetCount(), nObject, pRegion->objects.GetCount());
 					}
 				}
@@ -394,6 +388,8 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 		bbox.right	= min(m_Display.width, spd.w);
 		ASSERT(spd.h >= 0);
 		bbox.bottom	= min(m_Display.height, spd.h);
+
+		FinalizeRender(spd);
 	}
 }
 

@@ -17,22 +17,20 @@
 	+ AviSplitter - Добавлена поддержка 'RPZA', 'RV24' (RGB24 c перевернутым кадром), малораспространенных YUV-форматов;
 	+ MatroskaSplitter - Добавлена поддержка Microsoft MPEG4 V3, M-Jpeg, Prores, SNOW, и некоторых типов несжатого видео ('V_UNCOMPRESSED');
 	+ MP4Splitter - Добавлена поддержка '2Vuy', 'DVOO', 'yuvs', 'yuv2', DNxHD, FFV1, 'v308', 'v408', 'V410';
-	+ MpaDecFilter - Добавлена поддержка декодирования MEDIASUBTYPE_SIPR_WAVE - SIPR в .wmv;
-	+ MpaDecFilter- Добавлена поддержка декодирования Voxware MetaSound;
+	+ MpaDecFilter - Добавлена поддержка декодирования MEDIASUBTYPE_SIPR_WAVE - SIPR в .wmv, Voxware MetaSound;
 	+ MPCVideoDec - Добавлены выходные форматы 'AYUV', 'YV16', 'YV24', 'P010', 'P210', 'P016', 'P0216', 'Y410' и 'Y416';
-	+ MPCVideoDec - Добавлена поддержка 'Avid DNxHD', FFV1 (FFmpeg video codec #1), QuickTime 8BPS video, 'RPZA';
-	+ MPCVideoDec - Добавлена поддержка декодирования 'cyuv', 'yuv2', 'Y41B', 'Y42B', '444P', 'Y800', 'I420', 'V410';
-	+ MPCVideoDec - Добавлена поддержка декодирования HuffYUV и FFVH;
+	+ MPCVideoDec - Добавлена поддержка 'Avid DNxHD', HuffYUV, FFVH, FFV1 (FFmpeg video codec #1), QuickTime 8BPS video, 'RPZA', 'cyuv', 'yuv2', 'Y41B', 'Y42B', '444P', 'Y800', 'I420', 'V410'
 	+ MPCVideoDec - Добавлено декодирование Windows Media Video 9.1 Image и Windows Media Video 9.1 Image V2 (WMVP, WVP2);
 	+ MPCVideoDec - Добавлено поле Status с подробной информацией о работе декодера;
-	+ MPCVideoDec - Добавлена кнопка сброса настроек;
 	+ MPCVideoDec - Обработка изменения входного медиатипа в режиме DXVA1, что позволяет выполнять переключение видео-дорожек в этом режиме;
+	+ MPCVideoDec - Добавлена кнопка сброса настроек;
 	+ MPEGSplitter - Добавлена поддержка файлов с заголовком 'IMKH'(записи с видеорегистратора в формате MPEG-PS);
 	+ Null Video Renderer (Uncompressed) - Добавлена поддержка 'NV12', 'AYUV', 'YV16', 'YV24';
 	+ RawVideoSplitter - Добавлена поддержка 'YUV4MPEG2';
 	+ RawVideoSplitter - Добавлена частичная поддержка черно-белых y4m-файлоов и частичная поддержка 4:1:1 y4m файлов;
 	+ VSFilter - Добавлена поддержка AV Source/AV Splitter для auto-load опции;
 	+ VSFilter - Добавлена поддержка NV12;
+	+ VSFilter - Добавлена поддержка масштабирование PGS/DVB субтитров;
 	+ VSFilter - Добавлена поддержка интерлейсного видео;
 	+ Аудиомикшер - Добавлена поддержка микширования в 5.0;
 	+ Встроенный MPEG/DVD Decoder - Добавлена поддержка NV12 выходного формата;
@@ -182,6 +180,7 @@
 	! VSFilter - исправлен вывод DVB субтитров;
 	! WASAPI Renderer - Избавились от dead-lock (подвисания) при закрытии;
 	! WASAPI Renderer - Иногда некорректно отрабатывался конец файла в случае перемотки;
+	! EVR Custom - Исправлено моргание/черный экран в связке с Microsoft DTV-DVD Video Decoder при проигрывании некоторых DVD(на меню и при выводе субтитров) и видео;
 	! В OS Vista и новее, для VMR-9 renderless вновь активна опция 'YUV mixing'. При включенной опции 'YUV mixing', теперь активируется опция 'Dynamic switch to BOB';
 	! Восстановлено/исправлено отображение подсказок на странице "Вывод";
 	! Исправлен механизм состояние кнопки Play/Pause;

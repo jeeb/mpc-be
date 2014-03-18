@@ -89,7 +89,7 @@ void CompositionObject::AppendRLEData(const BYTE* pBuffer, int nSize)
 	}
 }
 
-void CompositionObject::RenderHdmv(SubPicDesc& spd)
+void CompositionObject::RenderHdmv(SubPicDesc& spd, SubPicDesc* spdResized)
 {
 	if (!m_pRLEData || !m_nColorNumber) {
 		return;
@@ -118,7 +118,7 @@ void CompositionObject::RenderHdmv(SubPicDesc& spd)
 						nPaletteIndex = 0;
 					}
 				} else {
-					nCount			= (bSwitch&0x3F) <<8 | (SHORT)GBuffer.ReadByte();
+					nCount			= (bSwitch & 0x3F) << 8 | (SHORT)GBuffer.ReadByte();
 					nPaletteIndex	= 0;
 				}
 			} else {
@@ -126,15 +126,15 @@ void CompositionObject::RenderHdmv(SubPicDesc& spd)
 					nCount			= bSwitch & 0x3F;
 					nPaletteIndex	= GBuffer.ReadByte();
 				} else {
-					nCount			= (bSwitch&0x3F) <<8 | (SHORT)GBuffer.ReadByte();
+					nCount			= (bSwitch & 0x3F) << 8 | (SHORT)GBuffer.ReadByte();
 					nPaletteIndex	= GBuffer.ReadByte();
 				}
 			}
 		}
 
-		if (nCount>0) {
+		if (nCount > 0) {
 			if (nPaletteIndex != 0xFF) {	// Fully transparent (section 9.14.4.2.2.1.1)
-				FillSolidRect (spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
+				FillSolidRect(spdResized ? *spdResized : spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
 			}
 			nX += nCount;
 		} else {
@@ -144,21 +144,21 @@ void CompositionObject::RenderHdmv(SubPicDesc& spd)
 	}
 }
 
-void CompositionObject::RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY)
+void CompositionObject::RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY, SubPicDesc* spdResized)
 {
 	if (!m_pRLEData) {
 		return;
 	}
 
-	CGolombBuffer	gb (m_pRLEData, m_nRLEDataSize);
+	CGolombBuffer	gb(m_pRLEData, m_nRLEDataSize);
 	SHORT			sTopFieldLength;
 	SHORT			sBottomFieldLength;
 
 	sTopFieldLength		= gb.ReadShort();
 	sBottomFieldLength	= gb.ReadShort();
 
-	DvbRenderField (spd, gb, nX, nY,   sTopFieldLength);
-	DvbRenderField (spd, gb, nX, nY+1, sBottomFieldLength);
+	DvbRenderField(spdResized ? *spdResized : spd, gb, nX, nY,   sTopFieldLength);
+	DvbRenderField(spdResized ? *spdResized : spd, gb, nX, nY+1, sBottomFieldLength);
 }
 
 void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT nXStart, SHORT nYStart, SHORT nLength)
@@ -204,10 +204,10 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT
 
 void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY)
 {
-	BYTE			bTemp;
-	BYTE			nPaletteIndex = 0;
-	SHORT			nCount;
-	bool			bQuit	= false;
+	BYTE	bTemp;
+	BYTE	nPaletteIndex = 0;
+	SHORT	nCount;
+	bool	bQuit = false;
 
 	while (!bQuit && !gb.IsEOF()) {
 		nCount			= 0;
@@ -250,7 +250,7 @@ void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 		}
 
 		if (nCount>0) {
-			FillSolidRect (spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
+			FillSolidRect(spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
 			nX += nCount;
 		}
 	}
@@ -260,10 +260,10 @@ void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 
 void CompositionObject::Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY)
 {
-	BYTE			bTemp;
-	BYTE			nPaletteIndex = 0;
-	SHORT			nCount;
-	bool			bQuit	= false;
+	BYTE	bTemp;
+	BYTE	nPaletteIndex = 0;
+	SHORT	nCount;
+	bool	bQuit = false;
 
 	while (!bQuit && !gb.IsEOF()) {
 		nCount			= 0;
@@ -313,7 +313,7 @@ void CompositionObject::Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 #endif
 
 		if (nCount>0) {
-			FillSolidRect (spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
+			FillSolidRect(spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
 			nX += nCount;
 		}
 	}
@@ -323,10 +323,10 @@ void CompositionObject::Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 
 void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY)
 {
-	BYTE			bTemp;
-	BYTE			nPaletteIndex = 0;
-	SHORT			nCount;
-	bool			bQuit	= false;
+	BYTE	bTemp;
+	BYTE	nPaletteIndex = 0;
+	SHORT	nCount;
+	bool	bQuit = false;
 
 	while (!bQuit && !gb.IsEOF()) {
 		nCount			= 0;
@@ -353,7 +353,7 @@ void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 		}
 
 		if (nCount>0) {
-			FillSolidRect (spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
+			FillSolidRect(spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
 			nX += nCount;
 		}
 	}
@@ -362,15 +362,15 @@ void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 }
 
 // from ffmpeg
-const BYTE ff_log2_tab[256]={
-		0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-		6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-		6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
+const BYTE ff_log2_tab[256] = {
+	0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+	5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+	6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+	6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+	7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+	7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+	7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+	7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
 };
 
 void CompositionObject::RenderXSUB(SubPicDesc& spd)
@@ -379,13 +379,13 @@ void CompositionObject::RenderXSUB(SubPicDesc& spd)
 		return;
 	}
 
-	CGolombBuffer	gb (m_pRLEData, m_nRLEDataSize);
+	CGolombBuffer	gb(m_pRLEData, m_nRLEDataSize);
 	BYTE			nPaletteIndex = 0;
 	SHORT			nCount;
-	SHORT			nX	= m_horizontal_position;
-	SHORT			nY	= m_vertical_position;
+	SHORT			nX = m_horizontal_position;
+	SHORT			nY = m_vertical_position;
 
-	for (int y = 0; y < m_height; y++) {
+	for (SHORT y = 0; y < m_height; y++) {
 		if (gb.IsEOF()) {
 			break;
 		}

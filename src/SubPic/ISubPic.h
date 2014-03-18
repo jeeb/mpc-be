@@ -43,6 +43,7 @@ struct SubPicDesc {
 		w = h = bpp = pitch = pitchUV = 0;
 		bits = NULL;
 		bitsU = bitsV = NULL;
+		vidrect = CRect(0, 0, 0, 0);
 	}
 };
 #pragma pack(pop)
