@@ -548,6 +548,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_NAVIGATION, OnViewNavigation)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_NAVIGATION, OnUpdateViewNavigation)
 
+	// Subtitle position
+	ON_COMMAND_RANGE(ID_SUB_POS_UP, ID_SUB_POS_RIGHT, OnSubtitlePos)
+
 	ON_WM_WTSSESSION_CHANGE()
 END_MESSAGE_MAP()
 
@@ -11372,6 +11375,31 @@ void CMainFrame::OnHelpDonate()
 }
 */
 
+void CMainFrame::OnSubtitlePos(UINT nID)
+{
+	if (m_pCAP) {
+		AppSettings& s = AfxGetAppSettings();
+		switch (nID) {
+			case ID_SUB_POS_UP:
+				s.m_RenderersSettings.nShiftPos.y--;
+				break;
+			case ID_SUB_POS_DOWN:
+				s.m_RenderersSettings.nShiftPos.y++;
+				break;
+			case ID_SUB_POS_LEFT:
+				s.m_RenderersSettings.nShiftPos.x--;
+				break;
+			case ID_SUB_POS_RIGHT:
+				s.m_RenderersSettings.nShiftPos.x++;
+				break;
+		}
+
+		if (GetMediaState() != State_Running) {
+			m_pCAP->Invalidate();
+		}
+	}
+}
+
 //////////////////////////////////
 
 static BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
@@ -11410,16 +11438,16 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		w = _DEFCLIENTW + r1.Width() - r2.Width();
 		h = _DEFCLIENTH + r1.Height() - r2.Height();
 
-		if (s.iCaptionMenuMode!=MODE_BORDERLESS) {
+		if (s.iCaptionMenuMode != MODE_BORDERLESS) {
 			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
 			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-			if (s.iCaptionMenuMode==MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode==MODE_HIDEMENU) {
+			if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode == MODE_HIDEMENU) {
 				w -= 2;
 				h -= 2;
 			}
 		}
 
-		if (s.iCaptionMenuMode==MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode==MODE_HIDEMENU) {
+		if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode == MODE_HIDEMENU) {
 			h += GetSystemMetrics(SM_CYCAPTION);
 			if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
 				h += GetSystemMetrics(SM_CYMENU);
@@ -11465,17 +11493,17 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		mi.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hMonitor, &mi);
 
-		x = (mi.rcWork.left+mi.rcWork.right-w)/2; // Center main window
-		y = (mi.rcWork.top+mi.rcWork.bottom-h)/2; // no need to call CenterWindow()
+		x = (mi.rcWork.left + mi.rcWork.right - w) / 2; // Center main window
+		y = (mi.rcWork.top + mi.rcWork.bottom - h) / 2; // no need to call CenterWindow()
 	}
 
 	UINT lastWindowType = s.nLastWindowType;
 	MoveWindow(x, y, w, h);
 
-	if (s.iCaptionMenuMode!=MODE_SHOWCAPTIONMENU) {
-		if (s.iCaptionMenuMode==MODE_FRAMEONLY) {
+	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
+		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
 			ModifyStyle(WS_CAPTION, 0, SWP_NOZORDER);
-		} else if (s.iCaptionMenuMode==MODE_BORDERLESS) {
+		} else if (s.iCaptionMenuMode == MODE_BORDERLESS) {
 			ModifyStyle(WS_CAPTION | WS_THICKFRAME, 0, SWP_NOZORDER);
 		}
 		::SetMenu(m_hWnd, NULL);
@@ -17317,6 +17345,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 	AppSettings& s = AfxGetAppSettings();
 
 	s.m_RenderersSettings.bPositionRelative	= 0;
+	s.m_RenderersSettings.nShiftPos = {0, 0};
 
 	if (pSubStream) {
 		CLSID clsid;

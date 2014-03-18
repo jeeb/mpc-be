@@ -3527,6 +3527,10 @@ BEGIN
     IDS_SUBTITLES_STEREO_DONTUSE        "Don't use"
     IDS_SUBTITLES_STEREO_SIDEBYSIDE     "Side by Side"
     IDS_SUBTITLES_STEREO_TOPANDBOTTOM   "Top and Bottom"
+    IDS_SUB_POS_UP                      "Subtitle shift positions up"
+    IDS_SUB_POS_DOWN                    "Subtitle shift positions down"
+    IDS_SUB_POS_LEFT                    "Subtitle shift positions left"
+    IDS_SUB_POS_RIGHT                   "Subtitle shift positions right"
 END
 
 #endif    // English (United States) resources

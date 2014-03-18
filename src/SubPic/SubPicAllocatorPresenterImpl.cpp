@@ -88,7 +88,7 @@ void CSubPicAllocatorPresenterImpl::AlphaBlt(CRect r, ISubPic* pSubPic, SubPicDe
 	if (SUCCEEDED(pSubPic->GetSourceAndDest(&r.Size(), rcSource, rcDest))) {
 		rcDest.OffsetRect(r.left, r.top);
 
-		CRenderersSettings& s = GetRenderersSettings();
+		const CRenderersSettings& s = GetRenderersSettings();
 		if (s.bPositionRelative) {
 			rcDest = CRect(rcDest.left		* m_VideoRect.Width()	/ m_WindowRect.Width(),
 							rcDest.top		* m_VideoRect.Height()	/ m_WindowRect.Height(),
@@ -101,6 +101,8 @@ void CSubPicAllocatorPresenterImpl::AlphaBlt(CRect r, ISubPic* pSubPic, SubPicDe
 			rcDest.bottom	+= m_VideoRect.top;
 		}
 
+		rcDest.OffsetRect(s.nShiftPos);
+
 		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
 }
@@ -112,7 +114,7 @@ STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSize(bool fCorrectAR)
 	CSize VideoSize(GetVisibleVideoSize());
 
 	if (fCorrectAR && m_AspectRatio.cx > 0 && m_AspectRatio.cy > 0) {
-		VideoSize.cx = (LONGLONG(VideoSize.cy)*LONGLONG(m_AspectRatio.cx))/LONGLONG(m_AspectRatio.cy);
+		VideoSize.cx = (LONGLONG(VideoSize.cy) * LONGLONG(m_AspectRatio.cx)) / LONGLONG(m_AspectRatio.cy);
 	}
 
 	return VideoSize;

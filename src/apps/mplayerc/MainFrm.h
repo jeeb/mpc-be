@@ -1017,7 +1017,10 @@ public:
 	afx_msg void OnHelpCheckForUpdate();
 	//afx_msg void OnHelpDocumentation();
 	afx_msg void OnHelpToolbarImages();
-	afx_msg void OnHelpDonate();
+	//afx_msg void OnHelpDonate();
+
+	// Subtitle position
+	afx_msg void OnSubtitlePos(UINT nID);
 
 	afx_msg void OnClose();
 

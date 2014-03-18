@@ -80,6 +80,9 @@ public:
 	BOOL bSideBySide;
 	BOOL bTopAndBottom;
 
+	// Subtitle position
+	CPoint nShiftPos;
+
 	class CAdvRendererSettings
 	{
 	public:
