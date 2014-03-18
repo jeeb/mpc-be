@@ -274,12 +274,6 @@ int ff_side_data_update_matrix_encoding(AVFrame *frame,
     return 0;
 }
 
-#if HAVE_NEON || ARCH_PPC || HAVE_MMX
-#   define STRIDE_ALIGN 16
-#else
-#   define STRIDE_ALIGN 8
-#endif
-
 void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
                                int linesize_align[AV_NUM_DATA_POINTERS])
 {
@@ -1627,7 +1621,7 @@ int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
                                               const AVFrame *frame,
                                               int *got_packet_ptr)
 {
-    AVFrame tmp;
+    AVFrame *extended_frame = NULL;
     AVFrame *padded_frame = NULL;
     int ret;
     AVPacket user_pkt = *avpkt;
@@ -1652,9 +1646,13 @@ int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
         }
         av_log(avctx, AV_LOG_WARNING, "extended_data is not set.\n");
 
-        tmp = *frame;
-        tmp.extended_data = tmp.data;
-        frame = &tmp;
+        extended_frame = av_frame_alloc();
+        if (!extended_frame)
+            return AVERROR(ENOMEM);
+
+        memcpy(extended_frame, frame, sizeof(AVFrame));
+        extended_frame->extended_data = extended_frame->data;
+        frame = extended_frame;
     }
 
     /* check for valid frame size */
@@ -1662,14 +1660,15 @@ int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
         if (avctx->codec->capabilities & CODEC_CAP_SMALL_LAST_FRAME) {
             if (frame->nb_samples > avctx->frame_size) {
                 av_log(avctx, AV_LOG_ERROR, "more samples than frame size (avcodec_encode_audio2)\n");
-                return AVERROR(EINVAL);
+                ret = AVERROR(EINVAL);
+                goto end;
             }
         } else if (!(avctx->codec->capabilities & CODEC_CAP_VARIABLE_FRAME_SIZE)) {
             if (frame->nb_samples < avctx->frame_size &&
                 !avctx->internal->last_audio_frame) {
                 ret = pad_last_frame(avctx, &padded_frame, frame);
                 if (ret < 0)
-                    return ret;
+                    goto end;
 
                 frame = padded_frame;
                 avctx->internal->last_audio_frame = 1;
@@ -1741,6 +1740,7 @@ int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
 
 end:
     av_frame_free(&padded_frame);
+    av_free(extended_frame);
 
     return ret;
 }

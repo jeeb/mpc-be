@@ -1270,6 +1270,9 @@
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\mpegutils.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.c" />
@@ -2646,6 +2649,9 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\mpegutils.c">
+      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -43,7 +43,7 @@
 #include "libavutil/attributes.h"
 #include "internal.h"
 #include "avcodec.h"
-#include "mpegvideo.h"
+#include "mpegutils.h"
 #include "h264.h"
 
 #include "h264data.h" // FIXME FIXME FIXME
@@ -69,9 +69,9 @@
 typedef struct {
     H264Context h;
     HpelDSPContext hdsp;
-    Picture *cur_pic;
-    Picture *next_pic;
-    Picture *last_pic;
+    H264Picture *cur_pic;
+    H264Picture *next_pic;
+    H264Picture *last_pic;
     int halfpel_flag;
     int thirdpel_flag;
     int unknown_flag;
@@ -298,8 +298,8 @@ static inline void svq3_mc_dir_part(SVQ3Context *s,
                                     int mx, int my, int dxy,
                                     int thirdpel, int dir, int avg)
 {
-    H264Context *h     = &s->h;
-    const Picture *pic = (dir == 0) ? s->last_pic : s->next_pic;
+    H264Context *h = &s->h;
+    const H264Picture *pic = (dir == 0) ? s->last_pic : s->next_pic;
     uint8_t *src, *dest;
     int i, emu = 0;
     int blocksize = 2 - (width >> 3); // 16->0, 8->1, 4->2
@@ -888,7 +888,8 @@ static av_cold int svq3_decode_init(AVCodecContext *avctx)
     h->is_complex      = 1;
     h->sps.chroma_format_idc = 1;
     h->picture_structure = PICT_FRAME;
-    avctx->pix_fmt     = avctx->codec->pix_fmts[0];
+    avctx->pix_fmt     = AV_PIX_FMT_YUVJ420P;
+    avctx->color_range = AVCOL_RANGE_JPEG;
 
     h->chroma_qp[0] = h->chroma_qp[1] = 4;
     h->chroma_x_shift = h->chroma_y_shift = 1;
@@ -1048,7 +1049,7 @@ fail:
     return ret;
 }
 
-static void free_picture(AVCodecContext *avctx, Picture *pic)
+static void free_picture(AVCodecContext *avctx, H264Picture *pic)
 {
     int i;
     for (i = 0; i < 2; i++) {
@@ -1060,7 +1061,7 @@ static void free_picture(AVCodecContext *avctx, Picture *pic)
     av_frame_unref(&pic->f);
 }
 
-static int get_buffer(AVCodecContext *avctx, Picture *pic)
+static int get_buffer(AVCodecContext *avctx, H264Picture *pic)
 {
     SVQ3Context *s = avctx->priv_data;
     H264Context *h = &s->h;
@@ -1154,7 +1155,7 @@ static int svq3_decode_frame(AVCodecContext *avctx, void *data,
     h->pict_type = h->slice_type;
 
     if (h->pict_type != AV_PICTURE_TYPE_B)
-        FFSWAP(Picture*, s->next_pic, s->last_pic);
+        FFSWAP(H264Picture*, s->next_pic, s->last_pic);
 
     av_frame_unref(&s->cur_pic->f);
 
@@ -1298,8 +1299,8 @@ static int svq3_decode_frame(AVCodecContext *avctx, void *data,
                     (h->pict_type == AV_PICTURE_TYPE_P && mb_type < 8) ? (mb_type - 1) : -1;
         }
 
-        ff_draw_horiz_band(avctx, s->cur_pic,
-                           s->last_pic->f.data[0] ? s->last_pic : NULL,
+        ff_draw_horiz_band(avctx, &s->cur_pic->f,
+                           s->last_pic->f.data[0] ? &s->last_pic->f : NULL,
                            16 * h->mb_y, 16, h->picture_structure, 0,
                            h->low_delay);
     }
@@ -1328,7 +1329,7 @@ static int svq3_decode_frame(AVCodecContext *avctx, void *data,
         *got_frame = 1;
 
     if (h->pict_type != AV_PICTURE_TYPE_B) {
-        FFSWAP(Picture*, s->cur_pic, s->next_pic);
+        FFSWAP(H264Picture*, s->cur_pic, s->next_pic);
     } else {
         av_frame_unref(&s->cur_pic->f);
     }

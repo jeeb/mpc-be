@@ -232,6 +232,7 @@
     <ClInclude Include="libavcodec\mpegaudiodectab.h" />
     <ClInclude Include="libavcodec\mpegaudiodsp.h" />
     <ClInclude Include="libavcodec\mpegaudio_tablegen.h" />
+    <ClInclude Include="libavcodec\mpegutils.h" />
     <ClInclude Include="libavcodec\mpegvideo.h" />
     <ClInclude Include="libavcodec\msmpeg4.h" />
     <ClInclude Include="libavcodec\msmpeg4data.h" />
@@ -645,6 +646,7 @@
     <ClCompile Include="libavcodec\mpegaudiodsp_float.c" />
     <ClCompile Include="libavcodec\mpegaudiodsp_template.c" />
     <ClCompile Include="libavcodec\mpegaudio_parser.c" />
+    <ClCompile Include="libavcodec\mpegutils.c" />
     <ClCompile Include="libavcodec\mpegvideo.c" />
     <ClCompile Include="libavcodec\mpegvideo_motion.c" />
     <ClCompile Include="libavcodec\mpegvideo_parser.c" />
