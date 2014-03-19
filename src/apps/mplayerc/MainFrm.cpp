@@ -5994,7 +5994,6 @@ bool CMainFrame::GetDIB(BYTE** ppData, long& size, bool fSilent)
 			}
 
 			hr = m_pCAP->GetDIB(*ppData, (DWORD*)&size);
-			//if (FAILED(hr)) {errmsg.Format(_T("GetDIB failed, hr = %08x"), hr); break;}
 			if (FAILED(hr)) {
 				OnPlayPause();
 				GetMediaState(); // Pause and retry to support ffdshow queuing.
@@ -6024,14 +6023,14 @@ bool CMainFrame::GetDIB(BYTE** ppData, long& size, bool fSilent)
 				break;
 			}
 
-			size = (long)dwSize+sizeof(BITMAPINFOHEADER);
+			size = (long)dwSize + sizeof(BITMAPINFOHEADER);
 			*ppData = DNew BYTE[size];
 			if (!(*ppData)) {
 				return false;
 			}
-			memcpy_s (*ppData, size, &bih, sizeof(BITMAPINFOHEADER));
-			memcpy_s (*ppData+sizeof(BITMAPINFOHEADER), size-sizeof(BITMAPINFOHEADER), pDib, dwSize);
-			CoTaskMemFree (pDib);
+			memcpy_s(*ppData, size, &bih, sizeof(BITMAPINFOHEADER));
+			memcpy_s(*ppData+sizeof(BITMAPINFOHEADER), size - sizeof(BITMAPINFOHEADER), pDib, dwSize);
+			CoTaskMemFree(pDib);
 		} else {
 			hr = m_pBV->GetCurrentImage(&size, NULL);
 			if (FAILED(hr) || size == 0) {

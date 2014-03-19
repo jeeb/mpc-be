@@ -2211,7 +2211,13 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	memset(&desc, 0, sizeof(desc));
 	m_pVideoSurface[m_nCurSurface]->GetDesc(&desc);
 
-	DWORD required = sizeof(BITMAPINFOHEADER) + (desc.Width * desc.Height * 32 >> 3);
+	CSize framesize = GetVideoSize(false);
+	CSize dar = GetVideoSize(true);
+	if (dar.cx > 0 && dar.cy > 0) {
+		framesize.cx = MulDiv(framesize.cy, dar.cx, dar.cy);
+	}
+
+	DWORD required = sizeof(BITMAPINFOHEADER) + (framesize.cx * framesize.cy * 4);
 	if (!lpDib) {
 		*size = required;
 		return S_OK;
@@ -2226,7 +2232,10 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	if (m_bFullFloatingPointProcessing || m_bHalfFloatingPointProcessing || m_bHighColorResolution) {
 		CComPtr<IDirect3DSurface9> fSurface = m_pVideoSurface[m_nCurSurface];
 		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &fSurface, NULL))
-				|| FAILED(hr = m_pD3DXLoadSurfaceFromSurface(fSurface, NULL, NULL, m_pVideoSurface[m_nCurSurface], NULL, NULL, D3DX_DEFAULT, 0))) return hr;
+				|| FAILED(hr = m_pD3DXLoadSurfaceFromSurface(fSurface, NULL, NULL, m_pVideoSurface[m_nCurSurface], NULL, NULL, D3DX_DEFAULT, 0))) {
+			return hr;
+		}
+
 		pSurface = fSurface;
 		if (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
 			pSurface = NULL;
@@ -2241,23 +2250,26 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 			pSurface = NULL;
 			if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, NULL))
 					|| FAILED(hr = m_pD3DDev->GetRenderTargetData(m_pVideoSurface[m_nCurSurface], pSurface))
-					|| FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) return hr;
+					|| FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
+				return hr;
+			}
 		}
 	}
 
-	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)lpDib;
+	BITMAPINFOHEADER* bih	= (BITMAPINFOHEADER*)lpDib;
 	memset(bih, 0, sizeof(BITMAPINFOHEADER));
-	bih->biSize = sizeof(BITMAPINFOHEADER);
-	bih->biWidth = desc.Width;
-	bih->biHeight = desc.Height;
-	bih->biBitCount = 32;
-	bih->biPlanes = 1;
-	bih->biSizeImage = bih->biWidth * bih->biHeight * bih->biBitCount >> 3;
+	bih->biSize				= sizeof(BITMAPINFOHEADER);
+	bih->biWidth			= framesize.cx;
+	bih->biHeight			= framesize.cy;
+	bih->biBitCount			= 32;
+	bih->biPlanes			= 1;
+	bih->biSizeImage		= bih->biWidth * bih->biHeight * 4;
 
-	BitBltFromRGBToRGB(
+	BitBltFromRGBToRGBStretch(
 		bih->biWidth, bih->biHeight,
-		(BYTE*)(bih + 1), bih->biWidth*bih->biBitCount>>3, bih->biBitCount,
-		(BYTE*)r.pBits + r.Pitch*(desc.Height-1), -(int)r.Pitch, 32);
+		(BYTE*)(bih + 1), bih->biWidth * 4, 32,
+		desc.Width, desc.Height,
+		(BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, 32);
 
 	pSurface->UnlockRect();
 

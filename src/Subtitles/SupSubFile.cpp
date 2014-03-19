@@ -23,15 +23,15 @@
 
 CSupSubFile::CSupSubFile(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
+	, m_Thread(NULL)
+	, m_pSub(NULL)
 {
-	m_Thread	= NULL;
-	m_pSub		= NULL;
 }
 
 CSupSubFile::~CSupSubFile()
 {
 	if (m_Thread) {
-		if (WaitForSingleObject(m_Thread->m_hThread, 5000) == WAIT_TIMEOUT) {
+		if (WaitForSingleObject(m_Thread->m_hThread, 1000) == WAIT_TIMEOUT) {
 			TerminateThread(m_Thread->m_hThread, 0xDEAD);
 		}
 	}
@@ -42,7 +42,7 @@ CSupSubFile::~CSupSubFile()
 	}
 }
 
-static UINT64 ReadByte(CFile* mfile, size_t count = 1)
+static UINT64 ReadByte(CFile* mfile, UINT count = 1)
 {
 	if (count <= 0 || count >= 64) {
 		return 0;
@@ -52,7 +52,7 @@ static UINT64 ReadByte(CFile* mfile, size_t count = 1)
 	if (mfile->Read(buf, count) != count) {
 		return 0;
 	}
-	for(size_t i = 0; i<count; i++) {
+	for(UINT i = 0; i < count; i++) {
 		ret = (ret << 8) + (buf[i] & 0xff);
 	}
 	
@@ -63,7 +63,7 @@ static CString StripPath(CString path)
 {
 	CString p = path;
 	p.Replace('\\', '/');
-	p = p.Mid(p.ReverseFind('/')+1);
+	p = p.Mid(p.ReverseFind('/') + 1);
 	return (p.IsEmpty() ? path : p);
 }
 
@@ -75,12 +75,11 @@ static UINT ThreadProc(LPVOID pParam)
 bool CSupSubFile::Open(CString fn, CString SubName)
 {
 	CFile f;
-	if (!f.Open(fn, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
+	if (!f.Open(fn, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
 		return false;
 	}
 
-	WORD sync = 0;
-	sync = (WORD)ReadByte(&f, 2);
+	WORD sync = (WORD)ReadByte(&f, 2);
 	if (sync != 'PG') {
 		return false;
 	}
@@ -97,7 +96,7 @@ bool CSupSubFile::Open(CString fn, CString SubName)
 UINT CSupSubFile::ThreadProc()
 {
 	CFile f;
-	if (!f.Open(m_fname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
+	if (!f.Open(m_fname, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
 		return 1;
 	}
 
@@ -110,7 +109,7 @@ UINT CSupSubFile::ThreadProc()
 	m_sub.SeekToBegin();
 
 	int len;
-	BYTE buff[65536];
+	BYTE buff[65536] = { 0 };
 	while ((len = f.Read(buff, sizeof(buff))) > 0) {
 		m_sub.Write(buff, len);
 	}
@@ -185,7 +184,7 @@ STDMETHODIMP_(bool) CSupSubFile::IsAnimated(POSITION pos)
 STDMETHODIMP CSupSubFile::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	m_pSub->Render (spd, rt, bbox);
+	m_pSub->Render(spd, rt, bbox);
 
 	return S_OK;
 }
@@ -218,12 +217,12 @@ STDMETHODIMP CSupSubFile::GetStreamInfo(int iStream, WCHAR** ppName, LCID* pLCID
 	}
 
 	if (ppName) {
-		*ppName = (WCHAR*)CoTaskMemAlloc((m_Subname.GetLength()+1)*sizeof(WCHAR));
+		*ppName = (WCHAR*)CoTaskMemAlloc((m_Subname.GetLength() + 1) * sizeof(WCHAR));
 		if (!(*ppName)) {
 			return E_OUTOFMEMORY;
 		}
 
-		wcscpy_s (*ppName, m_Subname.GetLength()+1, CStringW(m_Subname));
+		wcscpy_s(*ppName, m_Subname.GetLength() + 1, CStringW(m_Subname));
 	}
 
 	if (pLCID) {
