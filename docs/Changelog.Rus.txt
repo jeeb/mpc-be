@@ -137,7 +137,7 @@
 	* libwebp 0.4.0 git-59daf083;
 	* libopus 1.1 git-253e15f7;
 	* libpng 1.7.0 b34 git-8ebdaa07;
-	* MediaInfo 0.7.67+ svn rev.6168;
+	* MediaInfo 0.7.67+ svn rev.6171;
 	* Little-CMS 2.6 git-08bbb31f;
 	* VirtualDub 1.10.4;
 	* ZenLib 0.4.29+ svn rev.456;
