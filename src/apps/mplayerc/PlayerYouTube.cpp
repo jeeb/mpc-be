@@ -25,7 +25,7 @@
 #include "../../DSUtil/MPCSocket.h"
 #include "../../DSUtil/Log.h"
 
-#define MATCH_FMT_START			"\"url_encoded_fmt_stream_map\": \""
+#define MATCH_STREAM_MAP_START	"\"url_encoded_fmt_stream_map\": \""
 #define MATCH_WIDTH_START		"meta property=\"og:video:width\" content=\""
 #define MATCH_DASHMPD_START		"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
 #define MATCH_END				"\""
@@ -103,7 +103,10 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		CString str, Author;
 
 		char* final = NULL;
-		int match_fmt_start = 0, match_fmt_len = 0;
+
+		int stream_map_start = 0;
+		int stream_map_len = 0;
+
 		int match_width_start = 0, match_width_len = 0;
 		int nMaxWidth = 0;
 
@@ -130,35 +133,42 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			}
 			f = InternetOpenUrl(s, link, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
-				char *out			= NULL;
-				DWORD dwBytesRead	= 0;
-				DWORD dataSize		= 0;
+				char buffer[4096];
+				DWORD dwBytesRead = 0;
+
+				char* data = NULL;
+				DWORD dataSize = 0;
 
 				do {
-					char buffer[4096];
+					DWORD result;
+
 					if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
 						break;
 					}
 
-					char *tempData = DNew char[dataSize + dwBytesRead];
-					memcpy(tempData, out, dataSize);
-					memcpy(tempData + dataSize, buffer, dwBytesRead);
-					delete[] out;
-					out = tempData;
+					data = (char*)realloc(data, dataSize + dwBytesRead);
+					memcpy(data + dataSize, buffer, dwBytesRead);
 					dataSize += dwBytesRead;
 
 					// url_encoded_fmt_stream_map
-					if (!match_fmt_start) {
-						match_fmt_start	= strpos(out, MATCH_FMT_START);
-					} else if (!match_fmt_len) {
-						match_fmt_len	= strpos(out + match_fmt_start + strlen(MATCH_FMT_START), MATCH_END);
+					if (!stream_map_start) {
+						result = strpos(data, MATCH_STREAM_MAP_START);
+						if (result) {
+							stream_map_start = result + strlen(MATCH_STREAM_MAP_START);
+						}
+					}
+					if (stream_map_start && !stream_map_len) {
+						result = strpos(data + stream_map_start, MATCH_END);
+						if (result) {
+							stream_map_len = result;
+						}
 					}
 
 					// <meta property="og:video:width" content="....">
 					if (!match_width_start) {
-						match_width_start	= strpos(out, MATCH_WIDTH_START);
+						match_width_start	= strpos(data, MATCH_WIDTH_START);
 					} else if (!match_width_len) {
-						match_width_len		= strpos(out + match_width_start + strlen(MATCH_WIDTH_START), MATCH_END);
+						match_width_len		= strpos(data + match_width_start + strlen(MATCH_WIDTH_START), MATCH_END);
 					}
 
 					// detect MAX resolution for this video
@@ -166,7 +176,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 						match_width_start += strlen(MATCH_WIDTH_START);
 						char *tmp = DNew char[match_width_len + 1];
 						memset(tmp, 0, match_width_len + 1);
-						memcpy(tmp, out + match_width_start, match_width_len);
+						memcpy(tmp, data + match_width_start, match_width_len);
 
 						if (sscanf_s(tmp, "%d", &nMaxWidth) != 1) {
 							nMaxWidth = -1;
@@ -175,7 +185,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					}
 
 					// optimization - to not download the entire page
-					if (match_fmt_start && match_fmt_len) {
+					if (stream_map_len) {
 						if (nMaxWidth != 1920) {
 							break;
 						}
@@ -184,8 +194,9 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 				final = DNew char[dataSize + 1];
 				memset(final, 0, dataSize + 1);
-				memcpy(final, out, dataSize);
-				delete [] out;
+				memcpy(final, data, dataSize);
+
+				free(data);
 
 				InternetCloseHandle(f);
 			}
@@ -196,7 +207,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			return fn;
 		}
 
-		if (!match_fmt_start || !match_fmt_len) {
+		if (!stream_map_len) {
 			if (strstr(final, YOUTUBE_MP_URL)) {
 				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
 				fn.Empty();
@@ -270,10 +281,9 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			}
 		}
 
-		match_fmt_start += strlen(MATCH_FMT_START);
-		char *tmp = DNew char[match_fmt_len + 1];
-		memset(tmp, 0, match_fmt_len + 1);
-		memcpy(tmp, final + match_fmt_start, match_fmt_len);
+		char *tmp = DNew char[stream_map_len + 1];
+		memset(tmp, 0, stream_map_len + 1);
+		memcpy(tmp, final + stream_map_start, stream_map_len);
 		delete [] final;
 
 		// because separator is a ',', then replace it with '~' to avoid matches
