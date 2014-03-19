@@ -107,7 +107,9 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		int stream_map_start = 0;
 		int stream_map_len = 0;
 
-		int match_width_start = 0, match_width_len = 0;
+		int video_width_start = 0;
+		int video_width_len = 0;
+
 		int nMaxWidth = 0;
 
 		AppSettings& sApp = AfxGetAppSettings();
@@ -140,8 +142,6 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				DWORD dataSize = 0;
 
 				do {
-					DWORD result;
-
 					if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
 						break;
 					}
@@ -151,37 +151,31 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					dataSize += dwBytesRead;
 
 					// url_encoded_fmt_stream_map
-					if (!stream_map_start) {
-						result = strpos(data, MATCH_STREAM_MAP_START);
-						if (result) {
-							stream_map_start = result + strlen(MATCH_STREAM_MAP_START);
-						}
+					if (!stream_map_start && (stream_map_start = strpos(data, MATCH_STREAM_MAP_START))) {
+						stream_map_start += strlen(MATCH_STREAM_MAP_START);
 					}
 					if (stream_map_start && !stream_map_len) {
-						result = strpos(data + stream_map_start, MATCH_END);
-						if (result) {
-							stream_map_len = result;
-						}
+						stream_map_len = strpos(data + stream_map_start, MATCH_END);
 					}
 
 					// <meta property="og:video:width" content="....">
-					if (!match_width_start) {
-						match_width_start	= strpos(data, MATCH_WIDTH_START);
-					} else if (!match_width_len) {
-						match_width_len		= strpos(data + match_width_start + strlen(MATCH_WIDTH_START), MATCH_END);
+					if (!video_width_start && (video_width_start = strpos(data, MATCH_WIDTH_START))) {
+						video_width_start += strlen(MATCH_WIDTH_START);
+					}
+					if (video_width_start && !video_width_len) {
+						video_width_len = strpos(data + video_width_start, MATCH_END);
 					}
 
 					// detect MAX resolution for this video
-					if (bIsFullHD && match_width_start && match_width_len && !nMaxWidth) {
-						match_width_start += strlen(MATCH_WIDTH_START);
-						char *tmp = DNew char[match_width_len + 1];
-						memset(tmp, 0, match_width_len + 1);
-						memcpy(tmp, data + match_width_start, match_width_len);
+					if (bIsFullHD && video_width_len && !nMaxWidth) {
+						char* tmp = DNew char[video_width_len + 1];
+						memcpy(tmp, data + video_width_start, video_width_len);
+						tmp[video_width_len] = 0;
 
 						if (sscanf_s(tmp, "%d", &nMaxWidth) != 1) {
 							nMaxWidth = -1;
 						}
-						delete [] tmp;
+						delete[] tmp;
 					}
 
 					// optimization - to not download the entire page
@@ -193,8 +187,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				} while (dwBytesRead);
 
 				final = DNew char[dataSize + 1];
-				memset(final, 0, dataSize + 1);
 				memcpy(final, data, dataSize);
+				final[dataSize] = 0;
 
 				free(data);
 
