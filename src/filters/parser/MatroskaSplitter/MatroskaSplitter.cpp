@@ -871,44 +871,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					else mt.subtype = FOURCCMap(wfe->wFormatTag);
 					mts.Add(mt);
 				} else if (CodecID == "A_VORBIS") {
-					BYTE* p = pTE->CodecPrivate.GetData();
-					CAtlArray<int> sizes;
-					int totalsize = 0;
-					for (BYTE n = *p++; n > 0; n--) {
-						int size = 0;
-						do {
-							size += *p;
-						} while (*p++ == 0xff);
-						sizes.Add(size);
-						totalsize += size;
-					}
-					sizes.Add(pTE->CodecPrivate.GetCount() - (p - pTE->CodecPrivate.GetData()) - totalsize);
-					totalsize += sizes[sizes.GetCount()-1];
-
-					if (sizes.GetCount() == 3) {
-						mt.subtype = MEDIASUBTYPE_Vorbis2;
-						mt.formattype = FORMAT_VorbisFormat2;
-						VORBISFORMAT2* pvf2 = (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2) + totalsize);
-						memset(pvf2, 0, mt.FormatLength());
-						pvf2->Channels = (WORD)pTE->a.Channels;
-						pvf2->SamplesPerSec = (DWORD)pTE->a.SamplingFrequency;
-						pvf2->BitsPerSample = (DWORD)pTE->a.BitDepth;
-						BYTE* p2 = mt.Format() + sizeof(VORBISFORMAT2);
-						for (size_t i = 0; i < sizes.GetCount(); p += sizes[i], p2 += sizes[i], i++) {
-							memcpy(p2, p, pvf2->HeaderSize[i] = sizes[i]);
-						}
-
-						mts.Add(mt);
-					}
-
-					mt.subtype = MEDIASUBTYPE_Vorbis;
-					mt.formattype = FORMAT_VorbisFormat;
-					VORBISFORMAT* vf = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
-					memset(vf, 0, mt.FormatLength());
-					vf->nChannels = (WORD)pTE->a.Channels;
-					vf->nSamplesPerSec = (DWORD)pTE->a.SamplingFrequency;
-					vf->nMinBitsPerSec = vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = (DWORD)-1;
-					mts.Add(mt);
+					CreateVorbisMediaType(mt, mts,
+										  (DWORD)pTE->a.Channels,
+										  (DWORD)pTE->a.SamplingFrequency,
+										  DWORD(pTE->a.BitDepth),
+										  pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 				} else if (CodecID.Find("A_AAC/") == 0) {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);

@@ -3133,6 +3133,48 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 	return dstSize ? S_OK : E_FAIL;
 }
 
+void CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts, DWORD Channels, DWORD SamplesPerSec, DWORD BitsPerSample, const BYTE* pData, size_t Count)
+{
+	const BYTE* p = pData;
+	CAtlArray<int> sizes;
+	int totalsize = 0;
+	for (BYTE n = *p++; n > 0; n--) {
+		int size = 0;
+		do {
+			size += *p;
+		} while (*p++ == 0xff);
+		sizes.Add(size);
+		totalsize += size;
+	}
+	sizes.Add(Count - (p - pData) - totalsize);
+	totalsize += sizes[sizes.GetCount()-1];
+
+	if (sizes.GetCount() == 3) {
+		mt.subtype			= MEDIASUBTYPE_Vorbis2;
+		mt.formattype		= FORMAT_VorbisFormat2;
+		VORBISFORMAT2* pvf2	= (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2) + totalsize);
+		memset(pvf2, 0, mt.FormatLength());
+		pvf2->Channels		= Channels;
+		pvf2->SamplesPerSec	= SamplesPerSec;
+		pvf2->BitsPerSample	= BitsPerSample;
+		BYTE* p2 = mt.Format() + sizeof(VORBISFORMAT2);
+		for (size_t i = 0; i < sizes.GetCount(); p += sizes[i], p2 += sizes[i], i++) {
+			memcpy(p2, p, pvf2->HeaderSize[i] = sizes[i]);
+		}
+
+		mts.Add(mt);
+	}
+
+	mt.subtype = MEDIASUBTYPE_Vorbis;
+	mt.formattype = FORMAT_VorbisFormat;
+	VORBISFORMAT* vf = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
+	memset(vf, 0, mt.FormatLength());
+	vf->nChannels		= Channels;
+	vf->nSamplesPerSec	= SamplesPerSec;
+	vf->nMinBitsPerSec	= vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = DWORD_MAX;
+	mts.Add(mt);
+}
+
 CStringA VobSubDefHeader(int w, int h, CStringA palette)
 {
 	CStringA hdr;
