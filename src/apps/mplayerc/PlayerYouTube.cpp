@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include "atl/atlrx.h"
 #include "PlayerYouTube.h"
 #include "PlayerVimeo.h"
 
@@ -29,6 +30,8 @@
 #define MATCH_WIDTH_START		"meta property=\"og:video:width\" content=\""
 #define MATCH_DASHMPD_START		"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
 #define MATCH_END				"\""
+
+#define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit \""
 
 const YOUTUBE_PROFILES* getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)
@@ -376,153 +379,109 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 {
 	if (PlayerYouTubePlaylistCheck(fn)) {
 
-		char* final = NULL;
+		char* data = NULL;
+		DWORD dataSize = 0;
 
 		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 		if (s) {
 			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
-				char *out			= NULL;
-				DWORD dwBytesRead	= 0;
-				DWORD dataSize		= 0;
+				char buffer[4096];
+				DWORD dwBytesRead = 0;
 
 				do {
-					char buffer[4096];
 					if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
 						break;
 					}
 
-					char *tempData = DNew char[dataSize + dwBytesRead];
-					memcpy(tempData, out, dataSize);
-					memcpy(tempData + dataSize, buffer, dwBytesRead);
-					delete[] out;
-					out = tempData;
+					data = (char*)realloc(data, dataSize + dwBytesRead + 1);
+					memcpy(data + dataSize, buffer, dwBytesRead);
 					dataSize += dwBytesRead;
+					data[dataSize] = 0;
 
-					if (/*strstr(out, "id=\"player\"") || */strstr(out, "id=\"footer\"")) {
+					if (/*strstr(data, "id=\"player\"") || */strstr(data, "id=\"footer\"")) {
 						break;
 					}
 				} while (dwBytesRead);
-
-				final = DNew char[dataSize + 1];
-				memset(final, 0, dataSize + 1);
-				memcpy(final, out, dataSize);
-				delete [] out;
 
 				InternetCloseHandle(f);
 			}
 			InternetCloseHandle(s);
 		}
 
-		if (!final || !f || !s) {
+		if (!data || !f || !s) {
 			return fn;
 		}
 
-		CString Playlist = _T(""), Video = _T(""), Title = _T(""), tmp_out = _T("");
-		int t_start = 0, t_stop = 0;
-		char *str = NULL, sep1[32], sep[] = "href=\"/watch?v=", sep_sub[] = "href=\"/playlist?list=", sep2[] = "title=\"";
+		CString Playlist = L"#EXTM3U\n\n";
 
-		if (fn.Find(_T("&list=")) < 0) {
-			strcpy(sep1, "<a ");
-		} else {
-			strcpy(sep1, "\" ");
-		}
-		strcat(sep1, sep);
+		char* block = data;
+		while ((block = strstr(block, MATCH_PLAYLIST_ITEM_START)) != NULL) {
+			block += strlen(MATCH_PLAYLIST_ITEM_START);
 
-		if (fn.Find(_T("playlist?")) < 0 && fn.Find(_T("&list=")) < 0) {
+			int block_len = strpos(block, ">");
+			if (block_len) {
+				char* tmp = DNew char[block_len + 1];
+				memcpy(tmp, block, block_len);
+				tmp[block_len] = 0;
+				CString item = UTF8ToString(CStringA(tmp));
+				delete[] tmp;
 
-			if (strstr(final, sep_sub) && !type) {
-				strcpy(sep1, sep_sub);
-			} else {
-				strcpy(sep1, sep);
-			}
-		}
+				CString data_video_id;
+				int data_index = 0;
+				CString data_video_username;
+				CString data_video_title;
 
-		while ((final = strstr(final, sep1)) != NULL) {
+				CAtlRegExp<> re;
+				CAtlREMatchContext<> mc;
+				REParseError pe = re.Parse(L" {[a-z\-]+}=\"{[^\"]+}\"");
 
-			final += strlen(sep1);
+				LPCTSTR szEnd = item.GetBuffer();
+				while (re.Match(szEnd, &mc)) {
+					LPCTSTR szStart;
+					mc.GetMatch(0, &szStart, &szEnd);
+					CString propHeader = CString(szStart, int(szEnd - szStart));
 
-			t_stop = strpos(final, "&");
+					mc.GetMatch(1, &szStart, &szEnd);
+					CString propValue = CString(szStart, int(szEnd - szStart));
 
-			if (t_stop > 0) {
-
-				if (t_stop > 32) {
-					t_stop = strpos(final, "\"");
-				}
-
-				char* st = DNew char[t_stop + 1];
-				memset(st, 0, t_stop + 1);
-				memcpy(st, final, t_stop);
-
-				Video = CString(st);
-
-				delete [] st;
-			}
-
-			if (strstr(sep1, sep_sub)) {
-
-				tmp_out = _T("http");
-				tmp_out.Append(YOUTUBE_PL_URL);
-				tmp_out.Append(_T("list="));
-				tmp_out.Append(Video);
-				Playlist.Append(PlayerYouTubePlaylist(tmp_out, 1));
-			} else {
-				final += t_stop;
-
-				t_start = strpos(final, sep2) + strlen(sep2);
-
-				if (t_start > 0 && t_start < 128) {
-
-					final += t_start;
-
-					t_stop = strpos(final, "\"");
-
-					bool active = (str == NULL ? 1 : (strstr(final, str) ? 0 : 1));
-
-					if (t_stop > 0 && active) {
-
-						str = DNew char[t_stop + 1];
-						memset(str, 0, t_stop + 1);
-						memcpy(str, final, t_stop);
-
-						if (str[0] == '[' && str[strlen(str) - 1] == ']') {
-						} else {
-							Title = PlayerYouTubeReplaceTitle(str);
+					// data-video-id, data-video-clip-end, data-index, data-video-username, data-video-title, data-video-clip-start.
+					if (propHeader == L"data-video-id") {
+						data_video_id = propValue;
+					} else if (propHeader == L"data-index") {
+						if (swscanf_s(propValue, L"%d", &data_index) != 1) {
+							data_index = 0;
 						}
+					} else if (propHeader == L"data-video-username") {
+						data_video_username = propValue;
+					} else if (propHeader == L"data-video-title") {
+						data_video_title = propValue;
 					}
 				}
-			}
 
-			if (!Video.IsEmpty() && !Title.IsEmpty()) {
-
-				Playlist.Append(_T("#EXTINF:"));
-				Playlist.Append(Title);
-				Playlist.Append(_T("\r\nhttp"));
-				Playlist.Append(YOUTUBE_URL);
-				Playlist.Append(_T("v="));
-				Playlist.Append(Video);
-				Playlist.Append(_T("\r\n"));
-
-				Video = _T("");
-				Title = _T("");
+				if (data_video_id.GetLength() > 0) {
+					Playlist.AppendFormat(L"#EXTINF:-1,%s\n", data_video_title);
+					Playlist.AppendFormat(L"http://www.youtube.com/watch?v=%s\n\n", data_video_id);
+				}
 			}
 		}
 
-		if (type) {
-			return Playlist;
-		}
+		if (Playlist.GetLength() > 9) {
+			if (type) {
+				return Playlist;
+			}
 
-		CStdioFile fout;
-		CString file = PlayerYouTubePlaylistCreate();
+			CStdioFile fout;
+			CString file = PlayerYouTubePlaylistCreate();
 
-		if (fout.Open(file, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
+			if (fout.Open(file, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
+				CStringA ptr(Playlist);
+				const char* pt = (LPCSTR)ptr;
+				fout.Write(pt, strlen(pt));
+				fout.Close();
 
-			CStringA ptr(Playlist);
-			const char* pt = (LPCSTR)ptr;
-			fout.Write(pt, strlen(pt));
-			fout.Close();
-
-			return file;
+				return file;
+			}
 		}
 	}
 
