@@ -30,15 +30,37 @@
 #define MATCH_DASHMPD_START		"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
 #define MATCH_END				"\""
 
-static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A"), _T(""), false};
-
-static YOUTUBE_PROFILES getProfile(int iTag) {
+const YOUTUBE_PROFILES* getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)
 		if (iTag == youtubeProfiles[i].iTag) {
-			return youtubeProfiles[i];
+			return &youtubeProfiles[i];
 	}
 
-	return youtubeProfileEmpty;
+	return &youtubeProfileEmpty;
+}
+
+bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, const YOUTUBE_PROFILES* sets)
+{
+	const YOUTUBE_PROFILES* current = getProfile(itag_current);
+
+	if (current->iTag <= 0 || current->Resolution > sets->Resolution) {
+		return false;
+	}
+
+	if (itag_final != 0) {
+		const YOUTUBE_PROFILES* fin = getProfile(itag_final);
+		if (fin->Container == sets->Container && current->Container != sets->Container) {
+			return false;
+		}
+		if (current->Resolution < fin->Resolution) {
+			return false;
+		}
+	}
+
+	itag_final = current->iTag;
+	ext_final = '.' + CString(current->Container).MakeLower();
+
+	return true;
 }
 
 bool PlayerYouTubeCheck(CString fn)
@@ -100,7 +122,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		LOG2FILE(_T("Youtube parser"));
 #endif
 
-		CString str, Author;
+		CString Author;
 
 		char* data = NULL;
 		DWORD dataSize = 0;
@@ -114,9 +136,10 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		int nMaxWidth = 0;
 
 		AppSettings& sApp = AfxGetAppSettings();
-		CString tag;
-		tag.Format(_T("itag=%d"), sApp.iYoutubeTag);
-		BOOL match_itag = sApp.iYoutubeTag != 0;
+		const YOUTUBE_PROFILES* youtubeSets = getProfile(sApp.iYoutubeTag);
+		if (youtubeSets->iTag == 0) {
+			youtubeSets = getProfile(22);
+		}
 
 #if 0
 		BOOL bIsFullHD = FALSE;
@@ -276,170 +299,73 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		tmp[stream_map_len] = 0;
 		free(data);
 
-		// because separator is a ',', then replace it with '~' to avoid matches
-		for (size_t i = 0; i < strlen(tmp); i++) {
-			if (tmp[i] == ',') {
-				tmp[i] = '~';
-			}
-		}
+		CStringA strA = CStringA(tmp);
+		delete[] tmp;
+		strA.Replace("\\u0026", "&");
+		//str.Replace(_T("\\u0022"), _T("\""));
+		//str.Replace(_T("\\u0027"), _T("'"));
+		//str.Replace(_T("\\u003c"), _T("<"));
+		//str.Replace(_T("\\u003e"), _T(">"));
 
-		str = UTF8ToString(UrlDecode(UrlDecode(CStringA(tmp))));
-		delete [] tmp;
+		CString final_url;
+		CString final_ext;
+		int final_itag = 0;
 
-		// Character Representation
-		str.Replace(_T("\\u0022"), _T("\""));
-		str.Replace(_T("\\u0026"), _T("&"));
-		str.Replace(_T("\\u0027"), _T("'"));
-		str.Replace(_T("\\u003c"), _T("<"));
-		str.Replace(_T("\\u003e"), _T(">"));
 
-#ifdef _DEBUG
-		LOG2FILE(_T("Source = \'%s\'"), str);
-#endif
+		//str = UTF8ToString(UrlDecode(UrlDecode(CStringA(tmp))));
 
-		CAtlList<CString> sl;
-		Explode(str, sl, '~');
+		CAtlList<CStringA> linesA;
+		Explode(strA, linesA, ',');
 
-#ifdef _DEBUG
-		{
-			LOG2FILE(_T("	==> \'%s\'"), str);
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				LOG2FILE(_T("		=== >\'%s\'"), sl.GetNext(pos));
-			}
-		}
-#endif
+		POSITION posLine = linesA.GetHeadPosition();
+		while (posLine) {
+			CStringA &lineA = linesA.GetNext(posLine);
 
-again:
-
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			str = sl.GetNext(pos);
-			//str.Trim(_T("&,="));
-
-			if (match_itag && (str.Find(tag) == -1)) {
-				continue;
-			}
-
-#ifdef _DEBUG
-			LOG2FILE(_T("	trying \'%s\'"), str);
-#endif
-
-			CMapStringToString UrlFields;
-			{
-				// extract fields/params from url
-				CString templateStr = str;
-				CAtlList<CString> sl2;
-
-				CString tmp;
-				for (int i = 0; i < templateStr.GetLength(); i++) {
-					if (templateStr[i] == '&' || templateStr[i] == '?') {
-						sl2.AddTail(tmp);
-						tmp.Empty();
-					} else {
-						tmp += templateStr[i];
-					}
-				}
-
-				if (!tmp.IsEmpty()) {
-					sl2.AddTail(tmp);
-				}
-
-				POSITION pos = sl2.GetHeadPosition();
-				while (pos) {
-					CString tmp = sl2.GetNext(pos);
-					int sepPos = tmp.Find('=');
-					if (sepPos <= 0 || sepPos == tmp.GetLength()-1) {
-						continue;
-					}
-
-					CString TagKey		= tmp.Left(sepPos);
-					CString TagValue	= tmp.Mid(sepPos + 1);
-
-					UrlFields[TagKey] = TagValue;
-#ifdef _DEBUG
-					LOG2FILE(_T("			==> Tag \'%s\' = \'%s\'"), TagKey, TagValue);
-#endif
-				}
-			}
-
-			CString itagValueStr;
-			UrlFields.Lookup(_T("itag"), itagValueStr);
-
-			if (itagValueStr.IsEmpty()) {
-				continue;
-			}
-
+			int itag = 0;
+			CStringA url;
 			CString ext;
-			// format of the video - http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
-			int itagValue = 0;
-			if (_stscanf_s(itagValueStr, _T("%d"), &itagValue) == 1) {
-				YOUTUBE_PROFILES youtubePtofile = getProfile(itagValue);
-				if (youtubePtofile.Visible == false
-					|| youtubePtofile.iTag == 0
-					|| (youtubePtofile.Container == _T("WebM") && !match_itag)
-					|| youtubePtofile.Profile == _T("3D")) {
-					continue;
-				}
+			int resolution = 0;
 
-				ext.Format(_T(".%s"), youtubePtofile.Container);
-				ext.MakeLower();
-			}
+			CAtlList<CStringA> paramsA;
+			Explode(lineA, paramsA, '&');
 
-			if (!itagValue || ext.IsEmpty()) {
-				continue;
-			}
+			POSITION posParam = paramsA.GetHeadPosition();
+			while (posParam) {
+				CStringA &paramA = paramsA.GetNext(posParam);
 
-			CString url = UrlFields[_T("url")] + _T("?");
+				int k = paramA.Find('=');
+				if (k >= 0) {
+					CStringA paramHeader = paramA.Left(k);
+					CStringA paramValue = paramA.Mid(k + 1);
 
-			CString sparams = UrlFields[_T("sparams")];
-			CAtlList<CString> slparams;
-			Explode(sparams, slparams, ',');
-			{
-				slparams.AddTail(_T("sparams"));
-				slparams.AddTail(_T("mt"));
-				slparams.AddTail(_T("sver"));
-				slparams.AddTail(_T("mv"));
-				slparams.AddTail(_T("ms"));
-				slparams.AddTail(_T("fexp"));
-				slparams.AddTail(_T("key"));
-				slparams.AddTail(_T("sig"));
-				slparams.AddTail(_T("signature"));
-			}
-
-			POSITION pos = slparams.GetHeadPosition();
-			while (pos) {
-				CString param = slparams.GetNext(pos);
-				CString value = UrlFields[param];
-				if (value.GetLength() > 0) {
-					if (param == L"sig") {
-						url.AppendFormat(L"signature=%s&", value);
-					} else {
-						url.AppendFormat(L"%s=%s&", param, value);
+					// "quality", "fallback_host", "url", "itag", "type"
+					 if (paramHeader == "url") {
+						url = UrlDecode(UrlDecode(paramValue));
+					} else if (paramHeader == "itag") {
+						if (sscanf_s(paramValue, "%d", &itag) != 1) {
+							itag = 0;
+						}
 					}
 				}
 			}
-			url.Trim(_T("&"));
 
-#ifdef _DEBUG
-			LOG2FILE(_T("final url = \'%s\'"), url);
-			LOG2FILE(_T("------"));
-#endif
-
-			if (out_Title) {
-				Title.Replace(ext, _T(""));
-				*out_Title = Title + ext;
+			if (itag) {
+				if (SelectBestProfile(final_itag, final_ext, itag, youtubeSets)) {
+					final_url = url;
+				}
 			}
-			if (out_Author) {
-				*out_Author = Author;
-			}
-
-			return url;
 		}
 
-		if (match_itag) {
-			match_itag = FALSE;
-			goto again;
+		if (out_Title) {
+			Title.Replace(final_ext, _T(""));
+			*out_Title = Title + final_ext;
+		}
+		if (out_Author) {
+			*out_Author = Author;
+		}
+
+		if (final_url.GetLength() > 0) {
+			return final_url;
 		}
 	}
 

@@ -63,16 +63,15 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	int j = 0;
 	for (size_t i = 0; i < _countof(youtubeProfiles); i++) {
-		if (youtubeProfiles[i].Visible) {
-			j++;
-			m_YoutubeProfiles.Add(youtubeProfiles[i]);
+		j++;
+		m_YoutubeProfiles.Add(youtubeProfiles[i]);
 
-			CString fmt; fmt.Format(_T("%s@%s"), youtubeProfiles[i].Container, youtubeProfiles[i].Resolution);
-			m_iYoutubeFormatCtrl.AddString(fmt);
+		CString fmt;
+		fmt.Format(_T("%s@%dp"), youtubeProfiles[i].Container, youtubeProfiles[i].Resolution);
+		m_iYoutubeFormatCtrl.AddString(fmt);
 
-			if (youtubeProfiles[i].iTag == s.iYoutubeTag) {
-				m_iYoutubeFormatType = j;
-			}
+		if (youtubeProfiles[i].iTag == s.iYoutubeTag) {
+			m_iYoutubeFormatType = j;
 		}
 	}
 
