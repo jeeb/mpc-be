@@ -128,16 +128,16 @@ INT_PTR CDVSBasePPage::OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	switch (uMsg) {
 		case WM_COMMAND: {
 			if (m_bIsInitialized) {
-				m_bDirty = TRUE;
-				if (m_pPageSite) {
-					m_pPageSite->OnStatusChange(PROPPAGESTATUS_DIRTY);
-				}
-
 				switch (HIWORD(wParam)) {
 					case BN_CLICKED:
 					case CBN_SELCHANGE:
 					case EN_CHANGE: {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+						m_bDirty = TRUE;
+						if (m_pPageSite) {
+							m_pPageSite->OnStatusChange(PROPPAGESTATUS_DIRTY);
+						}
 
 						if (!m_fDisableInstantUpdate
 								&& !(HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_INSTANTUPDATE)
@@ -229,11 +229,16 @@ HRESULT CDVSBasePPage::OnApplyChanges()
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	if (m_bIsInitialized) {
+	if (m_bIsInitialized && m_bDirty) {
 		OnDeactivate();
 		UpdateObjectData(true);
 		m_pDirectVobSub->UpdateRegistry(); // *
 		OnActivate();
+
+		m_bDirty = FALSE;
+		if (m_pPageSite) {
+			m_pPageSite->OnStatusChange(PROPPAGESTATUS_CLEAN);
+		}
 	}
 
 	return NOERROR;
@@ -613,7 +618,8 @@ bool CDVSMiscPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case BN_CLICKED: {
 					if (LOWORD(wParam) == IDC_INSTANTUPDATE) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), !!m_instupd.GetCheck());
+						m_fApplyImmediatly = !!m_instupd.GetCheck();
+						theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), m_fApplyImmediatly);
 						return true;
 					}
 				}
@@ -636,6 +642,8 @@ void CDVSMiscPPage::UpdateObjectData(bool fSave)
 		m_pDirectVobSub->put_AnimWhenBuffering(m_fAnimWhenBuffering);
 		m_pDirectVobSub->put_SubtitleReloader(m_fReloaderDisabled);
 		m_pDirectVobSub->put_SaveFullPath(m_fSaveFullPath);
+
+		theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), m_fApplyImmediatly);
 	} else {
 		m_pDirectVobSub->get_Flip(&m_fFlipPicture, &m_fFlipSubtitles);
 		m_pDirectVobSub->get_HideSubtitles(&m_fHideSubtitles);
@@ -644,6 +652,8 @@ void CDVSMiscPPage::UpdateObjectData(bool fSave)
 		m_pDirectVobSub->get_AnimWhenBuffering(&m_fAnimWhenBuffering);
 		m_pDirectVobSub->get_SubtitleReloader(&m_fReloaderDisabled);
 		m_pDirectVobSub->get_SaveFullPath(&m_fSaveFullPath);
+
+		m_fApplyImmediatly = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1);
 	}
 }
 
@@ -668,7 +678,7 @@ void CDVSMiscPPage::UpdateControlData(bool fSave)
 		m_animwhenbuff.SetCheck(m_fAnimWhenBuffering);
 		m_showosd.SetCheck(m_fOSD);
 		m_autoreload.SetCheck(!m_fReloaderDisabled);
-		m_instupd.SetCheck(!!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1));
+		m_instupd.SetCheck(m_fApplyImmediatly);
 	}
 }
 
