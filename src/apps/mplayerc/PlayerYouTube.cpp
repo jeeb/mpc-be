@@ -150,7 +150,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					data[dataSize] = 0;
 
 					// url_encoded_fmt_stream_map
-					if (!stream_map_start && (stream_map_start = strpos(data, MATCH_STREAM_MAP_START))) {
+					if (!stream_map_start && (stream_map_start = strpos(data, MATCH_STREAM_MAP_START)) != 0) {
 						stream_map_start += strlen(MATCH_STREAM_MAP_START);
 					}
 					if (stream_map_start && !stream_map_len) {
@@ -158,7 +158,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					}
 
 					// <meta property="og:video:width" content="....">
-					if (!video_width_start && (video_width_start = strpos(data, MATCH_WIDTH_START))) {
+					if (!video_width_start && (video_width_start = strpos(data, MATCH_WIDTH_START)) != 0) {
 						video_width_start += strlen(MATCH_WIDTH_START);
 					}
 					if (video_width_start && !video_width_len) {
