@@ -434,7 +434,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 
 				CAtlRegExp<> re;
 				CAtlREMatchContext<> mc;
-				REParseError pe = re.Parse(L" {[a-z\-]+}=\"{[^\"]+}\"");
+				REParseError pe = re.Parse(L" {[a-z-]+}=\"{[^\"]+}\"");
 
 				LPCTSTR szEnd = item.GetBuffer();
 				while (re.Match(szEnd, &mc)) {

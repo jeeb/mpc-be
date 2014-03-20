@@ -527,7 +527,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 					AddLine(str);
 					key.Close();
 				} else { // Search filter in an external filter list ...
-					const AppSettings& s = AfxGetAppSettings();
+					AppSettings& s = AfxGetAppSettings();
 					POSITION pos = s.m_filters.GetHeadPosition();
 					while (pos) {
 						FilterOverride* fo = s.m_filters.GetNext(pos);
