@@ -16,7 +16,7 @@
 	+ AudioSplitter - Добавлена поддержка Monkey's Audio (.APE) и APE Tag, DTS-CD и AC3-CD, TTA, WAV и  Wave64;
 	+ AviSplitter - Добавлена поддержка 'RPZA', 'RV24' (RGB24 c перевернутым кадром), малораспространенных YUV-форматов;
 	+ MatroskaSplitter - Добавлена поддержка Microsoft MPEG4 V3, M-Jpeg, Prores, SNOW, и некоторых типов несжатого видео ('V_UNCOMPRESSED');
-	+ MP4Splitter - Добавлена поддержка '2Vuy', 'DVOO', 'yuvs', 'yuv2', DNxHD, FFV1, 'v308', 'v408', 'V410';
+	+ MP4Splitter - Добавлена поддержка '2Vuy', 'DVOO', 'yuvs', 'yuv2', DNxHD, FFV1, 'v308', 'v408', 'V410', Vorbis audio;
 	+ MpaDecFilter - Добавлена поддержка декодирования MEDIASUBTYPE_SIPR_WAVE - SIPR в .wmv, Voxware MetaSound;
 	+ MPCVideoDec - Добавлены выходные форматы 'AYUV', 'YV16', 'YV24', 'P010', 'P210', 'P016', 'P0216', 'Y410' и 'Y416';
 	+ MPCVideoDec - Добавлена поддержка 'Avid DNxHD', HuffYUV, FFVH, FFV1 (FFmpeg video codec #1), QuickTime 8BPS video, 'RPZA', 'cyuv', 'yuv2', 'Y41B', 'Y42B', '444P', 'Y800', 'I420', 'V410'
