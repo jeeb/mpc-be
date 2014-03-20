@@ -118,8 +118,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		tag.Format(_T("itag=%d"), sApp.iYoutubeTag);
 		BOOL match_itag = sApp.iYoutubeTag != 0;
 
-		BOOL bIsFullHD = FALSE;
 #if 0
+		BOOL bIsFullHD = FALSE;
 		if (sApp.iYoutubeTag == 37) {
 			// Full HD resolution, format .MP4
 			match_itag	= FALSE;
@@ -165,6 +165,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 						video_width_len = strpos(data + video_width_start, MATCH_END);
 					}
 
+#if 0
 					// detect MAX resolution for this video
 					if (bIsFullHD && video_width_len && !nMaxWidth) {
 						char* tmp = DNew char[video_width_len + 1];
@@ -176,6 +177,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 						}
 						delete[] tmp;
 					}
+#endif
 
 					// optimization - to not download the entire page
 					if (stream_map_len) {
@@ -205,6 +207,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 		CString Title = PlayerYouTubeSearchTitle(data);
 
+#if 0
 		DWORD dashmpd_start	= strpos(data, MATCH_DASHMPD_START);
 		if (bIsFullHD && dashmpd_start && nMaxWidth == 1920) {
 			DWORD dashmpd_len = strpos(data + dashmpd_start + strlen(MATCH_DASHMPD_START), MATCH_END);
@@ -266,10 +269,11 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				}
 			}
 		}
+#endif
 
 		char *tmp = DNew char[stream_map_len + 1];
-		memset(tmp, 0, stream_map_len + 1);
 		memcpy(tmp, data + stream_map_start, stream_map_len);
+		tmp[stream_map_len] = 0;
 		free(data);
 
 		// because separator is a ',', then replace it with '~' to avoid matches
