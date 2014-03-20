@@ -102,7 +102,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 		CString str, Author;
 
-		char* final = NULL;
+		char* data = NULL;
+		DWORD dataSize = 0;
 
 		int stream_map_start = 0;
 		int stream_map_len = 0;
@@ -138,17 +139,15 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				char buffer[4096];
 				DWORD dwBytesRead = 0;
 
-				char* data = NULL;
-				DWORD dataSize = 0;
-
 				do {
 					if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
 						break;
 					}
 
-					data = (char*)realloc(data, dataSize + dwBytesRead);
+					data = (char*)realloc(data, dataSize + dwBytesRead + 1);
 					memcpy(data + dataSize, buffer, dwBytesRead);
 					dataSize += dwBytesRead;
+					data[dataSize] = 0;
 
 					// url_encoded_fmt_stream_map
 					if (!stream_map_start && (stream_map_start = strpos(data, MATCH_STREAM_MAP_START))) {
@@ -186,40 +185,34 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					}
 				} while (dwBytesRead);
 
-				final = DNew char[dataSize + 1];
-				memcpy(final, data, dataSize);
-				final[dataSize] = 0;
-
-				free(data);
-
 				InternetCloseHandle(f);
 			}
 			InternetCloseHandle(s);
 		}
 
-		if (!final || !f || !s) {
+		if (!data || !f || !s) {
 			return fn;
 		}
 
 		if (!stream_map_len) {
-			if (strstr(final, YOUTUBE_MP_URL)) {
+			if (strstr(data, YOUTUBE_MP_URL)) {
 				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
 				fn.Empty();
 			}
-			delete [] final;
+			free(data);
 			return fn;
 		}
 
-		CString Title = PlayerYouTubeSearchTitle(final);
+		CString Title = PlayerYouTubeSearchTitle(data);
 
-		DWORD dashmpd_start	= strpos(final, MATCH_DASHMPD_START);
+		DWORD dashmpd_start	= strpos(data, MATCH_DASHMPD_START);
 		if (bIsFullHD && dashmpd_start && nMaxWidth == 1920) {
-			DWORD dashmpd_len = strpos(final + dashmpd_start + strlen(MATCH_DASHMPD_START), MATCH_END);
+			DWORD dashmpd_len = strpos(data + dashmpd_start + strlen(MATCH_DASHMPD_START), MATCH_END);
 			if (dashmpd_len) {
 				dashmpd_start	+= strlen(MATCH_DASHMPD_START);
 				char* dashmpd	= DNew char[dashmpd_len + 1];
 				memset(dashmpd, 0, dashmpd_len + 1);
-				memcpy(dashmpd, final + dashmpd_start, dashmpd_len);
+				memcpy(dashmpd, data + dashmpd_start, dashmpd_len);
 
 				CString str_dashmpd = UTF8ToString(UrlDecode(UrlDecode(CStringA(dashmpd))));
 				str_dashmpd.Replace(L"\\/", L"&");
@@ -268,8 +261,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					LOG2FILE(_T("final url = \'%s\'"), s_url);
 					LOG2FILE(_T("------"));
 #endif
-					delete [] final;
-
+					free(data);
 					return s_url;
 				}
 			}
@@ -277,8 +269,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 		char *tmp = DNew char[stream_map_len + 1];
 		memset(tmp, 0, stream_map_len + 1);
-		memcpy(tmp, final + stream_map_start, stream_map_len);
-		delete [] final;
+		memcpy(tmp, data + stream_map_start, stream_map_len);
+		free(data);
 
 		// because separator is a ',', then replace it with '~' to avoid matches
 		for (size_t i = 0; i < strlen(tmp); i++) {
