@@ -510,6 +510,57 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 							mts.Add(mt);
 							break;
+						case AP4_VORBIS_OTI:
+							/*
+							mt.subtype			= MEDIASUBTYPE_Vorbis2;
+							mt.formattype		= FORMAT_VorbisFormat2;
+	
+							VORBISFORMAT2* vf2	= (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2));
+							memset(mt.Format(), 0, mt.FormatLength());
+	
+							vf2->Channels		= audio_desc->GetChannelCount();
+							vf2->SamplesPerSec	= audio_desc->GetSampleRate() ? audio_desc->GetSampleRate() : track->GetMediaTimeScale();
+							*/
+							BYTE* p = (BYTE*)di->GetData();
+							CAtlArray<int> sizes;
+							int totalsize = 0;
+							for (BYTE n = *p++; n > 0; n--) {
+								int size = 0;
+								do {
+									size += *p;
+								} while (*p++ == 0xff);
+								sizes.Add(size);
+								totalsize += size;
+							}
+							sizes.Add(di->GetDataSize() - (p - (BYTE*)di->GetData()) - totalsize);
+							totalsize += sizes[sizes.GetCount() - 1];
+
+							if (sizes.GetCount() == 3) {
+								mt.subtype			= MEDIASUBTYPE_Vorbis2;
+								mt.formattype		= FORMAT_VorbisFormat2;
+								VORBISFORMAT2* pvf2	= (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2) + totalsize);
+								memset(pvf2, 0, mt.FormatLength());
+								pvf2->Channels		= (DWORD)audio_desc->GetChannelCount();
+								pvf2->SamplesPerSec	= (DWORD)(audio_desc->GetSampleRate() ? audio_desc->GetSampleRate() : track->GetMediaTimeScale());
+								pvf2->BitsPerSample	= (DWORD)audio_desc->GetSampleSize();
+								BYTE* p2 = mt.Format() + sizeof(VORBISFORMAT2);
+								for (size_t i = 0; i < sizes.GetCount(); p += sizes[i], p2 += sizes[i], i++) {
+									memcpy(p2, p, pvf2->HeaderSize[i] = sizes[i]);
+								}
+
+								mts.Add(mt);
+							}
+
+							mt.subtype			= MEDIASUBTYPE_Vorbis;
+							mt.formattype		= FORMAT_VorbisFormat;
+							VORBISFORMAT* vf	= (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
+							memset(vf, 0, mt.FormatLength());
+							vf->nChannels		= (WORD)audio_desc->GetChannelCount();
+							vf->nSamplesPerSec	= (DWORD)(audio_desc->GetSampleRate() ? audio_desc->GetSampleRate() : track->GetMediaTimeScale());
+							vf->nMinBitsPerSec	= vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = DWORD_MAX;
+							
+							mts.Add(mt);
+							break;
 					}
 
 					if (mt.subtype == GUID_NULL) {

@@ -265,6 +265,7 @@ AP4_MpegSampleDescription::GetObjectTypeString(OTI oti)
         case AP4_DTSH_AUDIO_OTI:           return "DTS-HD High Resolution Audio";
         case AP4_DTSL_AUDIO_OTI:           return "DTS-HD Master Audio";
         case AP4_NERO_VOBSUB:              return "VobSub Subtitle";
+        case AP4_VORBIS_OTI:               return "Vorbis audio";
         default:                           return "UNKNOWN";
     }
 }
