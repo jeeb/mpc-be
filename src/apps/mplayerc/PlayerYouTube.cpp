@@ -46,15 +46,14 @@ bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, co
 {
 	const YOUTUBE_PROFILES* current = getProfile(itag_current);
 
-	if (current->iTag <= 0 || current->Resolution > sets->Resolution) {
+	if (current->iTag <= 0
+			|| current->Container != sets->Container
+			|| current->Resolution > sets->Resolution) {
 		return false;
 	}
 
 	if (itag_final != 0) {
 		const YOUTUBE_PROFILES* fin = getProfile(itag_final);
-		if (fin->Container == sets->Container && current->Container != sets->Container) {
-			return false;
-		}
 		if (current->Resolution < fin->Resolution) {
 			return false;
 		}
