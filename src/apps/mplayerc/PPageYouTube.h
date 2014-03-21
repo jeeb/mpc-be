@@ -33,13 +33,11 @@ class CPPageYoutube : public CPPageBase
 private:
 	CComboBox m_iYoutubeFormatCtrl;
 
-	CAtlArray<YOUTUBE_PROFILES> m_YoutubeProfiles;
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();
 
 	enum { IDD = IDD_PPAGEYOUTUBE };
-	int m_iYoutubeFormatType;
 	int m_iYoutubeSourceType;
 
 protected:

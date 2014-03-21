@@ -27,7 +27,6 @@
 IMPLEMENT_DYNAMIC(CPPageYoutube, CPPageBase)
 CPPageYoutube::CPPageYoutube()
 	: CPPageBase(CPPageYoutube::IDD, CPPageYoutube::IDD)
-	, m_iYoutubeFormatType(0)
 	, m_iYoutubeSourceType(0)
 {
 }
@@ -58,25 +57,26 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_iYoutubeFormatCtrl.AddString(ResStr(IDS_PPAGE_FS_DEFAULT));
-	m_iYoutubeFormatType = 0;
+	m_iYoutubeFormatCtrl.Clear();
 
-	int j = 0;
 	for (size_t i = 0; i < _countof(youtubeProfiles); i++) {
-		j++;
-		m_YoutubeProfiles.Add(youtubeProfiles[i]);
-
 		CString fmt;
 		fmt.Format(_T("%s@%dp"), youtubeProfiles[i].Container, youtubeProfiles[i].Resolution);
-		m_iYoutubeFormatCtrl.AddString(fmt);
 
-		if (youtubeProfiles[i].iTag == s.iYoutubeTag) {
-			m_iYoutubeFormatType = j;
-		}
+		m_iYoutubeFormatCtrl.AddString(fmt);
+		m_iYoutubeFormatCtrl.SetItemData(i, youtubeProfiles[i].iTag);
 	}
 
-	CorrectComboListWidth(m_iYoutubeFormatCtrl);
-	m_iYoutubeFormatCtrl.SetCurSel(m_iYoutubeFormatType);
+	int j = 0;
+	for (j = 0; j < m_iYoutubeFormatCtrl.GetCount(); j++) {
+		if (m_iYoutubeFormatCtrl.GetItemData(j) == s.iYoutubeTag) {
+			m_iYoutubeFormatCtrl.SetCurSel(j);
+			break;
+		}
+	}
+	if (j >= m_iYoutubeFormatCtrl.GetCount()) {
+		m_iYoutubeFormatCtrl.SetCurSel(0);
+	}
 
 	m_iYoutubeSourceType = s.iYoutubeSource ? 1 : 0;
 
@@ -91,13 +91,7 @@ BOOL CPPageYoutube::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_iYoutubeFormatType = m_iYoutubeFormatCtrl.GetCurSel();
-
-	if (m_iYoutubeFormatType <= 0 || (m_iYoutubeFormatType - 1) >= _countof(youtubeProfiles)) {
-		s.iYoutubeTag = m_iYoutubeFormatType;
-	} else {
-		s.iYoutubeTag = m_YoutubeProfiles[m_iYoutubeFormatType - 1].iTag;
-	}
+	s.iYoutubeTag = m_iYoutubeFormatCtrl.GetItemData(m_iYoutubeFormatCtrl.GetCurSel());
 
 	s.iYoutubeSource = m_iYoutubeSourceType;
 
