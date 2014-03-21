@@ -108,12 +108,13 @@ DEF_OLD_QPEL(qpel8_mc32_old_c)
 DEF_OLD_QPEL(qpel8_mc13_old_c)
 DEF_OLD_QPEL(qpel8_mc33_old_c)
 
+struct MpegEncContext;
 /* Motion estimation:
  * h is limited to { width / 2, width, 2 * width },
  * but never larger than 16 and never smaller than 2.
  * Although currently h < 4 is not used as functions with
  * width < 8 are neither used nor implemented. */
-typedef int (*me_cmp_func)(void /* MpegEncContext */ *s,
+typedef int (*me_cmp_func)(struct MpegEncContext *c,
                            uint8_t *blk1 /* align width (8 or 16) */,
                            uint8_t *blk2 /* align 1 */, int line_size, int h);
 
@@ -355,10 +356,14 @@ int ff_check_alignment(void);
 void ff_set_cmp(DSPContext *c, me_cmp_func *cmp, int type);
 
 void ff_dsputil_init_alpha(DSPContext* c, AVCodecContext *avctx);
-void ff_dsputil_init_arm(DSPContext *c, AVCodecContext *avctx);
-void ff_dsputil_init_bfin(DSPContext *c, AVCodecContext *avctx);
-void ff_dsputil_init_ppc(DSPContext *c, AVCodecContext *avctx);
-void ff_dsputil_init_x86(DSPContext *c, AVCodecContext *avctx);
+void ff_dsputil_init_arm(DSPContext *c, AVCodecContext *avctx,
+                         unsigned high_bit_depth);
+void ff_dsputil_init_bfin(DSPContext *c, AVCodecContext *avctx,
+                          unsigned high_bit_depth);
+void ff_dsputil_init_ppc(DSPContext *c, AVCodecContext *avctx,
+                         unsigned high_bit_depth);
+void ff_dsputil_init_x86(DSPContext *c, AVCodecContext *avctx,
+                         unsigned high_bit_depth);
 
 void ff_dsputil_init_dwt(DSPContext *c);
 
