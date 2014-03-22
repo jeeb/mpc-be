@@ -1831,6 +1831,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			// Dynamic DXVA media types for DXVA1
 			for (int pos = 0; pos < ffCodecs[m_nCodecNb].DXVAModeCount(); pos++) {
 				if (m_nPCIVendor == PCIV_ATI && *ffCodecs[m_nCodecNb].DXVAModes->Decoder[pos] == DXVA2_ModeVC1_D2010) {
+					m_nVideoOutputCount--;
 					continue;
 				}
 
