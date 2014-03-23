@@ -26,10 +26,13 @@
 #include "libavutil/avassert.h"
 #include "libavutil/cpu.h"
 #include "libavutil/x86/asm.h"
+#include "libavcodec/pixels.h"
 #include "libavcodec/videodsp.h"
 #include "constants.h"
-#include "dsputil_x86.h"
 #include "diracdsp_mmx.h"
+#include "dsputil_x86.h"
+#include "fpel.h"
+#include "inline_asm.h"
 
 #if HAVE_INLINE_ASM
 
@@ -553,7 +556,7 @@ void ff_ ## OPNAME2 ## _dirac_pixels32_ ## EXT(uint8_t *dst, const uint8_t *src[
 }
 
 #if HAVE_MMX_INLINE
-PIXELS16(static, ff_avg, , , _mmxext)
+CALL_2X_PIXELS(ff_avg_pixels16_mmxext, ff_avg_pixels8_mmxext, 8)
 DIRAC_PIXOP(put, ff_put, mmx)
 DIRAC_PIXOP(avg, ff_avg, mmx)
 #endif

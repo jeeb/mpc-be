@@ -28,9 +28,12 @@
  * Half-pel DSP functions
  */
 
+#include "pixels.h"
+
 #include "bit_depth_template.c"
 
 #include "hpel_template.c"
+#include "tpel_template.c"
 
 #define PIXOP2(OPNAME, OP)                                              \
 static inline void FUNC(OPNAME ## _no_rnd_pixels8_l2)(uint8_t *dst,     \

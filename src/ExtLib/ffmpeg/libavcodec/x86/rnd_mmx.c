@@ -17,7 +17,9 @@
  */
 
 #include "config.h"
-#include "dsputil_x86.h"
+#include "libavcodec/pixels.h"
+#include "hpeldsp.h"
+#include "inline_asm.h"
 
 #if HAVE_INLINE_ASM
 
@@ -29,7 +31,7 @@
 
 #include "rnd_template.c"
 
-PIXELS16(, ff_avg, , _xy2, _mmx)
-PIXELS16(, ff_put, , _xy2, _mmx)
+CALL_2X_PIXELS_EXPORT(ff_avg_pixels16_xy2_mmx, ff_avg_pixels8_xy2_mmx, 8)
+CALL_2X_PIXELS_EXPORT(ff_put_pixels16_xy2_mmx, ff_put_pixels8_xy2_mmx, 8)
 
 #endif /* HAVE_INLINE_ASM */

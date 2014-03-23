@@ -93,6 +93,7 @@ struct MpegEncContext;
  */
 typedef struct Picture{
     struct AVFrame f;
+    uint8_t avframe_padding[1024]; // hack to allow linking to a avutil with larger AVFrame
     ThreadFrame tf;
 
     AVBufferRef *qscale_table_buf;
@@ -765,8 +766,6 @@ void ff_MPV_motion(MpegEncContext *s,
  * The pixels are allocated/set by calling get_buffer() if shared = 0.
  */
 int ff_alloc_picture(MpegEncContext *s, Picture *pic, int shared);
-
-extern const enum AVPixelFormat ff_pixfmt_list_420[];
 
 /**
  * permute block according to permuatation.

@@ -337,6 +337,7 @@ SRCS_C = \
 	libavcodec/tiff.c \
 	libavcodec/tiff_common.c \
 	libavcodec/tiff_data.c \
+	libavcodec/tpeldsp.c \
 	libavcodec/truespeech.c \
 	libavcodec/tscc.c \
 	libavcodec/tscc2.c \

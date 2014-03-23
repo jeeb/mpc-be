@@ -259,10 +259,19 @@
     <ClInclude Include="libavcodec\x86\fft.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\x86\fpel.h">
+      <Filter>libavcodec\x86</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\x86\h264_i386.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\x86\hpeldsp.h">
+      <Filter>libavcodec\x86</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\x86\idct_xvid.h">
+      <Filter>libavcodec\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\x86\inline_asm.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\mathops.h">
@@ -706,6 +715,9 @@
     <ClInclude Include="libavcodec\mpegaudiodsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\mpegutils.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\mpegvideo.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -737,6 +749,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\parser.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\pixels.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\png.h">
@@ -884,6 +899,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\tiff_data.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\tpeldsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\truespeech_data.h">
@@ -1150,6 +1168,9 @@
     <ClInclude Include="libavutil\downmix_info.h">
       <Filter>libavutil</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\dynarray.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\error.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -1269,9 +1290,6 @@
     </ClInclude>
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\mpegutils.h">
-      <Filter>libavcodec</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2056,6 +2074,9 @@
     <ClCompile Include="libavcodec\mpegaudiodsp_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\mpegutils.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\mpegvideo.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2255,6 +2276,12 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\tiff_data.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\tpel_template.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\tpeldsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\truespeech.c">
@@ -2649,9 +2676,6 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\mpegutils.c">
-      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

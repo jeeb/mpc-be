@@ -25,6 +25,8 @@
  * RV10/RV20 decoder
  */
 
+#include <inttypes.h>
+
 #include "libavutil/imgutils.h"
 
 #include "avcodec.h"
@@ -507,7 +509,7 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
     }
 
     if (avctx->debug & FF_DEBUG_PICT_INFO) {
-        av_log(avctx, AV_LOG_DEBUG, "ver:%X ver0:%X\n", rv->sub_id,
+        av_log(avctx, AV_LOG_DEBUG, "ver:%X ver0:%"PRIX32"\n", rv->sub_id,
                ((uint32_t *) avctx->extradata)[0]);
     }
 
@@ -793,7 +795,10 @@ AVCodec ff_rv10_decoder = {
     .decode         = rv10_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
     .max_lowres     = 3,
-    .pix_fmts       = ff_pixfmt_list_420,
+    .pix_fmts       = (const enum AVPixelFormat[]) {
+        AV_PIX_FMT_YUV420P,
+        AV_PIX_FMT_NONE
+    },
 };
 
 AVCodec ff_rv20_decoder = {
@@ -808,5 +813,8 @@ AVCodec ff_rv20_decoder = {
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush          = ff_mpeg_flush,
     .max_lowres     = 3,
-    .pix_fmts       = ff_pixfmt_list_420,
+    .pix_fmts       = (const enum AVPixelFormat[]) {
+        AV_PIX_FMT_YUV420P,
+        AV_PIX_FMT_NONE
+    },
 };

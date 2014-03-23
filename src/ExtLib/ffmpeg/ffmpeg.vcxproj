@@ -244,6 +244,7 @@
     <ClInclude Include="libavcodec\old_codec_ids.h" />
     <ClInclude Include="libavcodec\options_table.h" />
     <ClInclude Include="libavcodec\parser.h" />
+    <ClInclude Include="libavcodec\pixels.h" />
     <ClInclude Include="libavcodec\png.h" />
     <ClInclude Include="libavcodec\pngdsp.h" />
     <ClInclude Include="libavcodec\proresdata.h" />
@@ -293,6 +294,7 @@
     <ClInclude Include="libavcodec\tiff.h" />
     <ClInclude Include="libavcodec\tiff_common.h" />
     <ClInclude Include="libavcodec\tiff_data.h" />
+    <ClInclude Include="libavcodec\tpeldsp.h" />
     <ClInclude Include="libavcodec\truespeech_data.h" />
     <ClInclude Include="libavcodec\tscc2data.h" />
     <ClInclude Include="libavcodec\ttadata.h" />
@@ -338,8 +340,11 @@
     <ClInclude Include="libavcodec\x86\dirac_dwt.h" />
     <ClInclude Include="libavcodec\x86\dsputil_x86.h" />
     <ClInclude Include="libavcodec\x86\fft.h" />
+    <ClInclude Include="libavcodec\x86\fpel.h" />
     <ClInclude Include="libavcodec\x86\h264_i386.h" />
+    <ClInclude Include="libavcodec\x86\hpeldsp.h" />
     <ClInclude Include="libavcodec\x86\idct_xvid.h" />
+    <ClInclude Include="libavcodec\x86\inline_asm.h" />
     <ClInclude Include="libavcodec\x86\mathops.h" />
     <ClInclude Include="libavcodec\x86\vc1dsp.h" />
     <ClInclude Include="libavcodec\x86\vp56_arith.h" />
@@ -386,6 +391,7 @@
     <ClInclude Include="libavutil\crc.h" />
     <ClInclude Include="libavutil\dict.h" />
     <ClInclude Include="libavutil\downmix_info.h" />
+    <ClInclude Include="libavutil\dynarray.h" />
     <ClInclude Include="libavutil\error.h" />
     <ClInclude Include="libavutil\eval.h" />
     <ClInclude Include="libavutil\fifo.h" />
@@ -714,6 +720,8 @@
     <ClCompile Include="libavcodec\tiff.c" />
     <ClCompile Include="libavcodec\tiff_common.c" />
     <ClCompile Include="libavcodec\tiff_data.c" />
+    <ClCompile Include="libavcodec\tpeldsp.c" />
+    <ClCompile Include="libavcodec\tpel_template.c" />
     <ClCompile Include="libavcodec\truespeech.c" />
     <ClCompile Include="libavcodec\tscc.c" />
     <ClCompile Include="libavcodec\tscc2.c" />
