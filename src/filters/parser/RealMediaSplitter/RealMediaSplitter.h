@@ -304,6 +304,9 @@ public:
 	DWORD m_timestamp;
 	bool m_fDropFrames;
 	HRESULT AlterQuality(Quality q);
+
+protected:
+	virtual bool IsVideoInterlaced() { return true; }
 };
 
 class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E"))
