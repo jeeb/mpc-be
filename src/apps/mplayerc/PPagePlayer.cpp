@@ -136,13 +136,17 @@ BOOL CPPagePlayer::OnApply()
 	s.fKeepHistory = !!m_fKeepHistory;
 	s.fHideCDROMsSubMenu = !!m_fHideCDROMsSubMenu;
 	s.dwPriority = !m_priority ? NORMAL_PRIORITY_CLASS : ABOVE_NORMAL_PRIORITY_CLASS;
+	BOOL bShowOSDChanged = (s.fShowOSD != !!m_fShowOSD);
 	s.fShowOSD = !!m_fShowOSD;
-	if (m_fShowOSD) {
-		((CMainFrame*)AfxGetMainWnd())->m_OSD.Start(((CMainFrame*)AfxGetMainWnd())->m_pOSDWnd);
-		((CMainFrame*)AfxGetMainWnd())->m_OSD.ClearMessage(false);
-	} else {
-		((CMainFrame*)AfxGetMainWnd())->m_OSD.Stop();
-		((CMainFrame*)AfxGetMainWnd())->m_OSD.ShowWindow(SW_HIDE);
+	if (bShowOSDChanged) {
+		CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+		if (m_fShowOSD) {
+			pFrame->m_OSD.Start(pFrame->m_pOSDWnd);
+			pFrame->OSDBarSetPos();
+			pFrame->m_OSD.ClearMessage(false);
+		} else {
+			pFrame->m_OSD.Stop();
+		}
 	}
 	s.fLimitWindowProportions = !!m_fLimitWindowProportions;
 	s.fRememberDVDPos = m_fRememberDVDPos ? true : false;
