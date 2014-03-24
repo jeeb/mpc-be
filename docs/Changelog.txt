@@ -8,6 +8,24 @@ Legend:
 ! Fixed
 
 
+1.4.1.1
+==============================
+
+Added (+):
+
+	 ... and many more.
+
+
+Changes (*):
+
+	 ... and many more.
+
+
+Fixes (!):
+
+	 ... and many more.
+
+
 1.4.0.3
 ==============================
 
