@@ -76,6 +76,7 @@ public:
 	BOOL m_fFontShadow;
 	BOOL m_fFontShadow_Old;
 	BOOL m_fFontAA;
+	BOOL m_fFontAA_Old;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
