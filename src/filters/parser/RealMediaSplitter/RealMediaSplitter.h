@@ -306,7 +306,7 @@ public:
 	HRESULT AlterQuality(Quality q);
 
 protected:
-	virtual bool IsVideoInterlaced() { return true; }
+	virtual bool IsVideoInterlaced() { return false; }
 };
 
 class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E"))
