@@ -7168,9 +7168,13 @@ void CMainFrame::OnUpdateViewEVROutputRange(CCmdUI* pCmdUI)
 			break;
 	}
 
+	pCmdUI->SetCheck(fChecked);
+
+	/*
 	if (fChecked) {
 		CheckMenuRadioItem(ID_VIEW_EVROUTPUTRANGE_0_255, ID_VIEW_EVROUTPUTRANGE_16_235, pCmdUI->m_nID);	
 	}
+	*/
 }
 
 void CMainFrame::OnUpdateViewFlushGPU(CCmdUI* pCmdUI)
