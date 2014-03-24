@@ -55,7 +55,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	HRESULT DemuxNextPacket(REFERENCE_TIME rtStartOffset);
 
-	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY);
+	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY, CStringA& palette);
 
 	REFERENCE_TIME m_rtPlaylistDuration;
 	REFERENCE_TIME m_rtMin, m_rtMax;
