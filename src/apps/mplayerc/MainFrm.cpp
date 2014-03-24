@@ -7054,7 +7054,7 @@ void CMainFrame::OnUpdateViewColorManagementInput(CCmdUI* pCmdUI)
 
 	pCmdUI->Enable(supported);
 
-	bool fChecked = false;
+	BOOL fChecked = FALSE;
 	switch (pCmdUI->m_nID) {
 		case ID_VIEW_COLORMANAGEMENT_INPUT_AUTO:
 			fChecked = r.m_AdvRendSets.iVMR9ColorManagementInput == VIDEO_SYSTEM_UNKNOWN;
@@ -7073,9 +7073,12 @@ void CMainFrame::OnUpdateViewColorManagementInput(CCmdUI* pCmdUI)
 			break;
 	}
 
+	pCmdUI->SetCheck(fChecked);
+	/*
 	if (fChecked) {
 		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, pCmdUI->m_nID);	
 	}
+	*/
 }
 
 void CMainFrame::OnUpdateViewColorManagementAmbientLight(CCmdUI* pCmdUI)
@@ -7091,7 +7094,7 @@ void CMainFrame::OnUpdateViewColorManagementAmbientLight(CCmdUI* pCmdUI)
 
 	pCmdUI->Enable(supported);
 
-	bool fChecked = false;
+	BOOL fChecked = FALSE;
 	switch (pCmdUI->m_nID) {
 		case ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT:
 			fChecked = r.m_AdvRendSets.iVMR9ColorManagementAmbientLight == AMBIENT_LIGHT_BRIGHT;
@@ -7106,9 +7109,12 @@ void CMainFrame::OnUpdateViewColorManagementAmbientLight(CCmdUI* pCmdUI)
 			break;
 	}
 
+	pCmdUI->SetCheck(fChecked);
+	/*
 	if (fChecked) {
 		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, pCmdUI->m_nID);	
 	}
+	*/
 }
 
 void CMainFrame::OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI)
@@ -7124,7 +7130,7 @@ void CMainFrame::OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI)
 
 	pCmdUI->Enable(supported);
 
-	bool fChecked = false;
+	BOOL fChecked = FALSE;
 	switch (pCmdUI->m_nID) {
 		case ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL:
 			fChecked = r.m_AdvRendSets.iVMR9ColorManagementIntent == COLOR_RENDERING_INTENT_PERCEPTUAL;
@@ -7143,9 +7149,12 @@ void CMainFrame::OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI)
 			break;
 	}
 
+	pCmdUI->SetCheck(fChecked);
+	/*
 	if (fChecked) {
 		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, pCmdUI->m_nID);	
 	}
+	*/
 }
 
 void CMainFrame::OnUpdateViewEVROutputRange(CCmdUI* pCmdUI)
@@ -7158,7 +7167,7 @@ void CMainFrame::OnUpdateViewEVROutputRange(CCmdUI* pCmdUI)
 
 	pCmdUI->Enable(supported);
 
-	bool fChecked = false;
+	BOOL fChecked = FALSE;
 	switch (pCmdUI->m_nID) {
 		case ID_VIEW_EVROUTPUTRANGE_0_255:
 			fChecked = r.m_AdvRendSets.iEVROutputRange == 0;
