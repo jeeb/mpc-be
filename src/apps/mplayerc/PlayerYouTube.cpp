@@ -70,13 +70,13 @@ bool PlayerYouTubeCheck(CString fn)
 	CString tmp_fn(CString(fn).MakeLower());
 
 	if (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && (tmp_fn.Find(_T("watch?")) < 0 || tmp_fn.Find(_T("playlist?")) != -1 || tmp_fn.Find(_T("&list=")) != -1)) {
-		return 0;
+		return false;
 	}
 	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
 bool PlayerYouTubePlaylistCheck(CString fn)
@@ -87,16 +87,16 @@ bool PlayerYouTubePlaylistCheck(CString fn)
 	tmp_fn.Replace(_T("http"), _T(""));
 
 	if (tmp_fn == _T(YOUTUBE_MP_URL) || (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && tmp_fn.Find(_T("channel/")) != -1)) {
-		return 0;
+		return false;
 	}
 	if (tmp_fn.Find(YOUTUBE_PL_URL) != -1 || (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1)) {
-		return 1;
+		return true;
 	}
 	if (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && tmp_fn.Find(_T("watch?")) < 0) {
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
@@ -159,9 +159,10 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				link.Replace(YOUTU_BE_URL, YOUTUBE_URL);
 				link.Replace(_T("watch?"), _T("watch?v="));
 			}
+
 			f = InternetOpenUrl(s, link, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
-				char buffer[4096];
+				char buffer[4096] = { 0 };
 				DWORD dwBytesRead = 0;
 
 				do {
@@ -367,6 +368,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		}
 
 		if (final_url.GetLength() > 0) {
+			final_url.Replace(L"http://", L"https://");
 			return final_url;
 		}
 	}

@@ -12929,7 +12929,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (fn.IsEmpty() && !fFirst) {
 			break;
 		}
-		fn.Replace(_T("https://"), _T("http://"));
 
 		m_strUrl.Empty();
 		m_strTitleAlt.Empty();
@@ -12942,8 +12941,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		local.MakeLower();
 		bool validateUrl = true;
 
+		if (PlayerYouTubeCheck(local)) {
+			local.Replace(L"http://", L"https://");
+		}
+
 		for (;;) {
-			if (local.Find(_T("http://")) == 0 || local.Find(_T("https://")) == 0 || local.Find(_T("www.")) == 0) {
+			if (local.Find(_T("http://")) == 0 || local.Find(_T("www.")) == 0) {
 				// validate url before try to opening
 				if (local.Find(_T("www.")) == 0) {
 					local = _T("http://") + local;
@@ -12978,25 +12981,30 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 
 			if (!extimage) {
-				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt, &m_strAuthorAlt);
-				m_strUrl = tmpName;
+				CString tmpName = m_strUrl = fn;
+				if (PlayerYouTubeCheck(fn)) {
+					CString fn_https = fn;
+					fn_https.Replace(L"http://", L"https://");
+					tmpName = PlayerYouTube(fn_https, &m_strTitleAlt, &m_strAuthorAlt);
+					m_strUrl = tmpName;
 
-				if (PlayerYouTubeCheck(fn) && s.iYoutubeSource == 0) {
-					if (!m_strTitleAlt.IsEmpty() && ::PathIsURL(tmpName)) {
-						m_fYoutubeThreadWork = TH_START;
-						m_YoutubeFile = tmpName;
-						m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
-						while (m_fYoutubeThreadWork == TH_START) {
-							Sleep(50);
-						}
+					if (s.iYoutubeSource == 0) {
+						if (!m_strTitleAlt.IsEmpty() && ::PathIsURL(tmpName)) {
+							m_fYoutubeThreadWork = TH_START;
+							m_YoutubeFile = tmpName;
+							m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
+							while (m_fYoutubeThreadWork == TH_START) {
+								Sleep(50);
+							}
 
-						if (m_fYoutubeThreadWork == TH_WORK && ::PathFileExists(m_YoutubeFile)) {
-							tmpName = m_YoutubeFile;
-						} else {
-							tmpName.Empty();
+							if (m_fYoutubeThreadWork == TH_WORK && ::PathFileExists(m_YoutubeFile)) {
+								tmpName = m_YoutubeFile;
+							} else {
+								tmpName.Empty();
+							}
 						}
+						PlayerYouTubePlaylistDelete();
 					}
-					PlayerYouTubePlaylistDelete();
 				}
 
 				TCHAR path[MAX_PATH]	= {0};
