@@ -55,6 +55,14 @@ CPPageInterface::CPPageInterface()
 
 CPPageInterface::~CPPageInterface()
 {
+	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
+	if (pMainFrame->m_OSD) {
+		if (m_nOSDTransparent != m_nOSDTransparent_Old) {
+			pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - m_nOSDTransparent_Old, LWA_ALPHA | LWA_COLORKEY);
+		}
+
+		pMainFrame->m_OSD.ClearMessage();
+	}
 }
 
 void CPPageInterface::DoDataExchange(CDataExchange* pDX)
@@ -245,6 +253,15 @@ BOOL CPPageInterface::OnApply()
 
 	pFrame->Invalidate();
 
+	m_nThemeBrightness_Old	= s.nThemeBrightness;
+	m_nThemeRed_Old			= s.nThemeRed;
+	m_nThemeGreen_Old		= s.nThemeGreen;
+	m_nThemeBlue_Old		= s.nThemeBlue;
+	m_OSDBorder_Old			= s.nOSDBorder;
+	m_fFontShadow_Old		= s.fFontShadow;
+	m_fFontAA_Old			= s.fFontAA;
+	m_nOSDTransparent_Old	= s.nOSDTransparent;
+
 	return __super::OnApply();
 }
 
@@ -259,14 +276,7 @@ void CPPageInterface::OnCancel()
 	s.nOSDBorder		= m_OSDBorder_Old;
 	s.fFontShadow		= !!m_fFontShadow_Old;
 	s.fFontAA			= !!m_fFontAA_Old;
-
-	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
-	if (pMainFrame->m_OSD && m_nOSDTransparent != m_nOSDTransparent_Old) {
-		pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - m_nOSDTransparent_Old, LWA_ALPHA | LWA_COLORKEY);
-	}
 	s.nOSDTransparent	= m_nOSDTransparent_Old;
-
-	pMainFrame->m_OSD.ClearMessage();
 
 	OnThemeChange();
 }
