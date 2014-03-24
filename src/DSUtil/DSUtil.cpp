@@ -3177,17 +3177,14 @@ void CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts, DWORD Cha
 
 CStringA VobSubDefHeader(int w, int h, CStringA palette)
 {
+	CStringA def_palette = "000000,e0e0e0,808080,202020,3333fa,1111bb,fa3333,bb1111,33fa33,11bb11,fafa33,bbbb11,fa33fa,bb11bb,33fafa,11bbbb";
+
 	CStringA hdr;
 	hdr.Format(
 		"# VobSub index file, v7 (do not modify this line!)\n"
-		"size: %dx%d\n",
-		w, h);
-
-	if (palette.IsEmpty()) {
-		hdr.Append("custom colors: ON, tridx: 1000, colors: 00000, e0e0e0, 808080, 202020\n");
-	} else {
-		hdr.AppendFormat("palette: %s\n", palette);
-	}
+		"size: %dx%d\n"
+		"palette: %s\n",
+		w, h, palette.GetLength() > 0 ? palette : def_palette);
 
 	return hdr;
 }

@@ -162,8 +162,10 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 
 			int x, y, arx, ary;
 			ExtractDim(&m_mt, x, y, arx, ary);
+			UNREFERENCED_PARAMETER(arx);
+			UNREFERENCED_PARAMETER(ary);
 
-			CStringA hdr = VobSubDefHeader(x, y);
+			CStringA hdr = VobSubDefHeader(x ? x : 720, y ? y : 576);
 			pVSS->Open(name, (BYTE*)(LPCSTR)hdr, hdr.GetLength());
 		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
 			int x, y, arx, ary;
