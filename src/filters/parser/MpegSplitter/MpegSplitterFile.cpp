@@ -1033,7 +1033,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		if (m_bOpeningCompleted) {
 			s.mts.push_back(s.mt);
 		}
-		m_streams[type].Insert(s, type);
+
+		if (!m_bOpeningCompleted || (m_bOpeningCompleted && m_streams[type].GetCount() > 0)) {
+			m_streams[type].Insert(s, type);
+		}
 	}
 
 	return s;
