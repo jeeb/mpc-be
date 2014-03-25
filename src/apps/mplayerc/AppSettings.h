@@ -649,11 +649,13 @@ public:
 	int				nThemeBlue;
 	int				nOSDTransparent;
 	int				nOSDBorder;
-	int				clrFaceABGR;
-	int				clrOutlineABGR;
-	int				clrFontABGR;
-	int				clrGrad1ABGR;
-	int				clrGrad2ABGR;
+
+	COLORREF		clrFaceABGR;
+	COLORREF		clrOutlineABGR;
+	COLORREF		clrFontABGR;
+	COLORREF		clrGrad1ABGR;
+	COLORREF		clrGrad2ABGR;
+
 	bool			fUseTimeTooltip;
 	int				nTimeTooltipPosition;
 	bool			fFileNameOnSeekBar;

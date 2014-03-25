@@ -1792,6 +1792,7 @@ STRING IDS_OSD_RS_WAIT_OFF		"Αναμονή για εκκαθάριση της G
 STRING IDS_OSD_RS_WAIT_ON		"Αναμονή για εκκαθάριση της GPU: Ναι"
 STRING IDS_OSD_SATURATION		"Κορεσμός : %s"
 STRING IDS_OSD_SPEED		"Ταχύτητα: %.2lfx"
+STRING IDS_OSD_TEST		"OSD Test"
 STRING IDS_OSD_THUMBS_SAVED		"Οι μικρογραφίες αποθηκεύτηκαν επιτυχώς"
 STRING IDS_OSD_ZOOM		"Εστίαση: %.0lf%%"
 STRING IDS_OSD_ZOOM_AUTO		"Εστίαση: Αυτόματα"

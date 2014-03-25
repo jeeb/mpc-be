@@ -18162,6 +18162,7 @@ void CMainFrame::ShowOptions(int idPage)
 	Invalidate();
 
 	m_wndStatusBar.Relayout();
+	m_wndPlaylistBar.Invalidate();
 
 	OpenSetupWindowTitle(m_strFnFull);
 

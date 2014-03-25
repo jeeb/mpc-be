@@ -174,7 +174,8 @@ void COSD::OnSize(UINT nType, int cx, int cy)
 		InvalidateVMROSD();
 		UpdateBitmap();
 	} else if (m_pWnd) {
-		PostMessage(WM_OSD_DRAW);
+		//PostMessage(WM_OSD_DRAW);
+		DrawWnd();
 	}
 }
 
@@ -807,7 +808,8 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			}
 
 			SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-			PostMessage(WM_OSD_DRAW);
+			//PostMessage(WM_OSD_DRAW);
+			DrawWnd();
 		}
 	}
 }
@@ -838,7 +840,8 @@ void COSD::HideMessage(bool hide)
 			if (!m_strMessage.IsEmpty()) {
 				SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			}
-			PostMessage(WM_OSD_DRAW);
+			//PostMessage(WM_OSD_DRAW);
+			DrawWnd();
 		}
 	}
 }
@@ -898,7 +901,9 @@ BOOL COSD::OnEraseBkgnd(CDC* pDC)
 void COSD::OnPaint()
 {
 	CPaintDC dc(this);
-	PostMessage(WM_OSD_DRAW);
+
+	//PostMessage(WM_OSD_DRAW);
+	DrawWnd();
 }
 
 void COSD::DrawWnd()

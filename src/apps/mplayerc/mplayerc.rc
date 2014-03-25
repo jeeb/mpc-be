@@ -3533,6 +3533,11 @@ BEGIN
     IDS_SUB_POS_RIGHT                   "Subtitle shift positions right"
 END
 
+STRINGTABLE
+BEGIN
+    IDS_OSD_TEST                        "OSD Test"
+END
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 

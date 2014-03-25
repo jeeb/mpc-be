@@ -57,11 +57,11 @@ public:
 	int m_OSDBorder;
 	int m_OSDBorder_Old;
 	CSpinButtonCtrl m_OSDBorderCtrl;
-	int m_clrFaceABGR;
-	int m_clrOutlineABGR;
-	int m_clrFontABGR;
-	int m_clrGrad1ABGR;
-	int m_clrGrad2ABGR;
+	COLORREF m_clrFaceABGR;
+	COLORREF m_clrOutlineABGR;
+	COLORREF m_clrFontABGR;
+	COLORREF m_clrGrad1ABGR;
+	COLORREF m_clrGrad2ABGR;
 
 	BOOL m_fUseWin7TaskBar;
 	BOOL m_fUseTimeTooltip;

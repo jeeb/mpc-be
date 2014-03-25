@@ -889,6 +889,7 @@
 #define IDS_MPLAYERC_105                24003
 #define IDS_FILE_SAVE_THUMBNAILS        24005
 #define IDC_MAINFRAME_ICON              24006
+#define IDS_OSD_TEST                    24007
 #define IDS_SHADERS_TOGGLE              32771
 #define IDS_AG_CLOSE                    32830
 #define IDS_SHADEREDITORDLG_0           32831
