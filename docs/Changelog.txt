@@ -52,9 +52,9 @@ Added (+):
 	+ VSFilter - added support for NV12;
 	+ VSFilter - added support for scaling PGS/DVB subtitles;
 	+ VSFilter - added support for interlaced video;
-	+ Аудиомикшер - added support for muxing in 5.0;
+	+ Audiomixer - added support for muxing in 5.0;
 	+ Internal MPEG/DVD Decoder - added support for NV12 output;
-	+ added the 'Всегда использовать внешние аудиофайлы как основные' option ;
+	+ added the 'Always use an external audio file as the main' option ;
 	+ added the 'Use Subresync' option;
 	+ video renderer statistics - added the 'GPU Load' indicator;
 	 ... and many more.
