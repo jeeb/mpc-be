@@ -82,9 +82,12 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
+	virtual BOOL OnQueryCancel();
 	void OnCancel();
 
 	DECLARE_MESSAGE_MAP()
+
+	void ApplyOSDTransparent();
 
 public:
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMH, LRESULT* pResult);

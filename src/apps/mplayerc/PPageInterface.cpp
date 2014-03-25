@@ -55,14 +55,6 @@ CPPageInterface::CPPageInterface()
 
 CPPageInterface::~CPPageInterface()
 {
-	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
-	if (pMainFrame && pMainFrame->m_OSD) {
-		if (m_nOSDTransparent != m_nOSDTransparent_Old) {
-			pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - m_nOSDTransparent_Old, LWA_ALPHA | LWA_COLORKEY);
-		}
-
-		pMainFrame->m_OSD.ClearMessage();
-	}
 }
 
 void CPPageInterface::DoDataExchange(CDataExchange* pDX)
@@ -212,10 +204,7 @@ BOOL CPPageInterface::OnApply()
 	s.fFileNameOnSeekBar	= !!m_fFileNameOnSeekBar;
 	s.nOSDBorder			= m_OSDBorder;
 
-	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
-	if (pMainFrame->m_OSD && s.nOSDTransparent != m_nOSDTransparent_Old) {
-		pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - s.nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
-	}
+	ApplyOSDTransparent();
 
 	HWND WndToolBar			= ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
 	BOOL fDisableXPToolbars	= s.fDisableXPToolbars;
@@ -265,6 +254,12 @@ BOOL CPPageInterface::OnApply()
 	return __super::OnApply();
 }
 
+BOOL CPPageInterface::OnQueryCancel()
+{
+	ApplyOSDTransparent();
+	return CPropertyPage::OnQueryCancel();
+}
+
 void CPPageInterface::OnCancel()
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -279,6 +274,18 @@ void CPPageInterface::OnCancel()
 	s.nOSDTransparent	= m_nOSDTransparent_Old;
 
 	OnThemeChange();
+}
+
+void CPPageInterface::ApplyOSDTransparent()
+{
+	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
+	if (pMainFrame && pMainFrame->m_OSD) {
+		if (m_nOSDTransparent != m_nOSDTransparent_Old) {
+			pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - m_nOSDTransparent_Old, LWA_ALPHA | LWA_COLORKEY);
+		}
+
+		pMainFrame->m_OSD.ClearMessage();
+	}
 }
 
 void CPPageInterface::OnThemeChange()
