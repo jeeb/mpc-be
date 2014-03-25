@@ -32,3 +32,5 @@ bool				ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRe
 CString				GetModulePath(bool bInclModuleName = true);
 
 BOOL				CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status);
+
+BOOL				IsUserAdmin();

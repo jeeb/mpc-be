@@ -1085,7 +1085,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	if (m_s.nCLSwitches & (CLSW_REGEXTVID | CLSW_REGEXTAUD | CLSW_REGEXTPL)) { // register file types
-		if (IsWinVistaOrLater() && !IsUserAnAdmin()) {
+		if (IsWinVistaOrLater() && !IsUserAdmin()) {
 			TCHAR strApp[_MAX_PATH];
 			GetModuleFileNameEx (GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
 
@@ -1133,7 +1133,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	if ((m_s.nCLSwitches&CLSW_UNREGEXT)) { // unregistered file types
-		if (IsWinVistaOrLater() && !IsUserAnAdmin()) {
+		if (IsWinVistaOrLater() && !IsUserAdmin()) {
 			TCHAR strApp[_MAX_PATH];
 			GetModuleFileNameEx (GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
 

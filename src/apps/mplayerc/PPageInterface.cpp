@@ -56,7 +56,7 @@ CPPageInterface::CPPageInterface()
 CPPageInterface::~CPPageInterface()
 {
 	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
-	if (pMainFrame->m_OSD) {
+	if (pMainFrame && pMainFrame->m_OSD) {
 		if (m_nOSDTransparent != m_nOSDTransparent_Old) {
 			pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - m_nOSDTransparent_Old, LWA_ALPHA | LWA_COLORKEY);
 		}

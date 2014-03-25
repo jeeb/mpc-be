@@ -686,7 +686,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	CreateToolTip();
 
-	if (IsWinVistaOrLater() && !IsUserAnAdmin()) {
+	if (IsWinVistaOrLater() && !IsUserAdmin()) {
 		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_BUTTON3)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_BUTTON4)->ShowWindow(SW_HIDE);
