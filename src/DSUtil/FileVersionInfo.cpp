@@ -206,6 +206,20 @@ CString CFileVersionInfo::GetFileVersionEx(LPCTSTR lpszFileName)
 	return strFileVersion;
 }
 
+CString CFileVersionInfo::GetFileVersionExShort(LPCTSTR lpszFileName)
+{
+	CString				strFileVersion;
+	VS_FIXEDFILEINFO	FileInfo;
+	if (Create(lpszFileName, FileInfo)) {
+		strFileVersion.Format(L"%d.%d.%d",
+							 (FileInfo.dwFileVersionMS & 0xFFFF0000) >> 16,
+							 (FileInfo.dwFileVersionMS & 0x0000FFFF),
+							 (FileInfo.dwFileVersionLS & 0xFFFF0000) >> 16);
+	}
+
+	return strFileVersion;
+}
+
 QWORD CFileVersionInfo::GetFileVersion(LPCTSTR lpszFileName)
 {
 	QWORD				qwFileVersion = 0;

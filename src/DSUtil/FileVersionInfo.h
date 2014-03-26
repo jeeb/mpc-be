@@ -48,6 +48,7 @@ public:
 	static BOOL		Create(LPCTSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, FullFileInfo& fullFileInfo);
 
 	static CString	GetFileVersionEx(LPCTSTR lpszFileName);
+	static CString	GetFileVersionExShort(LPCTSTR lpszFileName);
 	static QWORD	GetFileVersion(LPCTSTR lpszFileName);
 
 protected:
