@@ -153,7 +153,7 @@ BOOL CPPageInterface::OnInitDialog()
 	DeleteDC(dc);
 
 	for (size_t i = 0; i < fntl.GetCount(); ++i) {
-		if (i > 0 && fntl[i-1] == fntl[i]) {
+		if (i > 0 && fntl[i - 1] == fntl[i]) {
 			continue;
 		}
 
@@ -180,6 +180,9 @@ BOOL CPPageInterface::OnInitDialog()
 	m_FontSize.SetCurSel(iSel - 10);
 
 	EnableToolTips(TRUE);
+
+	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
+	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek);
 
 	UpdateData(FALSE);
 
@@ -328,6 +331,7 @@ BEGIN_MESSAGE_MAP(CPPageInterface, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON_CLROUTLINE, OnClickClrOutline)
 	ON_BN_CLICKED(IDC_BUTTON_CLRDEFAULT, OnClickClrDefault)
 	ON_BN_CLICKED(IDC_CHECK8, OnUseTimeTooltipClicked)
+	ON_BN_CLICKED(IDC_CHECK_PRV, OnUsePreview)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnChngOSDCombo)
 	ON_CBN_SELCHANGE(IDC_COMBO2, OnChngOSDCombo)
 	ON_UPDATE_COMMAND_UI(IDC_SLIDER1, OnUpdateThemeBrightness)
@@ -586,6 +590,14 @@ void CPPageInterface::OnUseTimeTooltipClicked()
 	m_TimeTooltipPosition.EnableWindow(IsDlgButtonChecked(IDC_CHECK8));
 
 	SetModified();
+}
+
+void CPPageInterface::OnUsePreview()
+{
+	UpdateData();
+
+	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
+	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek);
 }
 
 void CPPageInterface::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
