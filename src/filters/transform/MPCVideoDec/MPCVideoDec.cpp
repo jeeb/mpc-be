@@ -1712,6 +1712,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				if (!MPEG2CheckCompatibility(m_pAVCtx)) {
 					break;
 				}
+			} else if ((m_nCodecId == AV_CODEC_ID_WMV3 || m_nCodecId == AV_CODEC_ID_VC1) && m_pAVCtx->profile == FF_PROFILE_VC1_COMPLEX) {
+				break;
 			}
 
 			m_bDXVACompatible = true;

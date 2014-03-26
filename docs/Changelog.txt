@@ -17,7 +17,8 @@ Added (+):
 
 
 Changes (*):
-	* Renumbered versions - now it consists of three digits (MAJOR.MINOR.PATCH)
+	* Renumbered versions - now it consists of three digits (MAJOR.MINOR.PATCH);
+	* MPCVideoDec - disable DXVA for WMV3 Complex profile;
 	* libpng 1.7.0 b35 git-3ac960f1;
 	 ... and many more.
 
