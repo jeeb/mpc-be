@@ -11,11 +11,6 @@ Legend:
 1.4.1
 ==============================
 
-Added (+):
-
-	 ... and many more.
-
-
 Changes (*):
 	* Renumbered versions - now it consists of three digits (MAJOR.MINOR.PATCH);
 	* MPCVideoDec - disable DXVA for WMV3 Complex profile;
