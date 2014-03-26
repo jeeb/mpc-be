@@ -456,11 +456,9 @@ FOR /F "tokens=3,4 delims= " %%A IN (
 FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_PATCH" "include\Version.h"') DO (SET "VerPatch=%%A")
 FOR /F "tokens=3,4 delims= " %%A IN (
-  'FINDSTR /I /L /C:"define MPC_VERSION_STATUS" "include\Version.h"') DO (SET "VerStatus=%%A")
-FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_REV" "include\Version_rev.h"') DO (SET "VerRev=%%A")
 
-SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%.%VerStatus%.%VerRev%
+SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%.%VerRev%
 EXIT /B
 
 :SubDetectWinArch

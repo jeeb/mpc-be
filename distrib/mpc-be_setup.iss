@@ -44,8 +44,8 @@
 #define copyright_year   str(MPC_YEAR_COMMENTS)
 #define app_name         str(MPC_WND_CLASS_NAME)
 #define app_url          str(MPC_VERSION_COMMENTS)
-#define app_version      str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_STATUS)
-#define app_version_out  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_STATUS)+ "." + str(MPC_VERSION_REV)
+#define app_version      str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH)
+#define app_version_out  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
 #define bin_dir        = "..\bin"
