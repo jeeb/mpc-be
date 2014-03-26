@@ -389,7 +389,7 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 	int dur = (int)(m_pMainFrame->GetDur()/10000);
 
 	CString positionstring, durationstring, versionstring, sizestring;
-	versionstring.Format(L"%s", AfxGetMyApp()->m_strVersion);
+	versionstring.Format(L"%s", CString(MPC_VERSION_STR));
 	CPath file(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
 	file.StripPath();
 	file.RemoveExtension();

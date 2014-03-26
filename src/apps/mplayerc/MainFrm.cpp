@@ -898,20 +898,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShaderScreenSpace = s.fToggleShaderScreenSpace;
 
 #ifdef _WIN64
-	m_strTitle.Format (L"%s x64 - v%s", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
+	m_strTitle.Format (L"%s x64 - v%s", ResStr(IDR_MAINFRAME), CString(MPC_VERSION_STR));
 #else
-	m_strTitle.Format (L"%s - v%s", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
+	m_strTitle.Format (L"%s - v%s", ResStr(IDR_MAINFRAME), CString(MPC_VERSION_STR));
 #endif
-	switch (MPC_VERSION_STATUS) {
-		case 0:
-			m_strTitle.AppendFormat(_T(" svn %d -alpha"), MPC_VERSION_REV);
-			break;
-		case 1:
-			m_strTitle.AppendFormat(_T(" svn %d -beta"), MPC_VERSION_REV);
-			break;
-		case 2:
-			m_strTitle.Append(_T(" -rc"));
-			break;
+	if (MPC_VERSION_STATUS == 0) {
+		m_strTitle.AppendFormat(_T(" svn %d -beta"), MPC_VERSION_REV);
 	}
 #if DBOXVersion
 	m_strTitle.Append(_T(" (D-BOX)"));

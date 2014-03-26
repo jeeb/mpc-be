@@ -383,11 +383,6 @@ END_MESSAGE_MAP()
 CMPlayerCApp::CMPlayerCApp()
 //	: m_hMutexOneInstance(NULL)
 {
-	TCHAR strApp [_MAX_PATH] = { 0 };
-
-	GetModuleFileNameEx(GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
-	m_strVersion = CFileVersionInfo::GetFileVersionEx(strApp);
-
 	memset(&m_ColorControl, 0, sizeof(m_ColorControl));
 	ResetColorControlRange();
 
@@ -2389,7 +2384,6 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 		CString strSatVersion = CFileVersionInfo::GetFileVersionEx(strSatellite);
 		if (strSatVersion.GetLength()) {
 			CString strNeededVersion = MPC_VERSION_STR;
-			strNeededVersion.Replace(_T(", "), _T("."));
 
 			if (strSatVersion == strNeededVersion) {
 				hMod = LoadLibrary(strSatellite);

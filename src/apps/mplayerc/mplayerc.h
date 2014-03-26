@@ -132,7 +132,6 @@ public:
 	bool GetAppSavePath(CString& path);
 
 	CRenderersData m_Renderers;
-	CString		m_strVersion;
 	CString		m_AudioRendererDisplayName_CL;
 
 	CAppSettings m_s;

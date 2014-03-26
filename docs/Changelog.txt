@@ -8,7 +8,7 @@ Legend:
 ! Fixed
 
 
-1.4.1.1
+1.4.1
 ==============================
 
 Added (+):
@@ -17,12 +17,15 @@ Added (+):
 
 
 Changes (*):
+	* Renumbered versions - now it consists of three digits (MAJOR.MINOR.PATCH)
 	* libpng 1.7.0 b35 git-3ac960f1;
 	 ... and many more.
 
 
 Fixes (!):
-
+	! Fixed crash when closing a window settings file associations when called from a UAC;
+	! Some menu items are not marked as active;
+	! Fixed changing settings interface;
 	 ... and many more.
 
 

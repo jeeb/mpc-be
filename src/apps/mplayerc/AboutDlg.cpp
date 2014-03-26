@@ -47,7 +47,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_appname += _T(" (64-bit)");
 #endif
 
-	m_strVersionNumber = AfxGetMyApp()->m_strVersion;
+	m_strVersionNumber = CString(MPC_VERSION_STR);
 #if DBOXVersion
 	m_strVersionNumber.Append(_T(" (D-BOX)"));
 #endif

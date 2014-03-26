@@ -3352,7 +3352,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 	switch (index) {
 	case INFO_MPCVersion:
-		infostr.Format(_T("v%d.%d.%d.%d (build %d)"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_STATUS,MPC_VERSION_REV);
+		infostr.Format(_T("v%s (build %d)"), CString(MPC_VERSION_STR), MPC_VERSION_REV);
 		break;
 	case INFO_InputFormat:
 		if (m_pAVCtx) {
