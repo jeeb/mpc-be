@@ -27,7 +27,10 @@ class FilterOverride
 {
 public:
 	bool fDisabled, fTemporary;
-	enum {REGISTERED, EXTERNAL} type;
+	enum {
+		REGISTERED,
+		EXTERNAL
+	} type;
 	// REGISTERED
 	CStringW dispname;
 	// EXTERNAL
@@ -35,7 +38,11 @@ public:
 	CLSID clsid;
 	// props
 	CAtlList<GUID> guids, backup;
-	enum {PREFERRED, BLOCK, MERIT};
+	enum {
+		PREFERRED,
+		BLOCK,
+		MERIT
+	};
 	int iLoadType;
 	DWORD dwMerit;
 
@@ -45,17 +52,17 @@ public:
 		clsid		= CLSID_NULL;
 	}
 	FilterOverride(FilterOverride* f) {
-		fDisabled = f->fDisabled;
-		fTemporary = f->fTemporary;
-		type = f->type;
-		dispname = f->dispname;
-		path = f->path;
-		name = f->name;
-		clsid = f->clsid;
+		fDisabled	= f->fDisabled;
+		fTemporary	= f->fTemporary;
+		type		= f->type;
+		dispname	= f->dispname;
+		path		= f->path;
+		name		= f->name;
+		clsid		= f->clsid;
 		guids.AddTailList(&f->guids);
 		backup.AddTailList(&f->backup);
-		iLoadType = f->iLoadType;
-		dwMerit = f->dwMerit;
+		iLoadType	= f->iLoadType;
+		dwMerit		= f->dwMerit;
 	}
 };
 

@@ -526,13 +526,14 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 					str.Format(_T("Module : %s\n"), buff);
 					AddLine(str);
 					key.Close();
-				} else { // Search filter in an external filter list ...
+				} else {
+					// Search filter in an external filter list ...
 					AppSettings& s = AfxGetAppSettings();
 					POSITION pos = s.m_filters.GetHeadPosition();
 					while (pos) {
-						FilterOverride* fo = s.m_filters.GetNext(pos);
-						if (fo->clsid == FilterClsid && ::PathFileExists(fo->path)) {
-							str.Format(_T("Module : %s\n"), fo->path);
+						CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
+						if (f->clsid == FilterClsid && ::PathFileExists(f->path)) {
+							str.Format(_T("Module : %s\n"), f->path);
 							AddLine(str);
 							break;
 						}
