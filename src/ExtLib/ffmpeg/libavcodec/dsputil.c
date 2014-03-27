@@ -46,12 +46,14 @@
 uint32_t ff_square_tab[512] = { 0, };
 
 #define BIT_DEPTH 16
-#include "dsputil_template.c"
+#include "dsputilenc_template.c"
 #undef BIT_DEPTH
 
 #define BIT_DEPTH 8
+#include "hpel_template.c"
 #include "tpel_template.c"
 #include "dsputil_template.c"
+#include "dsputilenc_template.c"
 
 // 0x7f7f7f7f or 0x7f7f7f7f7f7f7f7f or whatever, depending on the cpu's native arithmetic size
 #define pb_7f (~0UL / 255 * 0x7f)
@@ -1312,28 +1314,6 @@ static void wmv2_mspel8_h_lowpass(uint8_t *dst, uint8_t *src,
     }
 }
 
-#if CONFIG_RV40_DECODER
-void ff_put_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    put_pixels16_xy2_8_c(dst, src, stride, 16);
-}
-
-void ff_avg_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    avg_pixels16_xy2_8_c(dst, src, stride, 16);
-}
-
-void ff_put_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    put_pixels8_xy2_8_c(dst, src, stride, 8);
-}
-
-void ff_avg_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    avg_pixels8_xy2_8_c(dst, src, stride, 8);
-}
-#endif /* CONFIG_RV40_DECODER */
-
 #if CONFIG_DIRAC_DECODER
 #define DIRAC_MC(OPNAME)\
 void ff_ ## OPNAME ## _dirac_pixels8_c(uint8_t *dst, const uint8_t *src[5], int stride, int h)\
@@ -2570,6 +2550,44 @@ static void ff_jref_idct1_add(uint8_t *dest, int line_size, int16_t *block)
     dest[0] = av_clip_uint8(dest[0] + ((block[0] + 4)>>3));
 }
 
+/* draw the edges of width 'w' of an image of size width, height */
+// FIXME: Check that this is OK for MPEG-4 interlaced.
+static void draw_edges_8_c(uint8_t *buf, int wrap, int width, int height,
+                           int w, int h, int sides)
+{
+    uint8_t *ptr = buf, *last_line;
+    int i;
+
+    /* left and right */
+    for (i = 0; i < height; i++) {
+        memset(ptr - w, ptr[0], w);
+        memset(ptr + width, ptr[width - 1], w);
+        ptr += wrap;
+    }
+
+    /* top and bottom + corners */
+    buf -= w;
+    last_line = buf + (height - 1) * wrap;
+    if (sides & EDGE_TOP)
+        for (i = 0; i < h; i++)
+            // top
+            memcpy(buf - (i + 1) * wrap, buf, width + w + w);
+    if (sides & EDGE_BOTTOM)
+        for (i = 0; i < h; i++)
+            // bottom
+            memcpy(last_line + (i + 1) * wrap, last_line, width + w + w);
+}
+
+static void clear_block_8_c(int16_t *block)
+{
+    memset(block, 0, sizeof(int16_t) * 64);
+}
+
+static void clear_blocks_8_c(int16_t *blocks)
+{
+    memset(blocks, 0, sizeof(int16_t) * 6 * 64);
+}
+
 /* init static data */
 av_cold void ff_dsputil_static_init(void)
 {
@@ -2796,29 +2814,21 @@ av_cold void ff_dsputil_init(DSPContext *c, AVCodecContext *avctx)
 
     c->add_pixels8 = add_pixels8_c;
 
-#undef FUNC
-#undef FUNCC
-#define FUNC(f,  depth) f ## _ ## depth
-#define FUNCC(f, depth) f ## _ ## depth ## _c
+    c->draw_edges = draw_edges_8_c;
 
-    c->draw_edges = FUNCC(draw_edges, 8);
-
-    c->clear_block  = FUNCC(clear_block, 8);
-    c->clear_blocks = FUNCC(clear_blocks, 8);
-
-#define BIT_DEPTH_FUNCS(depth)                  \
-    c->get_pixels = FUNCC(get_pixels, depth);
+    c->clear_block  = clear_block_8_c;
+    c->clear_blocks = clear_blocks_8_c;
 
     switch (avctx->bits_per_raw_sample) {
     case 9:
     case 10:
     case 12:
     case 14:
-        BIT_DEPTH_FUNCS(16);
+        c->get_pixels = get_pixels_16_c;
         break;
     default:
         if (avctx->bits_per_raw_sample<=8 || avctx->codec_type != AVMEDIA_TYPE_VIDEO) {
-            BIT_DEPTH_FUNCS(8);
+            c->get_pixels = get_pixels_8_c;
         }
         break;
     }

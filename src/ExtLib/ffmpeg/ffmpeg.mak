@@ -187,11 +187,14 @@ SRCS_C = \
 	libavcodec/h264_cavlc.c \
 	libavcodec/h264_direct.c \
 	libavcodec/h264_loopfilter.c \
+	libavcodec/h264_mb.c \
 	libavcodec/h264_mp4toannexb_bsf.c \
 	libavcodec/h264_parser.c \
+	libavcodec/h264_picture.c \
 	libavcodec/h264_ps.c \
 	libavcodec/h264_refs.c \
 	libavcodec/h264_sei.c \
+	libavcodec/h264_slice.c \
 	libavcodec/h264chroma.c \
 	libavcodec/h264dsp.c \
 	libavcodec/h264idct.c \
@@ -412,7 +415,6 @@ SRCS_C = \
 	libavcodec/x86/motion_est.c \
 	libavcodec/x86/mpegaudiodsp.c \
 	libavcodec/x86/mpegvideo.c \
-	libavcodec/x86/rnd_mmx.c \
 	libavcodec/x86/pngdsp_init.c \
 	libavcodec/x86/proresdsp_init.c \
 	libavcodec/x86/rv34dsp_init.c \

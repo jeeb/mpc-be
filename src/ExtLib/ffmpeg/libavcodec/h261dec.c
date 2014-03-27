@@ -432,6 +432,13 @@ static int h261_decode_mb(H261Context *h)
     s->mv[0][0][0]                 = h->current_mv_x * 2; // gets divided by 2 in motion compensation
     s->mv[0][0][1]                 = h->current_mv_y * 2;
 
+    if (s->current_picture.motion_val[0]) {
+        int b_stride = 2*s->mb_width + 1;
+        int b_xy     = 2 * s->mb_x + (2 * s->mb_y) * b_stride;
+        s->current_picture.motion_val[0][b_xy][0] = s->mv[0][0][0];
+        s->current_picture.motion_val[0][b_xy][1] = s->mv[0][0][1];
+    }
+
 intra:
     /* decode each block */
     if (s->mb_intra || HAS_CBP(h->mtype)) {

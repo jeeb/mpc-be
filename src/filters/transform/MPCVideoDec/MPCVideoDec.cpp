@@ -201,6 +201,9 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_VP6A, AV_CODEC_ID_VP6A, NULL, VDEC_VP356, -1 },
 	{ &MEDIASUBTYPE_vp6a, AV_CODEC_ID_VP6A, NULL, VDEC_VP356, -1 },
 
+	// VP7
+	{ &MEDIASUBTYPE_VP70, AV_CODEC_ID_VP7, NULL, VDEC_VP89, -1 },
+
 	// VP8
 	{ &MEDIASUBTYPE_VP80, AV_CODEC_ID_VP8, NULL, VDEC_VP89, -1 },
 
@@ -496,6 +499,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_vp62 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_VP6A },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_vp6a },
+
+	// VP7
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_VP70 },
 
 	// VP8
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_VP80 },
@@ -1214,6 +1220,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 				case AV_CODEC_ID_VP6A :
 					bCodecActivated = (m_nActiveCodecs & CODEC_VP356) != 0;
 					break;
+				case AV_CODEC_ID_VP7  :
 				case AV_CODEC_ID_VP8  :
 				case AV_CODEC_ID_VP9  :
 					bCodecActivated = (m_nActiveCodecs & CODEC_VP89) != 0;

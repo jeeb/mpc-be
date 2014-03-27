@@ -11,6 +11,7 @@
 * libavcodec/h264.c
 * libavcodec/h264.h
 * libavcodec/h264_ps.c
+* libavcodec/h264_slice.c
 * libavcodec/internal.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegvideo.c
@@ -33,8 +34,4 @@
 The following files are available only in MPC-BE (compared with ffmpeg):
 
 * config.c
-
-======
-Следующие файлы остаются как есть, без последних изменений из ffmpeg:
-
-*
+* libavcodec/h264_slice.h

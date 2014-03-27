@@ -24,20 +24,32 @@
  * Provide registration of all codecs, parsers and bitstream filters for libavcodec.
  */
 
-#include "avcodec.h"
 #include "config.h"
+#include "avcodec.h"
+#include "version.h"
 
-#define REGISTER_ENCODER(X,x) { \
-          extern AVCodec ff_##x##_encoder; \
-          if(CONFIG_##X##_ENCODER)  avcodec_register(&ff_##x##_encoder); }
-#define REGISTER_DECODER(X,x) { \
-          extern AVCodec ff_##x##_decoder; \
-          if(CONFIG_##X##_DECODER)  avcodec_register(&ff_##x##_decoder); }
-#define REGISTER_ENCDEC(X,x)  REGISTER_ENCODER(X,x); REGISTER_DECODER(X,x)
+#define REGISTER_ENCODER(X, x)                                          \
+    {                                                                   \
+        extern AVCodec ff_##x##_encoder;                                \
+        if (CONFIG_##X##_ENCODER)                                       \
+            avcodec_register(&ff_##x##_encoder);                        \
+    }
 
-#define REGISTER_PARSER(X,x) { \
-          extern AVCodecParser ff_##x##_parser; \
-          if(CONFIG_##X##_PARSER)  av_register_codec_parser(&ff_##x##_parser); }
+#define REGISTER_DECODER(X, x)                                          \
+    {                                                                   \
+        extern AVCodec ff_##x##_decoder;                                \
+        if (CONFIG_##X##_DECODER)                                       \
+            avcodec_register(&ff_##x##_decoder);                        \
+    }
+
+#define REGISTER_ENCDEC(X, x) REGISTER_ENCODER(X, x); REGISTER_DECODER(X, x)
+
+#define REGISTER_PARSER(X, x)                                           \
+    {                                                                   \
+        extern AVCodecParser ff_##x##_parser;                           \
+        if (CONFIG_##X##_PARSER)                                        \
+            av_register_codec_parser(&ff_##x##_parser);                 \
+    }
 
 void avcodec_register_all(void)
 {
@@ -107,6 +119,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (VP6, vp6);
     REGISTER_DECODER (VP6A, vp6a);
     REGISTER_DECODER (VP6F, vp6f);
+    REGISTER_DECODER(VP7, vp7);
     REGISTER_DECODER (VP8, vp8);
     REGISTER_DECODER (VP9, vp9);
     REGISTER_DECODER (WMV1, wmv1);

@@ -501,7 +501,7 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{CODEC_UTVD,		_T("Ut video")},
 	{CODEC_VC1,			_T("VC-1 (FFmpeg)")},
 	{CODEC_VP356,		_T("VP3/5/6")},
-	{CODEC_VP89,		_T("VP8/9")},
+	{CODEC_VP89,		_T("VP7/8/9")},
 	{CODEC_WMV,			_T("WMV1/2/3")},
 	{CODEC_XVID,		_T("Xvid/MPEG-4")},
 	{CODEC_REALV,		_T("Real Video")},

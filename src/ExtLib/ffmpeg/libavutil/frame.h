@@ -92,6 +92,10 @@ enum AVFrameSideDataType {
      * The data is the AVDownmixInfo struct defined in libavutil/downmix_info.h.
      */
     AV_FRAME_DATA_DOWNMIX_INFO,
+    /**
+     * ReplayGain information in the form of the AVReplayGain struct.
+     */
+    AV_FRAME_DATA_REPLAYGAIN,
 };
 
 typedef struct AVFrameSideData {
@@ -279,7 +283,6 @@ typedef struct AVFrame {
      * motion_val[direction][x + y*mv_stride][0->mv_x, 1->mv_y];
      * @endcode
      */
-    attribute_deprecated
     int16_t (*motion_val[2])[2];
 
     /**
@@ -376,7 +379,6 @@ typedef struct AVFrame {
      * log2 of the size of the block which a single vector in motion_val represents:
      * (4->16x16, 3->8x8, 2-> 4x4, 1-> 2x2)
      */
-    attribute_deprecated
     uint8_t motion_subsample_log2;
 #endif
 
@@ -725,6 +727,12 @@ AVFrameSideData *av_frame_new_side_data(AVFrame *frame,
  */
 AVFrameSideData *av_frame_get_side_data(const AVFrame *frame,
                                         enum AVFrameSideDataType type);
+
+/**
+ * If side data of the supplied type exists in the frame, free it and remove it
+ * from the frame.
+ */
+void av_frame_remove_side_data(AVFrame *frame, enum AVFrameSideDataType type);
 
 /**
  * @}

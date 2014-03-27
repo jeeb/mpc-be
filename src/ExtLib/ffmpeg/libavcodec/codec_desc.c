@@ -1241,8 +1241,22 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Mirillis FIC"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_VP7,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "vp7",
+        .long_name = NULL_IF_CONFIG_SMALL("On2 VP7"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* image codecs */
+    {
+        .id        = AV_CODEC_ID_ALIAS_PIX,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "alias_pix",
+        .long_name = NULL_IF_CONFIG_SMALL("Alias/Wavefront PIX image"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
     {
         .id        = AV_CODEC_ID_ANSI,
         .type      = AVMEDIA_TYPE_VIDEO,

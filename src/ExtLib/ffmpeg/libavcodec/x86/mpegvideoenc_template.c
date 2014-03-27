@@ -20,6 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stdint.h>
+
+#include "libavutil/internal.h"
+#include "libavutil/x86/asm.h"
+#include "libavcodec/mpegvideo.h"
+
 #undef MMREG_WIDTH
 #undef MM
 #undef MOVQ
@@ -216,7 +222,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
         "psubusw "MM"1, "MM"4               \n\t"
         "packuswb "MM"4, "MM"4              \n\t"
 #if COMPILE_TEMPLATE_SSE2
-        "packuswb "MM"4, "MM"4              \n\t"
+        "packsswb "MM"4, "MM"4              \n\t"
 #endif
         "movd "MM"4, %0                     \n\t" // *overflow
         : "=g" (*overflow)

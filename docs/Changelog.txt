@@ -7,16 +7,16 @@ Legend:
 * Changed
 ! Fixed
 
-1.4.2
+1.4.2 (beta)
 ==============================
 
 Added (+):
-
+	+ MPCVideoDec - added support for decoding 'VP7';
 	 ... and many more.
 
 
 Changes (*):
-
+	* ffmpeg 2.2 git-57e939d9;
 	 ... and many more.
 
 

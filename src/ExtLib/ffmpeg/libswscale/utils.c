@@ -367,7 +367,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
         int sizeFactor = -1;
 
         for (i = 0; i < FF_ARRAY_ELEMS(scale_algorithms); i++) {
-            if (flags & scale_algorithms[i].flag) {
+            if (flags & scale_algorithms[i].flag && scale_algorithms[i].size_factor > 0) {
                 sizeFactor = scale_algorithms[i].size_factor;
                 break;
             }
@@ -1250,7 +1250,7 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         if (c->dither == SWS_DITHER_AUTO)
             c->dither = (flags & SWS_FULL_CHR_H_INT) ? SWS_DITHER_ED : SWS_DITHER_BAYER;
         if (!(flags & SWS_FULL_CHR_H_INT)) {
-            if (c->dither == SWS_DITHER_ED) {
+            if (c->dither == SWS_DITHER_ED || c->dither == SWS_DITHER_A_DITHER || c->dither == SWS_DITHER_X_DITHER) {
                 av_log(c, AV_LOG_DEBUG,
                     "Desired dithering only supported in full chroma interpolation for destination format '%s'\n",
                     av_get_pix_fmt_name(dstFormat));

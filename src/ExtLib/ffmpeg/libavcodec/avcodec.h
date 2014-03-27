@@ -286,6 +286,7 @@ enum AVCodecID {
     AV_CODEC_ID_HNM4_VIDEO,
     AV_CODEC_ID_HEVC_DEPRECATED,
     AV_CODEC_ID_FIC,
+    AV_CODEC_ID_ALIAS_PIX,
 
     AV_CODEC_ID_BRENDER_PIX= MKBETAG('B','P','I','X'),
     AV_CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
@@ -314,6 +315,7 @@ enum AVCodecID {
     AV_CODEC_ID_SMVJPEG    = MKBETAG('S','M','V','J'),
     AV_CODEC_ID_HEVC       = MKBETAG('H','2','6','5'),
 #define AV_CODEC_ID_H265 AV_CODEC_ID_HEVC
+    AV_CODEC_ID_VP7        = MKBETAG('V','P','7','0'),
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -1003,6 +1005,12 @@ enum AVPacketSideDataType {
     AV_PKT_DATA_H263_MB_INFO,
 
     /**
+     * This side data should be associated with an audio stream and contains
+     * ReplayGain information in form of the AVReplayGain struct.
+     */
+    AV_PKT_DATA_REPLAYGAIN,
+
+    /**
      * Recommmends skipping the specified number of samples
      * @code
      * u32le number of samples to skip from start of this packet
@@ -1067,6 +1075,12 @@ enum AVPacketSideDataType {
     AV_PKT_DATA_METADATA_UPDATE,
 };
 
+typedef struct AVPacketSideData {
+    uint8_t *data;
+    int      size;
+    enum AVPacketSideDataType type;
+} AVPacketSideData;
+
 /**
  * This structure stores compressed data. It is typically exported by demuxers
  * and then passed as input to decoders, or received as output from encoders and
@@ -1123,11 +1137,7 @@ typedef struct AVPacket {
      * Additional packet data that can be provided by the container.
      * Packet can contain several types of side information.
      */
-    struct {
-        uint8_t *data;
-        int      size;
-        enum AVPacketSideDataType type;
-    } *side_data;
+    AVPacketSideData *side_data;
     int side_data_elems;
 
     /**
