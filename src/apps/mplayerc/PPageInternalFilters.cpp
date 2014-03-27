@@ -91,7 +91,7 @@ static filter_t s_filters[] = {
 	{_T("Ut Video"),				VIDEO_DECODER, VDEC_UT,				0},
 	{_T("VC-1 (FFmpeg)"),			VIDEO_DECODER, VDEC_VC1,			0},
 	{_T("VP3/5/6"),					VIDEO_DECODER, VDEC_VP356,			0},
-	{_T("VP7/8/9"),					VIDEO_DECODER, VDEC_VP89,			0},
+	{_T("VP7/8/9"),					VIDEO_DECODER, VDEC_VP789,			0},
 	{_T("WMV1/2/3"),				VIDEO_DECODER, VDEC_WMV,			0},
 	{_T("Xvid/MPEG-4"),				VIDEO_DECODER, VDEC_XVID,			0},
 	{_T("RealVideo"),				VIDEO_DECODER, VDEC_REAL,			IDS_TRA_RV},

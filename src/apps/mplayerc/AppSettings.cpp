@@ -101,7 +101,7 @@ CAppSettings::CAppSettings()
 	VideoFiltersKeys[VDEC_UT]				= _T("vdec_ut");
 	VideoFiltersKeys[VDEC_VC1]				= _T("vdec_vc1");
 	VideoFiltersKeys[VDEC_VP356]			= _T("vdec_vp356");
-	VideoFiltersKeys[VDEC_VP89]				= _T("vdec_vp89");
+	VideoFiltersKeys[VDEC_VP789]			= _T("vdec_vp789");
 	VideoFiltersKeys[VDEC_WMV]				= _T("vdec_wmv");
 	VideoFiltersKeys[VDEC_XVID]				= _T("vdec_xvid");
 	VideoFiltersKeys[VDEC_REAL]				= _T("vdec_real");
