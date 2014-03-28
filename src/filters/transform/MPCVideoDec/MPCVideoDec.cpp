@@ -1886,35 +1886,36 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 {
 	// code from LAV ...
 	// Process Extradata
-	BYTE *extra				= NULL;
-	unsigned int extralen	= 0;
+	BYTE *extra = NULL;
+	size_t extralen = 0;
 	getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), NULL, &extralen);
 
 	BOOL bH264avc = FALSE;
-	if (extralen > 0) {
-		DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes", extralen));
+	if (pmt->formattype == FORMAT_MPEG2Video && (m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1') || m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1') || m_pAVCtx->codec_tag == MAKEFOURCC('C','C','V','1'))) {
+		DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AllocExtradata() : processing AVC1 extradata of %d bytes", extralen));
 		// Reconstruct AVC1 extradata format
-		if (pmt->formattype == FORMAT_MPEG2Video && (m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1') || m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1') || m_pAVCtx->codec_tag == MAKEFOURCC('C','C','V','1'))) {
-			MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)pmt->Format();
-			extralen += 7;
-			extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
-			extra[0] = 1;
-			extra[1] = (BYTE)mp2vi->dwProfile;
-			extra[2] = 0;
-			extra[3] = (BYTE)mp2vi->dwLevel;
-			extra[4] = (BYTE)(mp2vi->dwFlags ? mp2vi->dwFlags : 2) - 1;
+		MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)pmt->Format();
+		extralen += 7;
+		extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
+		extra[0] = 1;
+		extra[1] = (BYTE)mp2vi->dwProfile;
+		extra[2] = 0;
+		extra[3] = (BYTE)mp2vi->dwLevel;
+		extra[4] = (BYTE)(mp2vi->dwFlags ? mp2vi->dwFlags : 4) - 1;
 
+		// only process extradata if available
+		uint8_t ps_count = 0;
+		if (extralen > 7) {
 			// Actually copy the metadata into our new buffer
-			unsigned int actual_len;
-			getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra+6, &actual_len);
+			size_t actual_len;
+			getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra + 6, &actual_len);
 
 			// Count the number of SPS/PPS in them and set the length
 			// We'll put them all into one block and add a second block with 0 elements afterwards
 			// The parsing logic does not care what type they are, it just expects 2 blocks.
-			BYTE *p = extra+6, *end = extra+6+actual_len;
+			BYTE *p = extra + 6, *end = extra + 6 + actual_len;
 			BOOL bSPS = FALSE, bPPS = FALSE;
-			int count = 0;
-			while (p+1 < end) {
+			while (p + 1 < end) {
 				unsigned len = (((unsigned)p[0] << 8) | p[1]) + 2;
 				if (p + len > end) {
 					break;
@@ -1923,24 +1924,25 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 					bSPS = TRUE;
 				if ((p[2] & 0x1F) == 8)
 					bPPS = TRUE;
-				count++;
+				ps_count++;
 				p += len;
 			}
-			extra[5] = count;
-			extra[extralen-1] = 0;
+		}
+		extra[5] = ps_count;
+		extra[extralen - 1] = 0;
 
-			bH264avc = TRUE;
-		} else {
-			// Just copy extradata for other formats
-			extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
-			getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra, NULL);
+		if (!ps_count) {
+			// Some MP4 H264 files with avcC atoms without any SPS/PPS
+			m_bReorderBFrame = true;
 		}
-		// Hack to discard invalid MP4 metadata with AnnexB style video
-		if (m_nCodecId == AV_CODEC_ID_H264 && !bH264avc && extra[0] == 1) {
-			av_freep(&extra);
-			extralen = 0;
-		}
-		
+
+		bH264avc = TRUE;
+	} else if (extralen > 0) {
+		DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes", extralen));
+		// Just copy extradata for other formats
+		extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
+		getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra, NULL);
+
 		if (m_nCodecId == AV_CODEC_ID_HEVC) {
 			// try Reconstruct NAL units sequence into NAL Units in Byte-Stream Format
 			BYTE* src		= extra;
@@ -1986,10 +1988,16 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 				av_freep(&dst);
 			}
 		}
-
-		m_pAVCtx->extradata = extra;
-		m_pAVCtx->extradata_size = (int)extralen;
 	}
+
+	// Hack to discard invalid MP4 metadata with AnnexB style video
+	if (m_nCodecId == AV_CODEC_ID_H264 && !bH264avc && extra && extra[0] == 1) {
+		av_freep(&extra);
+		extralen = 0;
+	}
+
+	m_pAVCtx->extradata			= extra;
+	m_pAVCtx->extradata_size	= (int)extralen;
 }
 
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
