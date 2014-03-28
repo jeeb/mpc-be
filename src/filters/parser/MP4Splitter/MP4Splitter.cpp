@@ -273,8 +273,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CSize Aspect(0, 0);
 			if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
-				AP4_UI32 w = tkhd->GetWidth()>>16;
-				AP4_UI32 h = tkhd->GetHeight()>>16;
+				AP4_UI32 w = tkhd->GetWidth() >> 16;
+				AP4_UI32 h = tkhd->GetHeight() >> 16;
 				if (w && h) {
 					Aspect.SetSize(w, h);
 					ReduceDim(Aspect);
@@ -370,8 +370,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								pbmi.biPlanes		= 1;
 								pbmi.biBitCount		= 24;
 
-								Aspect.cx = pbmi.biWidth;
-								Aspect.cy = pbmi.biHeight;
+								if (Aspect == CSize(0, 0)) {
+									Aspect.cx = pbmi.biWidth;
+									Aspect.cy = pbmi.biHeight;
+								}
 								ReduceDim(Aspect);
 								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 								mts.Add(mt);
@@ -395,8 +397,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								pbmi.biPlanes		= 1;
 								pbmi.biBitCount		= 24;
 
-								Aspect.cx = pbmi.biWidth;
-								Aspect.cy = pbmi.biHeight;
+								if (Aspect == CSize(0, 0)) {
+									Aspect.cx = pbmi.biWidth;
+									Aspect.cy = pbmi.biHeight;
+								}
 								ReduceDim(Aspect);
 								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 								mts.Add(mt);
@@ -616,8 +620,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biPlanes		= 1;
 					pbmi.biBitCount		= 24;
 
-					Aspect.cx = pbmi.biWidth;
-					Aspect.cy = pbmi.biHeight;
+					if (Aspect == CSize(0, 0)) {
+						Aspect.cx = pbmi.biWidth;
+						Aspect.cy = pbmi.biHeight;
+					}
 					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
 						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
 							Aspect.cx *= pasp->GetNum();
@@ -652,8 +658,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biPlanes		= 1;
 					pbmi.biBitCount		= 24;
 
-					Aspect.cx = pbmi.biWidth;
-					Aspect.cy = pbmi.biHeight;
+					if (Aspect == CSize(0, 0)) {
+						Aspect.cx = pbmi.biWidth;
+						Aspect.cy = pbmi.biHeight;
+					}
 					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
 						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
 							Aspect.cx *= pasp->GetNum();
