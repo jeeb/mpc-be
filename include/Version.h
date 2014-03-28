@@ -24,8 +24,10 @@
 #ifndef MPC_VERSION_H
 #define MPC_VERSION_H
 
-#ifndef NO_VERSION_REV_NEEDED
 #include "Version_rev.h"
+
+#ifndef MPC_VERSION_REV
+#define MPC_VERSION_REV         0
 #endif
 
 #define DO_MAKE_STR(x)          #x
@@ -47,14 +49,13 @@
 #define MPC_COMP_NAME_STR       L"MPC-BE Team"
 #define MPC_COPYRIGHT_STR       L"Copyright © 2002-2014 all contributors, see Authors.txt"
 
-#define MPC_VERSION_NUM         MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_STATUS
+#define MPC_VERSION_NUM         MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH
 #define MPC_VERSION_STR         MAKE_STR(MPC_VERSION_MAJOR) "." \
                                 MAKE_STR(MPC_VERSION_MINOR) "." \
                                 MAKE_STR(MPC_VERSION_PATCH)
 
-#ifdef NO_VERSION_REV_NEEDED
-#define MPC_VERSION_REV         0
-#endif
+#define MPC_VERSION_NUM_SVN     MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_REV
+#define MPC_VERSION_STR_SVN     MPC_VERSION_STR "." MAKE_STR(MPC_VERSION_REV)
 
 #endif
 

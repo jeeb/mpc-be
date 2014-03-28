@@ -118,7 +118,7 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 				GetModuleFileName(NULL, strDumpPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 				strDumpPath.ReleaseBuffer();
 			}
-			strDumpPath.AppendFormat(_T(".%d.%d.%d.%d.dmp"), MPC_VERSION_NUM);
+			strDumpPath.AppendFormat(_T(".%d.%d.%d.%d.dmp"), MPC_VERSION_NUM_SVN);
 
 			HANDLE hFile = ::CreateFile(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
 										FILE_ATTRIBUTE_NORMAL, NULL);

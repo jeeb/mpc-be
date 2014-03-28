@@ -107,7 +107,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION MPC_VERSION_NUM
+ FILEVERSION MPC_VERSION_NUM_SVN
  PRODUCTVERSION MPC_VERSION_NUM
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -125,7 +125,7 @@ BEGIN
         BEGIN
             VALUE "CompanyName", MPC_COMP_NAME_STR
             VALUE "FileDescription", "MPC-BE Test API"
-            VALUE "FileVersion", MPC_VERSION_STR
+            VALUE "FileVersion", MPC_VERSION_STR_SVN
             VALUE "InternalName", "MPC-BE Test API"
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
             VALUE "OriginalFilename", "MPCTestAPI.exe"

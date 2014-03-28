@@ -27,7 +27,6 @@
 #include <psapi.h>
 #include "Ifo.h"
 #include "MultiMonitor.h"
-#define NO_VERSION_REV_NEEDED
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileVersionInfo.h"
