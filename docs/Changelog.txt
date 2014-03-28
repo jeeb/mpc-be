@@ -16,7 +16,7 @@ Added (+):
 
 
 Changes (*):
-	* ffmpeg 2.2 git-57e939d9;
+	* ffmpeg 2.2 git-92005c26;
 	* libwebp 0.4.0 git-59daf083;
 	 ... and many more.
 
