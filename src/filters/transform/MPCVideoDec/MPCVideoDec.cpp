@@ -1887,7 +1887,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 	// code from LAV ...
 	// Process Extradata
 	BYTE *extra = NULL;
-	size_t extralen = 0;
+	unsigned extralen = 0;
 	getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), NULL, &extralen);
 
 	BOOL bH264avc = FALSE;
@@ -1907,7 +1907,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		uint8_t ps_count = 0;
 		if (extralen > 7) {
 			// Actually copy the metadata into our new buffer
-			size_t actual_len;
+			unsigned actual_len;
 			getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra + 6, &actual_len);
 
 			// Count the number of SPS/PPS in them and set the length
