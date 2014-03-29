@@ -2151,7 +2151,7 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
 		m_styles.RemoveKey(name);
 		m_styles[name3] = val;
 
-		for (size_t k = 0, j = GetCount(); k < j; i++) {
+		for (size_t k = 0, j = GetCount(); k < j; k++) {
 			STSEntry& stse = GetAt(k);
 			if (stse.style == name) {
 				stse.style = name3;
