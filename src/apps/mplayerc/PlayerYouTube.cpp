@@ -160,7 +160,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				link.Replace(_T("watch?"), _T("watch?v="));
 			}
 
-			f = InternetOpenUrl(s, link, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+			f = InternetOpenUrl(s, link, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
 				char buffer[4096] = { 0 };
 				DWORD dwBytesRead = 0;
