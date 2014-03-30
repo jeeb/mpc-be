@@ -671,6 +671,8 @@ BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 {
+	CMainFrame*	pMainFrame = (CMainFrame*)AfxGetMainWnd();
+
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
 		if (pMsg->message == WM_KEYDOWN) {
 			if (pMsg->wParam == VK_ESCAPE) {
@@ -685,8 +687,10 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				}
 				if (items.GetCount() == 1) {
 					m_pl.SetPos(FindPos(items.GetHead()));
-					((CMainFrame*)AfxGetMainWnd())->OpenCurPlaylistItem();
-					AfxGetMainWnd()->SetFocus();
+					if (pMainFrame) {
+						pMainFrame->OpenCurPlaylistItem();
+						AfxGetMainWnd()->SetFocus();
+					}
 
 					return TRUE;
 				}
@@ -718,6 +722,10 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 		if (IsDialogMessage(pMsg)) {
 			return TRUE;
 		}
+	}
+
+	if (pMsg->message == WM_MOUSEWHEEL && pMainFrame) {
+		pMainFrame->PostMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
 	}
 
 	return CSizingControlBarG::PreTranslateMessage(pMsg);
