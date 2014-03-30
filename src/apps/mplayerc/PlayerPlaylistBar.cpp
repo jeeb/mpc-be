@@ -675,6 +675,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 		if (pMsg->message == WM_KEYDOWN) {
 			if (pMsg->wParam == VK_ESCAPE) {
 				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+
 				return TRUE;
 			} else if (pMsg->wParam == VK_RETURN) {
 				CList<int> items;
@@ -684,13 +685,15 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				}
 				if (items.GetCount() == 1) {
 					m_pl.SetPos(FindPos(items.GetHead()));
-
 					((CMainFrame*)AfxGetMainWnd())->OpenCurPlaylistItem();
-
 					AfxGetMainWnd()->SetFocus();
 
 					return TRUE;
 				}
+			} else if (pMsg->wParam == 55 && GetKeyState(VK_CONTROL) < 0) {
+				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+
+				return TRUE;
 			}
 		}
 
@@ -869,10 +872,10 @@ void CPlayerPlaylistBar::ResolveLinkFiles( CAtlList<CString> &fns )
 	POSITION pos = fns.GetHeadPosition();
 	while (pSL && pPF && pos) {
 		CString& fn = fns.GetNext(pos);
-		TCHAR buff[_MAX_PATH];
+		TCHAR buff[MAX_PATH];
 		if (CPath(fn).GetExtension().MakeLower() != _T(".lnk")
 				|| FAILED(pPF->Load(CStringW(fn), STGM_READ))
-				|| FAILED(pSL->Resolve(NULL, SLR_ANY_MATCH|SLR_NO_UI))
+				|| FAILED(pSL->Resolve(NULL, SLR_ANY_MATCH | SLR_NO_UI))
 				|| FAILED(pSL->GetPath(buff, _countof(buff), NULL, 0))) {
 			continue;
 		}
@@ -1770,9 +1773,7 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 		*pResult = TRUE;
 	} else if (pLVKeyDown->wVKey == VK_SPACE && items.GetCount() == 1) {
 		m_pl.SetPos(FindPos(items.GetHead()));
-
 		((CMainFrame*)AfxGetMainWnd())->OpenCurPlaylistItem();
-
 		AfxGetMainWnd()->SetFocus();
 
 		*pResult = TRUE;
@@ -1898,8 +1899,8 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	CPoint timept(rcItem.right, 0);
 	if (time.GetLength() > 0) {
 		timesize = pDC->GetTextExtent(time);
-		if ((3+timesize.cx+3) < rcItem.Width()/2) {
-			timept = CPoint(rcItem.right-(3+timesize.cx+3), (rcItem.top+rcItem.bottom-timesize.cy)/2);
+		if ((3+timesize.cx + 3) < rcItem.Width() / 2) {
+			timept = CPoint(rcItem.right - (3 + timesize.cx + 3), (rcItem.top + rcItem.bottom - timesize.cy) / 2);
 
 			pDC->SetTextColor(textcolor);
 			pDC->TextOut(timept.x, timept.y, time);
@@ -1907,17 +1908,17 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	}
 
 	CString fmt, file;
-	fmt.Format(_T("%%0%dd. %%s"), (int)log10(0.1+m_pl.GetCount())+1);
+	fmt.Format(_T("%%0%dd. %%s"), (int)log10(0.1 + m_pl.GetCount()) + 1);
 	file.Format(fmt, nItem+1, m_list.GetItemText(nItem, COL_NAME));
 	CSize filesize = pDC->GetTextExtent(file);
-	while (3+filesize.cx+6 > timept.x && file.GetLength() > 3) {
-		file = file.Left(file.GetLength()-4) + _T("...");
+	while (3 + filesize.cx + 6 > timept.x && file.GetLength() > 3) {
+		file = file.Left(file.GetLength() - 4) + _T("...");
 		filesize = pDC->GetTextExtent(file);
 	}
 
 	if (file.GetLength() > 3) {
 		pDC->SetTextColor(textcolor);
-		pDC->TextOut(rcItem.left+3, (rcItem.top+rcItem.bottom-filesize.cy)/2, file);
+		pDC->TextOut(rcItem.left + 3, (rcItem.top + rcItem.bottom - filesize.cy) / 2, file);
 	}
 }
 
@@ -1936,8 +1937,8 @@ void CPlayerPlaylistBar::OnDropFiles(HDROP hDropInfo)
 
 	UINT nFiles = ::DragQueryFile(hDropInfo, (UINT)-1, NULL, 0);
 	for (UINT iFile = 0; iFile < nFiles; iFile++) {
-		TCHAR szFileName[_MAX_PATH];
-		::DragQueryFile(hDropInfo, iFile, szFileName, _MAX_PATH);
+		TCHAR szFileName[MAX_PATH];
+		::DragQueryFile(hDropInfo, iFile, szFileName, MAX_PATH);
 		sl.AddTail(szFileName);
 	}
 	::DragFinish(hDropInfo);
@@ -2191,23 +2192,23 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	AppSettings& s = AfxGetAppSettings();
 	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
 
-	m.AppendMenu(MF_STRING|(!fOnItem?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));
-	m.AppendMenu(MF_STRING|MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
-	m.AppendMenu(MF_STRING|(/*fSelected||*/!fOnItem?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE));
+	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));
+	m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
+	m.AppendMenu(MF_STRING | (/*fSelected||*/!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING|(!m_pl.GetCount()?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
+	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING|(!fOnItem?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
-	m.AppendMenu(MF_STRING|(!m_pl.GetCount()?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
+	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
+	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING|(!m_pl.GetCount()?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_SORTBYNAME, ResStr(IDS_PLAYLIST_SORTBYLABEL));
-	m.AppendMenu(MF_STRING|(!m_pl.GetCount()?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_SORTBYPATH, ResStr(IDS_PLAYLIST_SORTBYPATH));
-	m.AppendMenu(MF_STRING|(!m_pl.GetCount()?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_RANDOMIZE, ResStr(IDS_PLAYLIST_RANDOMIZE));
-	m.AppendMenu(MF_STRING|(!m_pl.GetCount()?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_SORTBYID, ResStr(IDS_PLAYLIST_RESTORE));
+	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYNAME, ResStr(IDS_PLAYLIST_SORTBYLABEL));
+	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYPATH, ResStr(IDS_PLAYLIST_SORTBYPATH));
+	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_RANDOMIZE, ResStr(IDS_PLAYLIST_RANDOMIZE));
+	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYID, ResStr(IDS_PLAYLIST_RESTORE));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING|MF_ENABLED|(s.bShufflePlaylistItems?MF_CHECKED:MF_UNCHECKED), M_SHUFFLE, ResStr(IDS_PLAYLIST_SHUFFLE));
+	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShufflePlaylistItems ? MF_CHECKED : MF_UNCHECKED), M_SHUFFLE, ResStr(IDS_PLAYLIST_SHUFFLE));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING|MF_ENABLED|(s.bHidePlaylistFullScreen?MF_CHECKED:MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
+	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 
 	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, p.x, p.y, this);
 	switch (nID) {
@@ -2226,7 +2227,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					CAtlArray<CString> mask;
 					s.m_Formats.GetFilter(filter, mask);
 
-					DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
+					DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR;
 					if (!s.fKeepHistory) {
 						dwFlags |= OFN_DONTADDTORECENT;
 					}
