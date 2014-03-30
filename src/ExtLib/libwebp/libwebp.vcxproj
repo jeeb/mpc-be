@@ -169,6 +169,7 @@
     <ClCompile Include="dsp\enc.c" />
     <ClCompile Include="dsp\enc_sse2.c" />
     <ClCompile Include="dsp\lossless.c" />
+    <ClCompile Include="dsp\lossless_sse2.c" />
     <ClCompile Include="dsp\upsampling.c" />
     <ClCompile Include="dsp\upsampling_sse2.c" />
     <ClCompile Include="dsp\yuv.c" />
