@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"טען אוטומטית כתוביות"
+5		"Use the built-in subtitle renderer"
 6		"העדף כתוביות חיצוניות אם קיימות"
 8		"אל תטען כתוביות מובנות מהקונטיינר"
 10		"נתיבים לטעינה אוטומטית"

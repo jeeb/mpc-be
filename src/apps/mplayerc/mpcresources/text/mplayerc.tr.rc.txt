@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Altyazıları oto-yükle"
+5		"Use the built-in subtitle renderer"
 6		"Her zaman harici alt yazıları tercih et"
 8		"Gömülü altyazıları yükleme"
 10		"Yükleme konumları"

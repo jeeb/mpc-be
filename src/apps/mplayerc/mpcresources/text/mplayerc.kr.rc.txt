@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"자막파일을 자동으로 열기"
+5		"Use the built-in subtitle renderer"
 6		"항상 외부 자막보기(사용가능한경우)"
 8		"내장 자막 불러오지않음"
 10		"자동 불러오기 경로"

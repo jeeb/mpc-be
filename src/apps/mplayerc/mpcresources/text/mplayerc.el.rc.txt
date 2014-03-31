@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Αυτόματη φόρτωση υποτίτλων"
+5		"Use the built-in subtitle renderer"
 6		"Προτίμηση εξωτερικών υπότιτλων πάνω στους ενσωματωμένους υπότιτλους"
 8		"Παράβλεψη ενσωματωμένων υπότιτλων"
 10		"Κατάλογοι αυτόματης φόρτωσης"

@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"&Untertitel automatisch laden"
+5		"Use the built-in subtitle renderer"
 6		"Externe Untertitel bevorzugen (wenn verfügbar)"
 8		"Interne Untertitel nicht benutzen"
 10		"Pfade, in denen automatisch nach verfügbaren Untertiteln gesucht werden soll"

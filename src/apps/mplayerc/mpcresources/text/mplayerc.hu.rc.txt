@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Feliratok auto betöltése"
+5		"Use the built-in subtitle renderer"
 6		"Always default to external subtitles if available"
 8		"Do not load embedded subtitles"
 10		"Autoload paths"

@@ -372,7 +372,7 @@ void CPlaylistItem::AutoLoadFiles()
 		}
 	}
 
-	if (s.fAutoloadSubtitles) {
+	if (s.IsISRAutoLoadEnabled()) {
 		CAtlArray<CString> paths;
 		StringToPaths(curdir, s.strSubtitlePaths, paths);
 

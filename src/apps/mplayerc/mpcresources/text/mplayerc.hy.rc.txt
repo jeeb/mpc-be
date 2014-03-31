@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Տողագրերի ինքնաբացում"
+5		"Use the built-in subtitle renderer"
 6		"Միշտ օգտագործել արտաքին տողագրերը որպես հիմնական"
 8		"Չօգտագործել ներքին տողագրերը"
 10		"Տողագրերի ճանապարհը"

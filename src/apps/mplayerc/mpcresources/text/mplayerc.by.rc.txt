@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Аўтазагр. субтытраў"
+5		"Use the built-in subtitle renderer"
 6		"Заўсёды выкарыстоўваць знешнія субтытры як асноўныя"
 8		"Не загружаць убудаваныя субтытры"
 10		"Шлях да знешніх субтытраў"

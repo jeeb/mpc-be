@@ -13673,7 +13673,7 @@ void CMainFrame::OpenCustomizeGraph()
 	CleanGraph();
 
 	if (GetPlaybackMode() == PM_FILE) {
-		if (m_pCAP && AfxGetAppSettings().fAutoloadSubtitles) {
+		if (m_pCAP && AfxGetAppSettings().IsISRAutoLoadEnabled()) {
 			AddTextPassThruFilter();
 		}
 	}
@@ -17209,7 +17209,7 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 {
 	CComPtr<ISubStream> pSubStream;
 
-	if (GetFileExt(fn).MakeLower() == L".mks") {
+	if (GetFileExt(fn).MakeLower() == L".mks" && AfxGetAppSettings().IsISRAutoLoadEnabled()) {
 		if (CComQIPtr<IGraphBuilderSub> pGBS = m_pGB) {
 			HRESULT hr = pGBS->RenderSubFile(fn);
 			if (SUCCEEDED(hr)) {

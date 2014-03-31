@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Lecture automatique des sous-titres"
+5		"Use the built-in subtitle renderer"
 6		"Préférer les sous-titres externes aux sous-titres internes"
 8		"Ignorer les sous-titres internes"
 10		"Dossiers à utiliser pour le chargement automatique"

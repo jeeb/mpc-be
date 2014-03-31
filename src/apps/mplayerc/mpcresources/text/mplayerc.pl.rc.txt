@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Wczytywanie napisów"
+5		"Use the built-in subtitle renderer"
 6		"Wczytywanie zewnętrznych napisów zamiast zawartych w kontenerze"
 8		"Zaniechanie wczytywania napisów zawartych w kontenerze"
 10		"Położenia napisów"

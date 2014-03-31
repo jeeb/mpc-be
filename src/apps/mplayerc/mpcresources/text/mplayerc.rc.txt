@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Auto-load subtitles"
+5		"Use the built-in subtitle renderer"
 6		"Prefer external subtitles over embedded subtitles"
 8		"Ignore embedded subtitles"
 10		"Autoload paths"

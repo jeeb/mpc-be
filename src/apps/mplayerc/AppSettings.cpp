@@ -2108,6 +2108,21 @@ CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 	return NULL;
 }
 
+bool CAppSettings::IsISRSelect() const
+{
+	return (iDSVideoRendererType == VIDRNDT_DS_VMR7RENDERLESS ||
+			iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
+			iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
+			iDSVideoRendererType == VIDRNDT_DS_DXR ||
+			iDSVideoRendererType == VIDRNDT_DS_SYNC ||
+			iDSVideoRendererType == VIDRNDT_DS_MADVR);
+}
+
+bool CAppSettings::IsISRAutoLoadEnabled() const
+{
+	return fAutoloadSubtitles && IsISRSelect();
+}
+
 // Settings::CRecentFileAndURLList
 CAppSettings::CRecentFileAndURLList::CRecentFileAndURLList(UINT nStart, LPCTSTR lpszSection,
 		LPCTSTR lpszEntryFormat, int nSize,

@@ -785,6 +785,9 @@ public:
 
 	DWORD			nLastFileInfoPage;
 
+	bool			IsISRSelect() const;
+	bool			IsISRAutoLoadEnabled() const;
+
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;

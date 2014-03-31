@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"字幕を自動で読み込む"
+5		"Use the built-in subtitle renderer"
 6		"外部字幕ファイルを優先する"
 8		"内蔵された字幕を読み込まない"
 10		"字幕ファイルパス指定"

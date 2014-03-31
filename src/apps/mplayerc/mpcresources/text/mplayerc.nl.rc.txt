@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Ondertiteling autom. laden"
+5		"Use the built-in subtitle renderer"
 6		"Prefereer externe ondertiteling boven interne ondertiteling"
 8		"Geintegreerde ondertiteling niet laden"
 10		"Automatisch geladen locaties"

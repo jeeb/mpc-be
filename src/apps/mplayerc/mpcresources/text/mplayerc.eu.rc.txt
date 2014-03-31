@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Berez-gertatu azpidatziak"
+5		"Use the built-in subtitle renderer"
 6		"Hobetsi kanpoko azpidatziak barneko azpidatziei"
 8		"Ezikusi barneratutako azpidatziak"
 10		"Berez-gertatu helburuak"

@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Carga auto. de subtítols"
+5		"Use the built-in subtitle renderer"
 6		"Subtítols externs er defecte si hi són"
 8		"No carregar subtítols incrustats"
 10		"Auto-càrrega de ruta"

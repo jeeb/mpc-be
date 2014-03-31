@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Aut. načítanie titulkov"
+5		"Use the built-in subtitle renderer"
 6		"Uprednostniť externé titulky, ak sú dostupné"
 8		"Nenačítavať vložené titulky"
 10		"Cesty pre automotické načítavanie"
