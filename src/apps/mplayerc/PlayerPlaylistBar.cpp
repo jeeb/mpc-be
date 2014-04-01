@@ -1705,6 +1705,7 @@ void CPlayerPlaylistBar::SavePlaylist()
 }
 
 BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
+	ON_WM_WINDOWPOSCHANGED()
 	ON_WM_SIZE()
 	ON_NOTIFY(LVN_KEYDOWN, IDC_PLAYLIST, OnLvnKeyDown)
 	ON_NOTIFY(NM_DBLCLK, IDC_PLAYLIST, OnNMDblclkList)
@@ -1734,6 +1735,15 @@ void CPlayerPlaylistBar::ResizeListColumn()
 		m_list.GetClientRect(r);
 		m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
 		m_list.SetRedraw(TRUE);
+	}
+}
+
+void CPlayerPlaylistBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
+{
+	__super::OnWindowPosChanged(lpwndpos);
+
+	if (lpwndpos->flags & SWP_HIDEWINDOW) {
+		GetParentFrame()->SetFocus();
 	}
 }
 

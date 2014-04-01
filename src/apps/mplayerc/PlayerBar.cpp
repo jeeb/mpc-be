@@ -32,6 +32,7 @@ CPlayerBar::~CPlayerBar(void)
 }
 
 BEGIN_MESSAGE_MAP(CPlayerBar, CSizingControlBarG)
+	ON_WM_WINDOWPOSCHANGED()
 END_MESSAGE_MAP()
 
 BOOL CPlayerBar::Create(LPCTSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT defDockBarID, CString const& strSettingName)
@@ -102,4 +103,13 @@ void CPlayerBar::SaveState()
 	}
 
 	pApp->WriteProfileInt(section, _T("DockState"), dockBarID);
+}
+
+void CPlayerBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
+{
+	__super::OnWindowPosChanged(lpwndpos);
+
+	if (lpwndpos->flags & SWP_HIDEWINDOW) {
+		GetParentFrame()->SetFocus();
+	}
 }

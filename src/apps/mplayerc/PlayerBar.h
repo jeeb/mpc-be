@@ -41,4 +41,6 @@ public:
 
 	virtual void LoadState(CFrameWnd *pParent);
 	virtual void SaveState();
+
+	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 };
