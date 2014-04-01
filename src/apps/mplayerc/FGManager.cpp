@@ -2621,6 +2621,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
 	}
 
+	if (s.iDSVideoRendererType != VIDRNDT_DS_MADVR) {
+		// Prevent XySubFilter from connecting while the renderer not a madVR
+		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
+		// Prevent XySubFilter's loader from connecting while the renderer not a madVR
+		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
+	}
+
 	// Blacklist Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash
 	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{4C4CD9E1-F876-11D2-962F-00500471FDDC}")), MERIT64_DO_NOT_USE));
 
