@@ -414,6 +414,12 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
             s->upscale_v = 6;
             s->upscale_h = 6;
             s->chroma_height = s->height;
+        } else if (s->adobe_transform == 2 && s->bits <= 8) {
+            s->avctx->pix_fmt = AV_PIX_FMT_YUVA444P;
+            s->upscale_v = 6;
+            s->upscale_h = 6;
+            s->chroma_height = s->height;
+            s->avctx->color_range = s->cs_itu601 ? AVCOL_RANGE_MPEG : AVCOL_RANGE_JPEG;
         } else {
             if (s->bits <= 8) s->avctx->pix_fmt = AV_PIX_FMT_YUVA420P;
             else              s->avctx->pix_fmt = AV_PIX_FMT_YUVA420P16;
@@ -511,6 +517,8 @@ unk_pixfmt:
         s->upscale_h = s->upscale_v = 0;
         if (s->nb_components > 1)
             s->avctx->pix_fmt = AV_PIX_FMT_RGB24;
+        else if (s->palette_index && s->bits <= 8)
+            s->avctx->pix_fmt = AV_PIX_FMT_PAL8;
         else if (s->bits <= 8)
             s->avctx->pix_fmt = AV_PIX_FMT_GRAY8;
         else
@@ -2053,6 +2061,7 @@ the_end:
                    avctx->pix_fmt == AV_PIX_FMT_YUV444P  ||
                    avctx->pix_fmt == AV_PIX_FMT_YUVJ440P ||
                    avctx->pix_fmt == AV_PIX_FMT_YUV440P  ||
+                   avctx->pix_fmt == AV_PIX_FMT_YUVA444P ||
                    avctx->pix_fmt == AV_PIX_FMT_GBRAP
                   );
         for (p = 1; p<4; p++) {
@@ -2072,6 +2081,7 @@ the_end:
                    avctx->pix_fmt == AV_PIX_FMT_YUV444P  ||
                    avctx->pix_fmt == AV_PIX_FMT_YUVJ422P ||
                    avctx->pix_fmt == AV_PIX_FMT_YUV422P  ||
+                   avctx->pix_fmt == AV_PIX_FMT_YUVA444P ||
                    avctx->pix_fmt == AV_PIX_FMT_GBRAP
                    );
         avcodec_get_chroma_sub_sample(s->avctx->pix_fmt, &hshift, &vshift);
