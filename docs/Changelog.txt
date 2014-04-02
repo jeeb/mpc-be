@@ -20,7 +20,7 @@ Changes (*):
 	* MP4Splitter - correct aspect ratio for video tracks, has a higher priority value from the header(atom 'tkhd');
 	* After closing the Playlist/Shader Editor/Editor "Synchronize subtitle" - set the focus to the main window;
 	* In the property "FileVersion" indicates the version, including SVN revision number;
-	* ffmpeg 2.2 git-d506deae;
+	* ffmpeg 2.2 git-cecb6d6f;
 	* libwebp 0.4.0 git-af444608;
 	* MediaInfo 0.7.67+ svn rev.6177;
 	 ... and many more.

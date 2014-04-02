@@ -1186,6 +1186,9 @@
     <ClInclude Include="libavutil\file.h">
       <Filter>libavutil</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\fixed_dsp.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\float_dsp.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -1487,6 +1490,12 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\ac3dec_data.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\ac3dec_fixed.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\ac3dec_float.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\ac3dsp.c">
@@ -2564,6 +2573,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\file_open.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\fixed_dsp.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\float_dsp.c">

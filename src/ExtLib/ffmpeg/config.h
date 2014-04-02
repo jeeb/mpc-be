@@ -641,6 +641,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_AAC_DECODER 1
 #define CONFIG_AAC_LATM_DECODER 1
 #define CONFIG_AC3_DECODER 1
+#define CONFIG_AC3_FIXED_DECODER 1
 #define CONFIG_ALAC_DECODER 1
 #define CONFIG_ALS_DECODER 1
 #define CONFIG_APE_DECODER 1

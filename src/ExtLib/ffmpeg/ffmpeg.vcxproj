@@ -397,6 +397,7 @@
     <ClInclude Include="libavutil\eval.h" />
     <ClInclude Include="libavutil\fifo.h" />
     <ClInclude Include="libavutil\file.h" />
+    <ClInclude Include="libavutil\fixed_dsp.h" />
     <ClInclude Include="libavutil\float_dsp.h" />
     <ClInclude Include="libavutil\frame.h" />
     <ClInclude Include="libavutil\imgutils.h" />
@@ -457,6 +458,8 @@
     <ClCompile Include="libavcodec\ac3.c" />
     <ClCompile Include="libavcodec\ac3dec.c" />
     <ClCompile Include="libavcodec\ac3dec_data.c" />
+    <ClCompile Include="libavcodec\ac3dec_fixed.c" />
+    <ClCompile Include="libavcodec\ac3dec_float.c" />
     <ClCompile Include="libavcodec\ac3dsp.c" />
     <ClCompile Include="libavcodec\ac3enc.c" />
     <ClCompile Include="libavcodec\ac3enc_float.c" />
@@ -863,6 +866,7 @@
     <ClCompile Include="libavutil\eval.c" />
     <ClCompile Include="libavutil\fifo.c" />
     <ClCompile Include="libavutil\file_open.c" />
+    <ClCompile Include="libavutil\fixed_dsp.c" />
     <ClCompile Include="libavutil\float_dsp.c" />
     <ClCompile Include="libavutil\frame.c" />
     <ClCompile Include="libavutil\imgutils.c" />
