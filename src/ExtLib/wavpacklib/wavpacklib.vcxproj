@@ -221,35 +221,15 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="wavpack\filters.h" />
-    <ClInclude Include="wavpack\md5.h" />
-    <ClInclude Include="wavpack\unpack3.h" />
-    <ClInclude Include="wavpack\utils.h" />
-    <ClInclude Include="wavpack\wavpack.h" />
     <ClInclude Include="wavpack\wavpack_local.h" />
     <ClInclude Include="wavpack\wavpack_version.h" />
     <ClInclude Include="wavpack\wputils.h" />
-    <ClInclude Include="wavpack_buffer_decoder.h" />
     <ClInclude Include="wavpack_common.h" />
     <ClInclude Include="wavpack_frame.h" />
     <ClInclude Include="wavpack_parser.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="wavpack\bits.c" />
-    <ClCompile Include="wavpack\extra1.c" />
-    <ClCompile Include="wavpack\extra2.c" />
-    <ClCompile Include="wavpack\float.c" />
-    <ClCompile Include="wavpack\md5.c" />
-    <ClCompile Include="wavpack\metadata.c" />
-    <ClCompile Include="wavpack\pack.c" />
-    <ClCompile Include="wavpack\tags.c" />
-    <ClCompile Include="wavpack\unpack.c" />
-    <ClCompile Include="wavpack\unpack3.c" />
-    <ClCompile Include="wavpack\utils.c" />
-    <ClCompile Include="wavpack\wavpack.c" />
-    <ClCompile Include="wavpack\words.c" />
     <ClCompile Include="wavpack\wputils.c" />
-    <ClCompile Include="wavpack_buffer_decoder.c" />
     <ClCompile Include="wavpack_frame.c" />
     <ClCompile Include="wavpack_parser.c" />
   </ItemGroup>
