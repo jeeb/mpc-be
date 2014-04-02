@@ -16,13 +16,17 @@ Added (+):
 
 
 Changes (*):
+	* MPCVideoDec - add support MP4 H264 files with avcC atoms without any SPS/PPS (use code from LAV);
+	* MP4Splitter - correct aspect ratio for video tracks, has a higher priority value from the header(atom 'tkhd');
+	* After closing the Playlist/Shader Editor/Editor "Synchronize subtitle" - set the focus to the main window;
+	* In the property "FileVersion" indicates the version, including SVN revision number;
 	* ffmpeg 2.2 git-d506deae;
 	* libwebp 0.4.0 git-af444608;
 	 ... and many more.
 
 
 Fixes (!):
-
+	* Fixed parser .ass subtitles, leading to hang when loading subtitle;
 	 ... and many more.
 
 
