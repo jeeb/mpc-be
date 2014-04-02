@@ -7,6 +7,24 @@ Legend:
 * Changed
 ! Fixed
 
+1.4.3 (beta)
+==============================
+
+Added (+):
+
+	 ... and many more.
+
+
+Changes (*):
+
+	 ... and many more.
+
+
+Fixes (!):
+
+	 ... and many more.
+
+
 1.4.2
 ==============================
 
