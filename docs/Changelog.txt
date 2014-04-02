@@ -27,6 +27,7 @@ Changes (*):
 
 Fixes (!):
 	* Fixed parser .ass subtitles, leading to hang when loading subtitle;
+	* OSD is displayed on top of all windows;
 	 ... and many more.
 
 

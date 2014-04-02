@@ -46,7 +46,7 @@ COSD::COSD()
 	, m_bShowMessage(true)
 	, m_OSDType(OSD_TYPE_NONE)
 	, m_pChapterBag(NULL)
-	, m_pWndInsertAfter(NULL)
+	, m_pWndInsertAfter(&wndNoTopMost)
 {
 	if (IsWinEightOrLater()) {
 		m_pWndInsertAfter = &wndTop;
@@ -965,7 +965,6 @@ void COSD::DrawWnd()
 
 	CRect rcBar;
 	GetClientRect(&rcBar);
-	//rcBar = rectMessages;
 
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
@@ -973,7 +972,6 @@ void COSD::DrawWnd()
 	bm.CreateCompatibleBitmap(&dc, rcBar.Width(), rcBar.Height());
 	CBitmap* pOldBm = mdc.SelectObject(&bm);
 	mdc.SetBkMode(TRANSPARENT);
-	//mdc.FillSolidRect(rcBar, RGB(0,0,0)); // transparent color (LWA_COLORKEY)
 
 	if (m_MainFont.GetSafeHandle()) {
 		m_MainFont.DeleteObject();
