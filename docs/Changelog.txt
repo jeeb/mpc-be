@@ -22,12 +22,13 @@ Changes (*):
 	* In the property "FileVersion" indicates the version, including SVN revision number;
 	* ffmpeg 2.2 git-d506deae;
 	* libwebp 0.4.0 git-af444608;
+	* MediaInfo 0.7.67+ svn rev.6177;
 	 ... and many more.
 
 
 Fixes (!):
-	* Fixed parser .ass subtitles, leading to hang when loading subtitle;
-	* OSD is displayed on top of all windows;
+	! Fixed parser .ass subtitles, leading to hang when loading subtitle;
+	! OSD is displayed on top of all windows;
 	 ... and many more.
 
 
