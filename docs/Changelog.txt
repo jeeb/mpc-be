@@ -21,7 +21,7 @@ Changes (*):
 
 
 Fixes (!):
-
+	! VSFilter - fixed incorrect handling of font changes;
 	 ... and many more.
 
 

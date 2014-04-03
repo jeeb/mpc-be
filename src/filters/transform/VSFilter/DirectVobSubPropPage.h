@@ -41,13 +41,14 @@ protected:
 
 protected:
 	CDVSBasePPage(TCHAR* pName, LPUNKNOWN lpunk, int DialogId, int TitleId);
+	HRESULT OnApplyChanges();
 
 	bool m_fDisableInstantUpdate;
 
 private:
 	BOOL m_bIsInitialized;
 
-	HRESULT OnConnect(IUnknown* pUnknown), OnDisconnect(), OnActivate(), OnDeactivate(), OnApplyChanges();
+	HRESULT OnConnect(IUnknown* pUnknown), OnDisconnect(), OnActivate(), OnDeactivate();
 	INT_PTR OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:

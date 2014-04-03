@@ -141,6 +141,7 @@ INT_PTR CDVSBasePPage::OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 						if (!m_fDisableInstantUpdate
 								&& !(HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_INSTANTUPDATE)
+								&& !(HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_FONT)
 								&& LOWORD(wParam) != IDC_EDIT1 && LOWORD(wParam) != IDC_ANIMWHENBUFFERING
 								&& !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1)) {
 							OnApplyChanges();
@@ -356,12 +357,28 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 						CStyleEditorDialog dlg(_T("Default"), &m_defStyle, CWnd::FromHandle(m_hwnd));
 
 						if (dlg.DoModal() == IDOK) {
+							BOOL bStyleChanged = FALSE;
+							if (dlg.m_stss != m_defStyle) {
+								bStyleChanged = TRUE;
+							}
 							m_defStyle = dlg.m_stss;
 							CString str = m_defStyle.fontName;
 							if (str.GetLength() > 18) {
 								str = str.Left(16).TrimRight() + _T("...");
 							}
 							m_font.SetWindowText(str);
+
+							if (bStyleChanged) {
+								m_bDirty = TRUE;
+								if (m_pPageSite) {
+									m_pPageSite->OnStatusChange(PROPPAGESTATUS_DIRTY);
+								}
+
+								if (!m_fDisableInstantUpdate
+										&& !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1)) {
+									OnApplyChanges();
+								}
+							}
 						}
 
 						return true;
