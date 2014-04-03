@@ -22,6 +22,7 @@ Changes (*):
 
 Fixes (!):
 	! VSFilter - fixed incorrect handling of font changes;
+	! WASAPI Renderer - Fixed crash if no interface IReferenceClock;
 	 ... and many more.
 
 

@@ -780,6 +780,7 @@ HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
 	hr = SetSyncSource(m_pReferenceClock);
 	if (FAILED(hr)) {
 		SetSyncSource(NULL);
+		SAFE_RELEASE(m_pReferenceClock);
 		return hr;
 	}
 
@@ -1681,18 +1682,20 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 				if (!m_CurrentPacket) {
 					m_CurrentPacket = m_WasapiQueue.Remove();
-					while (m_CurrentPacket && m_CurrentPacket->rtStart != INVALID_TIME && m_CurrentPacket->rtStart < RefRt - hnsPeriod) {
-						if (m_WasapiQueue.GetCount()) {
-							m_CurrentPacket = m_WasapiQueue.Remove();
-						} else {
-							m_CurrentPacket.Free();
+					if (RefRt != INVALID_TIME) {
+						while (m_CurrentPacket && m_CurrentPacket->rtStart != INVALID_TIME && m_CurrentPacket->rtStart < RefRt - hnsPeriod) {
+							if (m_WasapiQueue.GetCount()) {
+								m_CurrentPacket = m_WasapiQueue.Remove();
+							} else {
+								m_CurrentPacket.Free();
+							}
+							RefRt = GetClockTime();
 						}
-						RefRt = GetClockTime();
 					}
 				}
 
 				UINT32 pos = 0;
-				if (m_CurrentPacket && !m_CurrentPacket->bSyncPoint && m_CurrentPacket->rtStart > RefRt) {
+				if (m_CurrentPacket && RefRt != INVALID_TIME && !m_CurrentPacket->bSyncPoint && m_CurrentPacket->rtStart > RefRt) {
 					REFERENCE_TIME rtSilenceDuration = m_CurrentPacket->rtStart - RefRt;
 					UINT32 framesSilence = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
 					UINT32 silenceBytes = min(framesSilence * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes);
@@ -2152,8 +2155,10 @@ HRESULT	CMpcAudioRenderer::EndFlush()
 inline REFERENCE_TIME CMpcAudioRenderer::GetClockTime()
 {
 	REFERENCE_TIME rt = INVALID_TIME;
-	m_pReferenceClock->GetTime(&rt);
-	rt -= m_rtStartTime;
+	if (m_pReferenceClock) {
+		m_pReferenceClock->GetTime(&rt);
+		rt -= m_rtStartTime;
+	}
 
 	return rt;
 }
