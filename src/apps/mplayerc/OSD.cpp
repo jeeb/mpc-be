@@ -22,8 +22,6 @@
 #include "OSD.h"
 #include "../../DSUtil/SysVersion.h"
 
-#define DEFFLAGS				SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS
-
 #define SEEKBAR_HEIGHT			60
 #define SLIDER_BAR_HEIGHT		10
 #define SLIDER_CURSOR_HEIGHT	30
@@ -47,8 +45,11 @@ COSD::COSD()
 	, m_OSDType(OSD_TYPE_NONE)
 	, m_pChapterBag(NULL)
 	, m_pWndInsertAfter(&wndNoTopMost)
+	, m_nDEFFLAGS(SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS | SWP_NOZORDER)
 {
 	if (IsWinEightOrLater()) {
+		// remove SWP_NOZORDER for Win 8 and later - it's use WS_CHILD style
+		m_nDEFFLAGS &= ~SWP_NOZORDER;
 		m_pWndInsertAfter = &wndTop;
 	}
 
@@ -807,7 +808,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
 			}
 
-			SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			//PostMessage(WM_OSD_DRAW);
 			DrawWnd();
 		}
@@ -838,7 +839,7 @@ void COSD::HideMessage(bool hide)
 			ClearMessage(true);
 		} else {
 			if (!m_strMessage.IsEmpty()) {
-				SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+				SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			}
 			//PostMessage(WM_OSD_DRAW);
 			DrawWnd();
@@ -961,7 +962,7 @@ void COSD::DrawWnd()
 		wr.left	-= m_MainWndRect.left;
 		wr.top	-= m_MainWndRect.top;
 	}
-	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, DEFFLAGS | SWP_NOZORDER);
+	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, m_nDEFFLAGS | SWP_NOZORDER);
 
 	CRect rcBar;
 	GetClientRect(&rcBar);

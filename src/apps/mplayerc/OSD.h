@@ -162,6 +162,8 @@ private :
 	CCritSec				m_CBLock;
 	CComPtr<IDSMChapterBag>	m_pChapterBag;
 
+	UINT	m_nDEFFLAGS;
+
 	void UpdateBitmap();
 	void CalcRect();
 	void UpdateSeekBarPos(CPoint point);
