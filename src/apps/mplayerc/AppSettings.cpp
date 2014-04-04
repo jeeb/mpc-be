@@ -79,6 +79,7 @@ CAppSettings::CAppSettings()
 	VideoFiltersKeys[VDEC_DNXHD]			= _T("vdec_dnxhd");
 	VideoFiltersKeys[VDEC_BINK]				= _T("vdec_bink");
 	VideoFiltersKeys[VDEC_CANOPUS]			= _T("vdec_canopus");
+	VideoFiltersKeys[VDEC_CINEPAK]			= _T("vdec_cinepak");
 	VideoFiltersKeys[VDEC_DIRAC]			= _T("vdec_dirac");
 	VideoFiltersKeys[VDEC_DIVX]				= _T("vdec_divx");
 	VideoFiltersKeys[VDEC_DV]				= _T("vdec_dv");
@@ -95,6 +96,7 @@ CAppSettings::CAppSettings()
 	VideoFiltersKeys[VDEC_LIBMPEG2_MPEG2]	= _T("vdec_libmpeg2_mpeg2");
 	VideoFiltersKeys[VDEC_MSMPEG4]			= _T("vdec_msmpeg4");
 	VideoFiltersKeys[VDEC_PNG]				= _T("vdec_png");
+	VideoFiltersKeys[VDEC_QT]				= _T("vdec_qt");
 	VideoFiltersKeys[VDEC_SCREEN]			= _T("vdec_screen");
 	VideoFiltersKeys[VDEC_SVQ]				= _T("vdec_svq");
 	VideoFiltersKeys[VDEC_THEORA]			= _T("vdec_theora");
