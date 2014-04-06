@@ -47,6 +47,7 @@ protected:
 	REFERENCE_TIME	m_rtduration;
 
 	GUID			m_subtype;
+	WORD			m_wFormatTag;
 	BYTE*			m_extradata;
 	int				m_extrasize;
 

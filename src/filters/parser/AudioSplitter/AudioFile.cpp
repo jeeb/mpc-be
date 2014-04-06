@@ -40,6 +40,7 @@ CAudioFile::CAudioFile()
 	, m_layout(0)
 	, m_rtduration(0)
 	, m_subtype(GUID_NULL)
+	, m_wFormatTag(0)
 	, m_extradata(NULL)
 	, m_extrasize(0)
 	, m_nAvgBytesPerSec(0)
@@ -105,7 +106,7 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	mt.SetSampleSize(256000);
 
 	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + m_extrasize);
-	wfe->wFormatTag			= 0;
+	wfe->wFormatTag			= m_wFormatTag;
 	wfe->nChannels			= m_channels;
 	wfe->nSamplesPerSec		= m_samplerate;
 	wfe->wBitsPerSample		= m_bitdepth;
