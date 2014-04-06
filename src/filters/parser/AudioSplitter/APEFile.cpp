@@ -78,6 +78,7 @@ CAPEFile::CAPEFile()
 	, m_APETag(NULL)
 {
 	m_subtype = MEDIASUBTYPE_APE;
+	m_wFormatTag = 0x5041;
 }
 
 CAPEFile::~CAPEFile()

@@ -43,6 +43,7 @@ CTTAFile::CTTAFile()
 	, m_APETag(NULL)
 {
 	m_subtype = MEDIASUBTYPE_TTA1;
+	m_wFormatTag = 0x77a1;
 }
 
 CTTAFile::~CTTAFile()
