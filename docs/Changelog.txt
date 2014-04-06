@@ -16,7 +16,8 @@ Added (+):
 
 
 Changes (*):
-
+	* Updated German translation (author: Sylt);
+	* Updated Ukrainian translation (author Arestarh1986);
 	 ... and many more.
 
 
