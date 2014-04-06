@@ -75,22 +75,22 @@ BOOL CPPageMisc::OnInitDialog()
 	m_iSaturation = s.iSaturation;
 
 	m_SliBrightness.EnableWindow	(TRUE);
-	m_SliBrightness.SetRange		(-100, 100, true);
+	m_SliBrightness.SetRange		(-100, 100, TRUE);
 	m_SliBrightness.SetTic			(0);
 	m_SliBrightness.SetPos			(m_iBrightness);
 
 	m_SliContrast.EnableWindow		(TRUE);
-	m_SliContrast.SetRange			(-100, 100, true);
+	m_SliContrast.SetRange			(-100, 100, TRUE);
 	m_SliContrast.SetTic			(0);
 	m_SliContrast.SetPos			(m_iContrast);
 
 	m_SliHue.EnableWindow			(TRUE);
-	m_SliHue.SetRange				(-180, 180, true);
+	m_SliHue.SetRange				(-180, 180, TRUE);
 	m_SliHue.SetTic					(0);
 	m_SliHue.SetPos					(m_iHue);
 
 	m_SliSaturation.EnableWindow	(TRUE);
-	m_SliSaturation.SetRange		(-100, 100, true);
+	m_SliSaturation.SetRange		(-100, 100, TRUE);
 	m_SliSaturation.SetTic			(0);
 	m_SliSaturation.SetPos			(m_iSaturation);
 
