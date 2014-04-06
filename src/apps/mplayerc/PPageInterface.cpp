@@ -291,10 +291,9 @@ void CPPageInterface::ApplyOSDTransparent()
 {
 	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
 	if (pMainFrame && pMainFrame->m_OSD) {
-		if (m_nOSDTransparent != m_nOSDTransparent_Old) {
-			pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - m_nOSDTransparent_Old, LWA_ALPHA | LWA_COLORKEY);
-		}
+		AppSettings& s = AfxGetAppSettings();
 
+		pMainFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - s.nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
 		pMainFrame->m_OSD.ClearMessage();
 	}
 }
