@@ -50,7 +50,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static int av_log_level = AV_LOG_INFO;
 static int flags;
 
-#if HAVE_SETCONSOLETEXTATTRIBUTE
+#if defined(_WIN32) && !defined(__MINGW32CE__) && HAVE_SETCONSOLETEXTATTRIBUTE
 #include <windows.h>
 static const uint8_t color[16 + AV_CLASS_CATEGORY_NB] = {
     [AV_LOG_PANIC  /8] = 12,
@@ -113,35 +113,40 @@ static const uint32_t color[16 + AV_CLASS_CATEGORY_NB] = {
 #endif
 static int use_color = -1;
 
-static void colored_fputs(int level, const char *str)
+static void check_color_terminal(void)
+{
+#if defined(_WIN32) && !defined(__MINGW32CE__) && HAVE_SETCONSOLETEXTATTRIBUTE
+    CONSOLE_SCREEN_BUFFER_INFO con_info;
+    con = GetStdHandle(STD_ERROR_HANDLE);
+    use_color = (con != INVALID_HANDLE_VALUE) && !getenv("NO_COLOR") &&
+                !getenv("AV_LOG_FORCE_NOCOLOR");
+    if (use_color) {
+        GetConsoleScreenBufferInfo(con, &con_info);
+        attr_orig  = con_info.wAttributes;
+        background = attr_orig & 0xF0;
+    }
+#elif HAVE_ISATTY
+    char *term = getenv("TERM");
+    use_color = !getenv("NO_COLOR") && !getenv("AV_LOG_FORCE_NOCOLOR") &&
+                (getenv("TERM") && isatty(2) || getenv("AV_LOG_FORCE_COLOR"));
+    if (   getenv("AV_LOG_FORCE_256COLOR")
+        || (term && strstr(term, "256color")))
+        use_color *= 256;
+#else
+    use_color = getenv("AV_LOG_FORCE_COLOR") && !getenv("NO_COLOR") &&
+               !getenv("AV_LOG_FORCE_NOCOLOR");
+#endif
+}
+
+static void colored_fputs(int level, int tint, const char *str)
 {
     if (!*str)
         return;
 
-    if (use_color < 0) {
-#if HAVE_SETCONSOLETEXTATTRIBUTE
-        CONSOLE_SCREEN_BUFFER_INFO con_info;
-        con = GetStdHandle(STD_ERROR_HANDLE);
-        use_color = (con != INVALID_HANDLE_VALUE) && !getenv("NO_COLOR") &&
-                    !getenv("AV_LOG_FORCE_NOCOLOR");
-        if (use_color) {
-            GetConsoleScreenBufferInfo(con, &con_info);
-            attr_orig  = con_info.wAttributes;
-            background = attr_orig & 0xF0;
-        }
-#elif HAVE_ISATTY
-        use_color = !getenv("NO_COLOR") && !getenv("AV_LOG_FORCE_NOCOLOR") &&
-                    (getenv("TERM") && isatty(2) ||
-                     getenv("AV_LOG_FORCE_COLOR"));
-        if (getenv("AV_LOG_FORCE_256COLOR"))
-            use_color *= 256;
-#else
-        use_color = getenv("AV_LOG_FORCE_COLOR") && !getenv("NO_COLOR") &&
-                   !getenv("AV_LOG_FORCE_NOCOLOR");
-#endif
-    }
+    if (use_color < 0)
+        check_color_terminal();
 
-#if HAVE_SETCONSOLETEXTATTRIBUTE
+#if defined(_WIN32) && !defined(__MINGW32CE__) && HAVE_SETCONSOLETEXTATTRIBUTE
     if (use_color && level != AV_LOG_INFO/8)
         SetConsoleTextAttribute(con, background | color[level]);
     fputs(str, stderr);
@@ -153,6 +158,12 @@ static void colored_fputs(int level, const char *str)
                 "\033[%d;3%dm%s\033[0m",
                 (color[level] >> 4) & 15,
                 color[level] & 15,
+                str);
+    } else if (tint && use_color == 256) {
+        fprintf(stderr,
+                "\033[48;5;%dm\033[38;5;%dm%s\033[0m",
+                (color[level] >> 16) & 0xff,
+                tint,
                 str);
     } else if (use_color == 256 && level != AV_LOG_INFO/8) {
         fprintf(stderr,
@@ -247,6 +258,12 @@ void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
     char line[LINE_SZ];
     static int is_atty;
     int type[2];
+    unsigned tint = 0;
+
+    if (level >= 0) {
+        tint = level & 0xff00;
+        level &= 0xff;
+    }
 
     if (level > av_log_level)
         return;
@@ -275,11 +292,11 @@ void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
     }
     strcpy(prev, line);
     sanitize(part[0].str);
-    colored_fputs(type[0], part[0].str);
+    colored_fputs(type[0], 0, part[0].str);
     sanitize(part[1].str);
-    colored_fputs(type[1], part[1].str);
+    colored_fputs(type[1], 0, part[1].str);
     sanitize(part[2].str);
-    colored_fputs(av_clip(level >> 3, 0, 6), part[2].str);
+    colored_fputs(av_clip(level >> 3, 0, 6), tint >> 8, part[2].str);
 end:
     av_bprint_finalize(part+2, NULL);
 #if HAVE_PTHREADS
@@ -360,3 +377,26 @@ void avpriv_report_missing_feature(void *avc, const char *msg, ...)
     missing_feature_sample(0, avc, msg, argument_list);
     va_end(argument_list);
 }
+
+#ifdef TEST
+// LCOV_EXCL_START
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+    int i;
+    av_log_set_level(AV_LOG_DEBUG);
+    for (use_color=0; use_color<=256; use_color = 255*use_color+1) {
+        av_log(NULL, AV_LOG_FATAL, "use_color: %d\n", use_color);
+        for (i = AV_LOG_DEBUG; i>=AV_LOG_QUIET; i-=8) {
+            av_log(NULL, i, " %d", i);
+            av_log(NULL, AV_LOG_INFO, "e ");
+            av_log(NULL, i + 256*123, "C%d", i);
+            av_log(NULL, AV_LOG_INFO, "e");
+        }
+        av_log(NULL, AV_LOG_PANIC, "\n");
+    }
+    return 0;
+}
+// LCOV_EXCL_STOP
+#endif

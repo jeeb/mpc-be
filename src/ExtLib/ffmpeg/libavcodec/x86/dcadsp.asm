@@ -132,10 +132,15 @@ DECODE_HF
     mulps       va, %2
     mulps       vb, %2
 %if %0 == 3
+%if cpuflag(fma3)
+    fmaddps     va, m4, %3, va
+    fmaddps     vb, m0, %3, vb
+%else
     mulps       m4, %3
     mulps       m0, %3
     addps       va, m4
     addps       vb, m0
+%endif
 %endif
     ; va = va1 va2 va3 va4
     ; vb = vb1 vb2 vb3 vb4
@@ -198,6 +203,10 @@ cglobal dca_lfe_fir%1, 3,3,6-%1, out, in, cf0
 INIT_XMM sse
 DCA_LFE_FIR 0
 DCA_LFE_FIR 1
+%if HAVE_FMA3_EXTERNAL
+INIT_XMM fma3
+DCA_LFE_FIR 0
+%endif
 
 %macro SETZERO 1
 %if cpuflag(sse2) && notcpuflag(avx)
@@ -292,7 +301,7 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
 %define scale m0
 %if ARCH_X86_32 || WIN64
 %if cpuflag(sse2) && notcpuflag(avx)
-    movd          m0, scalem
+    movd       scale, scalem
     SPLATD        m0
 %else
     VBROADCASTSS  m0, scalem
@@ -311,9 +320,14 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
     sub          r5q, offmp
     and          r5q, -64
     shl          r5q, 2
+%if ARCH_X86_32 || notcpuflag(avx)
     mov         OFFQ, r5q
 %define i        r5q
     mov            i, 16 * 4 - (ARCH_X86_64 + 1) * mmsize  ; main loop counter
+%else
+%define i 0
+%define OFFQ  r5q
+%endif
 
 %define buf2     synth_buf2q
 %if ARCH_X86_32
@@ -332,8 +346,10 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
 %define j        r3q
     mov          win, windowm
     mov         ptr1, synth_bufm
+%if ARCH_X86_32 || notcpuflag(avx)
     add          win, i
     add         ptr1, i
+%endif
 %else ; ARCH_X86_64
 %define ptr1     r6q
 %define ptr2     r7q ; must be loaded
@@ -349,7 +365,9 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
     mov         ptr2, synth_bufmp
     ; prepare the inner loop counter
     mov            j, OFFQ
+%if ARCH_X86_32 || notcpuflag(avx)
     sub         ptr2, i
+%endif
 .loop1:
     INNER_LOOP  0
     jge       .loop1
@@ -394,8 +412,10 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
     mova   [outq + i +  0 * 4 + mmsize], m7
     mova   [outq + i + 16 * 4 + mmsize], m8
 %endif
+%if ARCH_X86_32 || notcpuflag(avx)
     sub            i, (ARCH_X86_64 + 1) * mmsize
     jge    .mainloop
+%endif
     RET
 %endmacro
 
@@ -405,11 +425,7 @@ SYNTH_FILTER
 %endif
 INIT_XMM sse2
 SYNTH_FILTER
-%if HAVE_AVX_EXTERNAL
 INIT_YMM avx
 SYNTH_FILTER
-%endif
-%if HAVE_FMA3_EXTERNAL
 INIT_YMM fma3
 SYNTH_FILTER
-%endif

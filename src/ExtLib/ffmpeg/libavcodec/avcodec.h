@@ -290,6 +290,7 @@ enum AVCodecID {
     AV_CODEC_ID_BRENDER_PIX_DEPRECATED,
     AV_CODEC_ID_PAF_VIDEO_DEPRECATED,
     AV_CODEC_ID_EXR_DEPRECATED,
+    AV_CODEC_ID_VP7_DEPRECATED,
 
     AV_CODEC_ID_BRENDER_PIX= MKBETAG('B','P','I','X'),
     AV_CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
@@ -3607,14 +3608,14 @@ int av_dup_packet(AVPacket *pkt);
  *
  * @return 0 on success, negative AVERROR on fail
  */
-int av_copy_packet(AVPacket *dst, AVPacket *src);
+int av_copy_packet(AVPacket *dst, const AVPacket *src);
 
 /**
  * Copy packet side data
  *
  * @return 0 on success, negative AVERROR on fail
  */
-int av_copy_packet_side_data(AVPacket *dst, AVPacket *src);
+int av_copy_packet_side_data(AVPacket *dst, const AVPacket *src);
 
 /**
  * Free a packet.
@@ -3703,7 +3704,7 @@ void av_packet_free_side_data(AVPacket *pkt);
  *
  * @return 0 on success, a negative AVERROR on error.
  */
-int av_packet_ref(AVPacket *dst, AVPacket *src);
+int av_packet_ref(AVPacket *dst, const AVPacket *src);
 
 /**
  * Wipe the packet.

@@ -16,6 +16,7 @@
 Изменения (*):
 	* Обновлен Немецкий перевод (автор Sylt);
 	* Обновлен Украинский перевод (автор Arestarh1986);
+	* ffmpeg 2.2 git-4ccd7cb4;
 	* libwebp 0.4.0 git-e88150c9;
 	* MediaInfo 0.7.68+ svn rev.6185;
 	* ZenLib 0.4.29+ svn rev.457;
