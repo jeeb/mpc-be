@@ -18,6 +18,7 @@ Added (+):
 Changes (*):
 	* Updated German translation (author: Sylt);
 	* Updated Ukrainian translation (author Arestarh1986);
+	* libwebp 0.4.0 git-e88150c9;
 	* MediaInfo 0.7.68+ svn rev.6185;
 	* ZenLib 0.4.29+ svn rev.457;
 	 ... and many more.
