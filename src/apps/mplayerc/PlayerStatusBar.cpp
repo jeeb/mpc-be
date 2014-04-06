@@ -169,6 +169,7 @@ void CPlayerStatusBar::SetStatusBitmap(UINT id)
 void CPlayerStatusBar::SetStatusMessage(CString str)
 {
 	str.Trim();
+	str.Replace(L"&", L"&&");
 	m_status.SetWindowText(str);
 
 	Relayout();
