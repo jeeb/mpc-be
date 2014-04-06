@@ -115,11 +115,11 @@ BOOL CPPageInterface::OnInitDialog()
 	m_nOSDTransparent		= m_nOSDTransparent_Old		= s.nOSDTransparent;
 	m_OSDBorder				= m_OSDBorder_Old			= s.nOSDBorder;
 
-	m_ThemeBrightnessCtrl.SetRange(0, 100);
-	m_ThemeRedCtrl.SetRange(0, 255);
-	m_ThemeGreenCtrl.SetRange(0, 255);
-	m_ThemeBlueCtrl.SetRange(0, 255);
-	m_OSDTransparentCtrl.SetRange(0, 255);
+	m_ThemeBrightnessCtrl.SetRange	(0, 100, TRUE);
+	m_ThemeRedCtrl.SetRange			(0, 255, TRUE);
+	m_ThemeGreenCtrl.SetRange		(0, 255, TRUE);
+	m_ThemeBlueCtrl.SetRange		(0, 255, TRUE);
+	m_OSDTransparentCtrl.SetRange	(0, 255, TRUE);
 	m_OSDBorderCtrl.SetRange32(0, 5);
 
 	m_fFileNameOnSeekBar	= s.fFileNameOnSeekBar;
