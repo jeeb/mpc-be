@@ -2351,7 +2351,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				_T("MPC-BE playlist (*.mpcpl)|*.mpcpl|Playlist (*.pls)|*.pls|Winamp playlist (*.m3u)|*.m3u|Windows Media playlist (*.asx)|*.asx||"),
 				this);
 
-			fd.m_ofn.lpstrInitialDir = s.strLastOpenDir;
+			fd.m_ofn.lpstrInitialDir = s.strLastSavedPlaylistDir;
 			if (fd.DoModal() != IDOK) {
 				break;
 			}
@@ -2364,6 +2364,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			int idx = fd.m_pOFN->nFilterIndex;
 
 			CPath path(fd.GetPathName());
+			s.strLastSavedPlaylistDir = AddSlash(GetFolderOnly(path));
 
 			switch (idx) {
 				case 1:

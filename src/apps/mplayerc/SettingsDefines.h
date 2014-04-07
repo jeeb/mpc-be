@@ -238,6 +238,7 @@
 #define IDS_RS_MPC_OSD_SIZE					_T("OSD_Size")
 #define IDS_RS_MPC_OSD_FONT					_T("OSD_Font")
 #define IDS_RS_LAST_OPEN_DIR				_T("LastOpenDir")
+#define IDS_RS_LAST_SAVED_PLAYLIST_DIR		_T("LastSavedPlaylistDir")
 #define IDS_RS_ASSOCIATED_WITH_ICON			_T("AssociatedWithIcon")
 
 #define IDS_RS_TOGGLESHADER					_T("ToggleShader")

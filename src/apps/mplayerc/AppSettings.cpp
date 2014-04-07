@@ -606,6 +606,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, fAssociatedWithIcons);
 	// Last Open Dir
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
+	// Last Saved Playlist Dir
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
 	//pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
@@ -1001,7 +1003,9 @@ void CAppSettings::LoadSettings()
 	// Associated types with icon or not...
 	fAssociatedWithIcons = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, 1);
 	// Last Open Dir
-	strLastOpenDir = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, _T("C:\\"));
+	strLastOpenDir = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, L"C:\\");
+	// Last Saved Playlist Dir
+	strLastSavedPlaylistDir = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, L"C:\\");
 
 	if (pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, &ptr, &len)) {
 		if (len == sizeof(AChFR)) {

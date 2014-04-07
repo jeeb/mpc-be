@@ -739,7 +739,9 @@ public:
 	bool			bHidePlaylistFullScreen;
 
 	// OTHER STATES
-	CStringW		strLastOpenDir;
+	CString			strLastOpenDir;
+	CString			strLastSavedPlaylistDir;
+
 	UINT			nLastWindowType;
 	CRect			rcLastWindowPos;
 	UINT			nLastUsedPage;
