@@ -2347,10 +2347,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_SAVEAS: {
 			CSaveTextFileDialog fd(
-				CTextFile::ASCII, NULL, s.strLastOpenDir,
+				CTextFile::UTF8, NULL, NULL,
 				_T("MPC-BE playlist (*.mpcpl)|*.mpcpl|Playlist (*.pls)|*.pls|Winamp playlist (*.m3u)|*.m3u|Windows Media playlist (*.asx)|*.asx||"),
 				this);
 
+			fd.m_ofn.lpstrInitialDir = s.strLastOpenDir;
 			if (fd.DoModal() != IDOK) {
 				break;
 			}
