@@ -39,6 +39,9 @@
     <ClCompile Include="WAVFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WavPackFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="AudioSplitter.def">
@@ -71,6 +74,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WAVFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WavPackFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

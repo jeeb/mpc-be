@@ -207,6 +207,7 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WavPackFile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AudioSplitter.def" />
@@ -223,6 +224,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="WavPackFile.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AudioSplitter.rc">

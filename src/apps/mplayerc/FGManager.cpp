@@ -2019,6 +2019,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
+	if (src[SRC_WAVPACK] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,4,,7776706B"));               // 'wvpk'
+		m_source.AddTail(pFGF);
+	}
+
 	if (src[SRC_WAV] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // 'RIFF....WAVE'
@@ -2135,17 +2141,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (!IsPreview) {
-		if (src[SRC_WAVPACK]) {
-			pFGF = DNew CFGFilterInternal<CWavPackSplitterFilter>(WavPackSplitterName, MERIT64_ABOVE_DSHOW);
-		} else {
-			pFGF = DNew CFGFilterInternal<CWavPackSplitterFilter>(LowMerit(WavPackSplitterName), MERIT64_DO_USE);
-		}
-		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_WAVPACK_Stream);
-		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-		m_transform.AddTail(pFGF);
-	}
-
-	if (!IsPreview) {
 		if (src[SRC_MUSEPACK]) {
 			pFGF = DNew CFGFilterInternal<CMusePackSplitter>(MusePackSplitterName, MERIT64_ABOVE_DSHOW);
 		} else {
@@ -2199,8 +2194,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(
-					(src[SRC_APE] && src[SRC_TAK] && src[SRC_WAV]) ? AudioSplitterName : LowMerit(AudioSplitterName),
-					(src[SRC_APE] && src[SRC_TAK] && src[SRC_WAV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+					(src[SRC_APE] && src[SRC_TAK] && src[SRC_TTA] && src[SRC_WAVPACK] && src[SRC_WAV]) ? AudioSplitterName : LowMerit(AudioSplitterName),
+					(src[SRC_APE] && src[SRC_TAK] && src[SRC_TTA] && src[SRC_WAVPACK] && src[SRC_WAV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 		m_transform.AddTail(pFGF);
 	}
