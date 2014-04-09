@@ -372,7 +372,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hdmisize(0)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
-	, m_bIsBitstreamOutputSupported(FALSE)
 	, m_bHasVideo(TRUE)
 {
 	if (phr) {
@@ -395,6 +394,8 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		delete m_pInput, m_pInput = NULL;
 		return;
 	}
+
+	memset(&m_bBitstreamSupported, 0, sizeof(m_bBitstreamSupported));
 
 //	m_DDstats.Reset();
 
@@ -639,19 +640,21 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	memcpy(m_buff.GetData() + bufflen, pDataIn, len);
 	len += (long)bufflen;
 
-	if (m_bIsBitstreamOutputSupported) {
+	if (m_bBitstreamSupported[SPDIF]) {
 		if (GetSPDIF(ac3) && (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 || subtype == MEDIASUBTYPE_DNET)) {
 			return ProcessAC3_SPDIF();
-		}
-		if (GetSPDIF(eac3) && subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
-			return ProcessEAC3_SPDIF();
-		}
-		if (GetSPDIF(truehd) && subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-			return ProcessTrueHD_SPDIF();
 		}
 		if (GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_DTS2)) {
 			return ProcessDTS_SPDIF();
 		}
+	}
+
+	if (m_bBitstreamSupported[EAC3] && GetSPDIF(eac3) && subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
+		return ProcessEAC3_SPDIF();
+	}
+
+	if (m_bBitstreamSupported[TRUEHD] && GetSPDIF(truehd) && subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
+		return ProcessTrueHD_SPDIF();
 	}
 
 //	if (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 || subtype == MEDIASUBTYPE_DNET) {
@@ -1153,7 +1156,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 			break; // need more data
 		}
 
-		bool usehdmi = sizehd &&  GetSPDIF(dtshd);
+		bool usehdmi = sizehd && GetSPDIF(dtshd) && m_bBitstreamSupported[DTSHD];
 		if (usehdmi) {
 			if (FAILED(hr = DeliverBitstream(p, size + sizehd, IEC61937_DTSHD, aframe.samplerate, aframe.samples))) {
 				return hr;
@@ -1556,7 +1559,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, SampleFormat sfmt, DWORD n
 	ASSERT(nChannels == av_popcount(dwChannelMask));
 
 #if ENABLE_AC3_ENCODER
-	if (m_bIsBitstreamOutputSupported && GetSPDIF(ac3enc) /*&& nChannels > 2*/) { // do not encode mono and stereo
+	if (m_bBitstreamSupported[SPDIF] && GetSPDIF(ac3enc) /*&& nChannels > 2*/) { // do not encode mono and stereo
 		return AC3Encode(pBuff, size, sfmt, nSamplesPerSec, nChannels, dwChannelMask);
 	}
 #endif
@@ -2136,7 +2139,7 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 	{
 		// Checking audio renderer for supporting S/PDIF, Bitstream.
-		m_bIsBitstreamOutputSupported = FALSE;
+		memset(&m_bBitstreamSupported, 0, sizeof(m_bBitstreamSupported));
 
 		CMediaType outputMT;
 		outputMT.InitMediaType();
@@ -2162,31 +2165,43 @@ HRESULT CMpaDecFilter::StartStreaming()
 					FreeMediaType(mt);
 
 					if (outputMT.pbFormat) {
+						// check to support SPDIF/Bitstream output ...
+						WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+						if (wfe == NULL) {
+							FreeMediaType(outputMT);
+						} else {
+
+							CMediaType mt;
+							mt.InitMediaType();
+
+							mt = CreateMediaTypeSPDIF();
+							m_bBitstreamSupported[SPDIF]	= (S_OK == pPin->QueryAccept(&mt));
+							FreeMediaType(mt);
+
+							mt = CreateMediaTypeHDMI(IEC61937_EAC3);
+							m_bBitstreamSupported[EAC3]		= (S_OK == pPin->QueryAccept(&mt));
+							FreeMediaType(mt);
+
+							mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+							m_bBitstreamSupported[TRUEHD]	= (S_OK == pPin->QueryAccept(&mt));
+							FreeMediaType(mt);
+
+							mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+							m_bBitstreamSupported[DTSHD]	= (S_OK == pPin->QueryAccept(&mt));
+							FreeMediaType(mt);
+						}
 						break;
 					}
 				}
 				EndEnumPins
 
 				if (outputMT.pbFormat) {
+					FreeMediaType(outputMT);
 					break;
 				}
 			}
 		}
 
-		if (outputMT.pbFormat) {
-			WAVEFORMATEX *pWaveFormatEx = (WAVEFORMATEX*)outputMT.pbFormat;
-
-			if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
-				m_bIsBitstreamOutputSupported = TRUE;
-			} else if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pWaveFormatEx->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
-				WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
-				m_bIsBitstreamOutputSupported = (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
-												|| wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
-												|| wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP);
-			}
-
-			FreeMediaType(outputMT);
-		}
 	}
 
 	{

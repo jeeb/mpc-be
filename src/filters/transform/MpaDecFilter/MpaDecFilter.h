@@ -112,8 +112,16 @@ protected:
 
 	CFFAudioDecoder m_FFAudioDec;
 
-	BOOL			m_bIsBitstreamOutputSupported;
 	BOOL			m_bHasVideo;
+
+	enum BitstreamType {
+		SPDIF,
+		EAC3,
+		TRUEHD,
+		DTSHD,
+		BTCOUNT
+	};
+	BOOL			m_bBitstreamSupported[BTCOUNT];
 
 #if ENABLE_AC3_ENCODER
 	CAC3Encoder m_AC3Enc;
