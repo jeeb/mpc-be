@@ -311,7 +311,29 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 
 	CheckPointer(pwfx, VFW_E_TYPE_NOT_ACCEPTED);
 
-	return S_OK;
+	WAVEFORMATEX *tmp_pWaveFileFormat = NULL;
+	WAVEFORMATEX *tmp_pWaveFileFormatOutput = NULL;
+
+	if (m_pWaveFileFormat) {
+		CopyWaveFormat(m_pWaveFileFormat, &tmp_pWaveFileFormat);
+	}
+	if (m_pWaveFileFormatOutput) {
+		CopyWaveFormat(m_pWaveFileFormatOutput, &tmp_pWaveFileFormatOutput);
+	}
+
+	hr = SetMediaType(pmt);
+
+	if (tmp_pWaveFileFormat) {
+		CopyWaveFormat(tmp_pWaveFileFormat, &m_pWaveFileFormat);
+	}
+	if (tmp_pWaveFileFormatOutput) {
+		CopyWaveFormat(tmp_pWaveFileFormatOutput, &m_pWaveFileFormatOutput);
+	}
+
+	SAFE_DELETE_ARRAY(tmp_pWaveFileFormat);
+	SAFE_DELETE_ARRAY(tmp_pWaveFileFormatOutput);
+
+	return hr;
 }
 
 HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
@@ -1409,6 +1431,8 @@ bool CMpcAudioRenderer::CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORM
 
 bool CMpcAudioRenderer::CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx)
 {
+	CheckPointer(pSrcWaveFormatEx, false);
+
 	SAFE_DELETE_ARRAY(*ppDestWaveFormatEx);
 
 	size_t size = sizeof(WAVEFORMATEX) + pSrcWaveFormatEx->cbSize; // Always true, even for WAVEFORMATEXTENSIBLE and WAVEFORMATEXTENSIBLE_IEC61937
