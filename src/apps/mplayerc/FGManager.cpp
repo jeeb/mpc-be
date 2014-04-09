@@ -531,7 +531,6 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	AppSettings& s	= AfxGetAppSettings();
 	bool *src		= s.SrcFilters;
 	if ((ext == _T(".amr") && src[SRC_AMR])
-			|| (ext == _T(".wv") && src[SRC_WAVPACK])
 			|| (ext == _T(".mpc") && src[SRC_MUSEPACK])) { // hack for internal Splitter without Source - add File Source (Async) with high merit
 		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
