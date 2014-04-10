@@ -307,31 +307,38 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	WAVEFORMATEX *pwfx = (WAVEFORMATEX *)pmt->Format();
+	CheckPointer(pmt->pbFormat, VFW_E_TYPE_NOT_ACCEPTED);
 
-	CheckPointer(pwfx, VFW_E_TYPE_NOT_ACCEPTED);
+	if (pmt->subtype == MEDIASUBTYPE_PCM) {
+		// Check S/PDIF & Bistream ...
+		BOOL m_bIsBitstreamInput = FALSE;
+		WAVEFORMATEX *pWaveFormatEx = (WAVEFORMATEX*)pmt->pbFormat;
 
-	WAVEFORMATEX *tmp_pWaveFileFormat = NULL;
-	WAVEFORMATEX *tmp_pWaveFileFormatOutput = NULL;
+		if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+			m_bIsBitstreamInput = TRUE;
+		} else if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pWaveFormatEx->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+			WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
+			m_bIsBitstreamInput = (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
+								   || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
+								   || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP);
+		}
 
-	if (m_pWaveFileFormat) {
-		CopyWaveFormat(m_pWaveFileFormat, &tmp_pWaveFileFormat);
+		if (m_bIsBitstreamInput) {
+			if (!m_pAudioClient) {
+				hr = CheckAudioClient((WAVEFORMATEX *)NULL);
+				if (FAILED(hr)) {
+					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckMediaType() - Error on check audio client"));
+					return hr;
+				}
+				if (!m_pAudioClient) {
+					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckMediaType() - Error, audio client not loaded"));
+					return VFW_E_CANNOT_CONNECT;
+				}
+			}
+
+			hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pWaveFormatEx, NULL);
+		}
 	}
-	if (m_pWaveFileFormatOutput) {
-		CopyWaveFormat(m_pWaveFileFormatOutput, &tmp_pWaveFileFormatOutput);
-	}
-
-	hr = SetMediaType(pmt);
-
-	if (tmp_pWaveFileFormat) {
-		CopyWaveFormat(tmp_pWaveFileFormat, &m_pWaveFileFormat);
-	}
-	if (tmp_pWaveFileFormatOutput) {
-		CopyWaveFormat(tmp_pWaveFileFormatOutput, &m_pWaveFileFormatOutput);
-	}
-
-	SAFE_DELETE_ARRAY(tmp_pWaveFileFormat);
-	SAFE_DELETE_ARRAY(tmp_pWaveFileFormatOutput);
 
 	return hr;
 }
