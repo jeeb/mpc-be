@@ -16,6 +16,8 @@ Added (+):
 
 
 Changes (*):
+	* MpaDecFilter - corrected work with DTS-HD streams for output to S / PDIF output, in which case only output DTS core.
+	* MPCAudioRenderer - improved input validation support for media types;
 	* Updated German translation (author: Sylt);
 	* Updated Ukrainian translation (author Arestarh1986);
 	* ffmpeg 2.2 git-e20e854c;
@@ -26,8 +28,10 @@ Changes (*):
 
 
 Fixes (!):
+	! MPCVideoDec - fixed crash in DXVA 2.0 mode on some files (added check for size and overflow DXVA 2.0 buffer);
 	! VSFilter - fixed incorrect handling of font changes;
 	! WASAPI Renderer - Fixed crash if no interface IReferenceClock;
+	! Fixed various bugs related to OSD;
 	 ... and many more.
 
 
