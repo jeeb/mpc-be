@@ -32,7 +32,7 @@ public:
 	virtual ~CDXVADecoderH264_DXVA1();
 
 	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual HRESULT			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
 	virtual void			Flush();
 
 protected :

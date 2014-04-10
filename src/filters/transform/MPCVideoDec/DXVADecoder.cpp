@@ -244,7 +244,8 @@ HRESULT CDXVADecoder::AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, v
 
 			if (SUCCEEDED(hr) && (nSize <= nDXVASize)) {
 				if (CompressedBufferType == DXVA2_BitStreamDateBufferType) {
-					CopyBitstream(pDXVABuffer, (BYTE*)pBuffer, nSize);
+					HRESULT hr2 = CopyBitstream(pDXVABuffer, (BYTE*)pBuffer, nSize, nDXVASize);
+					ASSERT(SUCCEEDED(hr2));
 				} else {
 					memcpy(pDXVABuffer, (BYTE*)pBuffer, nSize);
 				}

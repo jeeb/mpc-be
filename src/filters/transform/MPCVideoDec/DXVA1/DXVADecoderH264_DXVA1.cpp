@@ -83,7 +83,7 @@ void CDXVADecoderH264_DXVA1::Init()
 	Flush();
 }
 
-void CDXVADecoderH264_DXVA1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
+HRESULT CDXVADecoderH264_DXVA1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
 {
 	CH264Nalu	Nalu;
 	UINT		m_nSize		= nSize;
@@ -128,6 +128,8 @@ void CDXVADecoderH264_DXVA1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UIN
 		m_pSliceShort[m_nSlices-1].SliceBytesInBuffer	+= nDummy;
 		nSize											+= nDummy;		
 	}
+
+	return S_OK;
 }
 
 void CDXVADecoderH264_DXVA1::Flush()

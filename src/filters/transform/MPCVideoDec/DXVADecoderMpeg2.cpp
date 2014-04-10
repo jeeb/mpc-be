@@ -60,7 +60,7 @@ void CDXVADecoderMpeg2::Init()
 	Flush();
 }
 
-void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
+HRESULT CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
 {
 	DXVA_MPEG2_Context *ctx_pic		= &m_DXVA_Context.DXVA_MPEG2Context[m_nFieldNum];
 	BYTE* current					= pDXVABuffer;
@@ -81,11 +81,18 @@ void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 				MBCount - slice[0].wNumberMBsInSlice;
 		}
 
+		if ((current - pDXVABuffer) + size > nDXVASize) {
+			nSize = 0;
+			return E_FAIL;
+		}
+
 		memcpy(current, &ctx_pic->bitstream[position], size);
 		current += size;
 	}
 
 	nSize = current - pDXVABuffer;
+
+	return S_OK;
 }
 
 HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)

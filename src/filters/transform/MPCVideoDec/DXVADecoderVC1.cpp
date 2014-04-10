@@ -99,7 +99,7 @@ static BYTE* FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
 	return NULL;
 }
 
-void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
+HRESULT CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
 {
 	if (bSecondField) {
 		memcpy_sse(pDXVABuffer, (BYTE*)pBuffer, nSize);
@@ -135,6 +135,8 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 		memset(pDXVABuffer, 0, nDummy);
 		nSize += nDummy;
 	}
+
+	return S_OK;
 }
 
 HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)

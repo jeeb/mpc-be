@@ -75,7 +75,7 @@ void CDXVADecoderH264::Flush()
 	__super::Flush();
 }
 
-void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
+HRESULT CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
 {
 	DXVA_H264_Context *ctx_pic		= &m_DXVA_Context.DXVA_H264Context[m_nFieldNum];
 	DXVA_Slice_H264_Short *slice	= NULL;
@@ -103,6 +103,11 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 			}
 		}
 
+		if ((current - pDXVABuffer) + (start_code_size + size) > nDXVASize) {
+			nSize = 0;
+			return E_FAIL;
+		}
+
 		memcpy(current, start_code, start_code_size);
 		current += start_code_size;
 
@@ -113,11 +118,19 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 	nSize = current - pDXVABuffer;
 	if (slice && nSize % 128) {
 		UINT padding = 128 - (nSize % 128);
+
+		if (nSize + padding > nDXVASize) {
+			nSize = 0;
+			return E_FAIL;
+		}
+
 		memset(current, 0, padding);
 		nSize += padding;
 
 		slice->SliceBytesInBuffer += padding;
 	}
+
+	return S_OK;
 }
 
 HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)

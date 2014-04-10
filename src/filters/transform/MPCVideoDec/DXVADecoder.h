@@ -90,7 +90,7 @@ public :
 	void						SetDirectXVideoDec(IDirectXVideoDecoder* pDirectXVideoDec) { m_pDirectXVideoDec = pDirectXVideoDec; }
 
 	virtual void				Flush();
-	virtual void				CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize) PURE;
+	virtual HRESULT				CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize = UINT_MAX) PURE;
 	virtual HRESULT				DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) PURE;
 
 	HRESULT						ConfigureDXVA1();
