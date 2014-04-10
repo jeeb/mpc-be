@@ -2166,30 +2166,25 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 					if (outputMT.pbFormat) {
 						// check to support SPDIF/Bitstream output ...
-						WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-						if (wfe == NULL) {
-							FreeMediaType(outputMT);
-						} else {
+						CMediaType mt;
+						mt.InitMediaType();
 
-							CMediaType mt;
-							mt.InitMediaType();
+						mt = CreateMediaTypeSPDIF();
+						m_bBitstreamSupported[SPDIF]	= (S_OK == pPin->QueryAccept(&mt));
+						FreeMediaType(mt);
 
-							mt = CreateMediaTypeSPDIF();
-							m_bBitstreamSupported[SPDIF]	= (S_OK == pPin->QueryAccept(&mt));
-							FreeMediaType(mt);
+						mt = CreateMediaTypeHDMI(IEC61937_EAC3);
+						m_bBitstreamSupported[EAC3]		= (S_OK == pPin->QueryAccept(&mt));
+						FreeMediaType(mt);
 
-							mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-							m_bBitstreamSupported[EAC3]		= (S_OK == pPin->QueryAccept(&mt));
-							FreeMediaType(mt);
+						mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+						m_bBitstreamSupported[TRUEHD]	= (S_OK == pPin->QueryAccept(&mt));
+						FreeMediaType(mt);
 
-							mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-							m_bBitstreamSupported[TRUEHD]	= (S_OK == pPin->QueryAccept(&mt));
-							FreeMediaType(mt);
+						mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+						m_bBitstreamSupported[DTSHD]	= (S_OK == pPin->QueryAccept(&mt));
+						FreeMediaType(mt);
 
-							mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-							m_bBitstreamSupported[DTSHD]	= (S_OK == pPin->QueryAccept(&mt));
-							FreeMediaType(mt);
-						}
 						break;
 					}
 				}
