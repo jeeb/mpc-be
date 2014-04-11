@@ -27,6 +27,15 @@ enum WASAPI_MODE {
 	MODE_NONE
 };
 
+enum BITSTREAM_MODE {
+	BITSTREAM_NONE,
+	BITSTREAM_AC3,
+	BITSTREAM_DTS,
+	BITSTREAM_EAC3,
+	BITSTREAM_TRUEHD,
+	BITSTREAM_DTSHD
+};
+
 interface __declspec(uuid("495D2C66-D430-439b-9DEE-40F9B7929BBA"))
 IMpcAudioRendererFilter :
 public IUnknown {
@@ -42,4 +51,6 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetBitExactOutput()) PURE;
 	STDMETHOD(SetSystemLayoutChannels(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetSystemLayoutChannels()) PURE;
+
+	STDMETHOD_(BITSTREAM_MODE, GetBitstreamMode()) PURE;
 };

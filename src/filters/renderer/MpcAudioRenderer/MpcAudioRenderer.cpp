@@ -85,6 +85,8 @@ CFilterApp theApp;
 
 #endif
 
+#define IsWaveFormatExtensible(wfe) (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))
+
 static GUID lpSoundGUID = {0xdef00000, 0x9c6d, 0x47ed, {0xaa, 0xf1, 0x4d, 0xda, 0x8f, 0x2b, 0x5c, 0x03}}; //DSDEVID_DefaultPlayback from dsound.h
 
 bool CALLBACK DSEnumProc2(LPGUID lpGUID,
@@ -114,7 +116,7 @@ static void DumpWaveFormatEx(WAVEFORMATEX* pwfx)
 	DbgLog((LOG_TRACE, 3, L"		=> nBlockAlign		= %d",	pwfx->nBlockAlign));
 	DbgLog((LOG_TRACE, 3, L"		=> wBitsPerSample	= %d",	pwfx->wBitsPerSample));
 	DbgLog((LOG_TRACE, 3, L"		=> cbSize			= %d",	pwfx->cbSize));
-	if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pwfx->cbSize == sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)) {
+	if (IsWaveFormatExtensible(pwfx)) {
 		WAVEFORMATEXTENSIBLE* wfe = (WAVEFORMATEXTENSIBLE*)pwfx;
 		DbgLog((LOG_TRACE, 3, L"		WAVEFORMATEXTENSIBLE:"));
 		DbgLog((LOG_TRACE, 3, L"			=> wValidBitsPerSample	= %d", wfe->Samples.wValidBitsPerSample));
@@ -316,7 +318,7 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 
 		if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
 			m_bIsBitstreamInput = TRUE;
-		} else if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pWaveFormatEx->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+		} else if (IsWaveFormatExtensible(pWaveFormatEx)) {
 			WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
 			m_bIsBitstreamInput = (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
 								   || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
@@ -791,6 +793,48 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetSystemLayoutChannels()
 	return m_bUseSystemLayoutChannels;
 }
 
+STDMETHODIMP_(BITSTREAM_MODE) CMpcAudioRenderer::GetBitstreamMode()
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	if (m_pGraph && m_bIsBitstream && m_pWaveFileFormatOutput) {
+		if (m_pWaveFileFormatOutput->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+			// AC3/DTS
+			{
+				CAutoLock cRenderLock(&m_csRender);
+				if (m_WasapiQueue.GetCount()) {
+					CAutoPtr<Packet> Packet = m_WasapiQueue.GetLast();
+					if (Packet->GetCount() > 8) {
+						BYTE* pData = Packet->GetData();
+						BYTE IEC61937_type = pData[4];
+						switch (IEC61937_type) {
+							case IEC61937_AC3:
+								return BITSTREAM_AC3;
+							case IEC61937_DTS1:
+							case IEC61937_DTS2:
+							case IEC61937_DTS3:
+								return BITSTREAM_DTS;
+						}
+					}
+				}
+			}
+
+			return BITSTREAM_AC3;
+		} else if (IsWaveFormatExtensible(m_pWaveFileFormatOutput)) {
+			WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
+			if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
+				return BITSTREAM_EAC3;
+			} else if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
+				return BITSTREAM_DTSHD;
+			} else if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
+				return BITSTREAM_TRUEHD;
+			}
+		}
+	}
+
+	return BITSTREAM_NONE;
+}
+
 HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
 {
 	HRESULT hr = S_OK;
@@ -917,7 +961,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		in_samplerate = wfe->nSamplesPerSec;
 		in_samples    = lSize / wfe->nBlockAlign;
 		bool isfloat  = false;
-		if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize >= 22) {
+		if (IsWaveFormatExtensible(wfe)) {
 			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormat;
 			in_layout = wfex->dwChannelMask;
 			isfloat   = !!(wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
@@ -959,7 +1003,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		out_channels   = wfeOutput->nChannels;;
 		out_samplerate = wfeOutput->nSamplesPerSec;
 		isfloat        = false;
-		if (wfeOutput->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfeOutput->cbSize >= 22) {
+		if (IsWaveFormatExtensible(wfeOutput)) {
 			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
 			out_layout = wfex->dwChannelMask;
 			isfloat    = !!(wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
@@ -1398,10 +1442,10 @@ bool CMpcAudioRenderer::IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const
 
 	WAVEFORMATEXTENSIBLE* wfex		= NULL;
 	WAVEFORMATEXTENSIBLE* wfexNew	= NULL;
-	if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pWaveFormatEx->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+	if (IsWaveFormatExtensible(pWaveFormatEx)) {
 		wfex = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
 	}
-	if ((pNewWaveFormatEx)->wFormatTag == WAVE_FORMAT_EXTENSIBLE && (pNewWaveFormatEx)->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+	if (IsWaveFormatExtensible(pNewWaveFormatEx)) {
 		wfexNew	= (WAVEFORMATEXTENSIBLE*)pNewWaveFormatEx;
 	}
 
@@ -1460,7 +1504,7 @@ BOOL CMpcAudioRenderer::IsBitstream(WAVEFORMATEX *pWaveFormatEx)
 		return TRUE;
 	}
 
-	if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pWaveFormatEx->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+	if (IsWaveFormatExtensible(pWaveFormatEx)) {
 		WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
 		return (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
 				|| wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
@@ -1557,7 +1601,7 @@ HRESULT CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE
 		}
 
 		dwChannelMask		= GetDefChannelMask(nChannels);
-		if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pwfx->cbSize == sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)) {
+		if (IsWaveFormatExtensible(pwfx)) {
 			dwChannelMask	= ((WAVEFORMATEXTENSIBLE*)pwfx)->dwChannelMask;
 		}
 

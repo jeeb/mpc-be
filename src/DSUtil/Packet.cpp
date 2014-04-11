@@ -63,6 +63,20 @@ CAutoPtr<Packet> CPacketQueue::Remove()
 	return p;
 }
 
+CAutoPtr<Packet> CPacketQueue::GetFirst()
+{
+	CAutoLock cAutoLock(this);
+	ASSERT(__super::GetCount() > 0);
+	return __super::GetHead();
+}
+
+CAutoPtr<Packet> CPacketQueue::GetLast()
+{
+	CAutoLock cAutoLock(this);
+	ASSERT(__super::GetCount() > 0);
+	return __super::GetTail();
+}
+
 void CPacketQueue::RemoveAll()
 {
 	CAutoLock cAutoLock(this);

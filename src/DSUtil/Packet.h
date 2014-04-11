@@ -58,6 +58,8 @@ public:
 	CPacketQueue();
 	void Add(CAutoPtr<Packet> p);
 	CAutoPtr<Packet> Remove();
+	CAutoPtr<Packet> GetFirst();
+	CAutoPtr<Packet> GetLast();
 	void RemoveAll();
 	size_t GetCount(), GetSize();
 };

@@ -91,17 +91,18 @@ public:
 	STDMETHODIMP				CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
 	// === IMpcAudioRendererFilter
-	STDMETHODIMP				Apply();
-	STDMETHODIMP				SetWasapiMode(INT nValue);
-	STDMETHODIMP_(INT)			GetWasapiMode();
-	STDMETHODIMP				SetSoundDevice(CString nValue);
-	STDMETHODIMP_(CString)		GetSoundDevice();
-	STDMETHODIMP_(UINT)			GetMode();
-	STDMETHODIMP				GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut);
-	STDMETHODIMP				SetBitExactOutput(BOOL nValue);
-	STDMETHODIMP_(BOOL)			GetBitExactOutput();
-	STDMETHODIMP				SetSystemLayoutChannels(BOOL nValue);
-	STDMETHODIMP_(BOOL)			GetSystemLayoutChannels();
+	STDMETHODIMP					Apply();
+	STDMETHODIMP					SetWasapiMode(INT nValue);
+	STDMETHODIMP_(INT)				GetWasapiMode();
+	STDMETHODIMP					SetSoundDevice(CString nValue);
+	STDMETHODIMP_(CString)			GetSoundDevice();
+	STDMETHODIMP_(UINT)				GetMode();
+	STDMETHODIMP					GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut);
+	STDMETHODIMP					SetBitExactOutput(BOOL nValue);
+	STDMETHODIMP_(BOOL)				GetBitExactOutput();
+	STDMETHODIMP					SetSystemLayoutChannels(BOOL nValue);
+	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels();
+	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode();
 
 	// CMpcAudioRenderer
 private:

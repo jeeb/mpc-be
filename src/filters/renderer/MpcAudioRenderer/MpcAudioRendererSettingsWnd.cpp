@@ -275,7 +275,27 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 				m_txtModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
 				break;
 			case MODE_WASAPI_EXCLUSIVE_BITSTREAM :
-				m_txtModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_5));
+				CString btMode_str;
+
+				BITSTREAM_MODE btMode = m_pMAR->GetBitstreamMode();
+				switch (btMode) {
+					case BITSTREAM_AC3 : btMode_str = L"AC3";
+						break;
+					case BITSTREAM_DTS : btMode_str = L"DTS";
+						break;
+					case BITSTREAM_EAC3 : btMode_str = L"E-AC3";
+						break;
+					case BITSTREAM_TRUEHD : btMode_str = L"TrueHD";
+						break;
+					case BITSTREAM_DTSHD : btMode_str = L"DTS-HD";
+						break;
+				}
+
+				CString msg = ResStr(IDS_ARS_WASAPI_MODE_STATUS_5);
+				if (btMode_str.GetLength()) {
+					msg.AppendFormat(L" [%s]", btMode_str);
+				}
+				m_txtModeText.SetWindowText(msg);
 				break;
 		}
 
