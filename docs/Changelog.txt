@@ -26,7 +26,7 @@ Changes (*):
 	* libpng 1.7.0 b35 git-f3b1eb68;
 	* libwebp 0.4.0 git-f0a1f3cd;
 	* MediaInfo 0.7.68+ svn rev.6185;
-	* ZenLib 0.4.29+ svn rev.457;
+	* ZenLib 0.4.29+ svn rev.458;
 	 ... and many more.
 
 
