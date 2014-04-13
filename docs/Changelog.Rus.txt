@@ -22,7 +22,7 @@
 	* Обновлен Украинский перевод (автор Arestarh1986);
 	* ffmpeg 2.2 git-cdd21f1f;
 	* libpng 1.7.0 b35 git-f3b1eb68;
-	* libwebp 0.4.0 git-f0a1f3cd;
+	* libwebp 0.4.0 git-0214f4a9;
 	* MediaInfo 0.7.68+ svn rev.6206;
 	* ZenLib 0.4.29+ svn rev.458;
 	 ... и многое другое.
