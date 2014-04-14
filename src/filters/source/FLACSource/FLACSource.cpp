@@ -30,6 +30,7 @@
 #include "FLACSource.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/CUE.h"
+#include "../../../DSUtil/ID3Tag.h"
 #include <libflac/src/libflac/include/protected/stream_decoder.h>
 
 #define _DECODER_   (FLAC__StreamDecoder*)m_pDecoder
@@ -202,6 +203,41 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		FLAC__stream_decoder_get_decode_position(_DECODER_, &m_llOffset);
 
+		CID3Tag* pID3Tag = NULL;
+
+		ULONGLONG pos = m_file.GetPosition();
+		m_file.Seek(0, CFile::begin);
+		DWORD id = 0;
+		if ((3 == m_file.Read(&id, 3)) && (id == FCC('ID3\0'))) {
+			BYTE major = 0;
+			m_file.Read(&major, sizeof(major));
+			BYTE revision = 0;
+			m_file.Read(&revision, sizeof(revision));
+			UNREFERENCED_PARAMETER(revision);
+			BYTE flags = 0;
+			m_file.Read(&flags, sizeof(flags));
+			UNREFERENCED_PARAMETER(flags);
+
+			DWORD size;
+			m_file.Read(&size, sizeof(size));
+			size = FCC(size);
+			size = (((size & 0x7F000000) >> 0x03) |
+					((size & 0x007F0000) >> 0x02) |
+					((size & 0x00007F00) >> 0x01) |
+					((size & 0x0000007F)		));
+
+			if (major <= 4) {
+				BYTE* buf = DNew BYTE[size];
+				m_file.Read(buf, size);
+
+				pID3Tag = DNew CID3Tag(major);
+				pID3Tag->ReadTagsV2(buf, size);
+				delete [] buf;
+			}
+		}
+
+		m_file.Seek(pos, CFile::begin);
+
 		if (file_info.got_vorbis_comments) {
 			CString Title	= file_info.title;
 			CString Year	= file_info.year;
@@ -217,6 +253,31 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		if (m_Cover.GetCount()) {
 			((CFLACSource*)m_pFilter)->ResAppend(L"cover.jpg", L"cover", m_CoverMime, m_Cover.GetData(), (DWORD)m_Cover.GetCount(), 0);
+		} else if (pID3Tag) {
+			BOOL bResAppend = FALSE;
+
+			POSITION pos = pID3Tag->TagItems.GetHeadPosition();
+			while (pos && !bResAppend) {
+				CID3TagItem* item = pID3Tag->TagItems.GetNext(pos);
+				if (item->GetType() == ID3Type::ID3_TYPE_BINARY && item->GetDataLen()) {
+					CString mime = item->GetMime();
+					CString fname;
+					if (mime == L"image/jpeg") {
+						fname = L"cover.jpg";
+					} else if (mime == L"image/png") {
+						fname = L"cover.png";
+					} else {
+						fname.Replace(L"image/", L"cover.");
+					}
+
+					HRESULT hr2 = ((CFLACSource*)m_pFilter)->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0);
+					bResAppend = SUCCEEDED(hr2);
+				}
+			}
+		}
+
+		if (pID3Tag) {
+			delete pID3Tag;
 		}
 
 		hr = S_OK;

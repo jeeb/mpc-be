@@ -133,42 +133,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->GetDuration();
 
-	CStringW str, title;
-	if (m_pFile->m_tags.Lookup('TIT2', str) || m_pFile->m_tags.Lookup('\0TT2', str)) {
-		title = str;
-	}
-	if (m_pFile->m_tags.Lookup('TYER', str) && !title.IsEmpty() && !str.IsEmpty()) {
-		title += L" (" + str + L")";
-	}
-	if (!title.IsEmpty()) {
-		SetProperty(L"TITL", title);
-	}
-	if (m_pFile->m_tags.Lookup('TPE1', str) || m_pFile->m_tags.Lookup('\0TP1', str)) {
-		SetProperty(L"AUTH", str);
-	}
-	if (m_pFile->m_tags.Lookup('TCOP', str)) {
-		SetProperty(L"CPYR", str);
-	}
-	if (m_pFile->m_tags.Lookup('COMM', str)) {
-		SetProperty(L"DESC", str);
-	}
-	if (m_pFile->m_tags.Lookup('USLT', str) || m_pFile->m_tags.Lookup('\0ULT', str)) {
-		SetProperty(L"LYRICS", str);
-	}
-	if (m_pFile->m_tags.Lookup('TALB', str) || m_pFile->m_tags.Lookup('\0TAL', str)) {
-		SetProperty(L"ALBUM", str);
-	}
-
-	if (m_pFile->m_Cover.GetCount()) {
-		CString f_name = _T("cover");
-		if (m_pFile->m_CoverMime == _T("image/jpeg")) {
-			f_name.Append(_T(".jpg"));
-		} else if (m_pFile->m_CoverMime == _T("image/png")) {
-			f_name.Append(_T(".png"));
-		}
-		ResAppend(f_name, _T("cover"), m_pFile->m_CoverMime, m_pFile->m_Cover.GetData(), (DWORD)m_pFile->m_Cover.GetCount());
-		m_pFile->m_Cover.RemoveAll();
-	}
+	SetID3TagProperties(this, m_pFile->ID3Tag);
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }

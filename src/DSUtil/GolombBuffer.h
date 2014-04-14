@@ -49,6 +49,7 @@ public:
 	BYTE*			GetBufferPos() { return m_pBuffer + m_nBitPos; };
 
 	void			SkipBytes(int nCount);
+	void			Seek(int nPos);
 
 private :
 	BYTE*		m_pBuffer;

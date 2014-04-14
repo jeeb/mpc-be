@@ -56,8 +56,8 @@ UINT64 CGolombBuffer::BitRead(int nBits, bool fPeek)
 	}
 
 	if (!fPeek) {
-		m_bitbuff &= ((1ui64 << bitlen) - 1);
-		m_bitlen = bitlen;
+		m_bitbuff	&= ((1ui64 << bitlen) - 1);
+		m_bitlen	= bitlen;
 	}
 
 	return ret;
@@ -128,6 +128,13 @@ void CGolombBuffer::Reset(BYTE* pNewBuffer, int nNewSize)
 void CGolombBuffer::SkipBytes(int nCount)
 {
 	m_nBitPos  += nCount;
+	m_bitlen	= 0;
+	m_bitbuff	= 0;
+}
+
+void CGolombBuffer::Seek(int nCount)
+{
+	m_nBitPos	= nCount;
 	m_bitlen	= 0;
 	m_bitbuff	= 0;
 }

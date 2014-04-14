@@ -22,6 +22,7 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
+#include "../../../DSUtil/ID3Tag.h"
 
 class CMpaSplitterFile : public CBaseSplitterFileEx
 {
@@ -47,10 +48,9 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 
 public:
 	CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr);
+	virtual ~CMpaSplitterFile();
 
-	CAtlMap<DWORD, CStringW> m_tags;
-	CAtlArray<BYTE> m_Cover;
-	CString m_CoverMime;
+	CID3Tag* ID3Tag;
 
 	const CMediaType& GetMediaType() {
 		return m_mt;
