@@ -502,6 +502,12 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<Packet> p)
 				start++;
 				continue;
 			}
+
+			const WAVEFORMATEX *wfe = GetFormatHelper(wfe, &m_mt);
+			if (wfe->nChannels != aframe.channels || wfe->nSamplesPerSec != aframe.samplerate) {
+				start++;
+				continue;
+			}
 			if (start + size > end) {
 				break;
 			}
