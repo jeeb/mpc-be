@@ -57,11 +57,13 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY, CStringA& palette);
 
+	CString FormatStreamName(CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type);
+
 	REFERENCE_TIME m_rtPlaylistDuration;
 	REFERENCE_TIME m_rtMin, m_rtMax;
 
 private:
-	CString m_csAudioLanguageOrder, m_csSubtitlesLanguageOrder;
+	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
 	bool m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;

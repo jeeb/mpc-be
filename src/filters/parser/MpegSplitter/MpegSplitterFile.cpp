@@ -817,11 +817,13 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				const CHdmvClipInfo::Stream *pClipInfo;
 				const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
 				if ((type == stream_type::unknown) && (pProgram != NULL) && AUDIO_STREAM_AC3_TRUE_HD == pProgram->streams[iProgram].type) {
-					const stream* source = m_streams[stream_type::audio].FindStream(s.pid);
+					stream* source = (stream*)m_streams[stream_type::audio].FindStream(s.pid);
 					if (source && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 						ac3hdr h;
 						if (Read(h, len, &s.mt, false, false) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-							m_streams[stream_type::audio].Replace((stream&)*source, s);
+							source->mts.push_back(s.mt);
+							source->mts.push_back(source->mt);
+							source->mt = s.mt;
 						}
 					}
 				}

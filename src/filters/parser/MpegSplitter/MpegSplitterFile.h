@@ -161,7 +161,7 @@ public:
 			}
 		}
 
-		static CStringW ToString(int type) {
+		static CString ToString(int type) {
 			return
 				type == video	? L"Video" :
 				type == audio	? L"Audio" :
