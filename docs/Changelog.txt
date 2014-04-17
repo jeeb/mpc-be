@@ -26,7 +26,7 @@ Changes (*):
 	* ffmpeg 2.2 git-a3bd33af;
 	* libpng 1.7.0 b35 git-f3b1eb68;
 	* libwebp 0.4.0 git-0214f4a9;
-	* MediaInfo 0.7.68+ svn rev.6206;
+	* MediaInfo 0.7.68+ svn rev.6212;
 	* ZenLib 0.4.29+ svn rev.458;
 	 ... and many more.
 

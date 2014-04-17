@@ -913,6 +913,9 @@ ScanType;Type de balayage
 ScanType_Original;Type de balayage original
 ScanOrder;Ordre de balayage
 ScanOrder_Original;Ordre original de balayage
+ScanOrder_Stored;Ordre stocké de balayage
+ScanOrder_StoredDisplayedInverted;Ordre de balayage invversé entre affiché/stocké
+ScanOrder_StoreMethod;Ordre de balayage, mode d'enregistrement
 ScreenplayBy;Joué par
 Season;Saison
 see below;voir ci-dessous
