@@ -14963,7 +14963,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 			if (MI.Open(mi_fn.GetString())) {
 				CString strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate"), Info_Text, Info_Name).c_str();
-				if (strFPS.IsEmpty() || wcstod(strFPS, NULL) > 200.0) {
+				if (strFPS.IsEmpty() || _wtof(strFPS) > 200.0) {
 					strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate_Original"), Info_Text, Info_Name).c_str();
 				}
 				CString strST = MI.Get(Stream_Video, 0, _T("ScanType"), Info_Text, Info_Name).c_str();
@@ -14978,8 +14978,10 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					// double fps for Interlaced video.
 					nFactor = 2;
 				}
-				miFPS	= wcstod(strFPS, NULL);
-				miFPS  *= nFactor;
+				miFPS	= _wtof(strFPS);
+				if (miFPS < 30.0) {
+					miFPS  *= nFactor;
+				}
 				s.dFPS	= miFPS;
 
 				AutoChangeMonitorMode();
