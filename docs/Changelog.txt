@@ -21,6 +21,7 @@ Changes (*):
 	* Updated German translation (author: Sylt);
 	* updated Dutch translation (author beter);
 	* updated Chinese (Traditional) translation (author beter);
+	* updated Chinese (Simplified) translation (author insolo);
 	* Updated Ukrainian translation (author Arestarh1986);
 	* ffmpeg 2.2 git-cdd21f1f;
 	* libpng 1.7.0 b35 git-f3b1eb68;

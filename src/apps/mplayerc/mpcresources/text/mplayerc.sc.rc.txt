@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
+5		"使用内建的字幕渲染器"
 6		"当外部字幕存在时优先使用外部字幕"
 8		"不载入内嵌字幕"
 10		"自动载入路径"
@@ -1788,7 +1788,7 @@ STRING IDS_OSD_RS_WAIT_OFF		"等待 GPU 刷新: 关"
 STRING IDS_OSD_RS_WAIT_ON		"等待 GPU 刷新: 开"
 STRING IDS_OSD_SATURATION		"饱和度: %s"
 STRING IDS_OSD_SPEED		"速度: %.2lfx"
-STRING IDS_OSD_TEST		"OSD Test"
+STRING IDS_OSD_TEST		"OSD 测试"
 STRING IDS_OSD_THUMBS_SAVED		"缩略图已成功保存"
 STRING IDS_OSD_ZOOM		"缩放: %.0lf%%"
 STRING IDS_OSD_ZOOM_AUTO		"缩放: 自动"
