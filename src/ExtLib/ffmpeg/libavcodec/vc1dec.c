@@ -6529,7 +6529,9 @@ AVCodec ff_wmv3image_decoder = {
     .close          = ff_vc1_decode_end,
     .decode         = vc1_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .flush          = vc1_sprite_flush,
+    // ==> Start patch MPC
+    //.flush          = vc1_sprite_flush,
+    // ==> end patch MPC
     .pix_fmts       = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
         AV_PIX_FMT_NONE
@@ -6548,7 +6550,9 @@ AVCodec ff_vc1image_decoder = {
     .close          = ff_vc1_decode_end,
     .decode         = vc1_decode_frame,
     .capabilities   = CODEC_CAP_DR1,
-    .flush          = vc1_sprite_flush,
+    // ==> Start patch MPC
+    //.flush          = vc1_sprite_flush,
+    // ==> end patch MPC
     .pix_fmts       = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUV420P,
         AV_PIX_FMT_NONE
