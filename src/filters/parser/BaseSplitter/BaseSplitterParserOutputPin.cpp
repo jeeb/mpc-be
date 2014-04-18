@@ -45,12 +45,23 @@ CBaseSplitterParserOutputPin::CBaseSplitterParserOutputPin(CAtlArray<CMediaType>
 	, m_fHasAccessUnitDelimiters(false)
 	, m_bFlushed(false)
 	, m_truehd_framelength(0)
+	, m_nChannels(0)
+	, m_nSamplesPerSec(0)
 {
 }
 
 CBaseSplitterParserOutputPin::~CBaseSplitterParserOutputPin()
 {
 	Flush();
+}
+
+void CBaseSplitterParserOutputPin::InitAudioParams()
+{
+	if (m_mt.pbFormat) {
+		const WAVEFORMATEX *wfe	= GetFormatHelper(wfe, &m_mt);
+		m_nChannels				= wfe->nChannels;
+		m_nSamplesPerSec		= wfe->nSamplesPerSec;
+	}
 }
 
 HRESULT CBaseSplitterParserOutputPin::Flush()
@@ -64,6 +75,8 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 	m_truehd_framelength	= 0;
 
 	m_hdmvLPCM.Clear();
+
+	InitAudioParams();
 
 	return S_OK;
 }
@@ -154,6 +167,10 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			SetMediaType((CMediaType*)p->pmt);
 			Flush();
 		}
+	}
+
+	if (m_mt.majortype == MEDIATYPE_Audio && (!m_nChannels || !m_nSamplesPerSec)) {
+		InitAudioParams();
 	}
 
 	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) { // special code for aac, the currently available decoders only like whole frame samples
@@ -503,8 +520,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<Packet> p)
 				continue;
 			}
 
-			const WAVEFORMATEX *wfe = GetFormatHelper(wfe, &m_mt);
-			if (wfe->nChannels != aframe.channels || wfe->nSamplesPerSec != aframe.samplerate) {
+			if (m_nChannels != aframe.channels || m_nSamplesPerSec != aframe.samplerate) {
 				start++;
 				continue;
 			}

@@ -46,6 +46,9 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 		}
 	} m_hdmvLPCM;
 
+	WORD	m_nChannels;
+	DWORD	m_nSamplesPerSec;
+
 protected:
 	HRESULT DeliverPacket(CAutoPtr<Packet> p);
 	HRESULT DeliverEndFlush();
@@ -61,6 +64,8 @@ protected:
 	HRESULT ParseTrueHD(CAutoPtr<Packet> p);
 	HRESULT ParseDirac(CAutoPtr<Packet> p);
 	HRESULT ParseVobSub(CAutoPtr<Packet> p);
+
+	void InitAudioParams();
 public:
 	CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets = 1);
 	virtual ~CBaseSplitterParserOutputPin();
