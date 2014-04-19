@@ -180,7 +180,7 @@ static double BitsEntropyCombined(const int* const X, const int* const Y,
   return BitsEntropyRefine(nonzeros, sum, max_val, retval);
 }
 
-static WEBP_INLINE double InitialHuffmanCost(void) {
+static double InitialHuffmanCost(void) {
   // Small bias because Huffman code length is typically not stored in
   // full length.
   static const int kHuffmanCodeOfHuffmanCodeSize = CODE_LENGTH_CODES * 3;
@@ -188,61 +188,29 @@ static WEBP_INLINE double InitialHuffmanCost(void) {
   return kHuffmanCodeOfHuffmanCodeSize - kSmallBias;
 }
 
-static WEBP_INLINE double HuffmanCostRefine(int streak, int val) {
-  double retval;
-  if (streak > 3) {
-    if (val == 0) {
-      retval = 1.5625 + 0.234375 * streak;
-    } else {
-      retval = 2.578125 + 0.703125 * streak;
-    }
-  } else {
-    if (val == 0) {
-      retval = 1.796875 * streak;
-    } else {
-      retval = 3.28125 * streak;
-    }
-  }
+// Finalize the Huffman cost based on streak numbers and length type (<3 or >=3)
+static double FinalHuffmanCost(const VP8LStreaks* const stats) {
+  double retval = InitialHuffmanCost();
+  retval += stats->counts[0] * 1.5625 + 0.234375 * stats->streaks[0][1];
+  retval += stats->counts[1] * 2.578125 + 0.703125 * stats->streaks[1][1];
+  retval += 1.796875 * stats->streaks[0][0];
+  retval += 3.28125 * stats->streaks[1][0];
   return retval;
 }
 
-// Returns the cost encode the rle-encoded entropy code.
-// The constants in this function are experimental.
+// Trampolines
 static double HuffmanCost(const int* const population, int length) {
-  int streak = 0;
-  int i = 0;
-  double retval = InitialHuffmanCost();
-  for (; i < length - 1; ++i) {
-    ++streak;
-    if (population[i] == population[i + 1]) {
-      continue;
-    }
-    retval += HuffmanCostRefine(streak, population[i]);
-    streak = 0;
-  }
-  retval += HuffmanCostRefine(++streak, population[i]);
-  return retval;
+  const VP8LStreaks stats = VP8LHuffmanCostCount(population, length);
+  return FinalHuffmanCost(&stats);
 }
 
 static double HuffmanCostCombined(const int* const X, const int* const Y,
                                   int length) {
-  int streak = 0;
-  int i = 0;
-  double retval = InitialHuffmanCost();
-  for (; i < length - 1; ++i) {
-    const int xy = X[i] + Y[i];
-    const int xy_next = X[i + 1] + Y[i + 1];
-    ++streak;
-    if (xy == xy_next) {
-      continue;
-    }
-    retval += HuffmanCostRefine(streak, xy);
-    streak = 0;
-  }
-  retval += HuffmanCostRefine(++streak, X[i] + Y[i]);
-  return retval;
+  const VP8LStreaks stats = VP8LHuffmanCostCombinedCount(X, Y, length);
+  return FinalHuffmanCost(&stats);
 }
 
+// Aggregated costs
 static double PopulationCost(const int* const population, int length) {
   return BitsEntropy(population, length) + HuffmanCost(population, length);
 }
@@ -250,24 +218,6 @@ static double PopulationCost(const int* const population, int length) {
 static double GetCombinedEntropy(const int* const X, const int* const Y,
                                  int length) {
   return BitsEntropyCombined(X, Y, length) + HuffmanCostCombined(X, Y, length);
-}
-
-static double ExtraCost(const int* const population, int length) {
-  int i;
-  double cost = 0.;
-  for (i = 2; i < length - 2; ++i) cost += (i >> 1) * population[i + 2];
-  return cost;
-}
-
-static double ExtraCostCombined(const int* const X, const int* const Y,
-                                int length) {
-  int i;
-  double cost = 0.;
-  for (i = 2; i < length - 2; ++i) {
-    const int xy = X[i + 2] + Y[i + 2];
-    cost += (i >> 1) * xy;
-  }
-  return cost;
 }
 
 // Estimates the Entropy + Huffman + other block overhead size cost.
@@ -278,8 +228,8 @@ double VP8LHistogramEstimateBits(const VP8LHistogram* const p) {
       + PopulationCost(p->blue_, 256)
       + PopulationCost(p->alpha_, 256)
       + PopulationCost(p->distance_, NUM_DISTANCE_CODES)
-      + ExtraCost(p->literal_ + 256, NUM_LENGTH_CODES)
-      + ExtraCost(p->distance_, NUM_DISTANCE_CODES);
+      + VP8LExtraCost(p->literal_ + 256, NUM_LENGTH_CODES)
+      + VP8LExtraCost(p->distance_, NUM_DISTANCE_CODES);
 }
 
 double VP8LHistogramEstimateBitsBulk(const VP8LHistogram* const p) {
@@ -289,8 +239,8 @@ double VP8LHistogramEstimateBitsBulk(const VP8LHistogram* const p) {
       + BitsEntropy(p->blue_, 256)
       + BitsEntropy(p->alpha_, 256)
       + BitsEntropy(p->distance_, NUM_DISTANCE_CODES)
-      + ExtraCost(p->literal_ + 256, NUM_LENGTH_CODES)
-      + ExtraCost(p->distance_, NUM_DISTANCE_CODES);
+      + VP8LExtraCost(p->literal_ + 256, NUM_LENGTH_CODES)
+      + VP8LExtraCost(p->distance_, NUM_DISTANCE_CODES);
 }
 
 // -----------------------------------------------------------------------------
@@ -322,8 +272,8 @@ static int GetCombinedHistogramEntropy(const VP8LHistogram* const a,
                                                         b->palette_code_bits_;
   *cost += GetCombinedEntropy(a->literal_, b->literal_,
                               VP8LHistogramNumCodes(palette_code_bits));
-  *cost += ExtraCostCombined(a->literal_ + 256, b->literal_ + 256,
-                             NUM_LENGTH_CODES);
+  *cost += VP8LExtraCostCombined(a->literal_ + 256, b->literal_ + 256,
+                                 NUM_LENGTH_CODES);
   if (*cost > cost_threshold) return 0;
 
   *cost += GetCombinedEntropy(a->red_, b->red_, 256);
@@ -336,7 +286,8 @@ static int GetCombinedHistogramEntropy(const VP8LHistogram* const a,
   if (*cost > cost_threshold) return 0;
 
   *cost += GetCombinedEntropy(a->distance_, b->distance_, NUM_DISTANCE_CODES);
-  *cost += ExtraCostCombined(a->distance_, b->distance_, NUM_DISTANCE_CODES);
+  *cost += VP8LExtraCostCombined(a->distance_, b->distance_,
+                                 NUM_DISTANCE_CODES);
   if (*cost > cost_threshold) return 0;
 
   return 1;
@@ -426,10 +377,10 @@ static void UpdateHistogramCost(VP8LHistogram* const h) {
   const double alpha_cost = PopulationCost(h->alpha_, 256);
   const double distance_cost =
       PopulationCost(h->distance_, NUM_DISTANCE_CODES) +
-      ExtraCost(h->distance_, NUM_DISTANCE_CODES);
+      VP8LExtraCost(h->distance_, NUM_DISTANCE_CODES);
   const int num_codes = VP8LHistogramNumCodes(h->palette_code_bits_);
   h->literal_cost_ = PopulationCost(h->literal_, num_codes) +
-                     ExtraCost(h->literal_ + 256, NUM_LENGTH_CODES);
+                     VP8LExtraCost(h->literal_ + 256, NUM_LENGTH_CODES);
   h->red_cost_ = PopulationCost(h->red_, 256);
   h->blue_cost_ = PopulationCost(h->blue_, 256);
   h->bit_cost_ = h->literal_cost_ + h->red_cost_ + h->blue_cost_ +
