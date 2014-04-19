@@ -27,6 +27,7 @@ Changes (*):
 	* libpng 1.7.0 b35 git-f3b1eb68;
 	* libwebp 0.4.0 git-b1dabe37;
 	* MediaInfo 0.7.68+ svn rev.6212;
+	* Little-CMS 2.7 beta git-1948a466;
 	* ZenLib 0.4.29+ svn rev.458;
 	 ... and many more.
 
