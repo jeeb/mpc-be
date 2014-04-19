@@ -6011,7 +6011,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                         // <== End patch MPC
                         )
                         buf_start_second_field = start;
-                    tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
+                    tmp = av_realloc_array(slices, sizeof(*slices), (n_slices+1));
                     if (!tmp)
                         goto err;
                     slices = tmp;
@@ -6036,7 +6036,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                     break;
                 case VC1_CODE_SLICE: {
                     int buf_size3;
-                    tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
+                    tmp = av_realloc_array(slices, sizeof(*slices), (n_slices+1));
                     if (!tmp)
                         goto err;
                     slices = tmp;
@@ -6069,7 +6069,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                     // <== End patch MPC
                     )
                     buf_start_second_field = divider;
-                tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
+                tmp = av_realloc_array(slices, sizeof(*slices), (n_slices+1));
                 if (!tmp)
                     goto err;
                 slices = tmp;
