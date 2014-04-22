@@ -1894,67 +1894,27 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 			return false;
 		}
 
-		/*
-		// Calculate size of extra data
-		int extra = 0;
-		for (int i = 0; i < 4; i++) {
-			if (h.spspps[i].complete) {
-				extra += 2 + (h.spspps[i].size);
-			}
-		}
+		BOOL bIsAVC = FALSE;
 
-		pmt->majortype					= MEDIATYPE_Video;
-		pmt->formattype					= FORMAT_MPEG2_VIDEO;
+		pmt->majortype						= MEDIATYPE_Video;
+		pmt->formattype						= FORMAT_MPEG2_VIDEO;
 		if (h.spspps[index_subsetsps].complete && !h.spspps[index_sps].complete) {
-			pmt->subtype				= FOURCCMap('CVME');	// MVC stream without base view
+			pmt->subtype					= FOURCCMap(FCC('EMVC'));	// MVC stream without base view
+			bIsAVC							= TRUE;
 		} else if (h.spspps[index_subsetsps].complete && h.spspps[index_sps].complete) {
-			pmt->subtype				= FOURCCMap('CVMA');	// MVC stream with base view
+			pmt->subtype					= FOURCCMap(FCC('AMVC'));	// MVC stream with base view
+			bIsAVC							= TRUE;
 		} else {
-			pmt->subtype				= FOURCCMap('1CVA');	// AVC stream
+			pmt->subtype					= FOURCCMap(FCC('H264'));	// AVC stream
 		}
-
-		int len = FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra;
-		MPEG2VIDEOINFO* vi				= (MPEG2VIDEOINFO*)DNew BYTE[len];
-		memset(vi, 0, len);
-		
-		vi->hdr.AvgTimePerFrame			= h.hdr.AvgTimePerFrame;
-		vi->hdr.dwPictAspectRatioX		= aspect.cx;
-		vi->hdr.dwPictAspectRatioY		= aspect.cy;
-		vi->hdr.bmiHeader.biSize		= sizeof(vi->hdr.bmiHeader);
-		vi->hdr.bmiHeader.biWidth		= h.hdr.width;
-		vi->hdr.bmiHeader.biHeight		= h.hdr.height;
-		vi->hdr.bmiHeader.biCompression	= pmt->subtype.Data1;
-		vi->dwProfile					= h.hdr.profile;
-		vi->dwFlags						= 4; // ?
-		vi->dwLevel						= h.hdr.level;
-		vi->cbSequenceHeader			= extra;
-
-		// Copy extra data
-		BYTE* p = (BYTE*)&vi->dwSequenceHeader[0];
-		for (int i = 0; i < 4; i++) {
-			if (h.spspps[i].complete) {
-				*p++ = (h.spspps[i].size) >> 8;
-				*p++ = (h.spspps[i].size) & 0xff;
-				memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
-				p += h.spspps[i].size;
-			}
-		}
-		
-		pmt->SetFormat((BYTE*)vi, len);
-		delete [] vi;
-		*/
 
 		// Calculate size of extra data
 		DWORD extra = 0;
 		for (int i = 0; i < 4; i++) {
 			if (h.spspps[i].complete) {
-				extra += 4 + (h.spspps[i].size);
+				extra += (bIsAVC ? 2 : 4) + (h.spspps[i].size);
 			}
 		}
-
-		pmt->majortype						= MEDIATYPE_Video;
-		pmt->formattype						= FORMAT_MPEG2_VIDEO;
-		pmt->subtype						= FOURCCMap(FCC('H264'));
 
 		MPEG2VIDEOINFO* mp2vi				= (MPEG2VIDEOINFO*)pmt->AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra);
 		memset(pmt->Format(), 0, pmt->FormatLength());
@@ -1974,9 +1934,16 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		BYTE* p = (BYTE*)&mp2vi->dwSequenceHeader[0];
 		for (int i = 0; i < 4; i++) {
 			if (h.spspps[i].complete) {
-				*p++ = 0x00; *p++ = 0x00; *p++ = 0x00; *p++ = 0x01;
-				memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
-				p += h.spspps[i].size;
+				if (bIsAVC) {
+					*p++ = (h.spspps[i].size) >> 8;
+					*p++ = (h.spspps[i].size) & 0xff;
+					memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
+					p += h.spspps[i].size;
+				} else {
+					*p++ = 0x00; *p++ = 0x00; *p++ = 0x00; *p++ = 0x01;
+					memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
+					p += h.spspps[i].size;
+				}
 			}
 		}
 	}
