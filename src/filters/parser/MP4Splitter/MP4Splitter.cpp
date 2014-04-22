@@ -33,6 +33,7 @@
 
 #include <Bento4/Core/Ap4.h>
 #include <Bento4/Core/Ap4File.h>
+#include <Bento4/Core/Ap4SttsAtom.h>
 #include <Bento4/Core/Ap4StssAtom.h>
 #include <Bento4/Core/Ap4StsdAtom.h>
 #include <Bento4/Core/Ap4IsmaCryp.h>
@@ -290,6 +291,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
 
 			REFERENCE_TIME AvgTimePerFrame = item->GetData()->GetSampleCount() ? item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()) : 0;
+			if (track->GetType() == AP4_Track::TYPE_VIDEO) {
+				if (AP4_SttsAtom* stts = dynamic_cast<AP4_SttsAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stts"))) {
+					AP4_Duration totalDuration	= stts->GetTotalDuration();
+					AP4_UI32 totalFrames		= stts->GetTotalFrames();
+					if (totalFrames) {
+						AvgTimePerFrame = 10000000.0 / track->GetMediaTimeScale() * totalDuration / totalFrames;
+					}
+				}
+			}
 
 			CAtlArray<CMediaType> mts;
 
