@@ -263,7 +263,6 @@ IF /I "%SIGN%" == "True" (
   CALL :SubSign %DIR% mpc-be*.exe
   CALL :SubSign %DIR% mpciconlib*.dll
 )
-  CALL :SubCopyDxDLL
 
 TITLE Compiling MPCBEShellExt - %BUILDCFG%...
 "%MSBUILD%" MPCBEShellExt%SLN%.sln %MSBUILD_SWITCHES%^
@@ -505,16 +504,6 @@ FOR /F "delims=" %%A IN (
   'REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\7-Zip" /v "Path" 2^>Nul ^| FIND "REG_SZ"') DO (
   SET "SEVENZIP_REG=%%A" & CALL :SubSevenzipPath %%SEVENZIP_REG:*REG_SZ=%%
 )
-EXIT /B
-
-:SubCopyDxDLL
-IF /I "%PLATFORM%" == "x64" (
-    COPY /Y /V "distrib\DirectX\x64\D3DCompiler_43.dll"    "%BIN%\mpc-be_x64\*.dll" >NUL
-    COPY /Y /V "distrib\DirectX\x64\d3dx9_43.dll"          "%BIN%\mpc-be_x64\*.dll" >NUL
-    ) ELSE (
-    COPY /Y /V "distrib\DirectX\x86\D3DCompiler_43.dll"    "%BIN%\mpc-be_x86\*.dll" >NUL
-    COPY /Y /V "distrib\DirectX\x86\d3dx9_43.dll"          "%BIN%\mpc-be_x86\*.dll" >NUL
-    )
 EXIT /B
 
 :ShowHelp
