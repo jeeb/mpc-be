@@ -644,6 +644,15 @@
     <ClInclude Include="MediaInfo\MediaInfo_Config_PerPackage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_ArriRaw.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_Dds.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_OpenMG.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1230,6 +1239,15 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\MediaInfo_Config_PerPackage.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_ArriRaw.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_Dds.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_OpenMG.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

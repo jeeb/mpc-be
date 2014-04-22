@@ -121,6 +121,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Mpc.h" />
     <ClInclude Include="MediaInfo\Audio\File_MpcSv8.h" />
     <ClInclude Include="MediaInfo\Audio\File_Mpega.h" />
+    <ClInclude Include="MediaInfo\Audio\File_OpenMG.h" />
     <ClInclude Include="MediaInfo\Audio\File_Opus.h" />
     <ClInclude Include="MediaInfo\Audio\File_Pcm.h" />
     <ClInclude Include="MediaInfo\Audio\File_Pcm_M2ts.h" />
@@ -138,6 +139,8 @@
     <ClInclude Include="MediaInfo\Audio\File_Vorbis.h" />
     <ClInclude Include="MediaInfo\Audio\File_Wvpk.h" />
     <ClInclude Include="MediaInfo\Export\Export_EbuCore.h" />
+    <ClInclude Include="MediaInfo\Image\File_ArriRaw.h" />
+    <ClInclude Include="MediaInfo\Image\File_Dds.h" />
     <ClInclude Include="MediaInfo\Image\File_Pcx.h" />
     <ClInclude Include="MediaInfo\Image\File_Psd.h" />
     <ClInclude Include="MediaInfo\MediaInfo_Config_PerPackage.h" />
@@ -325,6 +328,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Mpc.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_MpcSv8.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Mpega.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_OpenMG.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Opus.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Pcm.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Pcm_M2ts.cpp" />
@@ -359,7 +363,9 @@
     <ClCompile Include="MediaInfo\File__Base.cpp" />
     <ClCompile Include="MediaInfo\File__Duplicate.cpp" />
     <ClCompile Include="MediaInfo\File__MultipleParsing.cpp" />
+    <ClCompile Include="MediaInfo\Image\File_ArriRaw.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Bmp.cpp" />
+    <ClCompile Include="MediaInfo\Image\File_Dds.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Dpx.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Exr.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Gif.cpp" />
