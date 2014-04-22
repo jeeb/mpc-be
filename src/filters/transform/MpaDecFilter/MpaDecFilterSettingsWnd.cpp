@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "MpaDecFilterSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/SysVersion.h"
 
 //
 // CMpaDecSettingsWnd
@@ -140,6 +141,15 @@ bool CMpaDecSettingsWnd::OnActivate()
 #endif
 	OnDTSCheck();
 
+	if (!IsWinVistaOrLater()) {
+		m_spdif_eac3_check.EnableWindow(FALSE);
+		m_spdif_eac3_check.SetCheck(0);
+		m_spdif_truehd_check.EnableWindow(FALSE);
+		m_spdif_truehd_check.SetCheck(0);
+		m_spdif_dtshd_check.EnableWindow(FALSE);
+		m_spdif_dtshd_check.SetCheck(0);
+	}
+
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
@@ -252,5 +262,5 @@ void CMpaDecSettingsWnd::OnMixerCheck()
 
 void CMpaDecSettingsWnd::OnDTSCheck()
 {
-	m_spdif_dtshd_check.EnableWindow(!!m_spdif_dts_check.GetCheck());
+	m_spdif_dtshd_check.EnableWindow(!!m_spdif_dts_check.GetCheck() && IsWinVistaOrLater());
 }
