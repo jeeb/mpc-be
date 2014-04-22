@@ -133,13 +133,28 @@
     }\
 }
 
-// ==> Start patch MPC
-#ifdef __GNUC__
-#include "libm.h"
-#endif
-// <== End patch MPC
+#define FF_ALLOC_ARRAY_OR_GOTO(ctx, p, nelem, elsize, label)\
+{\
+    p = av_malloc_array(nelem, elsize);\
+    if (p == NULL) {\
+        av_log(ctx, AV_LOG_ERROR, "Cannot allocate memory.\n");\
+        goto label;\
+    }\
+}
+
+#define FF_ALLOCZ_ARRAY_OR_GOTO(ctx, p, nelem, elsize, label)\
+{\
+    p = av_mallocz_array(nelem, elsize);\
+    if (p == NULL) {\
+        av_log(ctx, AV_LOG_ERROR, "Cannot allocate memory.\n");\
+        goto label;\
+    }\
+}
+
 // ==> Start patch MPC
 /**
+#include "libm.h"
+
 #if defined(_MSC_VER)
 #pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_strtod")
 #pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_snprintf")

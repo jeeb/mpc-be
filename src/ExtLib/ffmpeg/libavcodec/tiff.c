@@ -221,7 +221,7 @@ static int add_metadata(int count, int type,
 {
     switch(type) {
     case TIFF_DOUBLE: return ff_tadd_doubles_metadata(count, name, sep, &s->gb, s->le, avpriv_frame_get_metadatap(frame));
-    case TIFF_SHORT : return ff_tadd_shorts_metadata(count, name, sep, &s->gb, s->le, avpriv_frame_get_metadatap(frame));
+    case TIFF_SHORT : return ff_tadd_shorts_metadata(count, name, sep, &s->gb, s->le, 0, avpriv_frame_get_metadatap(frame));
     case TIFF_STRING: return ff_tadd_string_metadata(count, name, &s->gb, s->le, avpriv_frame_get_metadatap(frame));
     default         : return AVERROR_INVALIDDATA;
     };
@@ -838,7 +838,7 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
             s->geotag_count = 0;
             return -1;
         }
-        s->geotags = av_mallocz(sizeof(TiffGeoTag) * s->geotag_count);
+        s->geotags = av_mallocz_array(s->geotag_count, sizeof(TiffGeoTag));
         if (!s->geotags) {
             av_log(s->avctx, AV_LOG_ERROR, "Error allocating temporary buffer\n");
             s->geotag_count = 0;
@@ -860,7 +860,7 @@ static int tiff_decode_tag(TiffContext *s, AVFrame *frame)
             return AVERROR_INVALIDDATA;
         if (bytestream2_get_bytes_left(&s->gb) < count * sizeof(int64_t))
             return AVERROR_INVALIDDATA;
-        dp = av_malloc(count * sizeof(double));
+        dp = av_malloc_array(count, sizeof(double));
         if (!dp) {
             av_log(s->avctx, AV_LOG_ERROR, "Error allocating temporary buffer\n");
             goto end;

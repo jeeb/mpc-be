@@ -285,6 +285,7 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     switch (s->pix_fmt) {
     case AV_PIX_FMT_YUV420P:
     case AV_PIX_FMT_YUYV422:
+    case AV_PIX_FMT_YVYU422:
     case AV_PIX_FMT_UYVY422:
     case AV_PIX_FMT_YUV422P:
     case AV_PIX_FMT_YUV440P:
@@ -2708,7 +2709,10 @@ static enum AVCodecID remap_deprecated_codec_id(enum AVCodecID id)
         case AV_CODEC_ID_PAF_VIDEO_DEPRECATED           : return AV_CODEC_ID_PAF_VIDEO;
         case AV_CODEC_ID_WEBP_DEPRECATED                : return AV_CODEC_ID_WEBP;
         case AV_CODEC_ID_HEVC_DEPRECATED                : return AV_CODEC_ID_HEVC;
+        case AV_CODEC_ID_MVC1_DEPRECATED                : return AV_CODEC_ID_MVC1;
+        case AV_CODEC_ID_MVC2_DEPRECATED                : return AV_CODEC_ID_MVC2;
         case AV_CODEC_ID_SANM_DEPRECATED                : return AV_CODEC_ID_SANM;
+        case AV_CODEC_ID_SGIRLE_DEPRECATED              : return AV_CODEC_ID_SGIRLE;
         case AV_CODEC_ID_VP7_DEPRECATED                 : return AV_CODEC_ID_VP7;
         default                                         : return id;
     }
