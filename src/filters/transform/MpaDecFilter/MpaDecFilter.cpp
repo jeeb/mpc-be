@@ -30,6 +30,7 @@
 #include "AudioHelper.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/SysVersion.h"
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
@@ -2118,60 +2119,57 @@ HRESULT CMpaDecFilter::StartStreaming()
 		// Checking audio renderer for supporting S/PDIF, Bitstream.
 		memset(&m_bBitstreamSupported, 0, sizeof(m_bBitstreamSupported));
 
-		CMediaType outputMT;
-		outputMT.InitMediaType();
+		if (IsWinVistaOrLater()) {
+			BOOL bFilterFound = FALSE;
 
-		IBaseFilter* pBF = GetDownStreamFilter(this, GetDownStreamPin(this, m_pOutput->GetConnected()));
-		while (pBF) {
-			IPin* pPin = GetFirstPin(pBF, PINDIR_OUTPUT);
-			if (pPin) {
-				pBF = GetDownStreamFilter(pBF, pPin);
-			} else {
-				// found the last filter in the filter chain ...
-				BeginEnumPins(pBF, pEP, pPin) {
-					AM_MEDIA_TYPE mt;
+			IBaseFilter* pBF = GetDownStreamFilter(this, GetDownStreamPin(this, m_pOutput->GetConnected()));
+			while (pBF && !bFilterFound) {
+				IPin* pPin = GetFirstPin(pBF, PINDIR_OUTPUT);
+				if (pPin) {
+					pBF = GetDownStreamFilter(pBF, pPin);
+				} else {
+					// found the last filter in the filter chain ...
+					BeginEnumPins(pBF, pEP, pPin) {
+						AM_MEDIA_TYPE mt;
 
-					if (S_OK != pPin->ConnectionMediaType(&mt)) {
-						continue;
+						if (S_OK != pPin->ConnectionMediaType(&mt)) {
+							continue;
+						}
+
+						if (mt.majortype == MEDIATYPE_Audio) {
+							bFilterFound = TRUE;
+						}
+
+						FreeMediaType(mt);
+
+						if (bFilterFound) {
+							CMediaType cmt;
+							cmt.InitMediaType();
+
+							cmt = CreateMediaTypeSPDIF();
+							m_bBitstreamSupported[SPDIF]	= (S_OK == pPin->QueryAccept(&cmt));
+							FreeMediaType(cmt);
+
+							cmt = CreateMediaTypeHDMI(IEC61937_EAC3);
+							m_bBitstreamSupported[EAC3]		= (S_OK == pPin->QueryAccept(&cmt));
+							FreeMediaType(cmt);
+
+							cmt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+							m_bBitstreamSupported[TRUEHD]	= (S_OK == pPin->QueryAccept(&cmt));
+							FreeMediaType(cmt);
+
+							cmt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+							m_bBitstreamSupported[DTSHD]	= (S_OK == pPin->QueryAccept(&cmt));
+							FreeMediaType(cmt);
+
+							break;
+						}
 					}
-
-					if (mt.majortype == MEDIATYPE_Audio) {
-						outputMT = CMediaType(mt);
-					}
-
-					FreeMediaType(mt);
-
-					if (outputMT.pbFormat) {
-						// check to support SPDIF/Bitstream output ...
-						CMediaType mt;
-						mt.InitMediaType();
-
-						mt = CreateMediaTypeSPDIF();
-						m_bBitstreamSupported[SPDIF]	= (S_OK == pPin->QueryAccept(&mt));
-						FreeMediaType(mt);
-
-						mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-						m_bBitstreamSupported[EAC3]		= (S_OK == pPin->QueryAccept(&mt));
-						FreeMediaType(mt);
-
-						mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-						m_bBitstreamSupported[TRUEHD]	= (S_OK == pPin->QueryAccept(&mt));
-						FreeMediaType(mt);
-
-						mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-						m_bBitstreamSupported[DTSHD]	= (S_OK == pPin->QueryAccept(&mt));
-						FreeMediaType(mt);
-
-						break;
-					}
-				}
-				EndEnumPins
-
-				if (outputMT.pbFormat) {
-					FreeMediaType(outputMT);
-					break;
+					EndEnumPins
 				}
 			}
+		} else {
+			m_bBitstreamSupported[SPDIF] = TRUE;
 		}
 
 	}
