@@ -119,6 +119,7 @@ protected:
 		EAC3,
 		TRUEHD,
 		DTSHD,
+		DTSFORCE,
 		BTCOUNT
 	};
 	BOOL			m_bBitstreamSupported[BTCOUNT];
@@ -176,6 +177,7 @@ public:
 	HRESULT StopStreaming();
 
 	HRESULT SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt);
+	HRESULT CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePin);
 
 	// ISpecifyPropertyPages2
 

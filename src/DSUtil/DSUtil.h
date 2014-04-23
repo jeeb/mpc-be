@@ -359,3 +359,5 @@ enum {
 	IEC61937_EAC3               = 0x15,          ///< E-AC-3 data
 	IEC61937_TRUEHD             = 0x16,          ///< TrueHD data
 };
+
+#define IsWaveFormatExtensible(wfe) (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))

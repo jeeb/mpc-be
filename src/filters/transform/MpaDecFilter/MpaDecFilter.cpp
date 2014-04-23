@@ -1134,6 +1134,17 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 			break; // need more data
 		}
 
+		if (GetSPDIF(dtshd) && !m_bBitstreamSupported[DTSHD] && !m_bBitstreamSupported[DTSFORCE]) {
+			CMediaType mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+			HRESULT hr = m_pOutput->GetConnected()->QueryAccept(&mt);
+
+			if (hr == S_OK) {
+				m_bBitstreamSupported[DTSHD] = TRUE;
+			} else {
+				m_bBitstreamSupported[DTSFORCE] = TRUE;
+			}
+		}
+
 		bool usehdmi = sizehd && GetSPDIF(dtshd) && m_bBitstreamSupported[DTSHD];
 		if (usehdmi) {
 			if (FAILED(hr = DeliverBitstream(p, size + sizehd, IEC61937_DTSHD, aframe.samplerate, aframe.samples))) {
@@ -2116,65 +2127,6 @@ HRESULT CMpaDecFilter::StartStreaming()
 	m_fDiscontinuity = false;
 
 	{
-		// Checking audio renderer for supporting S/PDIF, Bitstream.
-		memset(&m_bBitstreamSupported, 0, sizeof(m_bBitstreamSupported));
-
-		if (IsWinVistaOrLater()) {
-			BOOL bFilterFound = FALSE;
-
-			IBaseFilter* pBF = GetDownStreamFilter(this, GetDownStreamPin(this, m_pOutput->GetConnected()));
-			while (pBF && !bFilterFound) {
-				IPin* pPin = GetFirstPin(pBF, PINDIR_OUTPUT);
-				if (pPin) {
-					pBF = GetDownStreamFilter(pBF, pPin);
-				} else {
-					// found the last filter in the filter chain ...
-					BeginEnumPins(pBF, pEP, pPin) {
-						AM_MEDIA_TYPE mt;
-
-						if (S_OK != pPin->ConnectionMediaType(&mt)) {
-							continue;
-						}
-
-						if (mt.majortype == MEDIATYPE_Audio) {
-							bFilterFound = TRUE;
-						}
-
-						FreeMediaType(mt);
-
-						if (bFilterFound) {
-							CMediaType cmt;
-							cmt.InitMediaType();
-
-							cmt = CreateMediaTypeSPDIF();
-							m_bBitstreamSupported[SPDIF]	= (S_OK == pPin->QueryAccept(&cmt));
-							FreeMediaType(cmt);
-
-							cmt = CreateMediaTypeHDMI(IEC61937_EAC3);
-							m_bBitstreamSupported[EAC3]		= (S_OK == pPin->QueryAccept(&cmt));
-							FreeMediaType(cmt);
-
-							cmt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-							m_bBitstreamSupported[TRUEHD]	= (S_OK == pPin->QueryAccept(&cmt));
-							FreeMediaType(cmt);
-
-							cmt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-							m_bBitstreamSupported[DTSHD]	= (S_OK == pPin->QueryAccept(&cmt));
-							FreeMediaType(cmt);
-
-							break;
-						}
-					}
-					EndEnumPins
-				}
-			}
-		} else {
-			m_bBitstreamSupported[SPDIF] = TRUE;
-		}
-
-	}
-
-	{
 		BOOL b_HasVideo = FALSE;
 		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
 			if (GetCLSID(pFilter) == GUIDFromCString(_T("{09144FD6-BB29-11DB-96F1-005056C00008}"))) { // PBDA DTFilter
@@ -2223,6 +2175,29 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 	}
 
 	return __super::SetMediaType(dir, pmt);
+}
+
+HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePin)
+{
+	if (direction == PINDIR_OUTPUT) {
+		memset(&m_bBitstreamSupported, 0, sizeof(m_bBitstreamSupported));
+
+		CMediaType mt;
+		if (SUCCEEDED(pReceivePin->ConnectionMediaType(&mt)) && mt.pbFormat) {
+			WAVEFORMATEX *pWaveFormatEx = (WAVEFORMATEX*)mt.pbFormat;
+			m_bBitstreamSupported[SPDIF] = pWaveFormatEx->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF;
+
+			if (IsWaveFormatExtensible(pWaveFormatEx)) {
+				WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
+
+				m_bBitstreamSupported[EAC3]		= wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS;
+				m_bBitstreamSupported[TRUEHD]	= wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP;
+				m_bBitstreamSupported[DTSHD]	= wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD;
+			}
+		}
+	}
+
+	return __super::CompleteConnect(direction, pReceivePin);
 }
 
 // IMpaDecFilter
