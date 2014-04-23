@@ -1052,7 +1052,20 @@ HRESULT CStreamSwitcherOutputPin::BreakConnect()
 HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 {
 	m_pPinConnection = CComQIPtr<IPinConnection>(pReceivePin);
-	return __super::CompleteConnect(pReceivePin);
+	HRESULT hr = __super::CompleteConnect(pReceivePin);
+
+	CStreamSwitcherInputPin* pIn = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetInputPin();
+	CMediaType mt;
+	if (SUCCEEDED(hr) && pIn && pIn->IsConnected()
+			&& SUCCEEDED(pIn->GetConnected()->ConnectionMediaType(&mt)) && m_mt != mt) {
+		if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
+			hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
+		} else {
+			hr = VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	}
+
+	return hr;
 }
 
 HRESULT CStreamSwitcherOutputPin::CheckMediaType(const CMediaType* pmt)
