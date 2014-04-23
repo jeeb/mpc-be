@@ -3008,6 +3008,8 @@ void audioFormatTypeHandler(const BYTE *format, const GUID *formattype, DWORD *p
 
 HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)
 {
+	CheckPointer(extra, E_POINTER);
+
 	RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
 
 	mt->majortype					= MEDIATYPE_Video;
@@ -3021,12 +3023,15 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 	pm2vi->hdr.dwPictAspectRatioY	= aspect.cy;
 	pm2vi->hdr.AvgTimePerFrame		= AvgTimePerFrame;
 	pm2vi->hdr.rcSource				= pm2vi->hdr.rcTarget = rc;
+	pm2vi->cbSequenceHeader			= 0;
 
-	pm2vi->cbSequenceHeader = 0;
+	if (!extralen) {
+		return E_FAIL;
+	}
 
 	HRESULT hr = S_OK;
 
-	if (extra[0] == 1) {
+	if (extra[0] == 1 && extralen > 5) {
 		pm2vi->dwProfile	= extra[1];
 		pm2vi->dwLevel		= extra[3];
 		pm2vi->dwFlags		= (extra[4] & 3) + 1;

@@ -191,6 +191,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return hr;
 	}
 
+	CMatroskaNode Root(m_pFile);
+	if (!m_pFile
+			|| !(m_pSegment = Root.Child(MATROSKA_ID_SEGMENT))
+			|| !(m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER))) {
+		return E_FAIL;
+	}
+
+
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
