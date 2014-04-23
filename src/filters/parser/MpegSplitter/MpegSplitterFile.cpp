@@ -841,9 +841,15 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			if (b >= 0x80 && b < 0x88 || w == 0x0b77) { // ac3
 				s.ps1id = (b >= 0x80 && b < 0x88) ? (BYTE)(BitRead(32) >> 24) : 0x80;
 
-				ac3hdr h;
-				if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt)) {
-					type = stream_type::audio;
+				ac3hdr h = { 0 };
+				if (!m_streams[stream_type::audio].Find(s)) {
+					if (Read(h, len, &s.mt)) {
+						if (m_ac3Valid[nPid].IsValid()) {
+							type = stream_type::audio;
+						} else {
+							m_ac3Valid[nPid].Handle(h);
+						}
+					}
 				}
 			} else if (b >= 0x88 && b < 0x90 || dw == 0x7ffe8001) { // dts
 				s.ps1id = (b >= 0x88 && b < 0x90) ? (BYTE)(BitRead(32) >> 24) : 0x88;
@@ -937,7 +943,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 				if (w == 0x0b77) {
 					ac3hdr h;
-					if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt)) {
+					if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt, false)) {
 						type = stream_type::audio;
 					}
 				} else if (w == 0x0000) { // usually zero...
