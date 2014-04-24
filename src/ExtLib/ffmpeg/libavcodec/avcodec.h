@@ -484,6 +484,7 @@ enum AVCodecID {
     AV_CODEC_ID_TAK_DEPRECATED,
     AV_CODEC_ID_METASOUND,
     AV_CODEC_ID_PAF_AUDIO_DEPRECATED,
+    AV_CODEC_ID_ON2AVC,
     AV_CODEC_ID_FFWAVESYNTH = MKBETAG('F','F','W','S'),
     AV_CODEC_ID_SONIC       = MKBETAG('S','O','N','C'),
     AV_CODEC_ID_SONIC_LS    = MKBETAG('S','O','N','L'),
@@ -2260,7 +2261,7 @@ typedef struct AVCodecContext {
 
     /**
      * ratecontrol qmin qmax limiting method
-     * 0-> clipping, 1-> use a nice continuous function to limit qscale wthin qmin/qmax.
+     * 0-> clipping, 1-> use a nice continuous function to limit qscale within qmin/qmax.
      * - encoding: Set by user.
      * - decoding: unused
      */
@@ -2355,14 +2356,14 @@ typedef struct AVCodecContext {
     int context_model;
 
     /**
-     * minimum Lagrange multipler
+     * minimum Lagrange multiplier
      * - encoding: Set by user.
      * - decoding: unused
      */
     int lmin;
 
     /**
-     * maximum Lagrange multipler
+     * maximum Lagrange multiplier
      * - encoding: Set by user.
      * - decoding: unused
      */
@@ -2587,7 +2588,7 @@ typedef struct AVCodecContext {
 #define AV_EF_EXPLODE   (1<<3)          ///< abort decoding on minor error detection
 
 #define AV_EF_CAREFUL    (1<<16)        ///< consider things that violate the spec, are fast to calculate and have not been seen in the wild as errors
-#define AV_EF_COMPLIANT  (1<<17)        ///< consider all spec non compliancies as errors
+#define AV_EF_COMPLIANT  (1<<17)        ///< consider all spec non compliances as errors
 #define AV_EF_AGGRESSIVE (1<<18)        ///< consider things that a sane encoder should not do as an error
 
 
@@ -2777,7 +2778,7 @@ typedef struct AVCodecContext {
 #endif
 
     /**
-     * noise vs. sse weight for the nsse comparsion function
+     * noise vs. sse weight for the nsse comparison function
      * - encoding: Set by user.
      * - decoding: unused
      */
