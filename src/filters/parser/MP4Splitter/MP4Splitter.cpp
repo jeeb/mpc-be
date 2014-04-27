@@ -631,14 +631,16 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biBitCount		= 24;
 
 					if (Aspect == CSize(0, 0)) {
+						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+								Aspect.cx = pbmi.biWidth * pasp->GetNum();
+								Aspect.cy = pbmi.biHeight * pasp->GetDen();
+							}
+						}
+					}
+					if (Aspect == CSize(0, 0)) {
 						Aspect.cx = pbmi.biWidth;
 						Aspect.cy = pbmi.biHeight;
-					}
-					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-							Aspect.cx *= pasp->GetNum();
-							Aspect.cy *= pasp->GetDen();
-						}
 					}
 					ReduceDim(Aspect);
 					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
@@ -669,14 +671,16 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biBitCount		= 24;
 
 					if (Aspect == CSize(0, 0)) {
+						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+								Aspect.cx = pbmi.biWidth * pasp->GetNum();
+								Aspect.cy = pbmi.biHeight * pasp->GetDen();
+							}
+						}
+					}
+					if (Aspect == CSize(0, 0)) {
 						Aspect.cx = pbmi.biWidth;
 						Aspect.cy = pbmi.biHeight;
-					}
-					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-							Aspect.cx *= pasp->GetNum();
-							Aspect.cy *= pasp->GetDen();
-						}
 					}
 					ReduceDim(Aspect);
 					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
