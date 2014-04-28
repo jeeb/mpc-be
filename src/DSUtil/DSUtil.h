@@ -166,7 +166,7 @@ extern void				TraceFilterInfo(IBaseFilter* pBF);
 extern void				TracePinInfo(IPin* pPin);
 
 extern void				SetThreadName( DWORD dwThreadID, LPCSTR szThreadName);
-extern void				CorrectComboListWidth(CComboBox& m_pComboBox);
+extern void				CorrectComboListWidth(CComboBox& pComboBox);
 
 extern void				getExtraData(const BYTE *format, const GUID *formattype, const size_t formatlen, BYTE *extra, unsigned int *extralen);
 extern void				audioFormatTypeHandler(const BYTE *format, const GUID *formattype, DWORD *pnSamples, WORD *pnChannels, WORD *pnBitsPerSample, WORD *pnBlockAlign, DWORD *pnBytesPerSec);
@@ -181,6 +181,9 @@ extern void				CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts,
 
 extern CStringA			VobSubDefHeader(int w, int h, CStringA palette = "");
 extern void				CorrectWaveFormatEx(CMediaType *pmt);
+
+extern void				ReduceDim(LONG& num, LONG& den);
+extern void				ReduceDim(SIZE &dim);
 
 typedef enum FF_FIELD_TYPE{
 	PICT_NONE,
@@ -287,37 +290,6 @@ static CUnknown* WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT* phr)
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if (p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
-
-inline int LNKO(int a, int b)
-{
-	if (a == 0 || b == 0) {
-		return 1;
-	}
-	while (a != b) {
-		if (a < b) {
-			b -= a;
-		} else if (a > b) {
-			a -= b;
-		}
-	}
-	return a;
-}
-
-inline void ReduceDim(int& a, int& b)
-{
-	int lnko = LNKO(a, b);
-	if (lnko > 1) {
-		a /= lnko, b /= lnko;
-	}
-}
-
-inline void ReduceDim(SIZE &dim)
-{
-	int lnko = LNKO(dim.cx, dim.cy);
-	if (lnko > 1) {
-		dim.cx /= lnko, dim.cy /= lnko;
-	}
-}
 
 #ifndef uint8
 	typedef unsigned char		uint8;

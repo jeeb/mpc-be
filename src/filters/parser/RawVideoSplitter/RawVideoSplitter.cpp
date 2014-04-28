@@ -196,8 +196,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		int    height		= 0;
 		int    fpsnum		= 24;
 		int    fpsden		= 1;
-		int    sar_x		= 1;
-		int    sar_y		= 1;
+		LONG   sar_x		= 1;
+		LONG   sar_y		= 1;
 		FOURCC fourcc		= FCC('I420'); // 4:2:0 - I420 by default
 		FOURCC fourcc_2		= 0;
 		WORD   bpp			= 12;
