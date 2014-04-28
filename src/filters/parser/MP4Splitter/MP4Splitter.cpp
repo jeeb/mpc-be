@@ -630,12 +630,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biPlanes		= 1;
 					pbmi.biBitCount		= 24;
 
-					if (Aspect == CSize(0, 0)) {
-						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-								Aspect.cx = pbmi.biWidth * pasp->GetNum();
-								Aspect.cy = pbmi.biHeight * pasp->GetDen();
-							}
+					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+							Aspect.cx = pbmi.biWidth * pasp->GetNum();
+							Aspect.cy = pbmi.biHeight * pasp->GetDen();
 						}
 					}
 					if (Aspect == CSize(0, 0)) {
@@ -670,12 +668,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biPlanes		= 1;
 					pbmi.biBitCount		= 24;
 
-					if (Aspect == CSize(0, 0)) {
-						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-								Aspect.cx = pbmi.biWidth * pasp->GetNum();
-								Aspect.cy = pbmi.biHeight * pasp->GetDen();
-							}
+					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+							Aspect.cx = pbmi.biWidth * pasp->GetNum();
+							Aspect.cy = pbmi.biHeight * pasp->GetDen();
 						}
 					}
 					if (Aspect == CSize(0, 0)) {
@@ -775,8 +771,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
 							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-								Aspect.cx *= pasp->GetNum();
-								Aspect.cy *= pasp->GetDen();
+								Aspect.cx = vih2->bmiHeader.biWidth * pasp->GetNum();
+								Aspect.cy = vih2->bmiHeader.biHeight * pasp->GetDen();
 								ReduceDim(Aspect);
 							}
 						}
