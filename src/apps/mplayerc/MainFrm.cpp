@@ -549,7 +549,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_NAVIGATION, OnUpdateViewNavigation)
 
 	// Subtitle position
-	ON_COMMAND_RANGE(ID_SUB_POS_UP, ID_SUB_POS_RIGHT, OnSubtitlePos)
+	ON_COMMAND_RANGE(ID_SUB_POS_UP, IDS_SUB_POS_RESTORE, OnSubtitlePos)
 
 	ON_WM_WTSSESSION_CHANGE()
 END_MESSAGE_MAP()
@@ -11392,6 +11392,10 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 				break;
 			case ID_SUB_POS_RIGHT:
 				s.m_RenderersSettings.nShiftPos.x++;
+				break;
+			case ID_SUB_POS_RESTORE:
+				s.m_RenderersSettings.nShiftPos.x = 0;
+				s.m_RenderersSettings.nShiftPos.y = 0;
 				break;
 		}
 

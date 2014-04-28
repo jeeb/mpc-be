@@ -266,10 +266,6 @@
 #define ID_CUSTOM_CHANNEL_MAPPING       993
 #define ID_NORMALIZE                    994
 #define ID_REGAIN_VOLUME                995
-#define ID_SUB_POS_UP                   996
-#define ID_SUB_POS_DOWN                 997
-#define ID_SUB_POS_LEFT                 998
-#define ID_SUB_POS_RIGHT                999
 #define ID_MENU_NAVIGATE_AUDIO          1000
 #define ID_MENU_NAVIGATE_SUBTITLES      1001
 #define ID_MENU_NAVIGATE_JUMPTO         1002
@@ -348,6 +344,12 @@
 #define ID_AFTERPLAYBACK_EXIT               1077
 #define ID_AFTERPLAYBACK_NEXT               1078
 #define ID_AFTERPLAYBACK_EVERYTIMEDONOTHING 1079
+
+#define ID_SUB_POS_UP                   1100
+#define ID_SUB_POS_DOWN                 1101
+#define ID_SUB_POS_LEFT                 1102
+#define ID_SUB_POS_RIGHT                1103
+#define ID_SUB_POS_RESTORE              1104
 //
 #define ID_FILTERS_SUBITEM_START        2000
 #define ID_FILTERS_SUBITEM_END          2099
@@ -1248,10 +1250,11 @@
 #define IDS_SUBTITLES_STEREO_SIDEBYSIDE   34002
 #define IDS_SUBTITLES_STEREO_TOPANDBOTTOM 34003
 // subtitle position
-#define IDS_SUB_POS_UP					34010
-#define IDS_SUB_POS_DOWN				34011
-#define IDS_SUB_POS_LEFT				34012
-#define IDS_SUB_POS_RIGHT				34013
+#define IDS_SUB_POS_UP                  34010
+#define IDS_SUB_POS_DOWN                34011
+#define IDS_SUB_POS_LEFT                34012
+#define IDS_SUB_POS_RIGHT               34013
+#define IDS_SUB_POS_RESTORE             34014
 // video files
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002

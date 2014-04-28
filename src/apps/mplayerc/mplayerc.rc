@@ -3531,6 +3531,7 @@ BEGIN
     IDS_SUB_POS_DOWN                    "Subtitle shift positions down"
     IDS_SUB_POS_LEFT                    "Subtitle shift positions left"
     IDS_SUB_POS_RIGHT                   "Subtitle shift positions right"
+    IDS_SUB_POS_RESTORE                 "Restore the position of subtitles"
 END
 
 STRINGTABLE
