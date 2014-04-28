@@ -6371,12 +6371,9 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 			const int MAX_FILE_SIZE_BUFFER = 65;
 			WCHAR szFileSize[MAX_FILE_SIZE_BUFFER];
 			StrFormatByteSizeW(size, szFileSize, MAX_FILE_SIZE_BUFFER);
-			CStringW strByteSize;
-			strByteSize.Format(_T("%I64d"), size);
-			for (int i = strByteSize.GetLength() - 3; i > 0; i -= 3) {
-				strByteSize.Insert(i, L'\x00A0');
-			}
-			fs.Format(ResStr(IDS_MAINFRM_58), szFileSize, strByteSize);
+			CString szByteSize;
+			szByteSize.Format(L"%I64d", size);
+			fs.Format(ResStr(IDS_MAINFRM_58), szFileSize, FormatNumber(szByteSize));
 		}
 
 		CStringW ar;

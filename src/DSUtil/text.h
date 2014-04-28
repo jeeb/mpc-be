@@ -84,3 +84,5 @@ extern CAtlList<CString>& MakeLower(CAtlList<CString>& sl);
 extern CAtlList<CString>& MakeUpper(CAtlList<CString>& sl);
 
 void FixFilename(CString& str);
+
+CString FormatNumber(CString szNumber, bool bNoFractionalDigits = true);
