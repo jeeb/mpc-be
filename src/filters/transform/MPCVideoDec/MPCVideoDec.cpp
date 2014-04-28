@@ -896,6 +896,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nFrameType(PICT_FRAME)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 	, m_fSYNC(0)
+	, m_dwFrameCount(0)
+	, m_nWrongFramesOrdering(0)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1537,6 +1539,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::InitDecoder()"));
 
 	bool bReinit = ((m_pAVCtx != NULL));
+	if (bReinit) {
+		m_dwFrameCount = 0;
+	}
 
 	ffmpegCleanup();
 
@@ -1562,7 +1567,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	// code from LAV ... thanks to it's author
 	// Use ffmpegs logic to reorder timestamps
 	// This is required for H264 content (except AVI), and generally all codecs that use frame threading
-	m_bReorderBFrame = bH264_HEVCIsAVI || bMPEG4BFrames
+	m_bReorderBFrame = bH264_HEVCIsAVI
+						|| bMPEG4BFrames
 						|| !((m_pAVCodec->capabilities & CODEC_CAP_FRAME_THREADS)
 								|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 								|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
@@ -2412,7 +2418,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		}
 
 		ReorderBFrames(rtStart, rtStop);
-
 		UpdateFrameTime(rtStart, rtStop, PULLDOWN_FLAG);
 
 		m_rtPrevStop = rtStop;
@@ -2662,6 +2667,18 @@ void CMPCVideoDecFilter::UpdateAspectRatio()
 void CMPCVideoDecFilter::ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
 	// Re-order B-frames if needed
+	if (m_dwFrameCount < 30 && m_nCodecId == AV_CODEC_ID_H264 && !m_bReorderBFrame) {
+		if ((rtStart + m_rtAvrTimePerFrame) < m_rtLastStop && rtStart != INVALID_TIME) {
+			if (m_nWrongFramesOrdering == 5) {
+				m_bReorderBFrame = true;
+			} else {
+				m_nWrongFramesOrdering++;
+			}
+		}
+	}
+
+	m_dwFrameCount++;
+
 	if (m_pAVCtx->has_b_frames && m_bReorderBFrame) {
 		rtStart	= m_BFrames[m_nPosB].rtStart;
 		rtStop	= m_BFrames[m_nPosB].rtStop;
@@ -3389,7 +3406,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			LONG sarx = m_arx * m_h;
 			LONG sary = m_ary * m_w;
 			ReduceDim(sarx, sary);
-			infostr.Format(_T("%dx%d, SAR %d:%d, DAR %d:%d"), m_w, m_h, sarx, sary, m_arx, m_ary);
+			infostr.Format(_T("%dx%d, SAR %ld:%ld, DAR %d:%d"), m_w, m_h, sarx, sary, m_arx, m_ary);
 		}
 		break;
 	case INFO_OutputFormat:
