@@ -906,40 +906,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						DWORD nAvgBytesPerSec = 0;
 						if (type == AP4_ATOM_TYPE_EAC3) {
-
 							AP4_Sample sample;
 							AP4_DataBuffer sample_data;
-
-							AP4_Cardinal SampleCount = track->GetSampleCount();
-							if (SampleCount) {
-								track->ReadSample(1, sample, sample_data);
-								const AP4_Byte* data = sample_data.GetData();
-								AP4_Size size = sample_data.GetDataSize();
-
-								CGolombBuffer gb((BYTE *)data, size);
-								for (; size >= 7 && gb.BitRead(16, true) != 0x0b77; --size) {
-									gb.BitRead(8);
-								}
-								WORD sync = (WORD)gb.BitRead(16);
-								if ((size >= 7) && (sync == 0x0b77)) {
-									static DWORD freq[] = {48000, 44100, 32000, 0};
-									gb.BitRead(2);
-									gb.BitRead(3);
-									WORD frame_size = ((WORD)gb.BitRead(11) + 1) << 1;
-									BYTE sr_code = (BYTE)gb.BitRead(2);
-									if (sr_code == 3) {
-										BYTE sr_code2 = (BYTE)gb.BitRead(2);
-										samplerate = freq[sr_code2] / 2;
-									} else {
-										static BYTE eac3_blocks[4] = {1, 2, 3, 6};
-										BYTE num_blocks = eac3_blocks[gb.BitRead(2)];
-										samplerate = freq[sr_code];
-										nAvgBytesPerSec = frame_size * samplerate / (num_blocks * 256);
-									}
-									BYTE acmod = (BYTE)gb.BitRead(3);
-									BYTE lfeon = (BYTE)gb.BitRead(1);
-									static WORD channels_tbl[] = {2, 1, 2, 3, 3, 4, 4, 5};
-									channels = channels_tbl[acmod] + lfeon;
+							
+							if (track->GetSampleCount() && AP4_SUCCEEDED(track->ReadSample(1, sample, sample_data)) && sample_data.GetDataSize() >= 7) {
+								audioframe_t aframe;
+								if (ParseEAC3Header(sample_data.GetData(), &aframe)) {
+									samplerate		= aframe.samplerate;
+									channels		= aframe.channels;
+									nAvgBytesPerSec	= (aframe.size * 8i64 * samplerate / aframe.samples + 4) /8;
 								}
 							}
 						}
@@ -951,13 +926,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (!(fourcc & 0xffff0000)) {
 							wfe->wFormatTag = (WORD)fourcc;
 						}
-						wfe->nSamplesPerSec = samplerate;
-						wfe->nChannels      = channels;
-						wfe->wBitsPerSample = bitspersample;
-						wfe->nBlockAlign    = ase->GetBytesPerFrame();
-						if (nAvgBytesPerSec == 0 && ase->GetSamplesPerPacket() > 0) {
-							wfe->nAvgBytesPerSec = wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket();
-						}
+						wfe->nSamplesPerSec		= samplerate;
+						wfe->nChannels			= channels;
+						wfe->wBitsPerSample		= bitspersample;
+						wfe->nBlockAlign		= ase->GetBytesPerFrame();
+						wfe->nAvgBytesPerSec	= nAvgBytesPerSec ? nAvgBytesPerSec : (ase->GetSamplesPerPacket() ? wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket() : 0);
 
 						mt.subtype = FOURCCMap(fourcc);
 						if (type == AP4_ATOM_TYPE_EAC3) {
