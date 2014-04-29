@@ -34,7 +34,7 @@
 
 #define APE_EXTRADATA_SIZE 6
 
-typedef struct {
+struct APEContext {
     /* Derived fields */
     uint32_t junklength;
     uint32_t firstframe;
@@ -66,7 +66,7 @@ typedef struct {
     /* Seektable */
     uint32_t* seektable;
     uint8_t*  bittable;
-} APEContext;
+};
 
 //
 // CAPEFile
@@ -105,8 +105,12 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 
 	int version = 0;
 	m_pFile->ByteRead((BYTE*)&version, 2);
-	if (version < APE_MIN_VERSION || version > APE_MAX_VERSION) {
+	if (version < APE_MIN_VERSION) {
+		DbgLog((LOG_TRACE, 3, L"CAPEFile::Open() : Attempting to open an APE file with unsupported version. APE file version : %d, MIN Supported version : %d", version, APE_MIN_VERSION));
 		return E_FAIL;
+	}
+	if (version > APE_MAX_VERSION) {
+		DbgLog((LOG_TRACE, 3, L"CAPEFile::Open() : Attempting to open an APE file that was encoded with a version of Monkey's Audio which is newer than filter is supported. APE file version : %d, MAX Supported version : %d", version, APE_MAX_VERSION));
 	}
 
 	APEContext ape;
@@ -187,15 +191,15 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	if(!ape.totalframes){
-		TRACE(L"CAPEFile::Open() : No frames in the file!\n");
+		DbgLog((LOG_TRACE, 3, L"CAPEFile::Open() : No frames in the file!"));
 		return E_FAIL;
 	}
 	if(ape.totalframes > UINT_MAX / sizeof(APEFrame)){
-		TRACE(L"CAPEFile::Open() : Too many frames: %d\n", ape.totalframes);
+		DbgLog((LOG_TRACE, 3, L"CAPEFile::Open() : Too many frames: %d", ape.totalframes));
 		return E_FAIL;
 	}
 	if (ape.seektablelength / sizeof(*ape.seektable) < ape.totalframes) {
-		TRACE(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %zu vs. %d\n", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes);
+		DbgLog((LOG_TRACE, 3, L"CAPEFile::Open() : Number of seek entries is less than number of frames: %zu vs. %d", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes));
 		return E_FAIL;
 	}
 	if (!m_frames.SetCount(ape.totalframes)) {
@@ -223,6 +227,9 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		if (ape.fileversion < 3810) {
 			ape.bittable = (uint8_t*)malloc(ape.totalframes);
 			if (!ape.bittable) {
+				if (ape.seektable) {
+					free(ape.seektable);
+				}
 				return E_OUTOFMEMORY;
 			}
 			memset(ape.bittable, 0, ape.totalframes);
@@ -231,7 +238,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			}
 		}
 		if (!m_pFile->GetAvailable()) {
-			TRACE(L"CAPEFile::Open() : File truncated\n");
+			DbgLog((LOG_TRACE, 3, L"CAPEFile::Open() : File truncated"));
 		}
 	}
 
