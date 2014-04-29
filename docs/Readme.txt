@@ -76,6 +76,5 @@ ResizableLib        Artistic License           http://sourceforge.net/projects/r
 SoundTouch          LGPLv2.1                   http://surina.net/soundtouch/
 TreePropSheet       -                          -
 VirtualDub          GPLv2                      http://virtualdub.org/
-WavPackLib          BSD License                http://wavpack.com/
 ZenLib              zlib / libpng License      http://sourceforge.net/projects/zenlib/
 zlib                zlib License               http://zlib.net/

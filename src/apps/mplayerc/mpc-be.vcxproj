@@ -550,11 +550,6 @@
     <ProjectReference Include="..\..\filters\parser\AudioSplitter\AudioSplitter.vcxproj">
       <Project>{0A836E1E-C383-4F70-8129-4A0C22E356AA}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\parser\WVSplitter\WVSplitter.vcxproj">
-      <Project>{f22de3b2-4de9-4013-bbab-1bb39f2b7df7}</Project>
-      <Private>false</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -758,9 +753,6 @@
     <ProjectReference Include="..\..\ExtLib\VirtualDub\system\system.vcxproj">
       <Project>{c2082189-3ecb-4079-91fa-89d3c8a305c0}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ExtLib\wavpacklib\wavpacklib.vcxproj">
-      <Project>{99e59c6f-4e0e-40a1-9f16-f1302947516b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\ZenLib\ZenLib.vcxproj">
       <Project>{0da1da7d-f393-4e7c-a7ce-cb5c6a67bc94}</Project>

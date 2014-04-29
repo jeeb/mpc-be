@@ -40,7 +40,6 @@
 #include "parser/RoQSplitter/RoQSplitter.h"
 #include "parser/StreamDriveThru/StreamDriveThru.h"
 #include "parser/AudioSplitter/AudioSplitter.h"
-#include "parser/WVSplitter/WVSplitter.h"
 
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
