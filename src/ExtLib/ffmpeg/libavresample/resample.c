@@ -26,35 +26,6 @@
 #include "resample.h"
 #include "audio_data.h"
 
-struct ResampleContext {
-    AVAudioResampleContext *avr;
-    AudioData *buffer;
-    uint8_t *filter_bank;
-    int filter_length;
-    int ideal_dst_incr;
-    int dst_incr;
-    unsigned int index;
-    int frac;
-    int src_incr;
-    int compensation_distance;
-    int phase_shift;
-    int phase_mask;
-    int linear;
-    enum AVResampleFilterType filter_type;
-    int kaiser_beta;
-    void (*set_filter)(void *filter, double *tab, int phase, int tap_count);
-    void (*resample_one)(struct ResampleContext *c, void *dst0,
-                         int dst_index, const void *src0,
-                         unsigned int index, int frac);
-    void (*resample_nearest)(void *dst0, int dst_index,
-                             const void *src0, unsigned int index);
-    int padding_size;
-    int initial_padding_filled;
-    int initial_padding_samples;
-    int final_padding_filled;
-    int final_padding_samples;
-};
-
 
 /* double template */
 #define CONFIG_RESAMPLE_DBL
@@ -198,6 +169,9 @@ ResampleContext *ff_audio_resample_init(AVAudioResampleContext *avr)
         c->set_filter    = set_filter_s16;
         break;
     }
+
+    if (ARCH_AARCH64)
+        ff_audio_resample_init_aarch64(c, avr->internal_sample_fmt);
 
     felem_size = av_get_bytes_per_sample(avr->internal_sample_fmt);
     c->filter_bank = av_mallocz(c->filter_length * (phase_count + 1) * felem_size);

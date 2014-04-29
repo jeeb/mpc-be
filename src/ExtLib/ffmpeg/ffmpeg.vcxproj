@@ -284,6 +284,7 @@
     <ClInclude Include="libavcodec\snowdata.h" />
     <ClInclude Include="libavcodec\snow_dwt.h" />
     <ClInclude Include="libavcodec\sp5x.h" />
+    <ClInclude Include="libavcodec\startcode.h" />
     <ClInclude Include="libavcodec\svq1.h" />
     <ClInclude Include="libavcodec\svq1_cb.h" />
     <ClInclude Include="libavcodec\svq1_vlc.h" />
@@ -717,6 +718,7 @@
     <ClCompile Include="libavcodec\snow.c" />
     <ClCompile Include="libavcodec\snow_dwt.c" />
     <ClCompile Include="libavcodec\sp5xdec.c" />
+    <ClCompile Include="libavcodec\startcode.c" />
     <ClCompile Include="libavcodec\svq1.c" />
     <ClCompile Include="libavcodec\svq13.c" />
     <ClCompile Include="libavcodec\svq1dec.c" />

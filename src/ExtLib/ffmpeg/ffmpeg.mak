@@ -331,6 +331,7 @@ SRCS_C = \
 	libavcodec/snow_dwt.c \
 	libavcodec/snow.c \
 	libavcodec/sp5xdec.c \
+	libavcodec/startcode.c \
 	libavcodec/svq1.c \
 	libavcodec/svq13.c \
 	libavcodec/svq1dec.c \

@@ -5630,7 +5630,6 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
     ff_vc1_decode_end(avctx);
 
     ff_h264chroma_init(&v->h264chroma, 8);
-    ff_vc1dsp_init(&v->vc1dsp);
 
     if (avctx->codec_id == AV_CODEC_ID_WMV3 || avctx->codec_id == AV_CODEC_ID_WMV3IMAGE) {
         int count = 0;
@@ -6159,7 +6158,8 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
 
     /* skip B-frames if we don't have reference frames */
     if (s->last_picture_ptr == NULL && (s->pict_type == AV_PICTURE_TYPE_B || s->droppable)) {
-        goto err;
+        av_log(v->s.avctx, AV_LOG_DEBUG, "Skipping B frame without reference frames\n");
+        goto end;
     }
     if ((avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type == AV_PICTURE_TYPE_B) ||
         (avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type != AV_PICTURE_TYPE_I) ||
