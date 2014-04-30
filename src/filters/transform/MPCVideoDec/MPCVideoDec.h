@@ -154,6 +154,8 @@ protected:
 	DWORD									m_dwFrameCount;
 	BYTE									m_nWrongFramesOrdering;
 
+	CMediaType								m_InputMT;
+
 	// === Private functions
 	void				Cleanup();
 	void				ffmpegCleanup();

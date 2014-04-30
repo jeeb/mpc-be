@@ -1430,6 +1430,12 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 		if (FAILED(hr)) {
 			return hr;
 		}
+
+		if (*pmt != m_InputMT) {
+			m_dwFrameCount = 0;
+		}
+
+		m_InputMT = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
 		if (!ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut)) {
@@ -1539,9 +1545,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::InitDecoder()"));
 
 	bool bReinit = ((m_pAVCtx != NULL));
-	if (bReinit) {
-		m_dwFrameCount = 0;
-	}
 
 	ffmpegCleanup();
 
