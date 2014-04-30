@@ -40,7 +40,7 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/334.21/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/337.12/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
@@ -73,6 +73,8 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FFF, // Quadro 410
 	0x1004, // GeForce GTX 780
 	0x1005, // GeForce GTX TITAN
+	0x1007, // GeForce GTX 780
+	0x1008, // GeForce GTX 780 Ti
 	0x100A, // GeForce GTX 780 Ti
 	0x100C, // GeForce GTX TITAN Black
 	0x1021, // Tesla K20Xm
@@ -89,6 +91,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1048, // GeForce 605
 	0x104A, // GeForce GT 610 (fully tested)
 	0x104B, // GeForce GT 625 (OEM)
+	0x104C, // GeForce GT 705
 	0x1050, // GeForce GT 520M (GF119) (not officially supported or typo)
 	0x1051, // GeForce GT 520MX
 	0x1052, // GeForce GT 520M (GF119) (not officially supported or typo)
@@ -110,6 +113,10 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x118E, // GeForce GTX 760 (192-bit)
 	0x118F, // Tesla K10
 	0x1193, // GeForce GTX 760 Ti OEM
+	0x1195, // GeForce GTX 660
+	0x1198, // GeForce GTX 880M
+	0x1199, // GeForce GTX 870M
+	0x119A, // GeForce GTX 860M
 	0x119D, // GeForce GTX 775M
 	0x119E, // GeForce GTX 780M
 	0x119F, // GeForce GTX 780M
@@ -142,6 +149,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1281, // GeForce GT 710
 	0x1282, // GeForce GT 640 rev. 2 (not officially supported or typo, fully tested)
 	0x1284, // GeForce GT 630 rev. 2 (not officially supported or typo, fully tested)
+	0x1286, // GeForce GT 720
 	0x1290, // GeForce GT 730M
 	0x1291, // GeForce GT 735M
 	0x1292, // GeForce GT 740M
@@ -151,9 +159,14 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x12BA, // Quadro K510M
 
 	// VP6
+	0x1340, // GeForce 830M
+	0x1341, // GeForce 840M
 	0x1380, // GeForce GTX 750 Ti
 	0x1381, // GeForce GTX 750
 	0x1382, // GeForce GTX 745
+	0x1390, // GeForce 845M
+	0x1391, // GeForce GTX 850M
+	0x1392, // GeForce GTX 860M
 };
 
 static const WORD PCID_ATI_UVD [] = {
