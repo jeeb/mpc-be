@@ -2399,7 +2399,7 @@ void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData
 	CAutoPtr<SubPic> p(DNew SubPic());
 	p->tStart	= tStart;
 	p->tStop	= vsi.delay > 0 ? (tStart + 10000i64 * vsi.delay) : tStop;
-	if (p->tStop - p->tStart < UNITS/4) {
+	if (p->tStop - p->tStart < UNITS/100) {
 		p->tStop = _I64_MAX;
 	}
 	p->pData.SetCount(len);
