@@ -288,7 +288,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Antialiasing"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 6		"Als u een standalone-versie of een alternatief van deze filters wilt gebruiken, mag u de interne versie hier uitschakelen."
 10		"AVI-splitter\nconfiguratie"
 11		"MPEG-splitter\nconfiguratie"
@@ -296,6 +296,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 13		"MPEG-2/DVD-\ndecoder\nconfiguratie"
 14		"Audiodecoder\nconfiguratie"
 15		"Matroska-splitter\nconfiguratie"
+16		"VTS(IFO) Reader\nconfiguration"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -2020,6 +2021,7 @@ STRING IDS_VOLUME_BOOST_MAX		"Volume boost Max"
 STRING IDS_VOLUME_BOOST_MIN		"Volume boost Min"
 STRING IDS_VOLUME_OSD		"Volume: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Volume: %d%% [Gedempt]"
+STRING IDS_VTSREADER_LOAD_PGC		"Read All Program Chains (calculate duration)"
 STRING IDS_WEBSERVER_ERROR_TEST		"U moet de nieuwe instellingen toepassen voordat u hen testen."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"

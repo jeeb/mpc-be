@@ -288,7 +288,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Anti-Aliasing"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 6		"Wenn Sie die Standalone-Version eines Filters, oder einen anderen externen Filter verwenden möchten, haken Sie ihn hier nicht an. Eigenschaften der fett gedruckten Filter können durch einen Doppel-Klick angezeigt werden."
 10		"AVI Splitter\nEinstellungen"
 11		"MPEG Splitter\nEinstellungen"
@@ -296,6 +296,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 13		"MPEG-2/DVD\nDekoder\nEinstellungen"
 14		"Audio Dekoder\nEinstellungen"
 15		"Matroska Splitter\nnEinstellungen"
+16		"VTS(IFO) Reader\nconfiguration"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -2020,6 +2021,7 @@ STRING IDS_VOLUME_BOOST_MAX		"Lautstärke Verstärkung Max"
 STRING IDS_VOLUME_BOOST_MIN		"Lautstärke Verstärkung Min"
 STRING IDS_VOLUME_OSD		"Lautstärke: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Stumm]"
+STRING IDS_VTSREADER_LOAD_PGC		"Read All Program Chains (calculate duration)"
 STRING IDS_WEBSERVER_ERROR_TEST		"Sie müssen die neuen Einstellungen bestätigen, bevor Sie diese Testen können."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"

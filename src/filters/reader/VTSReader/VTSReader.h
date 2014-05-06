@@ -26,6 +26,7 @@
 #include <AsyncReader/asyncrdr.h>
 
 #include <ITrackInfo.h>
+#include "VTSReaderSettingsWnd.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 
 #include "IVTSReader.h"
@@ -46,7 +47,7 @@ public:
 	CVTSStream();
 	virtual ~CVTSStream();
 
-	bool Load(const WCHAR* fnw);
+	bool Load(const WCHAR* fnw, bool bReadAllProgramChains);
 
 	HRESULT SetPointer(LONGLONG llPos);
 	HRESULT Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead);
@@ -71,9 +72,14 @@ class __declspec(uuid("773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73"))
 	, public ITrackInfo
 	, public IDSMChapterBagImpl
 	, public IVTSReader
+	, public ISpecifyPropertyPages2
 {
 	CVTSStream m_stream;
 	CStringW m_fn;
+
+private:
+	CCritSec m_csProps;
+	bool m_bReadAllProgramChains;
 
 public:
 	CVTSReader(IUnknown* pUnk, HRESULT* phr);
@@ -99,7 +105,16 @@ public:
 	STDMETHODIMP_(BSTR) GetTrackCodecInfoURL(UINT aTrackIdx);
 	STDMETHODIMP_(BSTR) GetTrackCodecDownloadURL(UINT aTrackIdx);
 
+	// ISpecifyPropertyPages2
+	STDMETHODIMP GetPages(CAUUID* pPages);
+	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
+
 	// IVTSReader
+	STDMETHODIMP Apply();
+
+	STDMETHODIMP SetReadAllProgramChains(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetReadAllProgramChains();
+
 	STDMETHODIMP_(REFERENCE_TIME) GetDuration();
 	STDMETHODIMP_(AV_Rational) GetAspect();
 };

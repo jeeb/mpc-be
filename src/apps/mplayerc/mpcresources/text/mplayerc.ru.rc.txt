@@ -288,7 +288,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Сглаживание"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 6		"Если вы хотите использовать отдельную версию этих фильтров или другую замену, отключите их здесь."
 10		"Настройка\nAVI сплиттера"
 11		"Настройка\nMPEG сплиттера"
@@ -296,6 +296,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 13		"Настройка\nMPEG-2/DVD\nдекодера"
 14		"Настройка\nаудио декодера"
 15		"Настройка\nMatroska сплиттера"
+16		"Настройка\nVTS(IFO) ридера"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -2020,6 +2021,7 @@ STRING IDS_VOLUME_BOOST_MAX		"Усиление громкости - Max"
 STRING IDS_VOLUME_BOOST_MIN		"Усиление громкости - Min"
 STRING IDS_VOLUME_OSD		"Громкость: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Громкость: %d%% [Выкл.]"
+STRING IDS_VTSREADER_LOAD_PGC		"Считывать все ""программы"" для расч. длительности"
 STRING IDS_WEBSERVER_ERROR_TEST		"Вы должны применить новые настройки перед их использованием"
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"

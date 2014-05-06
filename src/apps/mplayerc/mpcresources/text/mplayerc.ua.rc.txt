@@ -288,7 +288,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Згладжування"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 6		"Якщо ви хочете використовувати окремі версії цих фільтрів або інші замінники, вимкніть їх тут."
 10		"AVI-демультиплексор\n(налаштування)"
 11		"MPEG-демультиплексор\n(налаштування)"
@@ -296,6 +296,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 13		"MPEG-2/DVD\nдекодер\n(налаштування)"
 14		"Аудіодекодер\n(налаштування)"
 15		"Matroska-демультиплексор\n(налаштування)"
+16		"VTS(IFO) Reader\nconfiguration"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -2020,6 +2021,7 @@ STRING IDS_VOLUME_BOOST_MAX		"Підсилення - Макс."
 STRING IDS_VOLUME_BOOST_MIN		"Підсилення - Мін."
 STRING IDS_VOLUME_OSD		"Гучн.: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Гучн.: %d%% [Без звуку]"
+STRING IDS_VTSREADER_LOAD_PGC		"Read All Program Chains (calculate duration)"
 STRING IDS_WEBSERVER_ERROR_TEST		"Вам необхідно застосувати нові налаштування перед тим, як їх тестувати."
 STRING IDS_ZOOM1		"Збільшення 1"
 STRING IDS_ZOOM2		"Збільшення 2"

@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2014 see Authors.txt
+ * (C) 2006-2014 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,16 +20,29 @@
 
 #pragma once
 
-#include <basestruct.h>
+#include "../../filters/InternalPropertyPage.h"
+#include "IVTSReader.h"
+#include "resource.h"
 
-interface __declspec(uuid("CFCFBA29-5E0D-4031-BC58-407291F56C11"))
-IVTSReader :
-public IUnknown {
-	STDMETHOD(Apply()) PURE;
+class __declspec(uuid("BA18CEF2-319A-4A1F-B2CB-BCB53F6ABDE5"))
+	CVTSReaderSettingsWnd : public CInternalPropertyPageWnd
+{
+private :
+	CComQIPtr<IVTSReader> m_pMSF;
 
-	STDMETHOD(SetReadAllProgramChains(BOOL nValue)) PURE;
-	STDMETHOD_(BOOL, GetReadAllProgramChains()) PURE;
+	CButton m_cbReadAllProgramChains;
 
-	STDMETHOD_(REFERENCE_TIME, GetDuration()) PURE;
-	STDMETHOD_(AV_Rational, GetAspect()) PURE;
+public:
+	CVTSReaderSettingsWnd(void);
+
+	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	void OnDisconnect();
+	bool OnActivate();
+	void OnDeactivate();
+	bool OnApply();
+
+	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
+	static CSize GetWindowSize() { return CSize(320, 250); }
+
+	DECLARE_MESSAGE_MAP()
 };

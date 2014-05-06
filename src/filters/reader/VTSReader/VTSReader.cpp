@@ -24,6 +24,11 @@
 #include "VTSReader.h"
 #include "../../../DSUtil/DSUtil.h"
 
+// option names
+#define OPT_REGKEY_VTSReader		_T("Software\\MPC-BE Filters\\VTS Reader")
+#define OPT_SECTION_VTSReader		_T("Filters\\VTS Reader")
+#define OPT_ReadAllProgramChains	_T("ReadAllProgramChains")
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -76,10 +81,26 @@ CFilterApp theApp;
 
 CVTSReader::CVTSReader(IUnknown* pUnk, HRESULT* phr)
 	: CAsyncReader(NAME("CVTSReader"), pUnk, &m_stream, phr, __uuidof(this))
+	, m_bReadAllProgramChains(false)
 {
 	if (phr) {
 		*phr = S_OK;
 	}
+
+#ifdef REGISTER_FILTER
+	CRegKey key;
+
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_VTSReader, KEY_READ)) {
+		DWORD dw;
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReadAllProgramChains, dw)) {
+			m_bReadAllProgramChains = !!dw;
+		}
+	}
+#else
+	m_bReadAllProgramChains = !!AfxGetApp()->GetProfileInt(OPT_SECTION_VTSReader, OPT_ReadAllProgramChains, m_bReadAllProgramChains);
+#endif
+
 }
 
 CVTSReader::~CVTSReader()
@@ -95,6 +116,8 @@ STDMETHODIMP CVTSReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		QI(ITrackInfo)
 		QI(IDSMChapterBag)
 		QI(IVTSReader)
+		QI(ISpecifyPropertyPages)
+		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -116,7 +139,7 @@ STDMETHODIMP CVTSReader::QueryFilterInfo(FILTER_INFO* pInfo)
 
 STDMETHODIMP CVTSReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
-	if (!m_stream.Load(pszFileName)) {
+	if (!m_stream.Load(pszFileName, m_bReadAllProgramChains)) {
 		return E_FAIL;
 	}
 
@@ -139,14 +162,10 @@ STDMETHODIMP CVTSReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 
 STDMETHODIMP CVTSReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 {
-	if (!ppszFileName) {
-		return E_POINTER;
-	}
+	CheckPointer(ppszFileName, E_POINTER);
 
-	*ppszFileName = (LPOLESTR)CoTaskMemAlloc((m_fn.GetLength()+1)*sizeof(WCHAR));
-	if (!(*ppszFileName)) {
-		return E_OUTOFMEMORY;
-	}
+	*ppszFileName = (LPOLESTR)CoTaskMemAlloc((m_fn.GetLength() + 1) * sizeof(WCHAR));
+	CheckPointer(*ppszFileName, E_OUTOFMEMORY);
 
 	wcscpy_s(*ppszFileName, m_fn.GetLength() + 1, m_fn);
 
@@ -195,7 +214,64 @@ STDMETHODIMP_(BSTR) CVTSReader::GetTrackCodecDownloadURL(UINT aTrackIdx)
 	return NULL; // Not implemented yet
 }
 
+// ISpecifyPropertyPages2
+
+STDMETHODIMP CVTSReader::GetPages(CAUUID* pPages)
+{
+	CheckPointer(pPages, E_POINTER);
+
+	pPages->cElems = 1;
+	pPages->pElems = (GUID*)CoTaskMemAlloc(sizeof(GUID) * pPages->cElems);
+	pPages->pElems[0] = __uuidof(CVTSReaderSettingsWnd);
+
+	return S_OK;
+}
+
+STDMETHODIMP CVTSReader::CreatePage(const GUID& guid, IPropertyPage** ppPage)
+{
+	CheckPointer(ppPage, E_POINTER);
+
+	if (*ppPage != NULL) {
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr;
+
+	if (guid == __uuidof(CVTSReaderSettingsWnd)) {
+		(*ppPage = DNew CInternalPropertyPageTempl<CVTSReaderSettingsWnd>(NULL, &hr))->AddRef();
+	}
+
+	return *ppPage ? S_OK : E_FAIL;
+}
+
 // IVTSReader
+
+STDMETHODIMP CVTSReader::Apply()
+{
+#ifdef REGISTER_FILTER
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VTSReader)) {
+		key.SetDWORDValue(OPT_ReadAllProgramChains, m_bReadAllProgramChains);
+	}
+#else
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VTSReader, OPT_ReadAllProgramChains, m_bReadAllProgramChains);
+#endif
+
+	return S_OK;
+}
+
+STDMETHODIMP CVTSReader::SetReadAllProgramChains(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bReadAllProgramChains = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CVTSReader::GetReadAllProgramChains()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bReadAllProgramChains;
+}
 
 STDMETHODIMP_(REFERENCE_TIME) CVTSReader::GetDuration()
 {
@@ -219,16 +295,16 @@ CVTSStream::~CVTSStream()
 {
 }
 
-bool CVTSStream::Load(const WCHAR* fnw)
+bool CVTSStream::Load(const WCHAR* fnw, bool bReadAllProgramChains)
 {
 	CAtlList<CString> sl;
-	return(m_vob && m_vob->Open(CString(fnw), sl) /*&& m_vob->IsDVD()*/);
+	return (m_vob && m_vob->Open(fnw, sl, bReadAllProgramChains ? ALL_PGCs : 1));
 }
 
 HRESULT CVTSStream::SetPointer(LONGLONG llPos)
 {
-	m_off = (int)(llPos&2047);
-	int lba = (int)(llPos/2048);
+	m_off = (int)(llPos & 2047);
+	int lba = (int)(llPos / 2048);
 
 	return lba == m_vob->Seek(lba) ? S_OK : S_FALSE;
 }
@@ -250,10 +326,10 @@ HRESULT CVTSStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 		memcpy(ptr, &buff[m_off], size);
 
-		m_off = (m_off + size)&2047;
+		m_off = (m_off + size) & 2047;
 
 		if (m_off > 0) {
-			m_vob->Seek(m_vob->GetPosition()-1);
+			m_vob->Seek(m_vob->GetPosition() - 1);
 		}
 
 		ptr += size;
@@ -269,7 +345,7 @@ HRESULT CVTSStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 LONGLONG CVTSStream::Size(LONGLONG* pSizeAvailable)
 {
-	LONGLONG len = 2048i64*m_vob->GetLength();
+	LONGLONG len = 2048i64 * m_vob->GetLength();
 	if (pSizeAvailable) {
 		*pSizeAvailable = len;
 	}

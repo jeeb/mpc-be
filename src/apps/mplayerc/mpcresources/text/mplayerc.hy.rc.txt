@@ -288,7 +288,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Anti-aliasing"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 6		"If you would like to use the stand-alone version from these filters or a some other replacement, disable them here. Filters written in bold can be double-clicked to show their property pages."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
@@ -296,6 +296,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 13		"MPEG-2/DVD\ndecoder\nconfiguration"
 14		"Audio decoder\nconfiguration"
 15		"Matroska Splitter\nconfiguration"
+16		"VTS(IFO) Reader\nconfiguration"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -2020,6 +2021,7 @@ STRING IDS_VOLUME_BOOST_MAX		"Ձայնը՝ Max"
 STRING IDS_VOLUME_BOOST_MIN		"Ձայնը՝ Min"
 STRING IDS_VOLUME_OSD		"Ձայնը. %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Mute]"
+STRING IDS_VTSREADER_LOAD_PGC		"Read All Program Chains (calculate duration)"
 STRING IDS_WEBSERVER_ERROR_TEST		"Նոր կարգավորումները թեստավորելուց առաջ նախ պետք է դրանք պահպանել"
 STRING IDS_ZOOM1		"Չափը 1"
 STRING IDS_ZOOM2		"Չափը 2"

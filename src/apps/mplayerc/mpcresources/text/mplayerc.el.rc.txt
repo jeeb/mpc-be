@@ -288,7 +288,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Anti-aliasing"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 6		"Εάν θέλετε να χρησιμοποιήσετε την αυτόνομη έκδοση απ΄αυτά τα φίλτρα ή κάποια άλλη αντικατάσταση, απενεργοποιήστε τα εδώ. Στα φίλτρα γραμμένα με έντονη γραφή, μπορείτε με διπλό κλικ να εμφανίσετε τις σελίδες ιδιοτήτων τους."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
@@ -296,6 +296,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 13		"MPEG-2/DVD\ndecoder\nconfiguration"
 14		"Audio decoder\nconfiguration"
 15		"Matroska Splitter\nconfiguration"
+16		"VTS(IFO) Reader\nconfiguration"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -2024,6 +2025,7 @@ STRING IDS_VOLUME_BOOST_MAX		"Μέγιστη ώθηση έντασης"
 STRING IDS_VOLUME_BOOST_MIN		"Ελάχιστη ώθηση έντασης"
 STRING IDS_VOLUME_OSD		"Έντ.: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Mute]"
+STRING IDS_VTSREADER_LOAD_PGC		"Read All Program Chains (calculate duration)"
 STRING IDS_WEBSERVER_ERROR_TEST		"Πρέπει να κάνετε εφαρμογή των νέων ρυθμίσεων πριν από τη δοκιμή τους."
 STRING IDS_ZOOM1		"Μεγέθυνση 1"
 STRING IDS_ZOOM2		"Μεγέθυνση 2"

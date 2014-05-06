@@ -201,6 +201,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="VTSReader.cpp" />
+    <ClCompile Include="VTSReaderSettingsWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VTSReader.def" />
@@ -212,6 +213,7 @@
     </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="VTSReader.h" />
+    <ClInclude Include="VTSReaderSettingsWnd.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VTSReader.rc">

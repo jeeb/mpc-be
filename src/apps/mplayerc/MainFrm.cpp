@@ -13414,7 +13414,6 @@ void CMainFrame::SetupChapters()
 						str.Format(IDS_AG_CHAPTER, i + 1);
 						m_pCB->ChapAppend(rt, str);
 					}
-					vob.Close();
 				}
 			}
 		}
