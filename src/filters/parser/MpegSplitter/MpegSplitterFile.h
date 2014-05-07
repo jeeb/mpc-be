@@ -34,8 +34,8 @@
 class CMpegSplitterFile : public CBaseSplitterFileEx
 {
 	CAtlMap<WORD, BYTE> m_pid2pes;
-	CAtlMap<WORD, avchdr> avch;
-	CAtlMap<WORD, seqhdr> seqh;
+	CAtlMap<DWORD, avchdr> avch;
+	CAtlMap<DWORD, seqhdr> seqh;
 
 	CAtlMap<DWORD, int> streamPTSCount;
 
@@ -59,10 +59,10 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 		BOOL IsValid() { return m_nValidStream >= 10; }
 	};
 
-	CAtlMap<WORD, CValidStream<latm_aachdr>>	m_aaclatmValid;
-	CAtlMap<WORD, CValidStream<aachdr>>			m_aacValid;
-	CAtlMap<WORD, CValidStream<mpahdr>>			m_mpaValid;
-	CAtlMap<WORD, CValidStream<ac3hdr>>			m_ac3Valid;
+	CAtlMap<DWORD, CValidStream<latm_aachdr>>	m_aaclatmValid;
+	CAtlMap<DWORD, CValidStream<aachdr>>		m_aacValid;
+	CAtlMap<DWORD, CValidStream<mpahdr>>		m_mpaValid;
+	CAtlMap<DWORD, CValidStream<ac3hdr>>		m_ac3Valid;
 
 	BOOL m_bOpeningCompleted;
 
@@ -106,7 +106,7 @@ public:
 		}
 
 		operator DWORD() const {
-			return pid ? pid : ((pesid<<8)|ps1id);
+			return pid ? pid : ((pesid << 8) | ps1id);
 		}
 
 		bool operator == (const struct stream& s) const {

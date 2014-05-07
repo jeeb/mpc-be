@@ -603,8 +603,6 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	s.pesid	= pesid;
 	s.ps1id	= ps1id;
 
-	WORD nPid = pid ? pid : pesid;
-
 	const __int64 start		= GetPos();
 	enum stream_type type	= stream_type::unknown;
 
@@ -625,27 +623,27 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		if (type == stream_type::unknown && (stream_type & MPEG2_VIDEO)) {
 			// Sequence/extension header can be split into multiple packets
 			if (!m_streams[stream_type::video].Find(s)) {
-				if (!seqh.Lookup(nPid)) {
-					seqh[nPid].Init();
+				if (!seqh.Lookup(s)) {
+					seqh[s].Init();
 				}
 
-				if (seqh[nPid].data.GetCount()) {
-					if (seqh[nPid].data.GetCount() < 512) {
-						size_t size = seqh[nPid].data.GetCount();
-						seqh[nPid].data.SetCount(size + (size_t)len);
-						ByteRead(seqh[nPid].data.GetData() + size, len);
+				if (seqh[s].data.GetCount()) {
+					if (seqh[s].data.GetCount() < 512) {
+						size_t size = seqh[s].data.GetCount();
+						seqh[s].data.SetCount(size + (size_t)len);
+						ByteRead(seqh[s].data.GetData() + size, len);
 					} else {
 						seqhdr h;
-						if (Read(h, seqh[nPid].data, &s.mt)) {
+						if (Read(h, seqh[s].data, &s.mt)) {
 							type = stream_type::video;
 						}
 					}
 				} else {
 					CMediaType mt;
-					if (Read(seqh[nPid], len, &mt)) {
+					if (Read(seqh[s], len, &mt)) {
 						Seek(start);
-						seqh[nPid].data.SetCount((size_t)len);
-						ByteRead(seqh[nPid].data.GetData(), len);
+						seqh[s].data.SetCount((size_t)len);
+						ByteRead(seqh[s].data.GetData(), len);
 					}
 				}
 			}
@@ -656,12 +654,12 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			Seek(start);
 			// PPS and SPS can be present on differents packets
 			// and can also be split into multiple packets
-			if (!avch.Lookup(nPid)) {
-				memset(&avch[nPid], 0, sizeof(avchdr));
+			if (!avch.Lookup(s)) {
+				memset(&avch[s], 0, sizeof(avchdr));
 			}
 
-			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[nPid], len, &s.mt)) {
-				if (avch[nPid].spspps[index_subsetsps].complete) {
+			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[s], len, &s.mt)) {
+				if (avch[s].spspps[index_subsetsps].complete) {
 					type = stream_type::stereo;
 				} else {
 					type = stream_type::video;
@@ -686,10 +684,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
-					if (m_aaclatmValid[nPid].IsValid()) {
+					if (m_aaclatmValid[s].IsValid()) {
 						type = stream_type::audio;
 					} else {
-						m_aaclatmValid[nPid].Handle(h);
+						m_aaclatmValid[s].Handle(h);
 					}
 				}
 			}
@@ -702,10 +700,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
-					if (m_aacValid[nPid].IsValid()) {
+					if (m_aacValid[s].IsValid()) {
 						type = stream_type::audio;
 					} else {
-						m_aacValid[nPid].Handle(h);
+						m_aacValid[s].Handle(h);
 					}
 				}
 			}
@@ -718,10 +716,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
-					if (m_mpaValid[nPid].IsValid()) {
+					if (m_mpaValid[s].IsValid()) {
 						type = stream_type::audio;
 					} else {
-						m_mpaValid[nPid].Handle(h);
+						m_mpaValid[s].Handle(h);
 					}
 				}
 			}
@@ -734,10 +732,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
-					if (m_ac3Valid[nPid].IsValid()) {
+					if (m_ac3Valid[s].IsValid()) {
 						type = stream_type::audio;
 					} else {
-						m_ac3Valid[nPid].Handle(h);
+						m_ac3Valid[s].Handle(h);
 					}
 				}
 			}
@@ -844,10 +842,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				ac3hdr h = { 0 };
 				if (!m_streams[stream_type::audio].Find(s)) {
 					if (Read(h, len, &s.mt)) {
-						if (m_ac3Valid[nPid].IsValid()) {
+						if (m_ac3Valid[s].IsValid()) {
 							type = stream_type::audio;
 						} else {
-							m_ac3Valid[nPid].Handle(h);
+							m_ac3Valid[s].Handle(h);
 						}
 					}
 				}
