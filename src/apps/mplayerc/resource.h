@@ -496,7 +496,7 @@
 // matroska splitter
 #define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
 // VTS reader
-#define IDS_VTSREADER_LOAD_PGC        7710
+#define IDS_VTSREADER_LOAD_PGC          7800
 ////////////////////////////////////////////
 // dialogs
 #define IDD_OPEN_DLG                    10000

@@ -3,7 +3,7 @@
 // Used by MpegSplitter.rc
 //
 #define IDS_FILTER_SETTINGS_CAPTION     7000
-#define IDS_VTSREADER_LOAD_PGC        7710
+#define IDS_VTSREADER_LOAD_PGC          7800
 
 // Next default values for new objects
 // 
