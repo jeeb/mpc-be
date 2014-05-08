@@ -492,3 +492,37 @@ from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).a
 
 	return ret;
 }
+
+// from http://msdn.microsoft.com/ru-RU/library/windows/desktop/ms680582(v=vs.85).aspx
+CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
+{ 
+	LPVOID lpMsgBuf;
+	LPVOID lpDisplayBuf;
+
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		dw,
+		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+		//MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default system language
+		(LPTSTR)&lpMsgBuf,
+		0, NULL);
+
+	// Format the error message
+
+	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+		(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
+	StringCchPrintf((LPTSTR)lpDisplayBuf,
+		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+		L"Function '%s' failed with error %d: %s",
+		lpszFunction, dw, lpMsgBuf);
+
+	CString ret = (LPCTSTR)lpDisplayBuf;
+
+	LocalFree(lpMsgBuf);
+	LocalFree(lpDisplayBuf);
+
+	return ret;
+}

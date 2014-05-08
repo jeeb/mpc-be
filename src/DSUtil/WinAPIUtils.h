@@ -34,3 +34,5 @@ CString				GetModulePath(bool bInclModuleName = true);
 BOOL				CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status);
 
 BOOL				IsUserAdmin();
+
+CString				GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw = GetLastError());

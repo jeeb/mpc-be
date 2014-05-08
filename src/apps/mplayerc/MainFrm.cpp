@@ -20316,6 +20316,10 @@ DWORD CMainFrame::NotifyRenderThread()
 					ReloadSubtitle();
 				}
 			}
+		} else {
+			DbgLog((LOG_TRACE, 3, L"CMainFrame::NotifyRenderThread() : %s", GetLastErrorMsg(L"WaitForMultipleObjects")));
+			ASSERT(FALSE);
+			break;
 		}
 	}
 
