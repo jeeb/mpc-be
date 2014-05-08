@@ -23,7 +23,8 @@ Translators:
 Basque - azpidatziak - Xabier Aramendi - azpidatziak@users.sourceforge.net
 Chinese (Simplified) - insolo
 Chinese (Traditional) - beter
-German - Markus Gaugg - gaugg@gmx.at
+Dutch - beter
+German - Markus Gaugg - gaugg@gmx.at, Sylt
 Italian - Lord Maius
 Korean - kuh3h3
 Turkish - Thingol
