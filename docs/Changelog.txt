@@ -18,6 +18,7 @@ Added (+):
 Changes (*):
 	* MpaDecFilter - corrected work with DTS-HD streams for output to S / PDIF output, in which case only output DTS core.
 	* MPCAudioRenderer - improved input validation support for media types;
+	* updated Basque translation (author azpidatziak);
 	* Updated German translation (author: Sylt);
 	* updated Dutch translation (author beter);
 	* updated Chinese (Traditional) translation (author beter);
