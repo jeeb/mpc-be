@@ -938,6 +938,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_hStopNotifyRenderThreadEvent		= CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_hRefreshNotifyRenderThreadEvent	= CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_ExtSubPathsHandles.RemoveAll();
 	m_ExtSubPathsHandles.Add(m_hStopNotifyRenderThreadEvent);
 	m_ExtSubPathsHandles.Add(m_hRefreshNotifyRenderThreadEvent);
 
