@@ -408,6 +408,7 @@ SRCS_C = \
 	libavcodec/x86/h264_intrapred_init.c \
 	libavcodec/x86/h264chroma_init.c \
 	libavcodec/x86/h264dsp_init.c \
+	libavcodec/x86/hevcdsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
 	libavcodec/x86/hpeldsp_mmx.c \
@@ -539,6 +540,7 @@ SRCS_YASM = \
 	libavcodec/x86/h264_qpel_8bit.asm \
 	libavcodec/x86/h264_weight.asm \
 	libavcodec/x86/h264_weight_10bit.asm \
+	libavcodec/x86/hevc_mc.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/imdct36.asm \
 	libavcodec/x86/lossless_videodsp.asm \

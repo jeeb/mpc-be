@@ -112,6 +112,9 @@
     <None Include="libavcodec\x86\h264_weight_10bit.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\hevc_mc.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\hpeldsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -263,6 +266,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\h264_i386.h">
+      <Filter>libavcodec\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\x86\hevcdsp.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\hpeldsp.h">
@@ -871,6 +877,9 @@
     <ClInclude Include="libavcodec\sp5x.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\startcode.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\svq1.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -1300,9 +1309,6 @@
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\startcode.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.c" />
@@ -1364,6 +1370,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\h264dsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\hevcdsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\hpeldsp_init.c">
@@ -2269,6 +2278,9 @@
     <ClCompile Include="libavcodec\sp5xdec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\startcode.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\svq1.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2703,9 +2715,6 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\startcode.c">
-      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

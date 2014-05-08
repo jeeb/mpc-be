@@ -324,6 +324,7 @@ typedef struct H264Picture {
     int reference;
     int recovered;          ///< picture at IDR or recovery point + recovery count
     int invalid_gap;
+    int sei_recovery_frame_cnt;
 
     int crop;
     int crop_left;
@@ -756,7 +757,7 @@ typedef struct H264Context {
     int   ref_pic_flag;
     void* dxva_context;
     // <== End patch MPC
-}H264Context;
+} H264Context;
 
 extern const uint8_t ff_h264_chroma_qp[7][QP_MAX_NUM + 1]; ///< One chroma qp table for each possible bit depth (8-14).
 extern const uint16_t ff_h264_mb_sizes[4];
