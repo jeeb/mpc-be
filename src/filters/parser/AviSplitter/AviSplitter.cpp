@@ -357,6 +357,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					break;
 				case FCC('H264'):
+				case FCC('h264'):
+				case FCC('AVC1'):
 				case FCC('avc1'):
 					if (s->strf.GetCount() > sizeof(BITMAPINFOHEADER)) {
 						size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
