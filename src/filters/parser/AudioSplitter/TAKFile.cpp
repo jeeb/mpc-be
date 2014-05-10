@@ -230,8 +230,7 @@ bool CTAKFile::ParseTAKStreamInfo(BYTE* buf, int size)
 		nb_samples     = frame_duration_type_quants[FrameSizeType];
 		max_nb_samples = SampleRate * frame_duration_type_quants[TAK_FRAME_250ms] >> 5;
 	} else {
-		nb_samples     = 0;
-		max_nb_samples = 0;
+		return false;
 	}
 
 	m_samplerate  = SampleRate;
