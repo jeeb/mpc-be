@@ -41,11 +41,11 @@ CString GetCUECommand(CString& ln)
 void MakeCUETitle(CString &Title, CString title, CString performer, UINT trackNum)
 {
 	if (performer.GetLength() > 0 && title.GetLength() > 0) {
-		Title.Format(_T("%02d. %s - %s"), trackNum, performer, title);
+		Title.Format(_T("%02u. %s - %s"), trackNum, performer, title);
 	} else if (performer.GetLength() > 0) {
-		Title.Format(_T("%02d. %s"), trackNum, performer);
+		Title.Format(_T("%02u. %s"), trackNum, performer);
 	} else if (title.GetLength() > 0) {
-		Title.Format(_T("%02d. %s"), trackNum, title);
+		Title.Format(_T("%02u. %s"), trackNum, title);
 	}
 
 	if (trackNum == UINT_MAX && Title.GetLength() > 0) {
