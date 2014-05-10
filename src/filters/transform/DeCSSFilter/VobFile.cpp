@@ -630,6 +630,8 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ALL_
 		}
 	}
 
+	int offset = -1;
+
 	m_rtDuration	= 0;
 	m_pChapters[0]	= 0;
 	m_ChaptersCount	= 1;
@@ -658,6 +660,8 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ALL_
 			REFERENCE_TIME rtTotalTime = 0;
 			for (int currentCell = entryCell; currentCell <= exitCell; currentCell++) {
 				int cellStart = cellTableOffset + ((currentCell - 1) * 0x18);
+
+				// cell playback time
 				m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart, CFile::begin);
 				BYTE bytes[4];
 				ReadBuffer(bytes, 4);
@@ -667,6 +671,16 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ALL_
 					ReadBuffer(bytes, 4);
 					rtTotalTime += FormatTime(bytes);
 				}
+
+				if (offset == -1) {
+					// first VOBU start sector
+					m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart + 8, CFile::begin);
+					DWORD firstVOBUStartSector = ReadDword();
+					offset = (int)firstVOBUStartSector;
+					// last VOBU end sector
+					//m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart + 20, CFile::begin);
+					//DWORD lastVOBUEndSector = ReadDword();
+				}
 			}
 			m_rtDuration += rtTotalTime;
 			m_pChapters[m_ChaptersCount++] = m_rtDuration;
@@ -674,7 +688,6 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ALL_
 	}
 	m_ifoFile.Close();
 
-	int offset = -1;
 	vobs.RemoveAll();
 
 	fn = fn.Left(fn.ReverseFind('.')+1);
@@ -702,7 +715,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ALL_
 		}
 
 		if (i == 0) {
-			offset = (int)(status.m_size / 0x800);
+			offset += (int)(status.m_size / 0x800);
 		}
 	}
 
