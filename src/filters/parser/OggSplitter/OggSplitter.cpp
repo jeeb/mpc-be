@@ -608,7 +608,6 @@ COggSourceFilter::COggSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 
 COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(pName, pFilter, pLock, phr)
-	, m_pFilter(pFilter)
 {
 	ResetState((DWORD)-1);
 }

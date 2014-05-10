@@ -50,8 +50,6 @@ protected:
 	REFERENCE_TIME m_rtLast;
 	bool m_fSetKeyFrame;
 
-	CBaseFilter* m_pFilter;
-
 	void ResetState(DWORD seqnum = -1);
 
 public:
