@@ -41,7 +41,6 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 
 	__int64 m_startpos;
 	int     m_framesize;
-	REFERENCE_TIME m_rtStart;
 	REFERENCE_TIME m_AvgTimePerFrame;
 
 protected:
