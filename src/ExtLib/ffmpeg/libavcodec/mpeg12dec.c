@@ -1412,7 +1412,6 @@ static enum AVPixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
 
 static void setup_hwaccel_for_pixfmt(AVCodecContext *avctx)
 {
-    avctx->hwaccel = ff_find_hwaccel(avctx);
     // until then pix_fmt may be changed right after codec init
     if (avctx->hwaccel || uses_vdpau(avctx))
         if (avctx->idct_algo == FF_IDCT_AUTO)

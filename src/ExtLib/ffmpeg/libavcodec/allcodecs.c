@@ -28,6 +28,13 @@
 #include "avcodec.h"
 #include "version.h"
 
+#define REGISTER_HWACCEL(X, x)                                          \
+    {                                                                   \
+        extern AVHWAccel ff_##x##_hwaccel;                              \
+        if (CONFIG_##X##_HWACCEL)                                       \
+            av_register_hwaccel(&ff_##x##_hwaccel);                     \
+    }
+
 #define REGISTER_ENCODER(X, x)                                          \
     {                                                                   \
         extern AVCodec ff_##x##_encoder;                                \
@@ -49,6 +56,13 @@
         extern AVCodecParser ff_##x##_parser;                           \
         if (CONFIG_##X##_PARSER)                                        \
             av_register_codec_parser(&ff_##x##_parser);                 \
+    }
+
+#define REGISTER_BSF(X, x)                                              \
+    {                                                                   \
+        extern AVBitStreamFilter ff_##x##_bsf;                          \
+        if (CONFIG_##X##_BSF)                                           \
+            av_register_bitstream_filter(&ff_##x##_bsf);                \
     }
 
 void avcodec_register_all(void)
