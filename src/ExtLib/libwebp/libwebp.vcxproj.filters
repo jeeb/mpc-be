@@ -67,9 +67,6 @@
     <ClCompile Include="dec\io.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dec\layer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dec\quant.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -137,9 +134,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\iterator.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="enc\layer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\picture.c">

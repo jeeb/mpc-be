@@ -136,12 +136,6 @@
     </ClCompile>
     <ClCompile Include="dec\idec.c" />
     <ClCompile Include="dec\io.c" />
-    <ClCompile Include="dec\layer.c">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)_dec.obj</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)_dec.obj</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)_dec.obj</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)_dec.obj</ObjectFileName>
-    </ClCompile>
     <ClCompile Include="dec\quant.c">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)_dec.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)_dec.obj</ObjectFileName>
@@ -182,7 +176,6 @@
     <ClCompile Include="enc\frame.c" />
     <ClCompile Include="enc\histogram.c" />
     <ClCompile Include="enc\iterator.c" />
-    <ClCompile Include="enc\layer.c" />
     <ClCompile Include="enc\picture.c" />
     <ClCompile Include="enc\quant.c" />
     <ClCompile Include="enc\syntax.c" />
