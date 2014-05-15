@@ -60,7 +60,11 @@ BOOL CAboutDlg::OnInitDialog()
 #endif
 #elif defined(_MSC_VER)
 #if (_MSC_VER == 1800)		// 2013
+#if (_MSC_FULL_VER == 180030501)
+	m_MPCCompiler = _T("MSVC 2013 Update 2");
+#else
 	m_MPCCompiler = _T("MSVC 2013");
+#endif
 #elif (_MSC_VER == 1700)	// 2012
 #if (_MSC_FULL_VER == 170061030)
     m_MPCCompiler = _T("MSVC 2012.4");
@@ -83,7 +87,7 @@ BOOL CAboutDlg::OnInitDialog()
 #else
 	m_MPCCompiler = _T("MSVC 2012");
 #endif
-#elif (_MSC_VER == 1600)	// 2013
+#elif (_MSC_VER == 1600)	// 2010
 #if (_MSC_FULL_VER >= 160040219)
 	m_MPCCompiler = _T("MSVC 2010 SP1");
 #else

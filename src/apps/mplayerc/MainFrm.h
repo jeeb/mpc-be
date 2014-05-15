@@ -358,7 +358,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	};
 
 	CAtlArray<SubStreams> subarray;
-	void SubFlags(CString strname, bool* forced, bool* def);
+	void SubFlags(CString strname, bool& forced, bool& def);
 	size_t GetSubSelIdx();
 	int cntintsub;
 	int m_nSelSub2;
