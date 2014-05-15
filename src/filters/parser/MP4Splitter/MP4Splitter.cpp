@@ -1260,11 +1260,6 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			continue;
 		}
 
-		AP4_Sample sample;
-		if (AP4_SUCCEEDED(track->GetSample(pPair->m_value.index, sample))) {
-			pPair->m_value.ts = sample.GetCts();
-		}
-
 		// FIXME: slow search & stss->m_Entries is private
 		if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
 			if (stss->m_Entries.ItemCount() > 0) {
@@ -1278,10 +1273,16 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					++i;
 				}
 				//ASSERT(pPair->m_value.index == stss->m_Entries[i-1] - 1); // fast seek test
-				if (bFoundKeyFrame) {
-					pPair->m_value.index = stss->m_Entries[i-1] - 1;
+				if (!bFoundKeyFrame && pPair->m_value.index > stss->m_Entries.ItemCount()) {
+					i = stss->m_Entries.ItemCount();
 				}
+				pPair->m_value.index = stss->m_Entries[i - 1] - 1;
 			}
+		}
+
+		AP4_Sample sample;
+		if (AP4_SUCCEEDED(track->GetSample(pPair->m_value.index, sample))) {
+			pPair->m_value.ts = sample.GetCts();
 		}
 	}
 }
