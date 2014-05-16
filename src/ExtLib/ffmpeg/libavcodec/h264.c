@@ -2246,12 +2246,8 @@ not_extra:
 
         /* Wait for second field. */
         *got_frame = 0;
-        if (h->next_output_pic
-                              // ==> Start patch MPC
-                              // && (
-                              //     h->next_output_pic->recovered)
-                              // <== End patch MPC
-                              ) {
+        if (h->next_output_pic && (
+                                   h->next_output_pic->recovered)) {
             if (!h->next_output_pic->recovered)
                 h->next_output_pic->f.flags |= AV_FRAME_FLAG_CORRUPT;
 
