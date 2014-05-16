@@ -37,6 +37,9 @@
     <Filter Include="libavfilter">
       <UniqueIdentifier>{7cbae717-7440-49b2-adfc-6e24433597e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libswresample">
+      <UniqueIdentifier>{cc2478b9-e2dd-494c-9677-13dcf595ba75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.asm" />
@@ -634,9 +637,6 @@
     <ClInclude Include="libavcodec\lagarithrac.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\libopus.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
     <ClInclude Include="libavcodec\lossless_videodsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -755,6 +755,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\options_table.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\opus.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\parser.h">
@@ -1308,6 +1311,12 @@
     </ClInclude>
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
+    </ClInclude>
+    <ClInclude Include="libswresample\swresample.h">
+      <Filter>libswresample</Filter>
+    </ClInclude>
+    <ClInclude Include="libswresample\version.h">
+      <Filter>libswresample</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1981,12 +1990,6 @@
     <ClCompile Include="libavcodec\libopenjpegdec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\libopus.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\libopusdec.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\libspeexdec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2165,6 +2168,24 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\options.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\opus.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\opus_celt.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\opus_imdct.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\opus_parser.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\opus_silk.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\opusdec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\parser.c">

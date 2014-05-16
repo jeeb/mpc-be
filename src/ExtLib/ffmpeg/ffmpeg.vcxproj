@@ -202,7 +202,6 @@
     <ClInclude Include="libavcodec\jpeglsdec.h" />
     <ClInclude Include="libavcodec\kbdwin.h" />
     <ClInclude Include="libavcodec\lagarithrac.h" />
-    <ClInclude Include="libavcodec\libopus.h" />
     <ClInclude Include="libavcodec\lossless_videodsp.h" />
     <ClInclude Include="libavcodec\lpc.h" />
     <ClInclude Include="libavcodec\lsp.h" />
@@ -245,6 +244,7 @@
     <ClInclude Include="libavcodec\nellymoser.h" />
     <ClInclude Include="libavcodec\old_codec_ids.h" />
     <ClInclude Include="libavcodec\options_table.h" />
+    <ClInclude Include="libavcodec\opus.h" />
     <ClInclude Include="libavcodec\parser.h" />
     <ClInclude Include="libavcodec\pixels.h" />
     <ClInclude Include="libavcodec\png.h" />
@@ -441,6 +441,8 @@
     <ClInclude Include="libavutil\x86\intreadwrite.h" />
     <ClInclude Include="libavutil\x86\timer.h" />
     <ClInclude Include="libavutil\x86_cpu.h" />
+    <ClInclude Include="libswresample\swresample.h" />
+    <ClInclude Include="libswresample\version.h" />
     <ClInclude Include="libswscale\rgb2rgb.h" />
     <ClInclude Include="libswscale\swscale.h" />
     <ClInclude Include="libswscale\swscale_internal.h" />
@@ -621,8 +623,6 @@
     <ClCompile Include="libavcodec\lagarithrac.c" />
     <ClCompile Include="libavcodec\latm_parser.c" />
     <ClCompile Include="libavcodec\libopenjpegdec.c" />
-    <ClCompile Include="libavcodec\libopus.c" />
-    <ClCompile Include="libavcodec\libopusdec.c" />
     <ClCompile Include="libavcodec\libspeexdec.c" />
     <ClCompile Include="libavcodec\log2_tab.c" />
     <ClCompile Include="libavcodec\lossless_videodsp.c" />
@@ -683,6 +683,12 @@
     <ClCompile Include="libavcodec\nellymoser.c" />
     <ClCompile Include="libavcodec\nellymoserdec.c" />
     <ClCompile Include="libavcodec\options.c" />
+    <ClCompile Include="libavcodec\opus.c" />
+    <ClCompile Include="libavcodec\opusdec.c" />
+    <ClCompile Include="libavcodec\opus_celt.c" />
+    <ClCompile Include="libavcodec\opus_imdct.c" />
+    <ClCompile Include="libavcodec\opus_parser.c" />
+    <ClCompile Include="libavcodec\opus_silk.c" />
     <ClCompile Include="libavcodec\parser.c" />
     <ClCompile Include="libavcodec\png.c" />
     <ClCompile Include="libavcodec\pngdec.c" />

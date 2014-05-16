@@ -1,7 +1,6 @@
 BIN_DIR  = ../../../bin13
 ZLIB_DIR = ../zlib
 OPENJPEG_DIR = ../openjpeg
-OPUS_DIR = ../opus
 SPEEX_DIR = ../speex
 
 ifeq ($(64BIT),yes)
@@ -29,7 +28,7 @@ TARGET_LIB_DIR = $(BIN_DIR)/lib/$(MY_DIR_PREFIX)_$(MY_ARCH)
 TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
 
 # Compiler and yasm flags
-CFLAGS	= -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(OPUS_DIR) -I$(SPEEX_DIR)\
+CFLAGS	= -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR)\
 		-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
 		-fomit-frame-pointer -std=gnu99 \
@@ -65,6 +64,8 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)libavresample/x86 \
 	$(OBJ_DIR)libavutil \
 	$(OBJ_DIR)libavutil/x86 \
+	$(OBJ_DIR)libswresample \
+	$(OBJ_DIR)libswresample/x86 \
 	$(OBJ_DIR)libswscale \
 	$(OBJ_DIR)libswscale/x86 \
 	$(TARGET_LIB_DIR)
@@ -235,8 +236,6 @@ SRCS_C = \
 	libavcodec/lagarithrac.c \
 	libavcodec/latm_parser.c \
 	libavcodec/libopenjpegdec.c \
-	libavcodec/libopus.c \
-	libavcodec/libopusdec.c \
 	libavcodec/libspeexdec.c \
 	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \
@@ -295,6 +294,12 @@ SRCS_C = \
 	libavcodec/nellymoser.c \
 	libavcodec/nellymoserdec.c \
 	libavcodec/options.c \
+	libavcodec/opus.c \
+	libavcodec/opus_celt.c \
+	libavcodec/opus_imdct.c \
+	libavcodec/opus_parser.c \
+	libavcodec/opus_silk.c \
+	libavcodec/opusdec.c \
 	libavcodec/parser.c \
 	libavcodec/png.c \
 	libavcodec/pngdec.c \
@@ -502,6 +507,12 @@ SRCS_C = \
 	libavutil/x86/cpu.c \
 	libavutil/x86/float_dsp_init.c \
 	libavutil/x86/lls_init.c \
+	libswresample/audioconvert.c \
+	libswresample/dither.c\
+	libswresample/rematrix.c \
+	libswresample/resample.c \
+	libswresample/swresample.c \
+	libswresample/x86/swresample_x86.c \
 	libswscale/input.c \
 	libswscale/options.c \
 	libswscale/output.c \
@@ -572,6 +583,8 @@ SRCS_YASM = \
 	libavutil/x86/emms.asm \
 	libavutil/x86/float_dsp.asm \
 	libavutil/x86/lls.asm \
+	libswresample/x86/audio_convert.asm \
+	libswresample/x86/rematrix.asm \
 	libswscale/x86/input.asm \
 	libswscale/x86/output.asm \
 	libswscale/x86/scale.asm

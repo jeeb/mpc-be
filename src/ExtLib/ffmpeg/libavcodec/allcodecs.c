@@ -166,6 +166,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MP2FLOAT, mp2float);
     REGISTER_DECODER (MP3FLOAT, mp3float);
     REGISTER_DECODER (NELLYMOSER, nellymoser);
+    REGISTER_DECODER(OPUS, opus);
     REGISTER_DECODER (RA_144, ra_144);
     REGISTER_DECODER (RA_288, ra_288);
     REGISTER_DECODER (RALF, ralf);
@@ -221,7 +222,7 @@ void avcodec_register_all(void)
 
     /* external libraries */
     REGISTER_DECODER (LIBOPENJPEG, libopenjpeg);
-    REGISTER_DECODER (LIBOPUS, libopus);
+/*  REGISTER_DECODER (LIBOPUS, libopus); */
     REGISTER_DECODER (LIBSPEEX, libspeex);
 /*  REGISTER_DECODER (LIBVPX_VP9, libvpx_vp9); */
 }

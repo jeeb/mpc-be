@@ -1,7 +1,4 @@
 /*
- * libopus encoder/decoder common code
- * Copyright (c) 2012 Nicolas George
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -19,30 +16,42 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <opus_defines.h>
+#ifndef AVCODEC_OPUS_IMDCT_H
+#define AVCODEC_OPUS_IMDCT_H
 
-#include "libavutil/common.h"
-#include "libavutil/error.h"
-#include "libopus.h"
+#include <stddef.h>
 
-int ff_opus_error_to_averror(int err)
-{
-    switch (err) {
-    case OPUS_BAD_ARG:
-        return AVERROR(EINVAL);
-    case OPUS_BUFFER_TOO_SMALL:
-        return AVERROR_UNKNOWN;
-    case OPUS_INTERNAL_ERROR:
-        return AVERROR(EFAULT);
-    case OPUS_INVALID_PACKET:
-        return AVERROR_INVALIDDATA;
-    case OPUS_UNIMPLEMENTED:
-        return AVERROR(ENOSYS);
-    case OPUS_INVALID_STATE:
-        return AVERROR_UNKNOWN;
-    case OPUS_ALLOC_FAIL:
-        return AVERROR(ENOMEM);
-    default:
-        return AVERROR(EINVAL);
-    }
-}
+#include "avfft.h"
+
+typedef struct CeltIMDCTContext {
+    int fft_n;
+    int len2;
+    int len4;
+
+    FFTComplex *tmp;
+
+    FFTComplex *twiddle_exptab;
+
+    FFTComplex *exptab[6];
+
+    /**
+     * Calculate the middle half of the iMDCT
+     */
+    void (*imdct_half)(struct CeltIMDCTContext *s, float *dst, const float *src,
+                       ptrdiff_t src_stride, float scale);
+} CeltIMDCTContext;
+
+/**
+ * Init an iMDCT of the length 2 * 15 * (2^N)
+ */
+int ff_celt_imdct_init(CeltIMDCTContext **s, int N);
+
+/**
+ * Free an iMDCT.
+ */
+void ff_celt_imdct_uninit(CeltIMDCTContext **s);
+
+
+void ff_celt_imdct_init_aarch64(CeltIMDCTContext *s);
+
+#endif /* AVCODEC_OPUS_IMDCT_H */
