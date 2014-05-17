@@ -14037,7 +14037,7 @@ void CMainFrame::OpenSetupAudioStream()
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS) {
-			CComQIPtr<ITrackInfo> pInfo = pSS;
+			//CComQIPtr<ITrackInfo> pInfo = pSS;
 			DWORD cStreamsS = 0;
 			if (SUCCEEDED(pSS->Count(&cStreamsS)) && cStreamsS > 0) {
 				for (int i = 0; i < (int)cStreamsS; i++) {
@@ -14056,6 +14056,7 @@ void CMainFrame::OpenSetupAudioStream()
 						}
 
 						as.forced = as.def = false;
+						/*
 						if (pInfo) {
 							TrackElement TrackInfo;
 							TrackInfo.Size = sizeof(TrackInfo);
@@ -14064,6 +14065,7 @@ void CMainFrame::OpenSetupAudioStream()
 								as.forced	= !!TrackInfo.FlagForced;
 							}
 						}
+						*/
 
 						as.iFilter	= 1;
 						as.iIndex	= i;
@@ -14083,6 +14085,7 @@ void CMainFrame::OpenSetupAudioStream()
 		CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
 		if (pSSa) {
 
+			/*
 			UINT maxAudioTrack = 0;
 			CComQIPtr<ITrackInfo> pInfo = FindFilter(__uuidof(CMatroskaSourceFilter), m_pGB);
 			if (!pInfo) {
@@ -14097,6 +14100,7 @@ void CMainFrame::OpenSetupAudioStream()
 					}
 				}
 			}
+			*/
 
 			DWORD cStreamsA = 0;
 			int i = MixAS.GetCount() > 0 ? 1 : 0;
@@ -14110,6 +14114,7 @@ void CMainFrame::OpenSetupAudioStream()
 					}
 
 					as.forced = as.def = false;
+					/*
 					UINT l = i + 1;
 					if (pInfo && l <= maxAudioTrack) {
 						TrackElement TrackInfo;
@@ -14119,6 +14124,7 @@ void CMainFrame::OpenSetupAudioStream()
 							as.forced	= !!TrackInfo.FlagForced;
 						}
 					}
+					*/
 
 					if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
 						//iSel = 1;
