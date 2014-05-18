@@ -160,7 +160,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 
 		pos += ((m_major == 2) ? 3 + 3 : 4 + 4 + 2) + size;
 
-		if (pos > gb.GetSize() || tag == 0) {
+		if (pos < 0 || pos > gb.GetSize() || tag == 0) {
 			break;
 		}
 
