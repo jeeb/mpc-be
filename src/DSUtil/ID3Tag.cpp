@@ -152,10 +152,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			size	= (DWORD)gb.BitRead(24);
 		} else {
 			tag		= (DWORD)gb.BitRead(32);
-			size	|= gb.BitRead(8) << 24;
-			size	|= gb.BitRead(8) << 16;
-			size	|= gb.BitRead(8) << 8;
-			size	|= gb.BitRead(8);
+			size	= (DWORD)gb.BitRead(32);
 			WORD flags = (WORD)gb.BitRead(16);
 			UNREFERENCED_PARAMETER(flags);
 		}
@@ -460,11 +457,12 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* ID3tag)
 			if (item->GetType() == ID3Type::ID3_TYPE_BINARY && item->GetDataLen()) {
 				CString mime = item->GetMime();
 				CString fname;
-				if (mime == L"image/jpeg") {
+				if (mime == L"image/jpeg" || mime == L"image/jpg") {
 					fname = L"cover.jpg";
 				} else if (mime == L"image/png") {
 					fname = L"cover.png";
 				} else {
+					fname = mime;
 					fname.Replace(L"image/", L"cover.");
 				}
 
