@@ -136,6 +136,8 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 	return wstr;
 }
 
+#define TAG_SIZE ((m_major == 2) ? 6 : 10)
+
 BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 {
 	CGolombBuffer gb(buf, len);
@@ -158,9 +160,13 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			UNREFERENCED_PARAMETER(flags);
 		}
 
-		pos += ((m_major == 2) ? 3 + 3 : 4 + 4 + 2) + size;
+		if (TAG_SIZE + size + pos > len) {
+			break;
+		}
 
-		if (pos < 0 || pos > gb.GetSize() || tag == 0) {
+		pos += TAG_SIZE + size;
+
+		if (pos > gb.GetSize() || tag == 0) {
 			break;
 		}
 
