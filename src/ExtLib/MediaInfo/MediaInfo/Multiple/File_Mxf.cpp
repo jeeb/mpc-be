@@ -1123,7 +1123,12 @@ void File_Mxf::Streams_Finish()
         {
             for (essences::iterator Essence=Essences.begin(); Essence!=Essences.end(); ++Essence)
                 for (parsers::iterator Parser=Essence->second.Parsers.begin(); Parser!=Essence->second.Parsers.end(); ++Parser)
+                {
                     Merge(*(*Parser));
+
+                    if (IsSub && StreamKind_Last!=Stream_Max && Retrieve(StreamKind_Last, StreamPos_Last, "MuxingMode").empty())
+                        Fill(StreamKind_Last, StreamPos_Last, "MuxingMode", "MXF");
+                }
         }
         else
             for (tracks::iterator Track=Tracks.begin(); Track!=Tracks.end(); ++Track)
@@ -2094,6 +2099,15 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                     Fill(Stream_Video, StreamPos_Last, Video_ScanOrder, ScanOrder_Temp, true);
             }
         }
+
+        //BlockAlignment
+        if (StreamKind_Last==Stream_Audio && Descriptor->second.BlockAlign!=(int16u)-1)
+        {
+            if (Retrieve(Stream_Audio, StreamPos_Last, "BlockAlignment").empty()) //TODO: check the reason it is sometimes call several times.
+                Fill(Stream_Audio, StreamPos_Last, "BlockAlignment", Descriptor->second.BlockAlign);
+            if (StreamPos_Last<Count_Get(Stream_Audio))
+                (*Stream_More)[Stream_Audio][StreamPos_Last](Ztring().From_Local("BlockAlignment"), Info_Options)=__T("N NT");
+        }
     }
 
     //Fallback on partition data if classic methods failed
@@ -2242,6 +2256,9 @@ void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 Edit
 
         if (Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount)).empty())
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount), FrameCount);
+
+        if (Retrieve(StreamKind_Last, StreamPos_Last, "FrameRate").empty())
+            Fill(StreamKind_Last, StreamPos_Last, "FrameRate", EditRate);
     }
 
     //For the sequence, searching Structural componenents
@@ -2256,7 +2273,8 @@ void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 Edit
                     IsDuplicate=true;
             if (!IsDuplicate)
             {
-                TimeCode TC(Component2->second.TimeCode_StartTimecode-Origin+Config->File_IgnoreFramesBefore, (int8u)Component2->second.TimeCode_RoundedTimecodeBase, Component2->second.TimeCode_DropFrame);
+                //Note: Origin is not part of the StartTimecode for the first frame in the source package. From specs: "For a Timecode Track with a single Timecode Component and with origin N, where N greater than 0, the timecode value at the Zero Point of the Track equals the start timecode of the Timecode Component incremented by N units."
+                TimeCode TC(Component2->second.TimeCode_StartTimecode+Config->File_IgnoreFramesBefore, (int8u)Component2->second.TimeCode_RoundedTimecodeBase, Component2->second.TimeCode_DropFrame);
                 Stream_Prepare(Stream_Other);
                 Fill(Stream_Other, StreamPos_Last, Other_ID, TrackID);
                 Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
