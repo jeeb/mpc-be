@@ -551,6 +551,7 @@ SRCS_YASM = \
 	libavcodec/x86/h264_qpel_8bit.asm \
 	libavcodec/x86/h264_weight.asm \
 	libavcodec/x86/h264_weight_10bit.asm \
+	libavcodec/x86/hevc_deblock.asm \
 	libavcodec/x86/hevc_mc.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/imdct36.asm \

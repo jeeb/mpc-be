@@ -44,6 +44,7 @@
     <None Include="libavcodec\x86\h264_qpel_8bit.asm" />
     <None Include="libavcodec\x86\h264_weight.asm" />
     <None Include="libavcodec\x86\h264_weight_10bit.asm" />
+    <None Include="libavcodec\x86\hevc_deblock.asm" />
     <None Include="libavcodec\x86\hevc_mc.asm" />
     <None Include="libavcodec\x86\hpeldsp.asm" />
     <None Include="libavcodec\x86\imdct36.asm" />

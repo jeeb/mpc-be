@@ -229,6 +229,9 @@
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\hevc_deblock.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
