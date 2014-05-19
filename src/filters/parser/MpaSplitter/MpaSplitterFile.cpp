@@ -130,57 +130,37 @@ HRESULT CMpaSplitterFile::Init()
 
 	int searchlen		= 0;
 	__int64 startpos	= 0;
-	__int64 syncpos		= 0;
 
-	__int64 startpos_mp3 = m_startpos;
-
-	__int64 len = min(GetLength(), 5 * MEGABYTE);
-	while (m_mode == none) {
-		if (!MP3_find && GetPos() >= 2048) {
-			break;
-		}
-
-		if ((len - GetPos()) < 512) {
-			break;
-		}
-
-		searchlen = (int)min(endpos - startpos_mp3, 512);
-		Seek(startpos_mp3);
-
-		// If we fail to see sync bytes, we reposition here and search again
-		syncpos = startpos_mp3 + searchlen;
+	__int64 endDataPos = min(GetAvailable() - MPA_HEADER_SIZE, MEGABYTE + m_startpos);
+	while (m_mode == none && endDataPos > (GetPos() + MPA_HEADER_SIZE)) {
+		searchlen = (int)min(endDataPos - GetPos(), 512);
 
 		// Check for a valid MPA header
 		if (Read(m_mpahdr, searchlen, &m_mt, true)) {
-			m_mode = mpa;
-
 			// check multiple frame to ensure that the data is correct
 			__int64 savepos = GetPos() - MPA_HEADER_SIZE;
-			for (int i = 0; i < 5; i++) {
-				syncpos = GetPos();
-				startpos = i ? syncpos : (syncpos - MPA_HEADER_SIZE);
-				Seek(startpos + m_mpahdr.FrameSize);
+			Seek(savepos + m_mpahdr.FrameSize);
+
+			int nValidFrameCount = 0;
+			while (endDataPos > GetPos() + MPA_HEADER_SIZE) {
+				m_mode = mpa;
 				if (!Sync(MPA_HEADER_SIZE)) {
 					m_mode = none;
 					break;
 				}
+				nValidFrameCount++;
+
+				Seek(GetPos() + m_mpahdr.FrameSize);
 			}
 
-			if (m_mode == mpa) {
+			if (m_mode == mpa && nValidFrameCount >= 5) {
 				startpos = savepos;
 				break;
 			}
 		}
-
-		// If we have enough room to search for a valid header, then skip ahead and try again
-		if (endpos - syncpos >= 8) {
-			startpos_mp3 = syncpos;
-		} else {
-			break;
-		}
 	}
 
-	searchlen = (int)min(endpos - m_startpos, 512);
+	searchlen = (int)min(GetAvailable(), 512);
 	Seek(m_startpos);
 
 	if (m_mode == none && Read(m_aachdr, searchlen, &m_mt)) {
@@ -224,7 +204,7 @@ HRESULT CMpaSplitterFile::Init()
 		}
 
 		if (dwFrames) {
-			bool l3ext = m_mpahdr.layer == 3 && !(m_mpahdr.version&1);
+			bool l3ext = m_mpahdr.layer == 3 && !(m_mpahdr.version & 1);
 			DWORD dwSamplesPerFrame = m_mpahdr.layer == 1 ? 384 : l3ext ? 576 : 1152;
 
 			m_bIsVBR = true;
