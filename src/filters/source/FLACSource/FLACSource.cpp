@@ -216,7 +216,6 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			UNREFERENCED_PARAMETER(revision);
 			BYTE flags = 0;
 			m_file.Read(&flags, sizeof(flags));
-			UNREFERENCED_PARAMETER(flags);
 
 			DWORD size;
 			m_file.Read(&size, sizeof(size));
@@ -230,7 +229,7 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				BYTE* buf = DNew BYTE[size];
 				m_file.Read(buf, size);
 
-				pID3Tag = DNew CID3Tag(major);
+				pID3Tag = DNew CID3Tag(major, flags);
 				pID3Tag->ReadTagsV2(buf, size);
 				delete [] buf;
 			}

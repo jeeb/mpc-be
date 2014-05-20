@@ -67,6 +67,7 @@ class CID3Tag
 {
 protected:
 	BYTE m_major;
+	BYTE m_flags;
 
 	CString ReadText(CGolombBuffer& gb, DWORD &size, BYTE encoding);
 	CString ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding);
@@ -75,7 +76,7 @@ public:
 	CAtlMap<DWORD, CString>	Tags;
 	CAtlList<CID3TagItem*>	TagItems;
 
-	CID3Tag(BYTE major = 0);
+	CID3Tag(BYTE major = 0, BYTE flags = 0);
 	virtual ~CID3Tag();
 
 	void Clear();

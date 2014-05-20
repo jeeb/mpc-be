@@ -80,7 +80,6 @@ HRESULT CMpaSplitterFile::Init()
 		UNREFERENCED_PARAMETER(revision);
 
 		BYTE flags = (BYTE)BitRead(8);
-		UNREFERENCED_PARAMETER(flags);
 
 		DWORD size = BitRead(32);
 		size = (((size & 0x7F000000) >> 0x03) |
@@ -96,7 +95,7 @@ HRESULT CMpaSplitterFile::Init()
 			BYTE* buf = DNew BYTE[size];
 			ByteRead(buf, size);
 
-			ID3Tag = DNew CID3Tag(major);
+			ID3Tag = DNew CID3Tag(major, flags);
 			ID3Tag->ReadTagsV2(buf, size);
 			delete [] buf;
 		}
@@ -219,7 +218,6 @@ HRESULT CMpaSplitterFile::Init()
 	clock_t start = clock();
 	int i = 0;
 	while (Sync(FrameSize, rtFrameDur) && (clock() - start) < CLOCKS_PER_SEC) {
-		TRACE(_T("%I64d\n"), m_rtDuration);
 		Seek(GetPos() + FrameSize);
 		i = rtPrevDur == m_rtDuration ? i + 1 : 0;
 		if (i == 10) {
@@ -247,17 +245,15 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 			mpahdr h;
 
 			if (Read(h, (int)(endpos - GetPos()), NULL, true)) {
-				if (m_mpahdr == h) {
-					Seek(GetPos() - MPA_HEADER_SIZE);
-					AdjustDuration(h.nBytesPerSec);
+				Seek(GetPos() - MPA_HEADER_SIZE);
+				AdjustDuration(h.nBytesPerSec);
 
-					FrameSize	= h.FrameSize;
-					rtDuration	= h.rtDuration;
+				FrameSize	= h.FrameSize;
+				rtDuration	= h.rtDuration;
 
-					memcpy(&m_mpahdr, &h, sizeof(mpahdr));
+				memcpy(&m_mpahdr, &h, sizeof(mpahdr));
 
-					return true;
-				}
+				return true;
 			} else {
 				break;
 			}

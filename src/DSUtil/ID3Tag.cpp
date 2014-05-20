@@ -46,8 +46,9 @@ CID3TagItem::CID3TagItem(CAtlArray<BYTE>& data, CString mime)
 //
 // ID3Tag class
 //
-CID3Tag::CID3Tag(BYTE major/* = 0*/)
+CID3Tag::CID3Tag(BYTE major/* = 0*/, BYTE flags/* = 0*/)
 	: m_major(major)
+	, m_flags(flags)
 {
 }
 
@@ -147,14 +148,14 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 
 		DWORD tag	= 0;
 		DWORD size	= 0;
+		WORD flags	= 0;
 		if (m_major == 2) {
 			tag		= (DWORD)gb.BitRead(24);
 			size	= (DWORD)gb.BitRead(24);
 		} else {
 			tag		= (DWORD)gb.BitRead(32);
 			size	= (DWORD)gb.BitRead(32);
-			WORD flags = (WORD)gb.BitRead(16);
-			UNREFERENCED_PARAMETER(flags);
+			flags	= (WORD)gb.BitRead(16);
 		}
 
 		if (TAG_SIZE + size + pos > len) {
@@ -170,6 +171,31 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 		if (!size) {
 			continue;
 		}
+
+		CAtlArray<BYTE>	pData;
+		BOOL bUnSync = m_flags & 0x80 || flags & 2;
+		if (bUnSync) {
+			DWORD dwSize = size;
+			while (dwSize) {
+				BYTE b = gb.ReadByte();
+				pData.Add(b);
+				dwSize--;
+				if (b == 0xFF && dwSize > 1) {
+					b = gb.ReadByte();
+					dwSize--;
+					if (!b) {
+						b = gb.ReadByte();
+						dwSize--;
+					}
+					pData.Add(b);
+				}
+			}
+		} else {
+			pData.SetCount(size);
+			gb.ReadBuffer(pData.GetData(), size);
+		}
+		CGolombBuffer gbData(pData.GetData(), pData.GetCount());
+		size = pData.GetCount();
 
 		if (tag == 'TIT2'
 				|| tag == 'TPE1'
@@ -187,19 +213,19 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			if (tag == 'APIC' || tag == '\0PIC') {
 				TCHAR mime[64];
 				memset(&mime, 0 ,64);
-				BYTE encoding = (BYTE)gb.BitRead(8);
+				BYTE encoding = (BYTE)gbData.BitRead(8);
 				size--;
 
 				int mime_len = 0;
-				while (size-- && (mime[mime_len++] = gb.BitRead(8)) != 0) {
+				while (size-- && (mime[mime_len++] = gbData.BitRead(8)) != 0) {
 					;
 				}
 
-				BYTE pic_type = (BYTE)gb.BitRead(8);
+				BYTE pic_type = (BYTE)gbData.BitRead(8);
 				size--;
 
 				if (tag == 'APIC') {
-					CString Desc = ReadField(gb, size, encoding);
+					CString Desc = ReadField(gbData, size, encoding);
 					UNREFERENCED_PARAMETER(Desc);
 				}
 
@@ -216,54 +242,54 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 
 				CAtlArray<BYTE>	Data;
 				Data.SetCount(size);
-				gb.ReadBuffer(Data.GetData(), size);
+				gbData.ReadBuffer(Data.GetData(), size);
 
 				CID3TagItem* item = DNew CID3TagItem(Data, mimeStr);
 				TagItems.AddTail(item);
 			} else if (tag == '\0ULT' || tag == 'USLT') {
 				// Text encoding
-				BYTE encoding = (BYTE)gb.BitRead(8);
+				BYTE encoding = (BYTE)gbData.BitRead(8);
 				size--;
 						
 				// Language
 				CHAR lang[3];
 				memset(&lang, 0 ,3);
-				gb.ReadBuffer((BYTE*)lang, 3);
+				gbData.ReadBuffer((BYTE*)lang, 3);
 				UNREFERENCED_PARAMETER(lang);
 				size -= 3;
 
-				CString Desc = ReadField(gb, size, encoding);
+				CString Desc = ReadField(gbData, size, encoding);
 				UNREFERENCED_PARAMETER(Desc);
 
-				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gb, size, encoding));
+				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gbData, size, encoding));
 				TagItems.AddTail(item);
 			} else {
 
 				// Text encoding
-				BYTE encoding = (BYTE)gb.BitRead(8);
+				BYTE encoding = (BYTE)gbData.BitRead(8);
 				size--;
 
 				if (tag == 'COMM') {
 					// Language
 					CHAR lang[3];
 					memset(&lang, 0 ,3);
-					gb.ReadBuffer((BYTE*)lang, 3);
+					gbData.ReadBuffer((BYTE*)lang, 3);
 					UNREFERENCED_PARAMETER(lang);
 					size -= 3;
 
-					if (gb.BitRead(8, true) == 0) {
-						gb.BitRead(8);
+					if (gbData.BitRead(8, true) == 0) {
+						gbData.BitRead(8);
 						size--;
 					}
 	
-					DWORD bom_big = (DWORD)gb.BitRead(32, true);
+					DWORD bom_big = (DWORD)gbData.BitRead(32, true);
 					if (bom_big == 0xfffe0000 || bom_big == 0xfeff0000) {
-						gb.BitRead(32);
+						gbData.BitRead(32);
 						size -= 4;
 					}
 				}
 
-				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gb, size, encoding));
+				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gbData, size, encoding));
 				TagItems.AddTail(item);
 			}
 		}
