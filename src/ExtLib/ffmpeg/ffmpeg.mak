@@ -408,7 +408,6 @@ SRCS_C = \
 	libavcodec/x86/fft_init.c \
 	libavcodec/x86/flacdsp_init.c \
 	libavcodec/x86/fmtconvert_init.c \
-	libavcodec/x86/fpel_mmx.c \
 	libavcodec/x86/h263dsp_init.c \
 	libavcodec/x86/h264_intrapred_init.c \
 	libavcodec/x86/h264chroma_init.c \
@@ -474,6 +473,7 @@ SRCS_C = \
 	libavutil/cpu.c \
 	libavutil/crc.c \
 	libavutil/dict.c \
+	libavutil/display.c \
 	libavutil/downmix_info.c \
 	libavutil/error.c \
 	libavutil/eval.c \

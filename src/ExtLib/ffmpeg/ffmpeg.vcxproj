@@ -395,6 +395,7 @@
     <ClInclude Include="libavutil\cpu_internal.h" />
     <ClInclude Include="libavutil\crc.h" />
     <ClInclude Include="libavutil\dict.h" />
+    <ClInclude Include="libavutil\display.h" />
     <ClInclude Include="libavutil\downmix_info.h" />
     <ClInclude Include="libavutil\dynarray.h" />
     <ClInclude Include="libavutil\error.h" />
@@ -802,7 +803,6 @@
     <ClCompile Include="libavcodec\x86\fft_init.c" />
     <ClCompile Include="libavcodec\x86\flacdsp_init.c" />
     <ClCompile Include="libavcodec\x86\fmtconvert_init.c" />
-    <ClCompile Include="libavcodec\x86\fpel_mmx.c" />
     <ClCompile Include="libavcodec\x86\h263dsp_init.c" />
     <ClCompile Include="libavcodec\x86\h264chroma_init.c" />
     <ClCompile Include="libavcodec\x86\h264dsp_init.c" />
@@ -873,6 +873,7 @@
     <ClCompile Include="libavutil\cpu.c" />
     <ClCompile Include="libavutil\crc.c" />
     <ClCompile Include="libavutil\dict.c" />
+    <ClCompile Include="libavutil\display.c" />
     <ClCompile Include="libavutil\downmix_info.c" />
     <ClCompile Include="libavutil\error.c" />
     <ClCompile Include="libavutil\eval.c" />

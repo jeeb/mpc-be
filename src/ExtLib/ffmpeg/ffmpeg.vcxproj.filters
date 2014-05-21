@@ -1321,6 +1321,9 @@
     <ClInclude Include="libswresample\version.h">
       <Filter>libswresample</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\display.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.c" />
@@ -1364,9 +1367,6 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\fmtconvert_init.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\fpel_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\h263dsp_init.c">
@@ -2739,6 +2739,9 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\display.c">
+      <Filter>libavutil</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -767,6 +767,16 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
 
             memcpy(frame_sd->data, packet_sd, size);
         }
+
+        /* copy the displaymatrix to the output frame */
+        packet_sd = av_packet_get_side_data(pkt, AV_PKT_DATA_DISPLAYMATRIX, &size);
+        if (packet_sd) {
+            frame_sd = av_frame_new_side_data(frame, AV_FRAME_DATA_DISPLAYMATRIX, size);
+            if (!frame_sd)
+                return AVERROR(ENOMEM);
+
+            memcpy(frame_sd->data, packet_sd, size);
+        }
     } else {
         frame->pkt_pts = AV_NOPTS_VALUE;
         av_frame_set_pkt_pos     (frame, -1);
@@ -1636,7 +1646,11 @@ int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size)
             av_fast_padded_malloc(&avctx->internal->byte_buffer, &avctx->internal->byte_buffer_size, size);
             avpkt->data = avctx->internal->byte_buffer;
             avpkt->size = avctx->internal->byte_buffer_size;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
             avpkt->destruct = NULL;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         }
     }
 
@@ -1808,7 +1822,11 @@ int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
             }
             avpkt->buf      = user_pkt.buf;
             avpkt->data     = user_pkt.data;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
             avpkt->destruct = user_pkt.destruct;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         } else {
             if (av_dup_packet(avpkt) < 0) {
                 ret = AVERROR(ENOMEM);
@@ -2009,7 +2027,11 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
             }
             avpkt->buf      = user_pkt.buf;
             avpkt->data     = user_pkt.data;
+#if FF_API_DESTRUCT_PACKET
+FF_DISABLE_DEPRECATION_WARNINGS
             avpkt->destruct = user_pkt.destruct;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         } else {
             if (av_dup_packet(avpkt) < 0) {
                 ret = AVERROR(ENOMEM);
@@ -2545,7 +2567,8 @@ end:
         iconv_close(cd);
     return ret;
 #else
-    av_assert0(!"requesting subtitles recoding without iconv");
+    av_log(avctx, AV_LOG_ERROR, "requesting subtitles recoding without iconv");
+    return AVERROR(EINVAL);
 #endif
 }
 
