@@ -294,8 +294,8 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	m_length	-= m_length % m_nBlockAlign;
-	m_endpos	= m_startpos + m_length;
+	m_length		-= m_length % m_nBlockAlign;
+	m_endpos		= m_startpos + m_length;
 	m_rtduration	= 10000000i64 * m_length / m_nAvgBytesPerSec;
 
 	CheckDTSAC3CD();

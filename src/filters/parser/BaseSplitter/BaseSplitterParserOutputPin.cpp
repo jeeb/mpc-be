@@ -29,13 +29,6 @@
 #define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e - 8 && (*(WORD*)b != 0x770b)) b++;
 #define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - 9 && ((*(WORD*)b & 0xf0ff) != 0xf0ff)) b++;
 
-#ifndef BSWAP32
-#define BSWAP32(x)	((x >> 24) & 0x000000ff) | \
-					((x >>  8) & 0x0000ff00) | \
-					((x <<  8) & 0x00ff0000) | \
-					((x << 24) & 0xff000000);
-#endif
-
 //
 // CBaseSplitterParserOutputPin
 //
@@ -47,21 +40,13 @@ CBaseSplitterParserOutputPin::CBaseSplitterParserOutputPin(CAtlArray<CMediaType>
 	, m_truehd_framelength(0)
 	, m_nChannels(0)
 	, m_nSamplesPerSec(0)
+	, m_wBitsPerSample(0)
 {
 }
 
 CBaseSplitterParserOutputPin::~CBaseSplitterParserOutputPin()
 {
 	Flush();
-}
-
-void CBaseSplitterParserOutputPin::InitAudioParams()
-{
-	if (m_mt.pbFormat) {
-		const WAVEFORMATEX *wfe	= GetFormatHelper(wfe, &m_mt);
-		m_nChannels				= wfe->nChannels;
-		m_nSamplesPerSec		= wfe->nSamplesPerSec;
-	}
 }
 
 HRESULT CBaseSplitterParserOutputPin::Flush()
@@ -73,8 +58,6 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 
 	m_bFlushed				= true;
 	m_truehd_framelength	= 0;
-
-	m_hdmvLPCM.Clear();
 
 	InitAudioParams();
 
@@ -107,7 +90,17 @@ void CBaseSplitterParserOutputPin::InitPacket(Packet* pSource)
 	pSource->rtStop			= INVALID_TIME;
 }
 
-#define HandlePacket \
+void CBaseSplitterParserOutputPin::InitAudioParams()
+{
+	if (m_mt.pbFormat) {
+		const WAVEFORMATEX *wfe	= GetFormatHelper(wfe, &m_mt);
+		m_nChannels				= wfe->nChannels;
+		m_nSamplesPerSec		= wfe->nSamplesPerSec;
+		m_wBitsPerSample		= wfe->wBitsPerSample;
+	}
+}
+
+#define HandlePacket(offset) \
 	CAutoPtr<Packet> p2(DNew Packet());			\
 	p2->TrackNumber		= m_p->TrackNumber;		\
 	p2->bDiscontinuity	= m_p->bDiscontinuity;	\
@@ -125,7 +118,7 @@ void CBaseSplitterParserOutputPin::InitPacket(Packet* pSource)
 	p2->pmt		= m_p->pmt;						\
 	m_p->pmt	= NULL;							\
 	\
-	p2->SetData(start, size);					\
+	p2->SetData(start + offset, size - offset);	\
 	\
 	if (!p2->pmt && m_bFlushed) {				\
 		p2->pmt		= CreateMediaType(&m_mt);	\
@@ -241,7 +234,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<Packet> p)
 				}
 			}
 
-			HandlePacket;
+			HandlePacket(0);
 							
 			start += size;
 		} else {
@@ -286,8 +279,8 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<Packet> p)
 		CAutoPtr<Packet> p2;
 
 		while (Nalu.ReadNext()) {
-			DWORD dwNalLength = Nalu.GetDataLength();
-			dwNalLength = BSWAP32(dwNalLength);
+			DWORD dwNalLength	= Nalu.GetDataLength();
+			dwNalLength			= _byteswap_ulong(dwNalLength);
 
 			CAutoPtr<Packet> p3(DNew Packet());
 
@@ -436,7 +429,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<Packet> p)
 
 		int size = next - start;
 
-		HandlePacket;
+		HandlePacket(0);
 
 		start		= next;
 		bSeqFound	= (*(DWORD*)start == 0x0D010000);
@@ -452,47 +445,65 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<Packet> p)
 HRESULT CBaseSplitterParserOutputPin::ParseHDMVLPCM(CAutoPtr<Packet> p)
 {
 	if (!m_p) {
-		m_p.Attach(DNew Packet());
+		InitPacket(p);
 	}
+
 	m_p->Append(*p);
 
 	if (m_p->GetCount() < 4) {
 		m_p.Free();
-		return S_OK;	// Should be invalid packet
+		return S_OK;
 	}
 
-	BYTE* start = m_p->GetData();
-	audioframe_t aframe;
-	size_t packet_size = ParseHdmvLPCMHeader(start, &aframe);
+	BYTE* start	= m_p->GetData();
+	BYTE* end	= start + m_p->GetCount();
 
-	if (!packet_size || packet_size > m_p->GetCount()) {
-		if (!packet_size) {
-			m_p.Free();
+	for(;;) {
+		if (start <= end - 4) {
+			audioframe_t aframe;
+			int size = ParseHdmvLPCMHeader(start, &aframe);
+			if (size == 0) {
+				start++;
+				continue;
+			}
+
+			if (m_nChannels != aframe.channels
+					|| m_nSamplesPerSec != aframe.samplerate
+					|| m_wBitsPerSample != aframe.param1) {
+				start++;
+				continue;
+			}
+
+			if (start + size > end) {
+				break;
+			}
+
+			if (start + size + 4 <= end) {
+				audioframe_t aframe2;
+				int size2 = ParseHdmvLPCMHeader(start + size, &aframe2);
+				if (size2 == 0
+						|| size2 != size
+						|| aframe2.channels != aframe.channels
+						|| aframe2.samplerate != aframe.samplerate
+						|| aframe2.param1 != aframe.param1) {
+					start++;
+					continue;
+				}
+			}
+
+			HandlePacket(4);
+							
+			start += size;
+		} else {
+			break;
 		}
-		return S_OK;
 	}
 
-	if (!m_hdmvLPCM.samplerate) {
-		m_hdmvLPCM.samplerate	= aframe.samplerate;
-		m_hdmvLPCM.channels		= aframe.channels;
-		m_hdmvLPCM.packetsize	= packet_size;
+	if (start > m_p->GetData()) {
+		m_p->RemoveAt(0, start - m_p->GetData());
 	}
 
-	if (m_hdmvLPCM.samplerate != aframe.samplerate
-		|| m_hdmvLPCM.channels != aframe.channels
-		|| m_hdmvLPCM.packetsize != packet_size) {
-		m_p.Free();
-		return S_OK;
-	}
-
-	if (!p->pmt && m_bFlushed) {
-		p->pmt = CreateMediaType(&m_mt);
-		m_bFlushed = false;
-	}
-	p->SetData(start + 4, m_p->GetCount() - 4);
-	m_p.Free();
-
-	return __super::DeliverPacket(p);
+	return S_OK;
 }
 
 HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<Packet> p)
@@ -528,7 +539,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<Packet> p)
 				break;
 			}
 
-			HandlePacket;
+			HandlePacket(0);
 							
 			start += size;
 		} else {
@@ -591,7 +602,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTrueHD(CAutoPtr<Packet> p)
 			break;
 		}
 
-		HandlePacket;
+		HandlePacket(0);
 							
 		start += size;
 	}
