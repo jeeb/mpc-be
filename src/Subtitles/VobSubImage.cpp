@@ -150,7 +150,9 @@ bool CVobSubImage::Decode(BYTE* lpData, int packetsize, int datasize,
 
 void CVobSubImage::GetPacketInfo(BYTE* lpData, int packetsize, int datasize)
 {
-	//	delay = 0;
+	if (packetsize <= datasize) {
+		return;
+	}
 
 	int i, nextctrlblk = datasize;
 	WORD pal = 0, tr = 0;
@@ -158,9 +160,9 @@ void CVobSubImage::GetPacketInfo(BYTE* lpData, int packetsize, int datasize)
 	do {
 		i = nextctrlblk;
 
-		int t = (lpData[i] << 8) | lpData[i+1];
+		int t = (lpData[i] << 8) | lpData[i + 1];
 		i += 2;
-		nextctrlblk = (lpData[i] << 8) | lpData[i+1];
+		nextctrlblk = (lpData[i] << 8) | lpData[i + 1];
 		i += 2;
 
 		if (nextctrlblk > packetsize || nextctrlblk < datasize) {
@@ -200,7 +202,7 @@ void CVobSubImage::GetPacketInfo(BYTE* lpData, int packetsize, int datasize)
 					break;
 			}
 
-			if (i+len >= packetsize) {
+			if (i + len >= packetsize) {
 				TRACE(_T("Warning: Wrong subpicture parameter block ending\n"));
 				break;
 			}
@@ -216,27 +218,27 @@ void CVobSubImage::GetPacketInfo(BYTE* lpData, int packetsize, int datasize)
 					delay = 1024 * t / 90;
 					break;
 				case 0x03:
-					pal = (lpData[i] << 8) | lpData[i+1];
+					pal = (lpData[i] << 8) | lpData[i + 1];
 					i += 2;
 					break;
 				case 0x04:
-					if (lpData[i] || lpData[i+1]) {
-						tr = (lpData[i] << 8) | lpData[i+1];
+					if (lpData[i] || lpData[i + 1]) {
+						tr = (lpData[i] << 8) | lpData[i + 1];
 					}
 					i += 2;
 					//tr &= 0x00f0;
 					break;
 				case 0x05:
-					rect = CRect((lpData[i] << 4) + (lpData[i+1] >> 4),
-								 (lpData[i+3] << 4) + (lpData[i+4] >> 4),
-								 ((lpData[i+1] & 0x0f) << 8) + lpData[i+2] + 1,
-								 ((lpData[i+4] & 0x0f) << 8) + lpData[i+5] + 1);
+					rect = CRect((lpData[i] << 4) + (lpData[i + 1] >> 4),
+								 (lpData[i + 3] << 4) + (lpData[i + 4] >> 4),
+								 ((lpData[i + 1] & 0x0f) << 8) + lpData[i + 2] + 1,
+								 ((lpData[i + 4] & 0x0f) << 8) + lpData[i + 5] + 1);
 					i += 6;
 					break;
 				case 0x06:
-					nOffset[0] = (lpData[i] << 8) + lpData[i+1];
+					nOffset[0] = (lpData[i] << 8) + lpData[i + 1];
 					i += 2;
-					nOffset[1] = (lpData[i] << 8) + lpData[i+1];
+					nOffset[1] = (lpData[i] << 8) + lpData[i + 1];
 					i += 2;
 					break;
 				case 0xff: // end of ctrlblk
