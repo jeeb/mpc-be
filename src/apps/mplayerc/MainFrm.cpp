@@ -2845,7 +2845,7 @@ bool CMainFrame::GraphEventComplete()
 			if (s.fNextInDirAfterPlayback) {
 				NextMediaExist = SearchInDir(true);
 			}
-			if (!s.fNextInDirAfterPlayback || !(NextMediaExist>1)) {
+			if (!s.fNextInDirAfterPlayback || !(NextMediaExist > 1)) {
 				if (s.fRewind) {
 					SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				} else {
@@ -9998,6 +9998,13 @@ void CMainFrame::OnAfterplayback(UINT nID)
 			break;
 		case ID_AFTERPLAYBACK_NEXT:
 			s.fNextInDirAfterPlayback = true;
+			s.fNextInDirAfterPlaybackLooped = false;
+			s.fExitAfterPlayback = false;
+			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
+			break;
+		case ID_AFTERPLAYBACK_NEXT_LOOPED:
+			s.fNextInDirAfterPlayback = true;
+			s.fNextInDirAfterPlaybackLooped = true;
 			s.fExitAfterPlayback = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
 			break;
@@ -10047,10 +10054,13 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 			fChecked = !!s.fExitAfterPlayback;
 			break;
 		case ID_AFTERPLAYBACK_NEXT:
-			fChecked = !!s.fNextInDirAfterPlayback;
+			fChecked = !!s.fNextInDirAfterPlayback && !s.fNextInDirAfterPlaybackLooped;
+			break;
+		case ID_AFTERPLAYBACK_NEXT_LOOPED:
+			fChecked = !!s.fNextInDirAfterPlayback && !!s.fNextInDirAfterPlaybackLooped;
 			break;
 		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
-			fChecked = (!s.fExitAfterPlayback) && (!s.fNextInDirAfterPlayback);
+			fChecked = !s.fExitAfterPlayback && !s.fNextInDirAfterPlayback;
 			break;
 	}
 
@@ -15218,12 +15228,12 @@ static int compare(const void* arg1, const void* arg2)
 
 int CMainFrame::SearchInDir(bool DirForward)
 {
-	CAtlList<CString> Play_sl;
 	// Use CStringElementTraitsI so that the search is case insensitive
 	CAtlList<CString, CStringElementTraitsI<CString>> sl;
 	CAtlArray<fileName> f_array;
 
-	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+	AppSettings& s = AfxGetAppSettings();
+	CMediaFormats& mf = s.m_Formats;
 
 	CString dir		= AddSlash(GetFolderOnly(m_LastOpenFile));
 	CString mask	= dir + L"*.*";
@@ -15248,7 +15258,7 @@ int CMainFrame::SearchInDir(bool DirForward)
 	}
 
 	if (f_array.GetCount() == 1) {
-		return true;
+		return 1;
 	}
 
 	qsort(f_array.GetData(), f_array.GetCount(), sizeof(fileName), compare);
@@ -15258,22 +15268,32 @@ int CMainFrame::SearchInDir(bool DirForward)
 
 	POSITION Pos = sl.Find(m_LastOpenFile);
 	if (Pos == NULL) {
-		return false;
+		return 0;
 	}
 
 	if (DirForward) {
 		if (Pos == sl.GetTailPosition()) {
-			return false;
+			if (s.fNextInDirAfterPlaybackLooped) {
+				Pos = sl.GetHeadPosition();
+			} else {
+				return 0;
+			}
+		} else {
+			sl.GetNext(Pos);
 		}
-		sl.GetNext(Pos);
-
 	} else {
 		if (Pos == sl.GetHeadPosition()) {
-			return false;
+			if (s.fNextInDirAfterPlaybackLooped) {
+				Pos = sl.GetTailPosition();
+			} else {
+				return 0;
+			}
+		} else {
+			sl.GetPrev(Pos);
 		}
-		sl.GetPrev(Pos);
 	}
 
+	CAtlList<CString> Play_sl;
 	Play_sl.AddHead(sl.GetAt(Pos));
 	m_wndPlaylistBar.Open(Play_sl, false);
 	OpenCurPlaylistItem();

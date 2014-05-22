@@ -1650,6 +1650,7 @@ BEGIN
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
+            MENUITEM "Play next in the folder (looped)",     ID_AFTERPLAYBACK_NEXT_LOOPED
             MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
     END
@@ -1815,6 +1816,7 @@ BEGIN
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
+            MENUITEM "Play next in the folder (looped)",     ID_AFTERPLAYBACK_NEXT_LOOPED
             MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
         MENUITEM SEPARATOR
@@ -2164,6 +2166,7 @@ BEGIN
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
+            MENUITEM "Play next in the folder (looped)",     ID_AFTERPLAYBACK_NEXT_LOOPED
             MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
         MENUITEM SEPARATOR

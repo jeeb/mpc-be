@@ -232,6 +232,7 @@
 #define IDS_RS_MPC_WIN7TASKBAR				_T("UseWin7TaskBar")
 #define IDS_RS_MPC_EXIT_AFTER_PB			_T("ExitAfterPlayBack")
 #define IDS_RS_MPC_NEXT_AFTER_PB			_T("SearchInDirAfterPlayBack")
+#define IDS_RS_MPC_NEXT_AFTER_PB_LOOPED		_T("SearchInDirAfterPlayBackLooped")
 #define IDS_RS_MPC_NO_SEARCH_IN_FOLDER		_T("DontUseSearchInFolder")
 #define IDS_RS_USE_TIME_TOOLTIP				_T("UseTimeTooltip")
 #define IDS_RS_TIME_TOOLTIP_POSITION		_T("TimeTooltipPosition")

@@ -713,6 +713,7 @@ public:
 	// After Playback
 	bool			fExitAfterPlayback;
 	bool			fNextInDirAfterPlayback;
+	bool			fNextInDirAfterPlaybackLooped;
 
 	// WINDOWS
 	// Add Favorite
