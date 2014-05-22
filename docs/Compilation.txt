@@ -19,7 +19,7 @@ Part B: Preparing the GCC environment
  NOTES:
   * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
- 1. Download and extract msys_be_20131017.7z to C:\MSYS\ -> http://dev.mpc-next.ru/index.php/topic,1829.0.html
+ 1. Download and extract msys_be_20140522.7z to C:\MSYS\ -> http://dev.mpc-next.ru/index.php/topic,2409.0.html
  2. Edit the "fstab" file in "C:\MSYS\etc\" to specify your MinGW path.
     Add this to it: C:\MSYS\mingw	\mingw
     Note the tab-space between mingw and \mingw
