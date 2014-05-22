@@ -24,7 +24,7 @@
 	* Обновлен Украинский перевод (автор Arestarh1986);
 	* ffmpeg 2.2.x git-1f359c85;
 	* libpng 1.7.0 b35 git-f3b1eb68;
-	* libwebp 0.4.0 git-3da924b5;
+	* libwebp 0.4.0 git-1b99c09c;
 	* MediaInfo 0.7.69+ svn rev.6260;
 	* Little-CMS 2.7 beta git-1948a466;
 	* ZenLib 0.4.29+ svn rev.458;
