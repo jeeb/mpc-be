@@ -270,8 +270,8 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 						strm.Attach(DNew strm_t());
 					}
 					ASSERT(strm->indx == NULL);
-					AVISUPERINDEX* pSuperIndex;
 					if (size < MAXDWORD-8) {
+						AVISUPERINDEX* pSuperIndex;
 						// Fix buffer overrun vulnerability : http://www.vulnhunt.com/advisories/CAL-20070912-1_Multiple_vendor_produce_handling_AVI_file_vulnerabilities.txt
 						TRY {
 							pSuperIndex = (AVISUPERINDEX*)DNew unsigned char [(size_t)(size + 8)];

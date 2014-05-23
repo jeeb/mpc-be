@@ -701,10 +701,10 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 
 	BYTE* pData = page.GetData();
 
-	int i = 0, j = 0, len = 0;
+	int i = 0, j = 0;
 
 	for (POSITION pos = page.m_lens.GetHeadPosition(); pos; page.m_lens.GetNext(pos)) {
-		len = page.m_lens.GetAt(pos);
+		int len = page.m_lens.GetAt(pos);
 		j += len;
 
 		if (len < 255 || pos == page.m_lens.GetTailPosition()) {

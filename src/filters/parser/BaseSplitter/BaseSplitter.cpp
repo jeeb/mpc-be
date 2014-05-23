@@ -121,11 +121,11 @@ HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDs
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
-	AM_MEDIA_TYPE* pmt = NULL;
-
 	CBaseSplitterOutputPin* pPin;
 	if (m_pPinMap.Lookup(TrackNumSrc, pPin)) {
+		AM_MEDIA_TYPE* pmt = NULL;
 		HRESULT hr = S_OK;
+
 		if (CComQIPtr<IPin> pPinTo = pPin->GetConnected()) {
 			for (size_t i = 0; i < mts.size(); i++) {
 				if (S_OK == pPinTo->QueryAccept(&mts[i])) {
