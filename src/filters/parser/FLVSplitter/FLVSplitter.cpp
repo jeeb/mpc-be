@@ -404,7 +404,7 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 		__int64 limit = m_pFile->GetRemaining(true);
 		while (true) {
 			BYTE b = (BYTE)m_pFile->BitRead(8);
-			if (b == FLV_AUDIODATA || b == FLV_VIDEODATA) {
+			if (IsValidTag(b)) {
 				break;
 			}
 			if (--limit < 15) {
@@ -687,7 +687,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining(true)) {
 							__int64 _next = m_pFile->GetPos() + tag.DataSize;
-
 							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
 
 								if (tag.TimeStamp != current_ts) {
@@ -699,13 +698,16 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								if (!first_ts && current_ts) {
 									first_ts = current_ts;
 								}
-
-								current_ts = tag.TimeStamp;
 							}
 							m_pFile->Seek(_next);
+							if (!Sync(_next)) {
+								break;
+							}
 						}
 
-						AvgTimePerFrame = 10000 * (current_ts - first_ts)/(frame_cnt - 1);
+						if (frame_cnt > 1 && current_ts > first_ts) {
+							AvgTimePerFrame = 10000 * (current_ts - first_ts) / (frame_cnt - 1);
+						}
 					}
 
 					m_pFile->Seek(pos);
