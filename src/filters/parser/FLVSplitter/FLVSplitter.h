@@ -136,8 +136,8 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 
 	CAtlArray<SyncPoint> m_sps;
 
-	CString AMF0GetString(CBaseSplitterFileEx* pFile, UINT64 end);
-	bool ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array);
+	CString AMF0GetString(UINT64 end);
+	bool ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array);
 
 protected:
 	CAutoPtr<CBaseSplitterFileEx> m_pFile;

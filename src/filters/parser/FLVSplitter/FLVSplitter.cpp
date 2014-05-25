@@ -162,39 +162,39 @@ static double int64toDouble(__int64 value)
 	return intfloat64.f;
 }
 
-CString CFLVSplitterFilter::AMF0GetString(CBaseSplitterFileEx* pFile, UINT64 end)
+CString CFLVSplitterFilter::AMF0GetString(UINT64 end)
 {
 	char name[256] = {0};
 
-	SHORT length = pFile->BitRead(16);
-	if (UINT64(pFile->GetPos() + length) > end) {
+	SHORT length = m_pFile->BitRead(16);
+	if (UINT64(m_pFile->GetPos() + length) > end) {
 		return L"";
 	}
 
 	if (length > sizeof(name)) {
-		pFile->Seek(pFile->GetPos() + length);
+		m_pFile->Seek(m_pFile->GetPos() + length);
 		return L"";
 	}
 
-	pFile->ByteRead((BYTE*)name, length);
+	m_pFile->ByteRead((BYTE*)name, length);
 
 	return CString(name);
 }
 
-bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array)
+bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array)
 {
-	if (UINT64(pFile->GetPos()) >= (end - 2)) {
+	if (UINT64(m_pFile->GetPos()) >= (end - 2)) {
 		return false;
 	}
 
 	AMF0 amf0;
 
-	AMF_DATA_TYPE amf_type = (AMF_DATA_TYPE)pFile->BitRead(8);
+	AMF_DATA_TYPE amf_type = (AMF_DATA_TYPE)m_pFile->BitRead(8);
 
 	switch (amf_type) {
 		case AMF_DATA_TYPE_NUMBER:
 			{
-				UINT64 value = pFile->BitRead(64);
+				UINT64 value	= m_pFile->BitRead(64);
 
 				amf0.type		= amf_type;
 				amf0.name		= key;
@@ -203,7 +203,7 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 			break;
 		case AMF_DATA_TYPE_BOOL:
 			{
-				BYTE value = pFile->BitRead(8);
+				BYTE value		= m_pFile->BitRead(8);
 
 				amf0.type		= amf_type;
 				amf0.name		= key;
@@ -214,7 +214,7 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 			{
 				amf0.type		= amf_type;
 				amf0.name		= key;
-				amf0.value_s	= AMF0GetString(pFile, end);
+				amf0.value_s	= AMF0GetString(end);
 			}
 			break;
 		case AMF_DATA_TYPE_OBJECT:
@@ -223,15 +223,15 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 					CAtlArray<double> times;
 					CAtlArray<double> filepositions;
 					for (;;) {
-						CString name	= AMF0GetString(pFile, end);
+						CString name	= AMF0GetString(end);
 						if (name.IsEmpty()) {
 							break;
 						}
-						BYTE value		= pFile->BitRead(8);
+						BYTE value		= m_pFile->BitRead(8);
 						if (value != AMF_DATA_TYPE_ARRAY) {
 							break;
 						}
-						WORD arraylen	= pFile->BitRead(32);
+						WORD arraylen	= m_pFile->BitRead(32);
 						CAtlArray<double>* array = NULL;
 						if (name == KEYFRAMES_BYTEOFFSET_TAG) {
 							array		= &filepositions;
@@ -242,11 +242,11 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 						}
 
 						for (int i = 0; i < arraylen; i++) {
-							BYTE value = pFile->BitRead(8);
+							BYTE value = m_pFile->BitRead(8);
 							if (value != AMF_DATA_TYPE_NUMBER) {
 								break;
 							}
-							array->Add(int64toDouble(pFile->BitRead(64)));
+							array->Add(int64toDouble(m_pFile->BitRead(64)));
 						}
 					}
 
@@ -265,31 +265,31 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 			return true;
 		case AMF_DATA_TYPE_MIXEDARRAY:
 			{
-				pFile->BitRead(32);
+				m_pFile->BitRead(32);
 				for (;;) {
-					CString name = AMF0GetString(pFile, end);
+					CString name = AMF0GetString(end);
 					if (name.IsEmpty()) {
 						return false;
 					}
-					if (ParseAMF0(pFile, end, name, AMF0Array) == false) {
+					if (ParseAMF0(end, name, AMF0Array) == false) {
 						return false;
 					}
 				}
 
-				return (pFile->BitRead(8) == AMF_END_OF_OBJECT);
+				return (m_pFile->BitRead(8) == AMF_END_OF_OBJECT);
 			}
 		case AMF_DATA_TYPE_ARRAY:
 			{
-				DWORD arraylen = pFile->BitRead(32);
+				DWORD arraylen = m_pFile->BitRead(32);
 				for (DWORD i = 0; i < arraylen; i++) {
-					if (ParseAMF0(pFile, end, L"", AMF0Array) == false) {
+					if (ParseAMF0(end, L"", AMF0Array) == false) {
 						return false;
 					}
 				}
 			}
 			break; // TODO ...
 		case AMF_DATA_TYPE_DATE:
-			pFile->Seek(pFile->GetPos() + 8 + 2);
+			m_pFile->Seek(m_pFile->GetPos() + 8 + 2);
 			return true;
 	}
 
@@ -525,7 +525,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_pFile->ByteRead((BYTE*)name, length);
 				if (!strncmp(name, "onTextData", length) || (!strncmp(name, "onMetaData", length))) {
 					CAtlArray<AMF0> AMF0Array;
-					ParseAMF0(m_pFile, next, CString(name), AMF0Array);
+					ParseAMF0(next, CString(name), AMF0Array);
 
 					for (size_t i = 0; i < AMF0Array.GetCount(); i++) {
 						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER) {
