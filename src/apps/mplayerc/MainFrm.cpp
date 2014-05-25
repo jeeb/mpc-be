@@ -14330,20 +14330,6 @@ void CMainFrame::SubFlags(CString strname, bool& forced, bool& def)
 
 size_t CMainFrame::GetSubSelIdx()
 {
-	if (b_UseVSFilter) {
-		size_t SelectedLanguage = 0;
-		/*
-		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS) {
-			int nLangs;
-			if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-				pDVS->get_SelectedLanguage(&SelectedLanguage);
-			}
-		}
-		*/
-		return SelectedLanguage;
-	}
-
 	AppSettings& s	= AfxGetAppSettings();
 	CString slo		= s.strSubtitlesLanguageOrder;
 	slo.Replace(L"[fc]", L"forced");
@@ -14462,30 +14448,28 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 	b_UseVSFilter = false;
 
 	CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-	if (pDVS) {
+	if (pDVS && !GetStreamCount(2)) {
 		b_UseVSFilter = true;
 		int nLangs;
 		if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-			// TODO ...
-			/*
 			SubStreams substream;
 			subarray.RemoveAll();
 
-			for (int i=0; i<nLangs; i++) {
+			for (int i = 0; i < nLangs; i++) {
 				WCHAR *pName;
-				pDVS->get_LanguageName(i, &pName);
-				CString streamName(pName);
+				if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
+					substream.iFilter	= 1;
+					substream.iNum		= i;
+					substream.iIndex	= i;
+					substream.lang		= pName;
 
-				substream.Extsub	= false;
-				substream.iFilter	= 1;
-				substream.iNum		= i;
-				substream.iIndex	= i;
-				substream.forced	= false;
-				substream.def		= false;
+					subarray.Add(substream);
 
-				subarray.Add(substream);
+					CoTaskMemFree(pName);
+				}
 			}
-			*/
+
+			pDVS->put_SelectedLanguage(GetSubSelIdx());
 		}
 	}
 
@@ -14550,7 +14534,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						bool Forced, Def;
 						SubFlags(lang, Forced, Def);
 
-						substream.lang		= CString(pName);
+						substream.lang		= pName;
 						substream.forced	= Forced;
 						substream.def		= Def;
 
@@ -14598,7 +14582,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					bool Forced, Def;
 					SubFlags(lang, Forced, Def);
 
-					substream.lang		= CString(pName);
+					substream.lang		= pName;
 					substream.forced	= Forced;
 					substream.def		= Def;
 
@@ -14642,7 +14626,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				WCHAR* pName = NULL;
 				LCID lcid;
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
-					CString name = CString(pName);
+					CString name(pName);
 
 					substream.Extsub	= true;
 					substream.iFilter	= 2;
