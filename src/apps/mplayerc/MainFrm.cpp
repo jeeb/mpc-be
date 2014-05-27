@@ -20122,6 +20122,13 @@ CString CMainFrame::GetStrForTitle()
 				}
 				EndEnumFilters;
 			}
+
+			if (m_iMediaLoadState == MLS_LOADED) {
+				CPlaylistItem pli;
+				if (m_wndPlaylistBar.GetCur(pli)) {
+					return pli.GetLabel();
+				}
+			}
 		}
 		return m_strFn;
 	} else {

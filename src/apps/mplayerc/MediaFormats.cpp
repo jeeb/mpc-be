@@ -370,7 +370,7 @@ void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		CMediaFormatCategory& mfc = GetAt(i);
-		if (mfc.GetFileType() == TAudio || mfc.GetEngineType() == DirectShow) {
+		if (mfc.GetFileType() == TAudio/* && mfc.GetEngineType() == DirectShow*/) {
 			strTemp	= GetAt(i).GetFilter() + _T(";");
 			mask[0]	+= strTemp;
 			filter	+= strTemp;
@@ -383,7 +383,7 @@ void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		CMediaFormatCategory& mfc = GetAt(i);
-		if (mfc.GetFileType() == TAudio || mfc.GetEngineType() == DirectShow) {
+		if (mfc.GetFileType() == TAudio/* && mfc.GetEngineType() == DirectShow*/) {
 			filter += mfc.GetDescription() + _T("|") + GetAt(i).GetFilter() + _T("|");
 			mask.Add(mfc.GetFilter());
 		}

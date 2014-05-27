@@ -348,7 +348,7 @@ void CPlaylistItem::AutoLoadFiles()
 
 					if (hFind != INVALID_HANDLE_VALUE) {
 						do {
-							if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+							if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 								continue;
 							}
 
@@ -397,7 +397,7 @@ void CPlaylistItem::AutoLoadFiles()
 				hFind = FindFirstFile(searchPattern[j], &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					do {
-						if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+						if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 							continue;
 						}
 
@@ -415,6 +415,74 @@ void CPlaylistItem::AutoLoadFiles()
 					} while (FindNextFile(hFind, &fd));
 
 					FindClose(hFind);
+				}
+			}
+		}
+	}
+
+	// cue-sheet file auto-load
+	CString cuefn(fn);
+	cuefn.Replace(ext, L"cue");
+	if (::PathFileExists(cuefn)) {
+		CString filter;
+		CAtlArray<CString> mask;
+		AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
+		CAtlList<CString> sl;
+		Explode(mask[0], sl, ';');
+
+		BOOL bExists = false;
+		POSITION pos = sl.GetHeadPosition();
+		while (pos) {
+			CString _mask = sl.GetNext(pos);
+			_mask.Delete(0, 2);
+			_mask.MakeLower();
+			if (_mask == ext) {
+				bExists = TRUE;
+				break;
+			}
+		}
+
+		if (bExists) {
+			CFileItem* fi = &m_fns.GetHead();
+			if (!fi->GetChapterCount()) {
+
+				CString Title, Performer;
+				CAtlList<CUETrack> CUETrackList;
+				if (ParseCUESheetFile(cuefn, CUETrackList, Title, Performer)) {
+					CAtlList<CString> fileNames;
+					POSITION pos = CUETrackList.GetHeadPosition();
+					while (pos) {
+						CUETrack cueTrack = CUETrackList.GetNext(pos);
+						if (!fileNames.Find(cueTrack.m_fn)) {
+							fileNames.AddTail(cueTrack.m_fn);
+						}
+					}
+					if (fileNames.GetCount() == 1) {
+						// support opening cue-sheet file with only a single file inside, even if its name differs from the current
+						MakeCUETitle(m_label, Title, Performer);
+
+						POSITION posCue = CUETrackList.GetHeadPosition();
+						while (posCue) {
+							CUETrack cueTrack = CUETrackList.GetNext(posCue);
+							CString cueTrackTitle;
+							MakeCUETitle(cueTrackTitle, cueTrack.m_Title, cueTrack.m_Performer, cueTrack.m_trackNum);
+							fi->AddChapter(Chapters(cueTrackTitle, cueTrack.m_rt));
+						}
+						fi->SetTitle(m_label);
+
+						ChaptersList chaplist;
+						fi->GetChapters(chaplist);
+						BOOL bTrustedChap = FALSE;
+						for (size_t i = 0; i < chaplist.size(); i++) {
+							if (chaplist[i].rt > 0) {
+								bTrustedChap = TRUE;
+								break;
+							}
+						}
+						if (!bTrustedChap) {
+							fi->ClearChapter();
+						}
+					}
 				}
 			}
 		}
