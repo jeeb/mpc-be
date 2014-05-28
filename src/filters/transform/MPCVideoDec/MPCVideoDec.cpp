@@ -2343,11 +2343,12 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 			// Update start time cache
 			// If more data was read then output, update the cache (incomplete frame)
-			// If output is bigger, a frame was completed, update the actual rtStart with the cached value, and then overwrite the cache
+			// If output is bigger or equal, a frame was completed, update the actual rtStart with the cached value, and then overwrite the cache
 			if (used_bytes > pOut_size) {
 				if (rtStartIn != INVALID_TIME) {
 					m_rtStartCache = rtStartIn;
 				}
+			/*
 			} else if (used_bytes == pOut_size || ((used_bytes + 9) == pOut_size)) {
 				// Why +9 above?
 				// Well, apparently there are some broken MKV muxers that like to mux the MPEG-2 PICTURE_START_CODE block (which is 9 bytes) in the package with the previous frame
@@ -2355,6 +2356,8 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				// So instead of failing on those samples, lets just assume that 9 bytes are that case exactly.
 				m_rtStartCache = rtStartIn = INVALID_TIME;
 			} else if (pOut_size > used_bytes) {
+			*/
+			} else {
 				rtStart			= m_rtStartCache;
 				m_rtStartCache	= rtStartIn;
 				// The value was used once, don't use it for multiple frames, that ends up in weird timings
