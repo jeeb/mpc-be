@@ -32,15 +32,6 @@
 #define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return S_FALSE; }
 #define CHECK_HR_FRAME(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex)); return S_FALSE; }
 
-#define CheckKeyFrame \
-	if (m_bWaitingForKeyFrame && got_picture) {	\
-		if (m_pFilter->GetFrame()->key_frame) {	\
-			m_bWaitingForKeyFrame = FALSE;		\
-		} else {								\
-			got_picture = 0;					\
-		}										\
-	}											\
-
 class CMPCVideoDecFilter;
 struct AVFrame;
 
@@ -112,7 +103,6 @@ protected :
 	GUID						m_guidDecoder;
 
 	CMPCVideoDecFilter*			m_pFilter;
-	BOOL						m_bWaitingForKeyFrame;
 
 	PICTURE_STORE*				m_pPictureStore;		// Store reference picture, and delayed B-frames
 	int							m_nPicEntryNumber;		// Total number of picture in store

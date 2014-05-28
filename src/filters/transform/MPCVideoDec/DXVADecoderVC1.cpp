@@ -160,7 +160,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 		return S_FALSE;
 	}
 
-	CheckKeyFrame;
+	m_pFilter->HandleKeyFrame(got_picture);
 
 	{
 		bSecondField = FALSE;

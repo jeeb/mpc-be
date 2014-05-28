@@ -2207,6 +2207,19 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 	}
 }
 
+void CMPCVideoDecFilter::HandleKeyFrame(int& got_picture)
+{
+	if (m_bWaitKeyFrame) {
+		if (m_bWaitingForKeyFrame && got_picture) {
+			if (m_pFrame->key_frame) {
+				m_bWaitingForKeyFrame = FALSE;
+			} else {
+				got_picture = 0;
+			}
+		}
+	}
+}
+
 #define RM_SKIP_BITS(n)	(buffer<<=n)
 #define RM_SHOW_BITS(n)	((buffer)>>(32-(n)))
 static int rm_fix_timestamp(uint8_t *buf, int64_t timestamp, enum AVCodecID nCodecId, int64_t *kf_base, int *kf_pts)
@@ -2396,15 +2409,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			return S_OK;
 		}
 
-		if (m_bWaitKeyFrame) {
-			if (m_bWaitingForKeyFrame && got_picture) {
-				if (m_pFrame->key_frame) {
-					m_bWaitingForKeyFrame = FALSE;
-				} else {
-					got_picture = 0;
-				}
-			}
-		}
+		HandleKeyFrame(got_picture);
 
 		if (!got_picture || !m_pFrame->data[0]) {
 			if (!avpkt.size) {

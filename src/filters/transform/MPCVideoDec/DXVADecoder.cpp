@@ -113,7 +113,6 @@ void CDXVADecoder::Flush()
 	m_nSurfaceIndex			= -1;
 	m_pSampleToDeliver.Release();
 
-	m_bWaitingForKeyFrame	= TRUE;
 	m_dwDisplayCount		= 1;
 }
 

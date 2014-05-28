@@ -110,7 +110,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		return S_FALSE;
 	}
 
-	CheckKeyFrame;
+	m_pFilter->HandleKeyFrame(got_picture);
 
 	for (UINT i = 0; i < m_DXVA_Context.frame_count; i++) {
 		DXVA_MPEG2_Context* pDXVA_MPEG2_ctx = &m_DXVA_Context.DXVA_MPEG2Context[i];

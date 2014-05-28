@@ -120,7 +120,7 @@ protected:
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
 
-	// === DXVA common variables
+	// === common variables
 	VIDEO_OUTPUT_FORMATS*					m_pVideoOutputFormat;
 	int										m_nVideoOutputCount;
 	CDXVADecoder*							m_pDXVADecoder;
@@ -244,7 +244,7 @@ public:
 	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
 	STDMETHODIMP_(int) GetFrameType();
 
-	// === DXVA common functions
+	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
 	BOOL						IsSupportedDecoderMode(const GUID* mode);
 	int							GetPicEntryNumber();
@@ -267,6 +267,7 @@ public:
 	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void						FlushDXVADecoder();
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
+	void						HandleKeyFrame(int& got_picture);
 
 	// === DXVA1 functions
 	DDPIXELFORMAT*				GetPixelFormat() { return &m_DDPixelFormat; }
