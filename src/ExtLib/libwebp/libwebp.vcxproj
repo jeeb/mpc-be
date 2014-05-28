@@ -108,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="dec\alphai.h" />
     <ClInclude Include="dsp\dsp.h" />
+    <ClInclude Include="dsp\yuv_tables_sse2.h" />
     <ClInclude Include="enc\cost.h" />
     <ClInclude Include="enc\vp8enci.h" />
     <ClInclude Include="utils\alpha_processing.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="dsp\dec_clip_tables.c" />
     <ClCompile Include="dsp\dec_sse2.c" />
     <ClCompile Include="dsp\enc.c" />
+    <ClCompile Include="dsp\enc_avx2.c" />
     <ClCompile Include="dsp\enc_sse2.c" />
     <ClCompile Include="dsp\lossless.c" />
     <ClCompile Include="dsp\lossless_sse2.c" />
