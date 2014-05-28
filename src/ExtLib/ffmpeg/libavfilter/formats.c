@@ -343,15 +343,19 @@ int ff_add_channel_layout(AVFilterChannelLayouts **l, uint64_t channel_layout)
 AVFilterFormats *ff_all_formats(enum AVMediaType type)
 {
     AVFilterFormats *ret = NULL;
-    int fmt;
-    int num_formats = type == AVMEDIA_TYPE_VIDEO ? AV_PIX_FMT_NB    :
-                      type == AVMEDIA_TYPE_AUDIO ? AV_SAMPLE_FMT_NB : 0;
 
-    for (fmt = 0; fmt < num_formats; fmt++) {
-        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
-        if ((type != AVMEDIA_TYPE_VIDEO) ||
-            (type == AVMEDIA_TYPE_VIDEO && !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL)))
+    if (type == AVMEDIA_TYPE_VIDEO) {
+        const AVPixFmtDescriptor *desc = NULL;
+        while ((desc = av_pix_fmt_desc_next(desc))) {
+            if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+                ff_add_format(&ret, av_pix_fmt_desc_get_id(desc));
+        }
+    } else if (type == AVMEDIA_TYPE_AUDIO) {
+        enum AVSampleFormat fmt = 0;
+        while (av_get_sample_fmt_name(fmt)) {
             ff_add_format(&ret, fmt);
+            fmt++;
+        }
     }
 
     return ret;
@@ -372,7 +376,7 @@ AVFilterFormats *ff_planar_sample_fmts(void)
     AVFilterFormats *ret = NULL;
     int fmt;
 
-    for (fmt = 0; fmt < AV_SAMPLE_FMT_NB; fmt++)
+    for (fmt = 0; av_get_bytes_per_sample(fmt)>0; fmt++)
         if (av_sample_fmt_is_planar(fmt))
             ff_add_format(&ret, fmt);
 
@@ -568,7 +572,7 @@ int ff_parse_pixel_format(enum AVPixelFormat *ret, const char *arg, void *log_ct
     int pix_fmt = av_get_pix_fmt(arg);
     if (pix_fmt == AV_PIX_FMT_NONE) {
         pix_fmt = strtol(arg, &tail, 0);
-        if (*tail || (unsigned)pix_fmt >= AV_PIX_FMT_NB) {
+        if (*tail || !av_pix_fmt_desc_get(pix_fmt)) {
             av_log(log_ctx, AV_LOG_ERROR, "Invalid pixel format '%s'\n", arg);
             return AVERROR(EINVAL);
         }
@@ -583,7 +587,7 @@ int ff_parse_sample_format(int *ret, const char *arg, void *log_ctx)
     int sfmt = av_get_sample_fmt(arg);
     if (sfmt == AV_SAMPLE_FMT_NONE) {
         sfmt = strtol(arg, &tail, 0);
-        if (*tail || (unsigned)sfmt >= AV_SAMPLE_FMT_NB) {
+        if (*tail || av_get_bytes_per_sample(sfmt)<=0) {
             av_log(log_ctx, AV_LOG_ERROR, "Invalid sample format '%s'\n", arg);
             return AVERROR(EINVAL);
         }

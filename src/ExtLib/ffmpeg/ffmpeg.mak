@@ -217,6 +217,7 @@ SRCS_C = \
 	libavcodec/huffman.c \
 	libavcodec/huffyuv.c \
 	libavcodec/huffyuvdec.c \
+	libavcodec/huffyuvdsp.c \
 	libavcodec/imc.c \
 	libavcodec/imgconvert.c \
 	libavcodec/indeo3.c \
@@ -403,7 +404,6 @@ SRCS_C = \
 	libavcodec/x86/diracdsp_mmx.c \
 	libavcodec/x86/dsputil_init.c \
 	libavcodec/x86/dsputil_mmx.c \
-	libavcodec/x86/dsputil_x86.c \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fft_init.c \
 	libavcodec/x86/flacdsp_init.c \
@@ -415,7 +415,8 @@ SRCS_C = \
 	libavcodec/x86/hevcdsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
-	libavcodec/x86/hpeldsp_mmx.c \
+	libavcodec/x86/huffyuvdsp_init.c \
+	libavcodec/x86/huffyuvdsp_mmx.c \
 	libavcodec/x86/idct_mmx_xvid.c \
 	libavcodec/x86/idct_sse2_xvid.c \
 	libavcodec/x86/lossless_videodsp_init.c \
@@ -502,6 +503,7 @@ SRCS_C = \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
 	libavutil/stereo3d.c \
+	libavutil/threadmessage.c \
 	libavutil/timecode.c \
 	libavutil/utils.c \
 	libavutil/x86/cpu.c \
@@ -554,6 +556,7 @@ SRCS_YASM = \
 	libavcodec/x86/hevc_deblock.asm \
 	libavcodec/x86/hevc_mc.asm \
 	libavcodec/x86/hpeldsp.asm \
+	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/imdct36.asm \
 	libavcodec/x86/lossless_videodsp.asm \
 	libavcodec/x86/mpeg4qpel.asm \

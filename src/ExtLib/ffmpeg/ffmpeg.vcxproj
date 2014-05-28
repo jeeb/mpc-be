@@ -47,6 +47,7 @@
     <None Include="libavcodec\x86\hevc_deblock.asm" />
     <None Include="libavcodec\x86\hevc_mc.asm" />
     <None Include="libavcodec\x86\hpeldsp.asm" />
+    <None Include="libavcodec\x86\huffyuvdsp.asm" />
     <None Include="libavcodec\x86\imdct36.asm" />
     <None Include="libavcodec\x86\lossless_videodsp.asm" />
     <None Include="libavcodec\x86\mpeg4qpel.asm" />
@@ -80,6 +81,8 @@
     <None Include="libavutil\x86\lls.asm" />
     <None Include="libavutil\x86\x86inc.asm" />
     <None Include="libavutil\x86\x86util.asm" />
+    <None Include="libswresample\x86\audio_convert.asm" />
+    <None Include="libswresample\x86\rematrix.asm" />
     <None Include="libswscale\x86\input.asm" />
     <None Include="libswscale\x86\output.asm" />
     <None Include="libswscale\x86\scale.asm" />
@@ -188,6 +191,8 @@
     <ClInclude Include="libavcodec\hpeldsp.h" />
     <ClInclude Include="libavcodec\huffman.h" />
     <ClInclude Include="libavcodec\huffyuv.h" />
+    <ClInclude Include="libavcodec\huffyuvdsp.h" />
+    <ClInclude Include="libavcodec\huffyuvencdsp.h" />
     <ClInclude Include="libavcodec\imcdata.h" />
     <ClInclude Include="libavcodec\imgconvert.h" />
     <ClInclude Include="libavcodec\indeo3data.h" />
@@ -246,6 +251,7 @@
     <ClInclude Include="libavcodec\old_codec_ids.h" />
     <ClInclude Include="libavcodec\options_table.h" />
     <ClInclude Include="libavcodec\opus.h" />
+    <ClInclude Include="libavcodec\opus_imdct.h" />
     <ClInclude Include="libavcodec\parser.h" />
     <ClInclude Include="libavcodec\pixels.h" />
     <ClInclude Include="libavcodec\png.h" />
@@ -348,6 +354,7 @@
     <ClInclude Include="libavcodec\x86\h264_i386.h" />
     <ClInclude Include="libavcodec\x86\hevcdsp.h" />
     <ClInclude Include="libavcodec\x86\hpeldsp.h" />
+    <ClInclude Include="libavcodec\x86\huffyuvdsp.h" />
     <ClInclude Include="libavcodec\x86\idct_xvid.h" />
     <ClInclude Include="libavcodec\x86\inline_asm.h" />
     <ClInclude Include="libavcodec\x86\mathops.h" />
@@ -433,6 +440,7 @@
     <ClInclude Include="libavutil\samplefmt.h" />
     <ClInclude Include="libavutil\sha.h" />
     <ClInclude Include="libavutil\stereo3d.h" />
+    <ClInclude Include="libavutil\threadmessage.h" />
     <ClInclude Include="libavutil\timecode.h" />
     <ClInclude Include="libavutil\timer.h" />
     <ClInclude Include="libavutil\version.h" />
@@ -443,8 +451,11 @@
     <ClInclude Include="libavutil\x86\intreadwrite.h" />
     <ClInclude Include="libavutil\x86\timer.h" />
     <ClInclude Include="libavutil\x86_cpu.h" />
+    <ClInclude Include="libswresample\audioconvert.h" />
     <ClInclude Include="libswresample\swresample.h" />
+    <ClInclude Include="libswresample\swresample_internal.h" />
     <ClInclude Include="libswresample\version.h" />
+    <ClInclude Include="libswresample\x86\resample_mmx.h" />
     <ClInclude Include="libswscale\rgb2rgb.h" />
     <ClInclude Include="libswscale\swscale.h" />
     <ClInclude Include="libswscale\swscale_internal.h" />
@@ -606,6 +617,7 @@
     <ClCompile Include="libavcodec\huffman.c" />
     <ClCompile Include="libavcodec\huffyuv.c" />
     <ClCompile Include="libavcodec\huffyuvdec.c" />
+    <ClCompile Include="libavcodec\huffyuvdsp.c" />
     <ClCompile Include="libavcodec\imc.c" />
     <ClCompile Include="libavcodec\imgconvert.c" />
     <ClCompile Include="libavcodec\indeo3.c" />
@@ -798,8 +810,6 @@
     <ClCompile Include="libavcodec\x86\dsputil_init.c" />
     <ClCompile Include="libavcodec\x86\dsputil_mmx.c" />
     <ClCompile Include="libavcodec\x86\dsputil_qns_template.c" />
-    <ClCompile Include="libavcodec\x86\dsputil_x86.c" />
-    <ClCompile Include="libavcodec\x86\fdct.c" />
     <ClCompile Include="libavcodec\x86\fft_init.c" />
     <ClCompile Include="libavcodec\x86\flacdsp_init.c" />
     <ClCompile Include="libavcodec\x86\fmtconvert_init.c" />
@@ -810,8 +820,9 @@
     <ClCompile Include="libavcodec\x86\h264_qpel.c" />
     <ClCompile Include="libavcodec\x86\hevcdsp_init.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_init.c" />
-    <ClCompile Include="libavcodec\x86\hpeldsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_rnd_template.c" />
+    <ClCompile Include="libavcodec\x86\huffyuvdsp_init.c" />
+    <ClCompile Include="libavcodec\x86\huffyuvdsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\idct_mmx_xvid.c" />
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c" />
     <ClCompile Include="libavcodec\x86\lossless_videodsp_init.c" />
@@ -903,11 +914,22 @@
     <ClCompile Include="libavutil\samplefmt.c" />
     <ClCompile Include="libavutil\sha.c" />
     <ClCompile Include="libavutil\stereo3d.c" />
+    <ClCompile Include="libavutil\threadmessage.c" />
     <ClCompile Include="libavutil\timecode.c" />
     <ClCompile Include="libavutil\utils.c" />
     <ClCompile Include="libavutil\x86\cpu.c" />
     <ClCompile Include="libavutil\x86\float_dsp_init.c" />
     <ClCompile Include="libavutil\x86\lls_init.c" />
+    <ClCompile Include="libswresample\audioconvert.c" />
+    <ClCompile Include="libswresample\dither.c" />
+    <ClCompile Include="libswresample\dither_template.c" />
+    <ClCompile Include="libswresample\noise_shaping_data.c" />
+    <ClCompile Include="libswresample\rematrix.c" />
+    <ClCompile Include="libswresample\rematrix_template.c" />
+    <ClCompile Include="libswresample\resample.c" />
+    <ClCompile Include="libswresample\resample_template.c" />
+    <ClCompile Include="libswresample\swresample.c" />
+    <ClCompile Include="libswresample\x86\swresample_x86.c" />
     <ClCompile Include="libswscale\bayer_template.c" />
     <ClCompile Include="libswscale\input.c" />
     <ClCompile Include="libswscale\options.c" />
