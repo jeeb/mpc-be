@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2010-2013 Hendrik Leppkes
+ *      Copyright (C) 2010-2014 Hendrik Leppkes
  *      http://www.1f0.de
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "stdafx.h"
 #include "FormatConverter.h"
 #include "pixconv_sse2_templates.h"
@@ -34,19 +33,31 @@ extern "C" {
 }
 #pragma warning(pop)
 
-HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+int sws_scale2(struct SwsContext *c, const uint8_t *const srcSlice[], const ptrdiff_t srcStride[], int srcSliceY, int srcSliceH, uint8_t *const dst[], const ptrdiff_t dstStride[])
+{
+  int srcStride2[4];
+  int dstStride2[4];
+
+  for (int i = 0; i < 4; i++) {
+    srcStride2[i] = (int)srcStride[i];
+    dstStride2[i] = (int)dstStride[i];
+  }
+  return sws_scale(c, srcSlice, srcStride2, srcSliceY, srcSliceH, dst, dstStride2);
+}
+
+HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const BYTE *y = NULL;
   const BYTE *u = NULL;
   const BYTE *v = NULL;
-  int line, i = 0;
-  int sourceStride = 0;
+  ptrdiff_t line, i = 0;
+  ptrdiff_t sourceStride = 0;
   BYTE *pTmpBuffer = NULL;
 
   if (m_FProps.avpixfmt != AV_PIX_FMT_YUV444P) {
-    uint8_t *tmp[4] = {NULL};
-    int     tmpStride[4] = {0};
-    int scaleStride = FFALIGN(width, 32);
+    uint8_t  *tmp[4] = {NULL};
+    ptrdiff_t tmpStride[4] = {0};
+    ptrdiff_t scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 3);
 
@@ -59,7 +70,7 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int s
     tmpStride[2] = scaleStride;
     tmpStride[3] = 0;
 
-    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+    sws_scale2(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
 
     y = tmp[0];
     u = tmp[1];
@@ -101,22 +112,22 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int s
   return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[], int chromaVertical)
+HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[], int chromaVertical)
 {
   const BYTE *y = NULL;
   const BYTE *u = NULL;
   const BYTE *v = NULL;
-  int line, i = 0;
-  int sourceStride = 0;
+  ptrdiff_t line, i = 0;
+  ptrdiff_t sourceStride = 0;
 
   int shift = 0;
 
   BYTE *pTmpBuffer = NULL;
 
   if ((m_FProps.pftype != PFType_YUV422Px && chromaVertical == 1) || (m_FProps.pftype != PFType_YUV420Px && chromaVertical == 2)) {
-    uint8_t *tmp[4] = {NULL};
-    int     tmpStride[4] = {0};
-    int scaleStride = FFALIGN(width, 32) * 2;
+    uint8_t  *tmp[4] = {NULL};
+    ptrdiff_t tmpStride[4] = {0};
+    ptrdiff_t scaleStride = FFALIGN(width, 32) * 2;
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 2);
 
@@ -129,7 +140,7 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
     tmpStride[2] = scaleStride / 2;
     tmpStride[3] = 0;
 
-    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+    sws_scale2(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
 
     y = tmp[0];
     u = tmp[1];
@@ -208,20 +219,20 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
     out += dstStride; \
   }
 
-HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const int16_t *y = NULL;
   const int16_t *u = NULL;
   const int16_t *v = NULL;
-  int sourceStride = 0;
+  ptrdiff_t sourceStride = 0;
   bool b9Bit = false;
 
   BYTE *pTmpBuffer = NULL;
 
   if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits > 10) {
-    uint8_t *tmp[4] = {NULL};
-    int     tmpStride[4] = {0};
-    int scaleStride = FFALIGN(width, 32);
+    uint8_t  *tmp[4] = {NULL};
+    ptrdiff_t tmpStride[4] = {0};
+    ptrdiff_t scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
 
@@ -234,7 +245,7 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int s
     tmpStride[2] = scaleStride * 2;
     tmpStride[3] = 0;
 
-    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+    sws_scale2(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
 
     y = (int16_t *)tmp[0];
     u = (int16_t *)tmp[1];
@@ -267,19 +278,19 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int s
   return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const int16_t *y = NULL;
   const int16_t *u = NULL;
   const int16_t *v = NULL;
-  int sourceStride = 0;
+  ptrdiff_t sourceStride = 0;
 
   BYTE *pTmpBuffer = NULL;
 
   if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits != 16) {
-    uint8_t *tmp[4] = {NULL};
-    int     tmpStride[4] = {0};
-    int scaleStride = FFALIGN(width, 32);
+    uint8_t  *tmp[4] = {NULL};
+    ptrdiff_t tmpStride[4] = {0};
+    ptrdiff_t scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
 
@@ -292,7 +303,7 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int s
     tmpStride[2] = scaleStride * 2;
     tmpStride[3] = 0;
 
-    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+    sws_scale2(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
 
     y = (int16_t *)tmp[0];
     u = (int16_t *)tmp[1];
@@ -319,7 +330,7 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int s
   return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
 	switch (m_out_pixfmt) {
 	case PixFmt_AYUV:
@@ -343,13 +354,13 @@ HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const int 
 		if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV16 || m_out_pixfmt == PixFmt_YV24) {
 			std::swap(dst[1], dst[2]);
 		}
-		int ret = sws_scale(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);
+		int ret = sws_scale2(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);
 	}
 
 	return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const uint16_t *y = (const uint16_t *)src[0];
   const uint16_t *u = (const uint16_t *)src[1];
@@ -412,7 +423,7 @@ HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const
 
 #define YUV444_PACK_AYUV(dst) *idst++ = v[i] | (u[i] << 8) | (y[i] << 16) | (0xff << 24);
 
-HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const uint8_t *y = (const uint8_t *)src[0];
   const uint8_t *u = (const uint8_t *)src[1];
@@ -468,7 +479,7 @@ HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const uint16_t *y = (const uint16_t *)src[0];
   const uint16_t *u = (const uint16_t *)src[1];
@@ -522,14 +533,10 @@ HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv420_px1x_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv420_px1x_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
-  const uint16_t *y = (const uint16_t *)src[0];
-  const uint16_t *u = (const uint16_t *)src[1];
-  const uint16_t *v = (const uint16_t *)src[2];
-
-  const ptrdiff_t inYStride   = srcStride[0] >> 1;
-  const ptrdiff_t inUVStride  = srcStride[1] >> 1;
+  const ptrdiff_t inYStride   = srcStride[0];
+  const ptrdiff_t inUVStride  = srcStride[1];
   const ptrdiff_t outYStride  = dstStride[0];
   const ptrdiff_t outUVStride = dstStride[1];
   const ptrdiff_t uvHeight    = (m_out_pixfmt == PixFmt_P010 || m_out_pixfmt == PixFmt_P016) ? (height >> 1) : height;
@@ -542,39 +549,35 @@ HRESULT CFormatConverter::convert_yuv420_px1x_le(const uint8_t* const src[4], co
 
   // Process Y
   for (line = 0; line < height; ++line) {
-    __m128i *dst128Y = (__m128i *)(dst[0] + line * outYStride);
+    const uint16_t * const y = (const uint16_t *)(src[0] + line * inYStride);
+          uint16_t * const d = (      uint16_t *)(dst[0] + line * outYStride);
 
     for (i = 0; i < width; i+=16) {
-      // Load 8 pixels into register
-      PIXCONV_LOAD_PIXEL16(xmm0, (y+i+0), m_FProps.lumabits); /* YYYY */
-      PIXCONV_LOAD_PIXEL16(xmm1, (y+i+8), m_FProps.lumabits); /* YYYY */
+      // Load 2x8 pixels into registers
+      PIXCONV_LOAD_PIXEL16X2(xmm0, xmm1, (y+i+0), (y+i+8), m_FProps.lumabits);
       // and write them out
-      _mm_stream_si128(dst128Y++, xmm0);
-      _mm_stream_si128(dst128Y++, xmm1);
+      PIXCONV_PUT_STREAM(d+i+0, xmm0);
+      PIXCONV_PUT_STREAM(d+i+8, xmm1);
     }
-
-    y += inYStride;
   }
 
   // Process UV
   for (line = 0; line < uvHeight; ++line) {
-    __m128i *dst128UV = (__m128i *)(dst[1] + line * outUVStride);
+    const uint16_t * const u = (const uint16_t *)(src[1] + line * inUVStride);
+    const uint16_t * const v = (const uint16_t *)(src[2] + line * inUVStride);
+          uint16_t * const d = (      uint16_t *)(dst[1] + line * outUVStride);
 
     for (i = 0; i < uvWidth; i+=8) {
       // Load 8 pixels into register
-      PIXCONV_LOAD_PIXEL16(xmm0, (v+i), m_FProps.lumabits); /* VVVV */
-      PIXCONV_LOAD_PIXEL16(xmm1, (u+i), m_FProps.lumabits); /* UUUU */
+      PIXCONV_LOAD_PIXEL16X2(xmm0, xmm1, (v+i), (u+i), m_FProps.lumabits); // Load V and U
 
       xmm2 = xmm0;
       xmm0 = _mm_unpacklo_epi16(xmm1, xmm0);    /* UVUV */
       xmm2 = _mm_unpackhi_epi16(xmm1, xmm2);    /* UVUV */
 
-      _mm_stream_si128(dst128UV++, xmm0);
-      _mm_stream_si128(dst128UV++, xmm2);
+      PIXCONV_PUT_STREAM(d + (i << 1) + 0, xmm0);
+      PIXCONV_PUT_STREAM(d + (i << 1) + 8, xmm2);
     }
-
-    u += inUVStride;
-    v += inUVStride;
   }
 
   return S_OK;
@@ -776,7 +779,7 @@ static int __stdcall yuv420yuy2_dispatch(MPCPixFmtType inputFormat, int bpp, con
   return 0;
 }
 
-HRESULT CFormatConverter::convert_yuv420_yuy2(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv420_yuy2(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const uint16_t *dithers = NULL;
   yuv420yuy2_dispatch<0, 0>(m_FProps.pftype, m_FProps.lumabits, src[0], src[1], src[2], dst[0], width, height, srcStride[0], srcStride[1], dstStride[0], NULL);
@@ -785,14 +788,10 @@ HRESULT CFormatConverter::convert_yuv420_yuy2(const uint8_t* const src[4], const
 }
 
 
-HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
-  const uint16_t *y = (const uint16_t *)src[0];
-  const uint16_t *u = (const uint16_t *)src[1];
-  const uint16_t *v = (const uint16_t *)src[2];
-
-  const ptrdiff_t inLumaStride    = srcStride[0] >> 1;
-  const ptrdiff_t inChromaStride  = srcStride[1] >> 1;
+  const ptrdiff_t inLumaStride    = srcStride[0];
+  const ptrdiff_t inChromaStride  = srcStride[1];
   const ptrdiff_t outStride       = dstStride[0];
   const ptrdiff_t chromaWidth     = (width + 1) >> 1;
 
@@ -804,7 +803,10 @@ HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* cons
   _mm_sfence();
 
   for (line = 0;  line < height; ++line) {
-    __m128i *dst128 = (__m128i *)(dst[0] + line * outStride);
+    const uint16_t * const y = (const uint16_t *)(src[0] + line * inLumaStride);
+    const uint16_t * const u = (const uint16_t *)(src[1] + line * inChromaStride);
+    const uint16_t * const v = (const uint16_t *)(src[2] + line * inChromaStride);
+          uint16_t * const d = (      uint16_t *)(dst[0] + line * outStride);
 
     PIXCONV_LOAD_DITHER_COEFFS(xmm7,line,8,dithers);
     xmm4 = xmm5 = xmm6 = xmm7;
@@ -829,25 +831,18 @@ HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* cons
       xmm3 = _mm_unpacklo_epi8(xmm3, xmm2);
       xmm2 = _mm_unpackhi_epi8(xmm0, xmm2);
 
-      _mm_stream_si128(dst128++, xmm3);
-      _mm_stream_si128(dst128++, xmm2);
+      PIXCONV_PUT_STREAM(d + (i << 1) + 0, xmm3);
+      PIXCONV_PUT_STREAM(d + (i << 1) + 8, xmm2);
     }
-    y += inLumaStride;
-    u += inChromaStride;
-    v += inChromaStride;
   }
 
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
-  const uint16_t *y = (const uint16_t *)src[0];
-  const uint16_t *u = (const uint16_t *)src[1];
-  const uint16_t *v = (const uint16_t *)src[2];
-
-  const ptrdiff_t inYStride   = srcStride[0] >> 1;
-  const ptrdiff_t inUVStride  = srcStride[1] >> 1;
+  const ptrdiff_t inYStride   = srcStride[0];
+  const ptrdiff_t inUVStride  = srcStride[1];
 
   const ptrdiff_t outYStride  = dstStride[0];
   const ptrdiff_t outUVStride = dstStride[1];
@@ -874,7 +869,8 @@ HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src
     PIXCONV_LOAD_DITHER_COEFFS(xmm7,line,8,dithers);
     xmm4 = xmm5 = xmm6 = xmm7;
 
-    __m128i *dst128Y = (__m128i *)(dst[0] + line * outYStride);
+    const uint16_t * const y  = (const uint16_t *)(src[0] + line * inYStride);
+          uint16_t * const dy = (      uint16_t *)(dst[0] + line * outYStride);
 
     for (i = 0; i < width; i+=32) {
       // Load pixels into registers, and apply dithering
@@ -886,15 +882,18 @@ HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src
       xmm2 = _mm_packus_epi16(xmm2, xmm3);                     /* YYYYYYYY */
 
       // Write data back
-      _mm_stream_si128(dst128Y++, xmm0);
-      _mm_stream_si128(dst128Y++, xmm2);
+      PIXCONV_PUT_STREAM(dy + (i >> 1) + 0, xmm0);
+      PIXCONV_PUT_STREAM(dy + (i >> 1) + 8, xmm2);
     }
 
     // Process U/V for chromaHeight lines
     if (line < chromaHeight) {
-      __m128i *dst128UV = (__m128i *)(dst[1] + line * outUVStride);
-      __m128i *dst128U = (__m128i *)(dst[2] + line * outUVStride);
-      __m128i *dst128V = (__m128i *)(dst[1] + line * outUVStride);
+      const uint16_t * const u = (const uint16_t *)(src[1] + line * inUVStride);
+      const uint16_t * const v = (const uint16_t *)(src[2] + line * inUVStride);
+
+      uint8_t * const duv = (uint8_t *)(dst[1] + line * outUVStride);
+      uint8_t * const du  = (uint8_t *)(dst[2] + line * outUVStride);
+      uint8_t * const dv  = (uint8_t *)(dst[1] + line * outUVStride);
 
        for (i = 0; i < chromaWidth; i+=16) {
         PIXCONV_LOAD_PIXEL16_DITHER(xmm0, xmm4, (u+i+0), m_FProps.lumabits);  /* U0U0U0U0 */
@@ -909,25 +908,20 @@ HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src
           xmm0 = _mm_unpacklo_epi8(xmm0, xmm2);
           xmm1 = _mm_unpackhi_epi8(xmm1, xmm2);
 
-          _mm_stream_si128(dst128UV++, xmm0);
-          _mm_stream_si128(dst128UV++, xmm1);
+          PIXCONV_PUT_STREAM(duv + (i << 1) + 0, xmm0);
+          PIXCONV_PUT_STREAM(duv + (i << 1) + 16, xmm1);
         } else {
-          _mm_stream_si128(dst128U++, xmm0);
-          _mm_stream_si128(dst128V++, xmm2);
+          PIXCONV_PUT_STREAM(du + i, xmm0);
+          PIXCONV_PUT_STREAM(dv + i, xmm2);
         }
       }
-
-      u += inUVStride;
-      v += inUVStride;
     }
-
-    y += inYStride;
   }
 
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
   const uint8_t *y = src[0];
   const uint8_t *u = src[1];

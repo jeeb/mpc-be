@@ -92,7 +92,7 @@ typedef struct {
 
 class CFormatConverter
 {
-#define CONV_FUNC_PARAMS const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]
+#define CONV_FUNC_PARAMS const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[]
 
 protected:
 	SwsContext*			m_pSwsContext;
