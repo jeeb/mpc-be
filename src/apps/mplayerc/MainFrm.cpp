@@ -789,7 +789,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // fail to create
 	}
 
-	m_pFullscreenWnd	= DNew CFullscreenWnd(this);
+	m_pFullscreenWnd = DNew CFullscreenWnd(this);
 
 	m_bars.AddTail(&m_wndSeekBar);
 	m_bars.AddTail(&m_wndToolBar);
@@ -12930,7 +12930,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (FAILED(hr)) {
 
 			if (fFirst) {
-				if (s.fReportFailedPins) {
+				if (s.fReportFailedPins && !(m_pFullscreenWnd && m_pFullscreenWnd->IsWindow())) {
 					CComQIPtr<IGraphBuilderDeadEnd> pGBDE = m_pGB;
 					if (pGBDE && pGBDE->GetCount()) {
 						CMediaTypesDlg(pGBDE, GetModalParent()).DoModal();
