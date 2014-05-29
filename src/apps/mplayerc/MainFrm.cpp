@@ -14445,11 +14445,10 @@ size_t CMainFrame::GetSubSelIdx()
 
 void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 {
-	b_UseVSFilter = false;
-
 	CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
+	b_UseVSFilter = (pDVS != NULL);
+
 	if (pDVS && !GetStreamCount(2)) {
-		b_UseVSFilter = true;
 		int nLangs;
 		if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 			SubStreams substream;
