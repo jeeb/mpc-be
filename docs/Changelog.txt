@@ -19,6 +19,7 @@ Changes (*):
 	* MpaDecFilter - corrected work with DTS-HD streams for output to S / PDIF output, in which case only output DTS core.
 	* MPCAudioRenderer - improved input validation support for media types;
 	* updated Basque translation (author azpidatziak);
+	* updated Italian translation (author Lord Maius);
 	* Updated German translation (author: Sylt);
 	* updated Dutch translation (author beter);
 	* updated Chinese (Traditional) translation (author beter);
@@ -205,7 +206,7 @@ Changes (*):
 	* improved opening of http-live-streaming links (in .m3u/.m3u8 format): they are not handled as a playlist anymore;
 	* VMR Mixer Mode and YUV Mixing modes now work for any VMR renderer;
 	* updated Basque translation (author azpidatziak);
-	* updated Italian translation (author Lord Maius).
+	* updated Italian translation (author Lord Maius);
 	* updated Dutch translation (author beter);
 	* updated Chinese (Traditional) translation (author beter);
 	* updated Chinese (Simplified) translation (author insolo);
