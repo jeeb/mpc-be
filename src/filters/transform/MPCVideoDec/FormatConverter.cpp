@@ -418,25 +418,30 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	}
 
 	uint8_t*	dstArray[4]			= {NULL};
-	int			dstStrideArray[4]	= {0};
-	int			byteStride			= outStride * swof.codedbytes;
+	ptrdiff_t	dstStrideArray[4]	= {0};
+	ptrdiff_t	byteStride			= outStride * swof.codedbytes;
 
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
 	for (int i = 1; i < swof.planes; ++i) {
-		dstArray[i] = dstArray[i-1] + dstStrideArray[i-1] * (m_planeHeight / swof.planeHeight[i-1]);
+		dstArray[i] = dstArray[i - 1] + dstStrideArray[i - 1] * (m_planeHeight / swof.planeHeight[i-1]);
 		dstStrideArray[i] = byteStride / swof.planeWidth[i];
 	}
 
-	(this->*pConvertFn)(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
+	ptrdiff_t srcStride[4];
+	for (int i = 0; i < 4; i++) {
+		srcStride[i] = pFrame->linesize[i];
+	}
+
+	(this->*pConvertFn)(pFrame->data, srcStride, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
 
 	if (out != dst) {
 		int line = 0;
 
 		// Copy first plane
-		const int widthBytes = m_FProps.width * swof.codedbytes;
-		const int srcStrideBytes = outStride * swof.codedbytes;
-		const int dstStrideBytes = m_dstStride * swof.codedbytes;
+		const size_t widthBytes			= m_FProps.width * swof.codedbytes;
+		const ptrdiff_t srcStrideBytes	= outStride * swof.codedbytes;
+		const ptrdiff_t dstStrideBytes	= m_dstStride * swof.codedbytes;
 		for (line = 0; line < m_FProps.height; ++line) {
 			memcpy(dst, out, widthBytes);
 			out += srcStrideBytes;
@@ -445,11 +450,11 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		dst += (m_planeHeight - m_FProps.height) * dstStrideBytes;
 		
 		for (int plane = 1; plane < swof.planes; ++plane) {
-			const int planeWidth        = widthBytes      / swof.planeWidth[plane];
-			const int activePlaneHeight = m_FProps.height / swof.planeHeight[plane];
-			const int totalPlaneHeight  = m_planeHeight   / swof.planeHeight[plane];
-			const int srcPlaneStride    = srcStrideBytes  / swof.planeWidth[plane];
-			const int dstPlaneStride    = dstStrideBytes  / swof.planeWidth[plane];
+			const size_t planeWidth			= widthBytes      / swof.planeWidth[plane];
+			const int activePlaneHeight		= m_FProps.height / swof.planeHeight[plane];
+			const int totalPlaneHeight		= m_planeHeight   / swof.planeHeight[plane];
+			const ptrdiff_t srcPlaneStride	= srcStrideBytes  / swof.planeWidth[plane];
+			const ptrdiff_t dstPlaneStride	= dstStrideBytes  / swof.planeWidth[plane];
 			for (line = 0; line < activePlaneHeight; ++line) {
 				memcpy(dst, out, planeWidth);
 				out += srcPlaneStride;
