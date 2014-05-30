@@ -111,7 +111,6 @@
     <ClInclude Include="dsp\yuv_tables_sse2.h" />
     <ClInclude Include="enc\cost.h" />
     <ClInclude Include="enc\vp8enci.h" />
-    <ClInclude Include="utils\alpha_processing.h" />
     <ClInclude Include="utils\bit_reader.h" />
     <ClInclude Include="utils\bit_writer.h" />
     <ClInclude Include="utils\quant_levels_dec.h" />
@@ -157,6 +156,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)_dec.obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="dec\webp.c" />
+    <ClCompile Include="dsp\alpha_processing.c" />
     <ClCompile Include="dsp\cpu.c" />
     <ClCompile Include="dsp\dec.c" />
     <ClCompile Include="dsp\dec_clip_tables.c" />
@@ -185,7 +185,6 @@
     <ClCompile Include="enc\tree.c" />
     <ClCompile Include="enc\vp8l.c" />
     <ClCompile Include="enc\webpenc.c" />
-    <ClCompile Include="utils\alpha_processing.c" />
     <ClCompile Include="utils\bit_reader.c" />
     <ClCompile Include="utils\bit_writer.c" />
     <ClCompile Include="utils\color_cache.c" />

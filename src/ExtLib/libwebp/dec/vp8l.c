@@ -16,9 +16,9 @@
 
 #include "./alphai.h"
 #include "./vp8li.h"
+#include "../dsp/dsp.h"
 #include "../dsp/lossless.h"
 #include "../dsp/yuv.h"
-#include "../utils/alpha_processing.h"
 #include "../utils/huffman.h"
 #include "../utils/utils.h"
 
@@ -474,6 +474,7 @@ static int EmitRows(WEBP_CSP_MODE colorspace,
 //------------------------------------------------------------------------------
 // Export to YUVA
 
+// TODO(skal): should be in yuv.c
 static void ConvertToYUVA(const uint32_t* const src, int width, int y_pos,
                           const WebPDecBuffer* const output) {
   const WebPYUVABuffer* const buf = &output->u.YUVA;
@@ -1370,6 +1371,11 @@ int VP8LDecodeImage(VP8LDecoder* const dec) {
 
   if (io->use_scaling && !AllocateAndInitRescaler(dec, io)) goto Err;
 
+  if (io->use_scaling || WebPIsPremultipliedMode(dec->output_->colorspace)) {
+    // need the alpha-multiply functions for premultiplied output or rescaling
+    WebPInitAlphaProcessing();
+  }
+
   // Decode.
   dec->action_ = READ_DATA;
   if (!DecodeImageData(dec, dec->pixels_, dec->width_, dec->height_,
@@ -1389,4 +1395,3 @@ int VP8LDecodeImage(VP8LDecoder* const dec) {
 }
 
 //------------------------------------------------------------------------------
-
