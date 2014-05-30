@@ -49,6 +49,9 @@
     <None Include="libavcodec\x86\ac3dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\apedsp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\dcadsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -136,9 +139,6 @@
     <None Include="libavcodec\x86\lossless_videodsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
-    <None Include="libavcodec\x86\mpeg4qpel.asm">
-      <Filter>libavcodec\x86</Filter>
-    </None>
     <None Include="libavcodec\x86\pngdsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -146,6 +146,9 @@
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\qpel.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
+    <None Include="libavcodec\x86\qpeldsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\rv34dsp.asm">
@@ -392,6 +395,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\amrwbdata.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\apedsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\atrac.h">
@@ -818,6 +824,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\qdm2data.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\qpeldsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\ra144.h">
@@ -1366,6 +1375,9 @@
     <ClCompile Include="libavcodec\x86\ac3dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\x86\apedsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\x86\constants.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1388,6 +1400,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\dsputil_qns_template.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\fdct.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\fft_init.c">
@@ -1457,6 +1472,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\proresdsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\qpeldsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\rnd_template.c">
@@ -1715,9 +1733,6 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\dsputil.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\dsputil_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\dsputilenc_template.c">
@@ -2258,6 +2273,12 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\qdm2.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\qpel_template.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\qpeldsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\qtrle.c">
