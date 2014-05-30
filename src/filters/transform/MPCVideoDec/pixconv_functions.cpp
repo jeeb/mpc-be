@@ -33,7 +33,7 @@ extern "C" {
 }
 #pragma warning(pop)
 
-int sws_scale2(struct SwsContext *c, const uint8_t *const srcSlice[], const ptrdiff_t srcStride[], int srcSliceY, int srcSliceH, uint8_t *const dst[], const ptrdiff_t dstStride[])
+int sws_scale2(struct SwsContext *c, const uint8_t *const srcSlice[], const int srcStride[], int srcSliceY, int srcSliceH, uint8_t *const dst[], const int dstStride[])
 {
   int srcStride2[4];
   int dstStride2[4];
@@ -45,19 +45,19 @@ int sws_scale2(struct SwsContext *c, const uint8_t *const srcSlice[], const ptrd
   return sws_scale(c, srcSlice, srcStride2, srcSliceY, srcSliceH, dst, dstStride2);
 }
 
-HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const BYTE *y = NULL;
   const BYTE *u = NULL;
   const BYTE *v = NULL;
   ptrdiff_t line, i = 0;
-  ptrdiff_t sourceStride = 0;
+  int sourceStride = 0;
   BYTE *pTmpBuffer = NULL;
 
   if (m_FProps.avpixfmt != AV_PIX_FMT_YUV444P) {
     uint8_t  *tmp[4] = {NULL};
-    ptrdiff_t tmpStride[4] = {0};
-    ptrdiff_t scaleStride = FFALIGN(width, 32);
+    int tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 3);
 
@@ -112,13 +112,13 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdi
   return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[], int chromaVertical)
+HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[], int chromaVertical)
 {
   const BYTE *y = NULL;
   const BYTE *u = NULL;
   const BYTE *v = NULL;
   ptrdiff_t line, i = 0;
-  ptrdiff_t sourceStride = 0;
+  int sourceStride = 0;
 
   int shift = 0;
 
@@ -126,8 +126,8 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
 
   if ((m_FProps.pftype != PFType_YUV422Px && chromaVertical == 1) || (m_FProps.pftype != PFType_YUV420Px && chromaVertical == 2)) {
     uint8_t  *tmp[4] = {NULL};
-    ptrdiff_t tmpStride[4] = {0};
-    ptrdiff_t scaleStride = FFALIGN(width, 32) * 2;
+    int tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32) * 2;
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 2);
 
@@ -219,20 +219,20 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
     out += dstStride; \
   }
 
-HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const int16_t *y = NULL;
   const int16_t *u = NULL;
   const int16_t *v = NULL;
-  ptrdiff_t sourceStride = 0;
+  int sourceStride = 0;
   bool b9Bit = false;
 
   BYTE *pTmpBuffer = NULL;
 
   if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits > 10) {
     uint8_t  *tmp[4] = {NULL};
-    ptrdiff_t tmpStride[4] = {0};
-    ptrdiff_t scaleStride = FFALIGN(width, 32);
+    int tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
 
@@ -278,19 +278,19 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdi
   return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const int16_t *y = NULL;
   const int16_t *u = NULL;
   const int16_t *v = NULL;
-  ptrdiff_t sourceStride = 0;
+  int sourceStride = 0;
 
   BYTE *pTmpBuffer = NULL;
 
   if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits != 16) {
     uint8_t  *tmp[4] = {NULL};
-    ptrdiff_t tmpStride[4] = {0};
-    ptrdiff_t scaleStride = FFALIGN(width, 32);
+    int tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
 
@@ -330,7 +330,7 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdi
   return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
 	switch (m_out_pixfmt) {
 	case PixFmt_AYUV:
@@ -360,7 +360,7 @@ HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrd
 	return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const uint16_t *y = (const uint16_t *)src[0];
   const uint16_t *u = (const uint16_t *)src[1];
@@ -423,7 +423,7 @@ HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const
 
 #define YUV444_PACK_AYUV(dst) *idst++ = v[i] | (u[i] << 8) | (y[i] << 16) | (0xff << 24);
 
-HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const uint8_t *y = (const uint8_t *)src[0];
   const uint8_t *u = (const uint8_t *)src[1];
@@ -479,7 +479,7 @@ HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const uint16_t *y = (const uint16_t *)src[0];
   const uint16_t *u = (const uint16_t *)src[1];
@@ -533,7 +533,7 @@ HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv420_px1x_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv420_px1x_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const ptrdiff_t inYStride   = srcStride[0];
   const ptrdiff_t inUVStride  = srcStride[1];
@@ -779,7 +779,7 @@ static int __stdcall yuv420yuy2_dispatch(MPCPixFmtType inputFormat, int bpp, con
   return 0;
 }
 
-HRESULT CFormatConverter::convert_yuv420_yuy2(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv420_yuy2(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const uint16_t *dithers = NULL;
   yuv420yuy2_dispatch<0, 0>(m_FProps.pftype, m_FProps.lumabits, src[0], src[1], src[2], dst[0], width, height, srcStride[0], srcStride[1], dstStride[0], NULL);
@@ -788,7 +788,7 @@ HRESULT CFormatConverter::convert_yuv420_yuy2(const uint8_t* const src[4], const
 }
 
 
-HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const ptrdiff_t inLumaStride    = srcStride[0];
   const ptrdiff_t inChromaStride  = srcStride[1];
@@ -839,7 +839,7 @@ HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* cons
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const ptrdiff_t inYStride   = srcStride[0];
   const ptrdiff_t inUVStride  = srcStride[1];
@@ -921,7 +921,7 @@ HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src
   return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, const int dstStride[])
 {
   const uint8_t *y = src[0];
   const uint8_t *u = src[1];
