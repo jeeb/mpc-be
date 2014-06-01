@@ -462,8 +462,8 @@ begin
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regpl', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
   end;
 
-  if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
-    SuppressibleMsgBox(CustomMessage('msg_NoD3DX9DLL_found'), mbError, MB_OK, MB_OK);
+//  if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
+//    SuppressibleMsgBox(CustomMessage('msg_NoD3DX9DLL_found'), mbError, MB_OK, MB_OK);
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
