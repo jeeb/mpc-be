@@ -24,7 +24,7 @@
 #include <d3d9.h>
 #include <evr9.h>
 #include <vmr9.h>
-#include <madVRAllocatorPresenter.h>
+#include <mvrInterfaces.h>
 #include "PngImage.h"
 #include "..\..\DSUtil\DSMPropertyBag.h"
 //#include <Gdiplus.h>

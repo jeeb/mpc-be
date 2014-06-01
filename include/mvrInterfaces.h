@@ -1,11 +1,12 @@
 // ***************************************************************
-//  mvrInterfaces.h           version: 1.0.6  ·  date: 2013-06-04
+//  mvrInterfaces.h           version: 1.0.7  ·  date: 2014-01-18
 //  -------------------------------------------------------------
 //  various interfaces exported by madVR
 //  -------------------------------------------------------------
-//  Copyright (C) 2011 - 2013 www.madshi.net, BSD license
+//  Copyright (C) 2011 - 2014 www.madshi.net, BSD license
 // ***************************************************************
 
+// 2014-01-18 1.0.7 added IMadVRSettings2
 // 2013-06-04 1.0.6 added IMadVRInfo
 // 2013-01-23 1.0.5 added IMadVRSubclassReplacement
 // 2012-11-18 1.0.4 added IMadVRExternalPixelShaders
@@ -109,6 +110,54 @@ interface IMadVROsdServices : public IUnknown
   // this API allows you to force madVR to redraw the current video frame
   // useful when using the (2) render callback method, when the graph is paused
   STDMETHOD(OsdRedrawFrame)(void) = 0;
+};
+
+// ---------------------------------------------------------------------------
+// IMadVRTextOsd
+// ---------------------------------------------------------------------------
+
+// This interface allows you to draw simple text messages.
+// madVR uses it internally, too, for showing various messages to the user.
+// The messages are shown in the top left corner of the video rendering window.
+// The messages work in both windowed and fullscreen exclusive mode.
+// There can always be only one message active at the same time, so basically
+// the messages are overwriting each other.
+
+[uuid("ABA34FDA-DD22-4E00-9AB4-4ABF927D0B0C")]
+interface IMadVRTextOsd : public IUnknown
+{
+  STDMETHOD(OsdDisplayMessage)(LPCWSTR text, DWORD milliseconds) = 0;
+  STDMETHOD(OsdClearMessage)(void) = 0;
+};
+
+// ---------------------------------------------------------------------------
+// IMadVRSubclassReplacement
+// ---------------------------------------------------------------------------
+
+// Normally madVR subclasses some parent of the madVR rendering window.
+// If your media player gets into stability issues because of that, you can
+// disable madVR's subclassing by using this interface. You should then
+// manually forward the messages from your own WindowProc to madVR by calling
+// this interface's "ParentWindowProc" method.
+// If "ParentWindowProc" returns "TRUE", you should consider the message
+// handled by madVR and *not* pass it on to the original WindowProc. Instead
+// just return the value madVR wrote to "result". If "ParentWindowProc"
+// returns "FALSE", process the message as usual.
+// When using the normal subclassing solution, madVR selects the parent window
+// to subclass by using the following code:
+// {
+//   HWND parentWindow = madVRWindow;
+//   while ((GetParent(parentWindow)) && (GetParent(parentWindow) == GetAncestor(parentWindow, GA_PARENT)))
+//     parentWindow = GetParent(parentWindow);
+// }
+// If you use this interface, send the messages to madVR from the same window
+// that madVR would otherwise have subclassed.
+
+[uuid("9B517604-2D86-4FA2-A20C-ECF88301B010")]
+interface IMadVRSubclassReplacement : public IUnknown
+{
+  STDMETHOD(DisableSubclassing)(void) = 0;
+  STDMETHOD_(BOOL, ParentWindowProc)(HWND hwnd, UINT uMsg, WPARAM *wParam, LPARAM *lParam, LRESULT *result) = 0;
 };
 
 // ---------------------------------------------------------------------------
@@ -261,8 +310,8 @@ interface IMadVRInfo : public IUnknown
 // setting value. E.g. the following calls will all return the same value:
 // (1) GetBoolean(L"dontDither", &boolVal);
 // (2) GetBoolean(L"don't use dithering", &boolVal);
-// (3) GetBoolean(L"tradeQuality\dontDither", &boolVal);
-// (4) GetBoolean(L"performanceTweaks\trade quality for performance\dontDither", &boolVal);
+// (3) GetBoolean(L"dithering\dontDither", &boolVal);
+// (4) GetBoolean(L"rendering\dithering\dontDither", &boolVal);
 
 // Using the full path can make sense if you want to access a specific profile.
 // If you don't specify a path, you automatically access the currently active
@@ -299,6 +348,55 @@ interface IMadVRSettings : public IUnknown
   STDMETHOD_(BOOL, SettingsGetBinary )(LPCWSTR path, LPVOID* value, int* bufLenInBytes) = 0;
 };
 
+[uuid("1C3E03D6-F422-4D31-9424-75936F663BF7")]
+interface IMadVRSettings2 : public IMadVRSettings
+{
+  // Enumerate the available settings stuff in the specified path.
+  // Simply loop from enumIndex 0 to infinite, until the enumeration returns FALSE.
+  // When enumeration is completed GetLastError returns ERROR_NO_MORE_ITEMS.
+  // The buffers must be provided by the caller and ...LenInChars set to the
+  // buffer's length (please note: 1 char -> 2 bytes). If the buffer is too small,
+  // the API fails and GetLastError returns ERROR_MORE_DATA. On return,
+  // ...LenInChars is set to the required buffer size.
+  STDMETHOD_(BOOL, SettingsEnumFolders      )(LPCWSTR path, int enumIndex, LPCWSTR id, LPCWSTR name, LPCWSTR type, int* idLenInChars, int* nameLenInChars, int* typeLenInChars) = 0;
+  STDMETHOD_(BOOL, SettingsEnumValues       )(LPCWSTR path, int enumIndex, LPCWSTR id, LPCWSTR name, LPCWSTR type, int* idLenInChars, int* nameLenInChars, int* typeLenInChars) = 0;
+  STDMETHOD_(BOOL, SettingsEnumProfileGroups)(LPCWSTR path, int enumIndex,             LPCWSTR name,                                  int* nameLenInChars                     ) = 0;
+  STDMETHOD_(BOOL, SettingsEnumProfiles     )(LPCWSTR path, int enumIndex,             LPCWSTR name,                                  int* nameLenInChars                     ) = 0;
+
+  // Creates/deletes a profile group in the specified path.
+  // Deleting a profile group works only if there's only one profile left in the group.
+  // Example:
+  // SettingsCreateProfileGroup('scalingParent', 'imageDoubling|lumaUp', 'upscaling profiles', 'SD 24fps');
+  // SettingsDeleteProfileGroup('scalingParent\upscaling profiles');
+  STDMETHOD_(BOOL, SettingsCreateProfileGroup)(LPCWSTR path, LPCWSTR settingsPageList, LPCWSTR profileGroupName, LPCWSTR firstProfileName) = 0;
+  STDMETHOD_(BOOL, SettingsDeleteProfileGroup)(LPCWSTR path) = 0;
+
+  // SettingsAddProfile adds a new profile, using default parameters for all values.
+  // SettingsDuplicateProfile duplicates/copies a profile with all parameters.
+  // Deleting a profile works only if it isn't the only profile left in the group.
+  // Example:
+  // SettingsAddProfile('scalingParent\upscaling profiles', 'SD 60fps');
+  // SettingsDuplicateProfile('scalingParent\upscaling profiles', 'SD 60fps', 'HD 24fps');
+  // SettingsDeleteProfile('scalingParent\upscaling profiles', 'SD 60fps');
+  STDMETHOD_(BOOL, SettingsAddProfile      )(LPCWSTR path,                              LPCWSTR newProfileName) = 0;
+  STDMETHOD_(BOOL, SettingsDuplicateProfile)(LPCWSTR path, LPCWSTR originalProfileName, LPCWSTR newProfileName) = 0;
+  STDMETHOD_(BOOL, SettingsDeleteProfile   )(LPCWSTR path, LPCWSTR         profileName                        ) = 0;
+
+  // SettingsActivateProfile activates the specified profile.
+  // It also disables automatic (rule based) profile selection.
+  // SettingsAutoselectProfile allows you to reactivate it.
+  // Example:
+  // if SettingsIsProfileActive('scalingParent\upscaling profiles', 'SD 24fps') then
+  // begin
+  //   SettingsActivateProfile('scalingParent\upscaling profiles', 'SD 60fps');
+  //   [...]
+  //   SettingsAutoselectProfile('scalingParent\upscaling profiles');
+  STDMETHOD_(BOOL, SettingsIsProfileActive)(LPCWSTR path, LPCWSTR profileName) = 0;
+  STDMETHOD_(BOOL, SettingsActivateProfile)(LPCWSTR path, LPCWSTR profileName) = 0;
+  STDMETHOD_(BOOL, SettingsIsProfileAutoselected)(LPCWSTR path) = 0;
+  STDMETHOD_(BOOL, SettingsAutoselectProfile)(LPCWSTR path) = 0;
+};
+
 // available settings: id, name, type, valid values
 // ------------------------------------------------
 // devices, devices
@@ -312,7 +410,7 @@ interface IMadVRSettings : public IUnknown
 //       levels,                    levels,                                                             string,  TV Levels|PC Levels|Custom
 //       black,                     black,                                                              integer, 0..48
 //       white,                     white,                                                              integer, 200..255
-//       displayBitdepth,           native display bitdepth,                                            integer, 6..10
+//       displayBitdepth,           native display bitdepth,                                            integer, 3..10
 //     calibration, calibration
 //       calibrate,                 calibrate display,                                                  string,  disable calibration controls for this display|this display is already calibrated|calibrate this display by using yCMS|calibrate this display by using an external 3dlut file
 //       disableGpuGammaRamps,      disable GPU gamma ramps,                                            boolean
@@ -348,10 +446,28 @@ interface IMadVRSettings : public IUnknown
 //     contentType,                 source type,                                                        string,  auto|film|video
 //     scanPartialFrame,            only look at pixels in the frame center,                            boolean
 //     deinterlaceThread,           perform deinterlacing in separate thread,                           boolean
+//   artifactRemoval, artifact removal
+//     debandActive,                reduce banding artifacts,                                           boolean
+//     debandLevel,                 default debanding strength,                                         integer, 0..2
+//     debandFadeLevel,             strength during fade in/out,                                        integer, 0..2
 // scalingParent, scaling algorithms
 //   chromaUp, chroma upscaling
-//     chromaUp,                    chroma upsampling,                                                  string,  Nearest Neighbor|Bilinear|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64|Jinc3|Jinc4|Jinc8
+//     chromaUp,                    chroma upsampling,                                                  string,  Nearest Neighbor|Bilinear|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64|Jinc3|Jinc4|Jinc8|Nnedi16|Nnedi32|Nnedi64|Nnedi128|Nnedi256
 //     chromaAntiRinging,           activate anti-ringing filter for chroma upsampling,                 boolean
+//   imageDoubling, image doubling
+//     nnediDLEnable,               use NNEDI3 to double Luma resolution,                               boolean
+//     nnediDCEnable,               use NNEDI3 to double Chroma resolution,                             boolean
+//     nnediQLEnable,               use NNEDI3 to quadruple Luma resolution,                            boolean
+//     nnediQCEnable,               use NNEDI3 to quadruple Chroma resolution,                          boolean
+//     nnediDLScalingFactor,        when to use NNEDI3 to double Luma resolution,                       string,  1.2x|1.5x|2.0x|always
+//     nnediDCScalingFactor,        when to use NNEDI3 to double Chroma resolution,                     string,  1.2x|1.5x|2.0x|always
+//     nnediQLScalingFactor,        when to use NNEDI3 to quadruple Luma resolution,                    string,  1.2x|1.5x|2.0x|always
+//     nnediQCScalingFactor,        when to use NNEDI3 to quadruple Chroma resolution,                  string,  1.2x|1.5x|2.0x|always
+//     nnediDLQuality,              NNEDI3 double Luma quality,                                         integer, 0..4
+//     nnediDLQuality,              NNEDI3 double Chroma quality,                                       integer, 0..4
+//     nnediDLQuality,              NNEDI3 quadruple Luma quality,                                      integer, 0..4
+//     nnediDLQuality,              NNEDI3 quadruple Chroma quality,                                    integer, 0..4
+//     amdInteropHack,              use alternative interop hack (not recommended, AMD only),           boolean
 //   lumaUp, image upscaling
 //     lumaUp,                      image upscaling,                                                    string,  Nearest Neighbor|Bilinear|Dxva|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64|Jinc3|Jinc4|Jinc8
 //     lumaUpAntiRinging,           activate anti-ringing filter for luma upsampling,                   boolean
@@ -370,6 +486,7 @@ interface IMadVRSettings : public IUnknown
 //     enableExclusive,             enable automatic fullscreen exclusive mode,                         boolean
 //     disableAero,                 disable desktop composition (Vista and newer),                      boolean
 //     disableAeroCfg,              disable desktop composition configuration,                          string,  during exclusive - windowed mode switch|while madVR is in exclusive mode|while media player is in fullscreen mode|always
+//     splitNv12ViaOpenCL,          use OpenCL to process DXVA NV12 surfaces (Intel, AMD),              boolean
 //     separateDevice,              use a separate device for presentation (Vista and newer),           boolean
 //     useD3d11,                    use D3D11 for presentation,                                         boolean
 //     dxvaDevice,                  use separate device for DXVA processing (Vista and newer),          boolean
@@ -381,10 +498,12 @@ interface IMadVRSettings : public IUnknown
 //     flushAfterLastStep,          after last step,                                                    string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
 //     flushAfterBackbuffer,        after backbuffer,                                                   string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
 //     flushAfterPresent,           after present,                                                      string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     oldWindowedPath,             use old windowed rendering path,                                    boolean
+//     preRenderFramesWindowed,     no of pre-presented frames,                                         integer, 1..16
 //   exclusiveSettings, exclusive mode settings
 //     enableSeekbar,               show seek bar,                                                      boolean
 //     exclusiveDelay,              delay switch to exclusive mode by 3 seconds,                        boolean
-//     oldExclusivePath,            use old rendering path,                                             boolean
+//     oldExclusivePath,            use old fse rendering path,                                         boolean
 //     presentThread,               run presentation in a separate thread,                              boolean
 //     avoidGlitches,               limit rendering times to avoid glitches,                            boolean
 //     overshootMaxLatency,         overshoot max frame latency (Vista and newer),                      boolean
@@ -397,18 +516,26 @@ interface IMadVRSettings : public IUnknown
 //   smoothMotion, smooth motion
 //     smoothMotionEnabled,         enable smooth motion frame rate conversion,                         boolean
 //     smoothMotionMode,            smooth motion mode,                                                 string,  avoidJudder|almostAlways|always
-//   tradeQuality, trade quality for performance
-//     gammaBlending,               don't use linear light for smooth motion frame blending,            boolean
+//   dithering, dithering
+//     ditheringAlgo,               dithering algorithm,                                                string,  random|ordered|errorDifLowNoise|errorDifMedNoise
 //     dontDither,                  don't use dithering,                                                boolean
-//     halfDxvaDeintFramerate,      use half frame rate for DXVA deinterlacing,                         boolean
-//     10bitChroma,                 use 10bit chroma buffer instead of 16bit,                           boolean
-//     10bitLuma,                   use 10bit image buffer instead of 16bit,                            boolean
+//     coloredDither,               use colored noise,                                                  boolean
+//     dynamicDither,               change dither for every frame,                                      boolean
+//   tradeQuality, trade quality for performance
+//     fastSubtitles,               optimize subtitles for performance instead of quality,              boolean
 //     customShaders16f,            store custom pixel shader results in 16bit buffer instead of 32bit, boolean
-//     customShadersTv,             run custom pixel shaders in video levels instead of PC levels,      boolean
+//     gammaDithering,              don't use linear light for dithering,                               boolean
+//     noGradientAngles,            don't analyze gradient angles for debanding,                        boolean
+//     dontRerenderFades,           don't rerender frames when fade in/out is detected,                 boolean
 //     noDeintCopyback,             don't use "copyback" for DXVA deinterlacing,                        boolean
 //     noDecodeCopyback,            don't use "copyback" for DXVA decoding,                             boolean
+//     gammaBlending,               don't use linear light for smooth motion frame blending,            boolean
+//     10bitChroma,                 use 10bit chroma buffer instead of 16bit,                           boolean
+//     10bitLuma,                   use 10bit image buffer instead of 16bit,                            boolean
+//     customShadersTv,             run custom pixel shaders in video levels instead of PC levels,      boolean
 //     3dlutLowerBitdepth,          use lower bitdepth for yCMS 3dlut calibration,                      boolean
 //     3dlutBitdepth,               3dlut bitdepth,                                                     integer, 6..7
+//     halfDxvaDeintFramerate,      use half frame rate for DXVA deinterlacing,                         boolean
 // ui, user interface
 //   keys, keyboard shortcuts
 //     keysOnlyIfFocused,           use only if media player has keyboard focus,                        boolean
@@ -443,6 +570,8 @@ interface IMadVRSettings : public IUnknown
 //     keyDeintContentTypeFilm,     deinterlacing content type - set to "film",                         string
 //     keyDeintContentTypeVideo,    deinterlacing content type - set to "video",                        string
 //     keyDeintContentTypeAuto,     deinterlacing content type - set to "auto detect",                  string
+//     keyDeband,                   debanding - toggle,                                                 string
+//     keyDebandCustom,             debanding custom settings - toggle,                                 string
 //     keyDesiredGammaCurve,        desired display gamma curve - toggle,                               string
 //     keyDesiredGammaValueInc,     desired display gamma value - increase,                             string
 //     keyDesiredGammaValueDec,     desired display gamma value - decrease,                             string
@@ -496,6 +625,16 @@ interface IMadVRSettings : public IUnknown
 //     keyDisplayModeChanger,       display mode switcher - toggle on/off,                              string
 //     keyDisplayBitdepth,          display bitdepth - toggle,                                          string
 //     keyDithering,                dithering - toggle on/off,                                          string
+
+// profile settings: id, name, type, valid values
+// ----------------------------------------------
+// Profile Group 1
+//   keyToggleProfiles,             keyboard shortcut to toggle profiles,                               string
+//   autoselectRules,               profile auto select rules,                                          string
+//   Profile 1
+//     keyActivateProfile,          keyboard shortcut to activate this profile,                         string
+//     activateCmdline,             command line to execute when this profile is activated,             string
+//     deactivateCmdline,           command line to execute when this profile is deactivated,           string
 
 // ---------------------------------------------------------------------------
 // IMadVRExclusiveModeInfo (obsolete)
