@@ -787,7 +787,23 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 				} else if (CodecID == "A_MPEG/L2" ||
 						   CodecID == "A_MPEG/L1") {
+					WORD layer = CodecID == "A_MPEG/L1" ? 1 : 2;
+
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_MPEG);
+					if (layer == 2) {
+						mt.subtype = MEDIASUBTYPE_MPEG2_AUDIO;
+					}
+					MPEG1WAVEFORMAT* f = (MPEG1WAVEFORMAT*)mt.ReallocFormatBuffer(sizeof(MPEG1WAVEFORMAT));
+					f->wfx.wFormatTag	= WAVE_FORMAT_MPEG;
+					f->fwHeadMode		= 1 << wfe->nChannels;
+					f->fwHeadLayer		= 1 << (layer - 1);
+					f->dwHeadBitrate	= 0;
+					f->dwPTSHigh		= 0;
+					f->dwPTSLow			= 0;
+					f->fwHeadFlags		= 0;
+					f->fwHeadModeExt	= 0;
+					f->wHeadEmphasis	= 0;
+
 					mts.Add(mt);
 				} else if (CodecID == "A_AC3") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
