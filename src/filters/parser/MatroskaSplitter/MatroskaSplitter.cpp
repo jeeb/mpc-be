@@ -794,7 +794,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.subtype = MEDIASUBTYPE_MPEG2_AUDIO;
 					}
 					MPEG1WAVEFORMAT* f = (MPEG1WAVEFORMAT*)mt.ReallocFormatBuffer(sizeof(MPEG1WAVEFORMAT));
-					f->wfx.wFormatTag	= WAVE_FORMAT_MPEG;
 					f->fwHeadMode		= 1 << wfe->nChannels;
 					f->fwHeadLayer		= 1 << (layer - 1);
 					f->dwHeadBitrate	= 0;
