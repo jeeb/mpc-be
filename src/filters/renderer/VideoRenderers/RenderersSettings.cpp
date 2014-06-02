@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "RenderersSettings.h"
 #include "../../../apps/mplayerc/mplayerc.h"
+#include <version.h>
 #include <d3dx9.h>
 
 void CRenderersSettings::UpdateData(bool fSave)
@@ -132,7 +133,7 @@ HINSTANCE CRenderersData::GetD3X9Dll()
 		m_nDXSdkRelease = 0;
 
 		// load latest compatible version of the DLL that is available
-		for (UINT i = D3DX_SDK_VERSION; i>=43; i--) {
+		for (UINT i = D3DX_SDK_VERSION; i >= DIRECTX_SDK_NUMBER; i--) {
 			m_strD3DX9Version.Format(L"d3dx9_%u.dll", i);
 			m_hD3DX9Dll = LoadLibrary(m_strD3DX9Version);
 			if (m_hD3DX9Dll) {
