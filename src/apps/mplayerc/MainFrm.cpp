@@ -14445,6 +14445,7 @@ size_t CMainFrame::GetSubSelIdx()
 
 void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 {
+	AppSettings& s = AfxGetAppSettings();
 	CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 	b_UseVSFilter = (pDVS != NULL);
 
@@ -14468,14 +14469,13 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				}
 			}
 
-			pDVS->put_SelectedLanguage(GetSubSelIdx());
+			if (s.fUseInternalSelectTrackLogic) {
+				pDVS->put_SelectedLanguage(GetSubSelIdx());
+			}
 		}
 	}
 
 	if (!b_UseVSFilter && m_pCAP && (!m_fAudioOnly || m_fRealMediaGraph)) {
-
-		AppSettings& s = AfxGetAppSettings();
-
 		SubStreams substream;
 		subarray.RemoveAll();
 		int checkedsplsub	= 0;
