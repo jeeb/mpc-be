@@ -134,6 +134,9 @@ public:
 	STDMETHODIMP put_TextSettings(STSStyle* pDefStyle);
 	STDMETHODIMP put_AspectRatioSettings(CSimpleTextSubtitle::EPARCompensationType* ePARCompensationType);
 
+	// IDirectVobSub3
+	STDMETHODIMP get_LanguageType(int iLanguage, int* pType);
+
 	// ISpecifyPropertyPages
 	STDMETHODIMP GetPages(CAUUID* pPages);
 

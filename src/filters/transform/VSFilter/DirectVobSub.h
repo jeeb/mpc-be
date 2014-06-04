@@ -24,7 +24,10 @@
 #include "IDirectVobSub.h"
 #include <IFilterVersion.h>
 
-class CDirectVobSub : public IDirectVobSub2, public IFilterVersion
+class CDirectVobSub
+	: public IDirectVobSub2
+	, public IDirectVobSub3
+	, public IFilterVersion
 {
 protected:
 	CDirectVobSub();
@@ -129,6 +132,12 @@ public:
 	STDMETHODIMP put_TextSettings(STSStyle* pDefStyle);
 	STDMETHODIMP get_AspectRatioSettings(CSimpleTextSubtitle::EPARCompensationType* ePARCompensationType);
 	STDMETHODIMP put_AspectRatioSettings(CSimpleTextSubtitle::EPARCompensationType* ePARCompensationType);
+
+	// IDirectVobSub3
+
+	STDMETHODIMP get_LanguageType(int iLanguage, int* pType) {
+		return E_NOTIMPL;
+	}
 
 	// IFilterVersion
 

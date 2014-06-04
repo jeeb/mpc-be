@@ -137,6 +137,7 @@ STDMETHODIMP CDirectVobSubFilter::NonDelegatingQueryInterface(REFIID riid, void*
 	return
 		QI(IDirectVobSub)
 		QI(IDirectVobSub2)
+		QI(IDirectVobSub3)
 		QI(IFilterVersion)
 		QI(ISpecifyPropertyPages)
 		QI(IAMStreamSelect)
@@ -1358,6 +1359,38 @@ STDMETHODIMP CDirectVobSubFilter::put_AspectRatioSettings(CSimpleTextSubtitle::E
 
 	return hr;
 }
+
+// IDirectVobSub3
+
+STDMETHODIMP CDirectVobSubFilter::get_LanguageType(int iLanguage, int* pType)
+{
+	HRESULT hr = E_INVALIDARG;
+	WCHAR *pName;
+	if (pType && SUCCEEDED(hr = get_LanguageName(iLanguage, &pName)) && pName) {
+		*pType = 0;
+		CoTaskMemFree(pName);
+
+		int nLangs = 0;
+		get_LanguageCount(&nLangs);
+		
+		int nEmbeddedCount = 0;
+		for (size_t i = 0; i < m_pTextInput.GetCount(); i++) {
+			if (m_pTextInput[i]->IsConnected()) {
+				CComPtr<ISubStream> pSubStream = m_pTextInput[i]->GetSubStream();
+				nEmbeddedCount += pSubStream->GetStreamCount();
+			}
+		}
+
+		nLangs -= nEmbeddedCount;
+
+		if (iLanguage < nLangs) {
+			*pType = 1;
+		}
+	}
+
+	return hr;
+}
+
 
 // IDirectVobSubFilterColor
 

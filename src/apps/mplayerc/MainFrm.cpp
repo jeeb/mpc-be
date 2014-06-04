@@ -14463,6 +14463,12 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.iIndex	= i;
 					substream.lang		= pName;
 
+					if (CComQIPtr<IDirectVobSub3> pDVS3 = pDVS) {
+						int nType = 0;
+						pDVS3->get_LanguageType(i, &nType);
+						substream.Extsub = !!nType;
+					}
+
 					subarray.Add(substream);
 
 					CoTaskMemFree(pName);
