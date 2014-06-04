@@ -172,6 +172,30 @@ public:
 			SendMessage(WM_COMMAND, ID_PLAY_PLAY); \
 	} \
 
+static CString FormatStreamName(CString name, LCID lcid, int id)
+{
+	CString str;
+
+	CString lcname = CString(name).MakeLower();
+	if (lcname.Find(L" off") >= 0) {
+		str = ResStr(IDS_AG_DISABLED);
+	} else if (lcid == 0) {
+		str.Format(ResStr(IDS_AG_UNKNOWN), id);
+	} else {
+		int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
+		str.ReleaseBufferSetLength(max(len - 1, 0));
+	}
+
+	CString lcstr = CString(str).MakeLower();
+	if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
+		str = name;
+	} else if (!name.IsEmpty()) {
+		str = CString(name) + L" (" + str + L")";
+	}
+
+	return str;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 
@@ -14486,7 +14510,6 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					}
 
 					CString name(pszName);
-					CString lcname = CString(name).MakeLower();
 
 					if (pszName) {
 						CoTaskMemFree(pszName);
@@ -14496,24 +14519,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						continue;
 					}
 
-					CString str;
-
-					if (lcname.Find(_T(" off")) >= 0) {
-						str = ResStr(IDS_AG_DISABLED);
-					} else if (lcid == 0) {
-						str.Format(ResStr(IDS_AG_UNKNOWN), i);
-					} else {
-						int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
-						str.ReleaseBufferSetLength(max(len-1, 0));
-					}
-
-					CString lcstr = CString(str).MakeLower();
-
-					if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
-						str = name;
-					} else if (!name.IsEmpty()) {
-						str = name + L" (" + str + L")";
-					}
+					CString str = FormatStreamName(name, lcid, i);
 
 					SubStreams substream;
 					substream.iFilter	= 2;
@@ -15910,7 +15916,6 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 							}
 
 							CString name(pszName);
-							CString lcname = CString(name).MakeLower();
 
 							if (pszName) {
 								CoTaskMemFree(pszName);
@@ -15920,24 +15925,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 								continue;
 							}
 
-							CString str;
-
-							if (lcname.Find(_T(" off")) >= 0) {
-								str = ResStr(IDS_AG_DISABLED);
-							} else if (lcid == 0) {
-								str.Format(ResStr(IDS_AG_UNKNOWN), id - baseid);
-							} else {
-								int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
-								str.ReleaseBufferSetLength(max(len-1, 0));
-							}
-
-							CString lcstr = CString(str).MakeLower();
-
-							if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
-								str = name;
-							} else if (!name.IsEmpty()) {
-								str = name + L" (" + str + L")";
-							}
+							CString str = FormatStreamName(name, lcid, id - baseid);
 
 							UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
 							if (dwFlags && iSelectedLanguage == (nLangs - 1)) {
@@ -16008,7 +15996,6 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					}
 
 					CString name(pszName);
-					CString lcname = CString(name).MakeLower();
 
 					if (pszName) {
 						CoTaskMemFree(pszName);
@@ -16018,24 +16005,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 						continue;
 					}
 
-					CString str;
-
-					if (lcname.Find(_T(" off")) >= 0) {
-						str = ResStr(IDS_AG_DISABLED);
-					} else if (lcid == 0) {
-						str.Format(ResStr(IDS_AG_UNKNOWN), id - baseid);
-					} else {
-						int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
-						str.ReleaseBufferSetLength(max(len-1, 0));
-					}
-
-					CString lcstr = CString(str).MakeLower();
-
-					if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
-						str = name;
-					} else if (!name.IsEmpty()) {
-						str = CString(name) + _T(" (") + str + _T(")");
-					}
+					CString str = FormatStreamName(name, lcid, id - baseid);
 
 					UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 					if (dwFlags) {
@@ -16366,7 +16336,6 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 		}
 
 		CString name(pszName);
-		CString lcname = CString(name).MakeLower();
 
 		if (pszName) {
 			CoTaskMemFree(pszName);
@@ -16381,26 +16350,7 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 		}
 		dwPrevGroup = dwGroup;
 
-		CString str;
-
-		if (lcname.Find(_T(" off")) >= 0) {
-			str = ResStr(IDS_AG_DISABLED);
-		} else {
-			if (lcid == 0) {
-				str.Format(ResStr(IDS_AG_UNKNOWN), id - baseid);
-			} else {
-				int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
-				str.ReleaseBufferSetLength(max(len-1, 0));
-			}
-
-			CString lcstr = CString(str).MakeLower();
-
-			if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
-				str = name;
-			} else if (!name.IsEmpty()) {
-				str = CString(name) + _T(" (") + str + _T(")");
-			}
-		}
+		CString str = FormatStreamName(name, lcid, id - baseid);
 
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		if (dwFlags) {
@@ -16494,7 +16444,6 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					}
 
 					CString name(pszName);
-					CString lcname = CString(name).MakeLower();
 
 					if (pszName) {
 						CoTaskMemFree(pszName);
@@ -16509,24 +16458,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					}
 
 					dwPrevGroup = dwGroup;
-					CString str;
-
-					if (lcname.Find(_T(" off")) >= 0) {
-						str = ResStr(IDS_AG_DISABLED);
-					} else if (lcid == 0) {
-						str.Format(ResStr(IDS_AG_UNKNOWN), id - baseid);
-					} else {
-						int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
-						str.ReleaseBufferSetLength(max(len-1, 0));
-					}
-
-					CString lcstr = CString(str).MakeLower();
-
-					if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
-						str = name;
-					} else if (!name.IsEmpty()) {
-						str = CString(name) + _T(" (") + str + _T(")");
-					}
+					CString str = FormatStreamName(name, lcid, id - baseid);
 
 					UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 					if (dwFlags) {
