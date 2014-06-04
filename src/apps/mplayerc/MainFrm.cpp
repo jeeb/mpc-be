@@ -10363,7 +10363,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 								pDVS->put_SelectedLanguage(i);
 								return;
 							} else {
-								pDVS->put_SelectedLanguage(i);
+								pDVS->put_SelectedLanguage(nLangs - 1);
 								id -= (nLangs - 1);
 							}
 						}
@@ -14449,34 +14449,111 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 	CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 	b_UseVSFilter = (pDVS != NULL);
 
-	if (pDVS && !GetStreamCount(2)) {
+	if (pDVS) {
 		int nLangs;
 		if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-			SubStreams substream;
 			subarray.RemoveAll();
 
-			for (int i = 0; i < nLangs; i++) {
-				WCHAR *pName;
-				if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
-					substream.iFilter	= 1;
-					substream.iNum		= i;
-					substream.iIndex	= i;
-					substream.lang		= pName;
+			int subcount = GetStreamCount(2);
+			CComQIPtr<IAMStreamSelect> pSS	= m_pMainSourceFilter;
+			if (subcount) {
+				for (int i = 0; i < nLangs - 1; i++) {
+					WCHAR *pName;
+					if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
+						SubStreams substream;
+						substream.iFilter	= 1;
+						substream.iNum		= i;
+						substream.iIndex	= i;
+						substream.Extsub	= true;
+						substream.lang		= pName;
+						subarray.Add(substream);
 
-					if (CComQIPtr<IDirectVobSub3> pDVS3 = pDVS) {
-						int nType = 0;
-						pDVS3->get_LanguageType(i, &nType);
-						substream.Extsub = !!nType;
+						CoTaskMemFree(pName);
+					}
+				}
+
+				DWORD cStreams;
+				pSS->Count(&cStreams);
+				for (int i = 0, j = cStreams; i < j; i++) {
+					DWORD dwFlags	= DWORD_MAX;
+					DWORD dwGroup	= DWORD_MAX;
+					LCID lcid		= DWORD_MAX;
+					WCHAR* pszName = NULL;
+
+					if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+							|| !pszName) {
+						continue;
 					}
 
+					CString name(pszName);
+					CString lcname = CString(name).MakeLower();
+
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+
+					if (dwGroup != 2) {
+						continue;
+					}
+
+					CString str;
+
+					if (lcname.Find(_T(" off")) >= 0) {
+						str = ResStr(IDS_AG_DISABLED);
+					} else if (lcid == 0) {
+						str.Format(ResStr(IDS_AG_UNKNOWN), i);
+					} else {
+						int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
+						str.ReleaseBufferSetLength(max(len-1, 0));
+					}
+
+					CString lcstr = CString(str).MakeLower();
+
+					if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
+						str = name;
+					} else if (!name.IsEmpty()) {
+						str = name + L" (" + str + L")";
+					}
+
+					SubStreams substream;
+					substream.iFilter	= 2;
+					substream.iNum++;
+					substream.iIndex++;
+					substream.lang		= str;
+					if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+						substream.iSel = subarray.GetCount();
+					}
 					subarray.Add(substream);
 
-					CoTaskMemFree(pName);
+
+				}
+			} else {
+				for (int i = 0; i < nLangs; i++) {
+					WCHAR *pName;
+					if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
+						SubStreams substream;
+						substream.iFilter	= 1;
+						substream.iNum		= i;
+						substream.iIndex	= i;
+						substream.lang		= pName;
+
+						if (CComQIPtr<IDirectVobSub3> pDVS3 = pDVS) {
+							int nType = 0;
+							pDVS3->get_LanguageType(i, &nType);
+							substream.Extsub = !!nType;
+						}
+
+						subarray.Add(substream);
+
+						CoTaskMemFree(pName);
+					}
 				}
 			}
 
 			if (s.fUseInternalSelectTrackLogic) {
-				pDVS->put_SelectedLanguage(GetSubSelIdx());
+				OnNavMixStreamSubtitleSelectSubMenu(GetSubSelIdx(), 2);
+			} else if (subcount && !s.fPrioritizeExternalSubtitles) {
+				pDVS->put_SelectedLanguage(nLangs - 1);
 			}
 		}
 	}
@@ -14665,6 +14742,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				for (size_t i = 0; i < cnt; i++) {
 					if (subarray[i].Extsub)	{
 						checkedsplsub = i;
+						break;
 					}
 				}
 			}
