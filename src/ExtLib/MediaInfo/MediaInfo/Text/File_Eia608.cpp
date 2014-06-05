@@ -70,6 +70,8 @@ File_Eia608::File_Eia608()
 
     //In
     cc_type=(int8u)-1;
+    ServiceDescriptors=NULL;
+    ServiceDescriptors_IsPresent=NULL;
 
     //Temp
     XDS_Level=(size_t)-1;
@@ -97,8 +99,15 @@ void File_Eia608::Streams_Fill()
     if (Config->File_Eia608_DisplayEmptyStream_Get() && Streams.size()<2)
         Streams.resize(2);
 
-    for (size_t StreamPos=0; StreamPos<Streams.size(); StreamPos++)
-        if (Streams[StreamPos] || (StreamPos<2 && Config->File_Eia608_DisplayEmptyStream_Get()))
+    if (!HasContent && ServiceDescriptors && ServiceDescriptors->find(cc_type)!=ServiceDescriptors->end())
+    {
+        TextMode=0;
+        DataChannelMode=0;
+        Special_14(0x20); //CC1/CC3 fake RCL - Resume Caption Loading
+    }
+
+    for (size_t Pos=0; Pos<Streams.size(); Pos++)
+        if (Streams[Pos] || (Pos<2 && Config->File_Eia608_DisplayEmptyStream_Get()))
         {
             Stream_Prepare(Stream_Text);
             Fill(Stream_Text, StreamPos_Last, Text_Format, "EIA-608");
@@ -106,11 +115,32 @@ void File_Eia608::Streams_Fill()
             Fill(Stream_Text, StreamPos_Last, Text_BitRate_Mode, "CBR");
             if (cc_type!=(int8u)-1)
             {
-                string ID=StreamPos<2?"CC":"T";
-                ID+='1'+(cc_type*2)+(StreamPos%2);
+                string ID=Pos<2?"CC":"T";
+                ID+='1'+(cc_type*2)+(Pos%2);
                 Fill(Stream_Text, StreamPos_Last, Text_ID, ID);
-                Fill(Stream_Text, StreamPos_Last, "ServiceName", ID);
-                (*Stream_More)[StreamKind_Last][StreamPos_Last](Ztring().From_Local("ServiceName"), Info_Options)=__T("N NT");
+                Fill(Stream_Text, StreamPos_Last, "CaptionServiceName", ID);
+                (*Stream_More)[StreamKind_Last][StreamPos_Last](Ztring().From_Local("CaptionServiceName"), Info_Options)=__T("N NT");
+            }
+            if (Config->ParseSpeed>=1.0)
+            {
+                Fill(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", DataDetected[Pos+1]?"Yes":"No", Unlimited, true, true); //1 bit per service, starting at 1
+                (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("CaptionServiceContent_IsPresent"), Info_Options)=__T("N NT");
+            }
+            if (ServiceDescriptors)
+            {
+                servicedescriptors::iterator ServiceDescriptor=ServiceDescriptors->find(cc_type);
+                if (ServiceDescriptor!=ServiceDescriptors->end())
+                {
+                    if (Pos==0 && Retrieve(Stream_Text, StreamPos_Last, Text_Language).empty()) //Only CC1/CC3
+                        Fill(Stream_Text, StreamPos_Last, Text_Language, ServiceDescriptor->second.language, true);
+                    Fill(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "Yes", Unlimited, true, true);
+                    (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("CaptionServiceDescriptor_IsPresent"), Info_Options)=__T("N NT");
+                }
+                else if (ServiceDescriptors_IsPresent) // && *ServiceDescriptors_IsPresent) //ServiceDescriptors_IsPresent pointer is for the support by the transport layer of the info, *ServiceDescriptors_IsPresent is for the presence test
+                {
+                    Fill(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "No", Unlimited, true, true);
+                    (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("CaptionServiceDescriptor_IsPresent"), Info_Options)=__T("N NT");
+                }
             }
         }
 }
@@ -319,6 +349,8 @@ void File_Eia608::XDS()
 
     XDS_Data.erase(XDS_Data.begin()+XDS_Level);
     XDS_Level=(size_t)-1;
+
+    DataDetected[5]=true; //bit 5=XDS
 }
 
 //---------------------------------------------------------------------------
@@ -373,6 +405,7 @@ void File_Eia608::XDS_Current_ContentAdvisory()
                     case 5 : ContentAdvisory="TV-14"; break;
                     case 6 : ContentAdvisory="TV-MA"; break;
                     case 7 : ContentAdvisory="None"; break;
+                    default: ;
                 }
                 if (XDS_Data[XDS_Level][2]&0x20) //Suggestive dialogue
                     ContentDescriptors+='D';
@@ -420,6 +453,7 @@ void File_Eia608::XDS_Current_ContentAdvisory()
                         }
                 }
                 break;
+        default: ;
     }
 
     if (ContentAdvisory)
@@ -440,6 +474,8 @@ void File_Eia608::XDS_Current_ProgramName()
     Ztring Value;
     Value.From_UTF8(ValueS.c_str());
     Element_Info1(__T("Program Name=")+Value);
+    if (Retrieve(Stream_General, 0, General_Title).empty())
+        Fill(Stream_General, 0, General_Title, Value);
 }
 
 //---------------------------------------------------------------------------
@@ -1045,6 +1081,7 @@ void File_Eia608::Character_Fill(wchar_t Character)
 
     if (!HasContent)
         HasContent=true;
+    DataDetected[1+StreamPos]=true;
 }
 
 //---------------------------------------------------------------------------

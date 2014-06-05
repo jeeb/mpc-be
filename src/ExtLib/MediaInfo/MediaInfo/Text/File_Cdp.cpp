@@ -97,6 +97,9 @@ File_Cdp::File_Cdp()
     WithAppleHeader=false;
     AspectRatio=0;
 
+    //Temp
+    cdp_frame_rate=(int8u)-1;
+
     //EIA-708 descriptors
     #if defined(MEDIAINFO_EIA708_YES)
         ccsvcinfo_section_IsPresent=false;
@@ -152,11 +155,11 @@ void File_Cdp::Streams_Update_PerStream(size_t Pos)
             if (WithAppleHeader)
                 Fill(Stream_Text, StreamPos_Last, "MuxingMode", "Final Cut");
             Fill(Stream_Text, StreamPos_Last, "MuxingMode", "CDP");
+            if (cdp_frame_rate!=(int8u)-1)
+                Fill(Stream_Text, StreamPos_Last, Text_FrameRate, Cdp_cdp_frame_rate(cdp_frame_rate));
             Fill(Stream_Text, StreamPos_Last, Text_ID, Streams[Pos]->Parser->Retrieve(Stream_Text, Pos2, Text_ID), true);
-            Ztring LawRating=Streams[Pos]->Parser->Retrieve(Stream_General, 0, General_LawRating);
-            if (!LawRating.empty())
-                Fill(Stream_General, 0, General_LawRating, LawRating, true);
 
+            //cdp_length
             if (cdp_length_Min<=cdp_length_Max)
             {
                 Fill(Stream_Text, StreamPos_Last, "cdp_length_Min", cdp_length_Min, 10, true);
@@ -169,6 +172,9 @@ void File_Cdp::Streams_Update_PerStream(size_t Pos)
         Ztring LawRating=Streams[Pos]->Parser->Retrieve(Stream_General, 0, General_LawRating);
         if (!LawRating.empty())
             Fill(Stream_General, 0, General_LawRating, LawRating, true);
+        Ztring Title=Streams[Pos]->Parser->Retrieve(Stream_General, 0, General_Title);
+        if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+            Fill(Stream_General, 0, General_Title, Title);
     }
 }
 
@@ -263,7 +269,7 @@ void File_Cdp::cdp_header()
 {
     Element_Begin1("cdp_header");
     int16u cdp_identifier;
-    int8u cdp_length, cdp_frame_rate;
+    int8u cdp_length;
     Get_B2 (   cdp_identifier,                                  "cdp_identifier");
     Get_B1 (   cdp_length,                                      "cdp_length");
     BS_Begin();
@@ -358,40 +364,15 @@ void File_Cdp::ccdata_section()
                 //Calculating the parser position
                 int8u Parser_Pos=cc_type==3?2:cc_type; //cc_type 2 and 3 are for the same text
 
+                //Stream creation
+                if (Streams[Parser_Pos]==NULL)
+                    CreateStream(Parser_Pos);
+
                 //Parsing
                 #if MEDIAINFO_DEMUX
                     Element_Code=Parser_Pos;
+                    Demux(Buffer+(size_t)(Buffer_Offset+Element_Offset), 2, ContentType_MainStream);
                 #endif //MEDIAINFO_DEMUX
-                if (Streams[Parser_Pos]==NULL)
-                    Streams[Parser_Pos]=new stream;
-                if (Streams[Parser_Pos]->Parser==NULL)
-                {
-                    #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                        if (cc_type<2)
-                        {
-                            #if defined(MEDIAINFO_EIA608_YES)
-                                Streams[Parser_Pos]->Parser=new File_Eia608();
-                                ((File_Eia608*)Streams[Parser_Pos]->Parser)->cc_type=cc_type;
-                            #else //defined(MEDIAINFO_EIA608_YES)
-                                Streams[Parser_Pos]->Parser=new File__Analyze();
-                            #endif //defined(MEDIAINFO_EIA608_YES)
-                        }
-                        else
-                        {
-                            #if defined(MEDIAINFO_EIA708_YES)
-                                Streams[Parser_Pos]->Parser=new File_Eia708();
-                                ((File_Eia708*)Streams[Parser_Pos]->Parser)->ServiceDescriptors=&ServiceDescriptors;
-                                ((File_Eia708*)Streams[Parser_Pos]->Parser)->ServiceDescriptors_IsPresent=&ccsvcinfo_section_IsPresent;
-                            #else //defined(MEDIAINFO_EIA708_YES)
-                                Streams[Parser_Pos]->Parser=new File__Analyze();
-                            #endif //defined(MEDIAINFO_EIA708_YES)
-                        }
-                    #else //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                        Streams[Parser_Pos]->Parser=new File__Analyze();
-                    #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                    Open_Buffer_Init(Streams[Parser_Pos]->Parser);
-                }
-                Demux(Buffer+(size_t)(Buffer_Offset+Element_Offset), 2, ContentType_MainStream);
                 if (!Streams[Parser_Pos]->Parser->Status[IsFinished])
                 {
                     if (Streams[Parser_Pos]->Parser->PTS_DTS_Needed)
@@ -472,7 +453,7 @@ void File_Cdp::ccsvcinfo_section()
         Element_Begin1("service");
         Ztring language;
         int8u caption_service_number=0;
-        bool digital_cc;
+        bool digital_cc, line21_field;
         Get_Local(3, language,                                  "language");
         BS_Begin();
         Get_SB (digital_cc,                                     "digital_cc");
@@ -482,7 +463,7 @@ void File_Cdp::ccsvcinfo_section()
         else
         {
             Skip_S1(5,                                          "reserved");
-            Skip_SB(                                            "line21_field");
+            Get_SB (   line21_field,                            "line21_field");
         }
         Skip_SB(                                                "easy_reader");
         Skip_SB(                                                "wide_aspect_ratio");
@@ -494,8 +475,15 @@ void File_Cdp::ccsvcinfo_section()
         FILLING_BEGIN();
             #if defined(MEDIAINFO_EIA708_YES)
                 if (digital_cc)
-                    ServiceDescriptors[caption_service_number].language=language;
+                    ServiceDescriptors708[caption_service_number].language=language;
+                else
+                    ServiceDescriptors608[line21_field?1:0].language=language;
             #endif
+
+            //Stream creation
+            int8u Parser_Pos=digital_cc?2:(line21_field?1:0); //cc_type 2 and 3 are for the same text
+            if (Streams[Parser_Pos]==NULL)
+                CreateStream(Parser_Pos);
         FILLING_END();
     }
     Element_End0();
@@ -525,6 +513,54 @@ void File_Cdp::future_section()
     Get_B1 (length,                                             "length");
     Skip_XX(length,                                             "Unknown");
     Element_End0();
+}
+
+//***************************************************************************
+// Helpers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Cdp::CreateStream(int8u Parser_Pos)
+{
+    if (Streams[Parser_Pos])
+        return; //Already done
+
+    //Parsing
+    #if MEDIAINFO_DEMUX
+        Element_Code=Parser_Pos;
+    #endif //MEDIAINFO_DEMUX
+
+    //Creation of the parser
+    Streams[Parser_Pos]=new stream;
+    #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+        if (Parser_Pos<2)
+        {
+            #if defined(MEDIAINFO_EIA608_YES)
+                Streams[Parser_Pos]->Parser=new File_Eia608();
+                ((File_Eia608*)Streams[Parser_Pos]->Parser)->cc_type=Parser_Pos;
+                ((File_Eia608*)Streams[Parser_Pos]->Parser)->ServiceDescriptors=&ServiceDescriptors608;
+                ((File_Eia608*)Streams[Parser_Pos]->Parser)->ServiceDescriptors_IsPresent=&ccsvcinfo_section_IsPresent;
+            #else //defined(MEDIAINFO_EIA608_YES)
+                Streams[Parser_Pos]->Parser=new File__Analyze();
+            #endif //defined(MEDIAINFO_EIA608_YES)
+        }
+        else
+        {
+            #if defined(MEDIAINFO_EIA708_YES)
+                Streams[Parser_Pos]->Parser=new File_Eia708();
+                ((File_Eia708*)Streams[Parser_Pos]->Parser)->ServiceDescriptors=&ServiceDescriptors708;
+                ((File_Eia708*)Streams[Parser_Pos]->Parser)->ServiceDescriptors_IsPresent=&ccsvcinfo_section_IsPresent;
+            #else //defined(MEDIAINFO_EIA708_YES)
+                Streams[Parser_Pos]->Parser=new File__Analyze();
+            #endif //defined(MEDIAINFO_EIA708_YES)
+        }
+    #else //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+        Streams[Parser_Pos]->Parser=new File__Analyze();
+    #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+    
+    //Init
+    Open_Buffer_Init(Streams[Parser_Pos]->Parser);
+    Streams[Parser_Pos]->Parser->Accept();
 }
 
 //***************************************************************************

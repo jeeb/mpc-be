@@ -399,7 +399,7 @@ const char* Mxf_EssenceElement(const int128u EssenceElement)
     int8u Code2=(int8u)((EssenceElement.lo&0x00FF000000000000LL)>>48);
     int8u Code5=(int8u)((EssenceElement.lo&0x00000000FF000000LL)>>24);
     int8u Code7=(int8u)((EssenceElement.lo&0x000000000000FF00LL)>> 8);
-    
+
     switch (Code1)
     {
         case 0x0E : //Private
@@ -1060,21 +1060,21 @@ const char* Mxf_ChannelAssignment_ChannelPositions(const int128u ChannelLayout, 
                                         case 0x01 : //Config 1
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "Front: L C R, Side: L R, LFE"; 
+                                                        case  6 : return "Front: L C R, Side: L R, LFE";
                                                         default : return "Front: L C R, Side: L R, LFE, HI, VI-N";
                                                     }
                                         case 0x02 : //Config 2
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "Front: L C R, Side: L R, LFE"; 
-                                                        case  8 : return "Front: L C R, Side: L R, Back: C, LFE"; 
+                                                        case  6 : return "Front: L C R, Side: L R, LFE";
+                                                        case  8 : return "Front: L C R, Side: L R, Back: C, LFE";
                                                         default : return "Front: L C R, Side: L R, Back: C, LFE, HI, VI-N";
                                                     }
                                         case 0x03 : //Config 3
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "Front: L C R, Side: L R, LFE"; 
-                                                        case  8 : return "Front: L C R, Side: L R, Back: L R, LFE"; 
+                                                        case  6 : return "Front: L C R, Side: L R, LFE";
+                                                        case  8 : return "Front: L C R, Side: L R, Back: L R, LFE";
                                                         default : return "Front: L C R, Side: L R, Back: L R, LFE, HI, VI-N";
                                                     }
                                         default   : return "";
@@ -1107,21 +1107,21 @@ const char* Mxf_ChannelAssignment_ChannelPositions2(const int128u ChannelLayout,
                                         case 0x01 : //Config 1
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "3/2/0.1"; 
+                                                        case  6 : return "3/2/0.1";
                                                         default : return "3/2/0.1+2";
                                                     }
                                         case 0x02 : //Config 2
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "3/2/0.1"; 
-                                                        case  8 : return "3/2/1.1"; 
+                                                        case  6 : return "3/2/0.1";
+                                                        case  8 : return "3/2/1.1";
                                                         default : return "3/2/1.1+2";
                                                     }
                                         case 0x03 : //Config 3
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "3/2/0.1"; 
-                                                        case  8 : return "3/2/2.1"; 
+                                                        case  6 : return "3/2/0.1";
+                                                        case  8 : return "3/2/2.1";
                                                         default : return "3/2/2.1+2";
                                                     }
                                         default   : return "";
@@ -1154,21 +1154,21 @@ const char* Mxf_ChannelAssignment_ChannelLayout(const int128u ChannelLayout, int
                                         case 0x01 : //Config 1
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "L R C LFE Ls Rs"; 
+                                                        case  6 : return "L R C LFE Ls Rs";
                                                         default : return "L R C LFE Ls Rs HI VI-N";
                                                     }
                                         case 0x02 : //Config 2
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "L R C LFE Ls Rs"; 
-                                                        case  8 : return "L R C LFE Ls Rs Cs X"; 
+                                                        case  6 : return "L R C LFE Ls Rs";
+                                                        case  8 : return "L R C LFE Ls Rs Cs X";
                                                         default : return "L R C LFE Ls Rs Cs X HI VI-N";
                                                     }
                                         case 0x03 : //Config 3
                                                     switch (ChannelsCount)
                                                     {
-                                                        case  6 : return "L R C LFE Ls Rs"; 
-                                                        case  8 : return "L R C LFE Ls Rs Rls Rrs"; 
+                                                        case  6 : return "L R C LFE Ls Rs";
+                                                        case  8 : return "L R C LFE Ls Rs Rls Rrs";
                                                         default : return "L R C LFE Ls Rs Rls Rrs HI VI-N";
                                                     }
                                         default   : return "";
@@ -1586,6 +1586,13 @@ void File_Mxf::Streams_Finish()
                 for (parsers::iterator Parser=Essence->second.Parsers.begin(); Parser!=Essence->second.Parsers.end(); ++Parser)
                 {
                     Merge(*(*Parser));
+
+                    Ztring LawRating=(*Parser)->Retrieve(Stream_General, 0, General_LawRating);
+                    if (!LawRating.empty())
+                        Fill(Stream_General, 0, General_LawRating, LawRating, true);
+                    Ztring Title=(*Parser)->Retrieve(Stream_General, 0, General_Title);
+                    if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+                        Fill(Stream_General, 0, General_Title, Title);
 
                     if (IsSub && StreamKind_Last!=Stream_Max && Retrieve(StreamKind_Last, StreamPos_Last, "MuxingMode").empty())
                         Fill(StreamKind_Last, StreamPos_Last, "MuxingMode", "MXF");
@@ -2020,6 +2027,13 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
 
         Merge(*(*Parser), StreamKind_Last, 0, StreamPos_Last);
 
+        Ztring LawRating=(*Parser)->Retrieve(Stream_General, 0, General_LawRating);
+        if (!LawRating.empty())
+            Fill(Stream_General, 0, General_LawRating, LawRating, true);
+        Ztring Title=(*Parser)->Retrieve(Stream_General, 0, General_Title);
+        if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+            Fill(Stream_General, 0, General_Title, Title);
+
         for (size_t Pos=0; Pos<DMScheme1s_List.size(); Pos++)
         {
             dmscheme1s::iterator DMScheme1=DMScheme1s.find(DMScheme1s_List[Pos]);
@@ -2182,6 +2196,13 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
                 }
             }
         }
+
+        Ztring LawRating=(*Parser)->Retrieve(Stream_General, 0, General_LawRating);
+        if (!LawRating.empty())
+            Fill(Stream_General, 0, General_LawRating, LawRating, true);
+        Ztring Title=(*Parser)->Retrieve(Stream_General, 0, General_Title);
+        if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+            Fill(Stream_General, 0, General_Title, Title);
 
         StreamKind_Last=Stream_Video;
         StreamPos_Last=Essence->second.StreamPos-(StreamPos_StartAtOne?1:0);
@@ -2617,7 +2638,7 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
         if (!Descriptor->second.SubDescriptors.empty())
         {
             std::vector<int128u> AudioChannelLabels_MCALabelDictionaryID;
-                
+
             for (size_t Pos=0; Pos<Descriptor->second.SubDescriptors.size(); Pos++)
             {
                 descriptors::iterator SubDescriptor=Descriptors.find(Descriptor->second.SubDescriptors[Pos]);
@@ -3392,7 +3413,7 @@ size_t File_Mxf::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                         if (File_GoTo!=(int64u)-1)
                             Value+=File_GoTo;
                     }
-                        
+
                     //Calculating the byte count not included in seek information (partition, index...)
                     Partitions_Pos=0;
                     while (Partitions_Pos<Partitions.size() && Partitions[Partitions_Pos].StreamOffset<Value)
@@ -3471,7 +3492,14 @@ size_t File_Mxf::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                         if (Descriptor==Descriptors.end())
                             return (size_t)-1; //Not supported
 
-                        if (TimeCode_StartTimecode!=(int64u)-1)
+                        if (Config->Demux_Offset_DTS!=(int64u)-1)
+                        {
+                            int64u Delay=float64_int64s(Config->Demux_Offset_DTS);
+                            if (Value<Delay)
+                                return 2; //Invalid value
+                            Value-=Delay;
+                        }
+                        else if (TimeCode_StartTimecode!=(int64u)-1)
                         {
                             int64u Delay=float64_int64s(DTS_Delay*1000000000);
                             if (Value<Delay)
@@ -4725,7 +4753,7 @@ void File_Mxf::Data_Parse()
         //Ignore tail
         if (Config->ParseSpeed>=1.0 && Frame_Count_NotParsedIncluded!=(int64u)-1 && Config->File_IgnoreFramesAfter!=(int64u)-1 && Frame_Count_NotParsedIncluded>=Config->File_IgnoreFramesAfter)
         {
-            if (PartitionMetadata_FooterPartition!=(int64u)-1)
+            if (PartitionMetadata_FooterPartition!=(int64u)-1 && PartitionMetadata_FooterPartition>=File_Offset+Buffer_Offset+Element_Size)
                 GoTo(PartitionMetadata_FooterPartition);
             else
                 GoToFromEnd(0);
@@ -5587,7 +5615,7 @@ void File_Mxf::SystemScheme1()
     {
         SystemSchemes[Element_Code&0xFFFF].IsTimeCode=false;
     }
-    
+
     switch(Code2)
     {
         #if MEDIAINFO_TRACE
@@ -5903,7 +5931,7 @@ void File_Mxf::SoundfieldGroupLabelSubDescriptor()
             int32u Code_Compare3=Primer_Value->second.lo>>32;
             int32u Code_Compare4=(int32u)Primer_Value->second.lo;
             if(0);
-            ELEMENT_UUID(GroupOfSoundfieldGroupsLinkID,                 "Group Of Soundfield Groups Link ID") 
+            ELEMENT_UUID(GroupOfSoundfieldGroupsLinkID,                 "Group Of Soundfield Groups Link ID")
             else
                 MCALabelSubDescriptor();
 
@@ -11596,7 +11624,6 @@ void File_Mxf::Info_UL_040101_Values()
                                                             Skip_B1(    "Unknown");
                                                     }
                                                     }
-                                                    break;
                                                     break;
                                                 default   :
                                                     Skip_B2(    "Unknown");

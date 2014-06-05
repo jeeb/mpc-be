@@ -1,0 +1,1 @@
+* Source\MediaInfo\Reader\Reader_File.cpp

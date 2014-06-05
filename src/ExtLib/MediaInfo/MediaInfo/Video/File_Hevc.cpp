@@ -1378,6 +1378,8 @@ void File_Hevc::seq_parameter_set()
 
         //Autorisation of other streams
         Streams[34].Searching_Payload=true; //pic_parameter_set
+    FILLING_ELSE();
+        delete vui_parameters_Item; //vui_parameters_Item=NULL;
     FILLING_END();
 }
 
@@ -2082,7 +2084,7 @@ void File_Hevc::scaling_list_data()
                 }
                 for(size_t i=0; i<coefNum; i++)
                 {
-                    Skip_SE(                                    "scaling_list_delta_coef"); 
+                    Skip_SE(                                    "scaling_list_delta_coef");
                     //nextCoef = ( nextCoef + scaling_list_delta_coef + 256 ) % 256
                     //ScalingList[ sizeId ][ matrixId ][ i ] = nextCoef
                 }
@@ -2106,7 +2108,7 @@ void File_Hevc::VPS_SPS_PPS()
          && Buffer[Buffer_Offset+3]==0x00
          && Buffer[Buffer_Offset+4]==0xFF) //Trying to detect old proposal of the form of Matroska implementation
             return VPS_SPS_PPS_FromMatroska();
-        
+
         MustParse_VPS_SPS_PPS_FromMatroska=false;
         MustParse_VPS_SPS_PPS_FromFlv=false;
     }

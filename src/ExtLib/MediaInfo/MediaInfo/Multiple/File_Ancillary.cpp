@@ -255,14 +255,14 @@ void File_Ancillary::Streams_Finish()
                 Merge(*Cdp_Parser, Stream_Text, StreamPos, StreamPos);
                 Ztring MuxingMode=Cdp_Parser->Retrieve(Stream_Text, StreamPos, "MuxingMode");
                 Fill(Stream_Text, StreamPos, "MuxingMode", __T("Ancillary data / ")+MuxingMode, true);
-                Ztring LawRating=Cdp_Parser->Retrieve(Stream_General, 0, General_LawRating);
-                if (!LawRating.empty())
-                    Fill(Stream_General, 0, General_LawRating, LawRating, true);
             }
 
             Ztring LawRating=Cdp_Parser->Retrieve(Stream_General, 0, General_LawRating);
             if (!LawRating.empty())
                 Fill(Stream_General, 0, General_LawRating, LawRating, true);
+            Ztring Title=Cdp_Parser->Retrieve(Stream_General, 0, General_Title);
+            if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+                Fill(Stream_General, 0, General_Title, Title);
         }
     #endif //defined(MEDIAINFO_CDP_YES)
 
@@ -615,7 +615,7 @@ void File_Ancillary::Data_Parse()
                                                 case 0x20:
                                                 case 0x40: Fill(Stream_Other, StreamPos_Last, Other_Format, "UMID"); break;
                                             }
-                                            
+
                                             Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE RP 223");
                                         }
                                         break;
