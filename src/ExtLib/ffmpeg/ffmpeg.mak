@@ -238,6 +238,7 @@ SRCS_C = \
 	libavcodec/latm_parser.c \
 	libavcodec/libopenjpegdec.c \
 	libavcodec/libspeexdec.c \
+	libavcodec/lossless_audiodsp.c \
 	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \
@@ -398,7 +399,6 @@ SRCS_C = \
 	libavcodec/wmv2dsp.c \
 	libavcodec/xiph.c \
 	libavcodec/x86/ac3dsp_init.c \
-	libavcodec/x86/apedsp_init.c \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
 	libavcodec/x86/dct_init.c \
@@ -421,6 +421,7 @@ SRCS_C = \
 	libavcodec/x86/huffyuvdsp_mmx.c \
 	libavcodec/x86/idct_mmx_xvid.c \
 	libavcodec/x86/idct_sse2_xvid.c \
+	libavcodec/x86/lossless_audiodsp_init.c \
 	libavcodec/x86/lossless_videodsp_init.c \
 	libavcodec/x86/mlpdsp.c \
 	libavcodec/x86/motion_est.c \
@@ -533,7 +534,6 @@ SRCS_C = \
 # Yasm objects
 SRCS_YASM = \
 	libavcodec/x86/ac3dsp.asm \
-	libavcodec/x86/apedsp.asm \
 	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
 	libavcodec/x86/deinterlace.asm \
@@ -562,6 +562,7 @@ SRCS_YASM = \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/imdct36.asm \
+	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
 	libavcodec/x86/pngdsp.asm \
 	libavcodec/x86/proresdsp.asm \

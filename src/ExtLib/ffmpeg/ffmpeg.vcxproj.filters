@@ -49,9 +49,6 @@
     <None Include="libavcodec\x86\ac3dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
-    <None Include="libavcodec\x86\apedsp.asm">
-      <Filter>libavcodec\x86</Filter>
-    </None>
     <None Include="libavcodec\x86\dcadsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -134,6 +131,9 @@
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\imdct36.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
+    <None Include="libavcodec\x86\lossless_audiodsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\lossless_videodsp.asm">
@@ -395,9 +395,6 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\amrwbdata.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\apedsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\atrac.h">
@@ -665,6 +662,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\lagarithrac.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\lossless_audiodsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\lossless_videodsp.h">
@@ -1375,9 +1375,6 @@
     <ClCompile Include="libavcodec\x86\ac3dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\apedsp_init.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\x86\constants.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1448,6 +1445,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\lossless_audiodsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\lossless_videodsp_init.c">
@@ -2048,6 +2048,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\log2_tab.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\lossless_audiodsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\lossless_videodsp.c">

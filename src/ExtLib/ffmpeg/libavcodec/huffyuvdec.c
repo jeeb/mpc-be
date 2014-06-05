@@ -559,7 +559,8 @@ static av_cold int decode_init_thread_copy(AVCodecContext *avctx)
     return 0;
 }
 
-#define DUAL_INTERN(dst, table, gb, name, bits, max_depth)            \
+/** Subset of GET_VLC for use in hand-roller VLC code */
+#define VLC_INTERN(dst, table, gb, name, bits, max_depth)   \
     code = table[index][0];                                 \
     n    = table[index][1];                                 \
     if (max_depth > 1 && n < 0) {                           \
@@ -585,31 +586,30 @@ static av_cold int decode_init_thread_copy(AVCodecContext *avctx)
 
 
 #define GET_VLC_DUAL(dst0, dst1, name, gb, dtable, table1, table2,  \
-                     bits, max_depth, rsvd )                        \
+                     bits, max_depth)                               \
     do {                                                            \
         unsigned int index = SHOW_UBITS(name, gb, bits);            \
-        int          code  = dtable[index][0];                      \
-        int          n     = dtable[index][1];                      \
+        int          code, n = dtable[index][1];                    \
                                                                     \
-        if (code != rsvd && n>0) {                                  \
+        if (n>0) {                                                  \
+            code = dtable[index][0];                                \
             dst0 = code>>8;                                         \
             dst1 = code;                                            \
             LAST_SKIP_BITS(name, gb, n);                            \
         } else {                                                    \
             int nb_bits;                                            \
-            DUAL_INTERN(dst0, table1, gb, name, bits, max_depth);   \
+            VLC_INTERN(dst0, table1, gb, name, bits, max_depth);    \
                                                                     \
             UPDATE_CACHE(re, gb);                                   \
             index = SHOW_UBITS(name, gb, bits);                     \
-            DUAL_INTERN(dst1, table2, gb, name, bits, max_depth);   \
+            VLC_INTERN(dst1, table2, gb, name, bits, max_depth);    \
         }                                                           \
     } while (0)
 
 #define READ_2PIX(dst0, dst1, plane1)\
     UPDATE_CACHE(re, &s->gb); \
     GET_VLC_DUAL(dst0, dst1, re, &s->gb, s->vlc[4+plane1].table, \
-                 s->vlc[0].table, s->vlc[plane1].table, \
-                 VLC_BITS, 3, 0xffff)
+                 s->vlc[0].table, s->vlc[plane1].table, VLC_BITS, 3)
 
 static void decode_422_bitstream(HYuvContext *s, int count)
 {
@@ -636,16 +636,11 @@ static void decode_422_bitstream(HYuvContext *s, int count)
 
 /* TODO instead of restarting the read when the code isn't in the first level
  * of the joint table, jump into the 2nd level of the individual table. */
-#define READ_2PIX_PLANE(dst0, dst1, plane){\
-    uint16_t code = get_vlc2(&s->gb, s->vlc[4+plane].table, VLC_BITS, 1);\
-    if(code != 0xffff){\
-        dst0 = code>>8;\
-        dst1 = code;\
-    }else{\
-        dst0 = get_vlc2(&s->gb, s->vlc[plane].table, VLC_BITS, 3);\
-        dst1 = get_vlc2(&s->gb, s->vlc[plane].table, VLC_BITS, 3);\
-    }\
-}
+#define READ_2PIX_PLANE(dst0, dst1, plane) \
+    UPDATE_CACHE(re, &s->gb); \
+    GET_VLC_DUAL(dst0, dst1, re, &s->gb, s->vlc[4+plane].table, \
+                 s->vlc[plane].table, s->vlc[plane].table, VLC_BITS, 3)
+
 #define READ_2PIX_PLANE14(dst0, dst1, plane){\
     int16_t code = get_vlc2(&s->gb, s->vlc[4+plane].table, VLC_BITS, 1);\
     if(code != (int16_t)0xffff){\
@@ -670,6 +665,7 @@ static void decode_plane_bitstream(HYuvContext *s, int count, int plane)
     count/=2;
 
     if (s->bps <= 8) {
+        OPEN_READER(re, &s->gb);
         if (count >= (get_bits_left(&s->gb)) / (31 * 2)) {
             for (i = 0; i < count && get_bits_left(&s->gb) > 0; i++) {
                 READ_2PIX_PLANE(s->temp[0][2 * i], s->temp[0][2 * i + 1], plane);
@@ -679,6 +675,7 @@ static void decode_plane_bitstream(HYuvContext *s, int count, int plane)
                 READ_2PIX_PLANE(s->temp[0][2 * i], s->temp[0][2 * i + 1], plane);
             }
         }
+        CLOSE_READER(re, &s->gb);
     } else if (s->bps <= 14) {
         if (count >= (get_bits_left(&s->gb)) / (31 * 2)) {
             for (i = 0; i < count && get_bits_left(&s->gb) > 0; i++) {
@@ -720,33 +717,6 @@ static void decode_gray_bitstream(HYuvContext *s, int count)
     CLOSE_READER(re, &s->gb);
 }
 
-#define GET_VLC_DUAL(dst0, dst1, name, gb, dtable, table1, table2,  \
-                     bits, max_depth, rsvd )                        \
-    do {                                                            \
-        unsigned int index = SHOW_UBITS(name, gb, bits);            \
-        int          code  = dtable[index][0];                      \
-        int          n     = dtable[index][1];                      \
-                                                                    \
-        if (code != rsvd && n>0) {                                  \
-            dst0 = code>>8;                                         \
-            dst1 = code;                                            \
-            LAST_SKIP_BITS(name, gb, n);                            \
-        } else {                                                    \
-            int nb_bits;                                            \
-            DUAL_INTERN(dst0, table1, gb, name, bits, max_depth);   \
-                                                                    \
-            UPDATE_CACHE(re, gb);                                   \
-            index = SHOW_UBITS(name, gb, bits);                     \
-            DUAL_INTERN(dst1, table2, gb, name, bits, max_depth);   \
-        }                                                           \
-    } while (0)
-
-#define READ_2PIX(dst0, dst1, plane1)\
-    UPDATE_CACHE(re, &s->gb); \
-    GET_VLC_DUAL(dst0, dst1, re, &s->gb, s->vlc[4+plane1].table, \
-                 s->vlc[0].table, s->vlc[plane1].table, \
-                 VLC_BITS, 3, 0xffff)
-
 static av_always_inline void decode_bgr_1(HYuvContext *s, int count,
                                           int decorrelate, int alpha)
 {
@@ -759,46 +729,46 @@ static av_always_inline void decode_bgr_1(HYuvContext *s, int count,
 
         UPDATE_CACHE(re, &s->gb);
         index = SHOW_UBITS(re, &s->gb, VLC_BITS);
-        code  = s->vlc[4].table[index][0];
         n     = s->vlc[4].table[index][1];
 
-        if (code != -1) {
+        if (n>0) {
+            code  = s->vlc[4].table[index][0];
             *(uint32_t*)&s->temp[0][4 * i] = s->pix_bgr_map[code];
             LAST_SKIP_BITS(re, &s->gb, n);
         } else {
             int nb_bits;
             if(decorrelate) {
-                DUAL_INTERN(s->temp[0][4 * i + G], s->vlc[1].table,
-                            &s->gb, re, VLC_BITS, 3);
+                VLC_INTERN(s->temp[0][4 * i + G], s->vlc[1].table,
+                           &s->gb, re, VLC_BITS, 3);
 
                 UPDATE_CACHE(re, &s->gb);
                 index = SHOW_UBITS(re, &s->gb, VLC_BITS);
-                DUAL_INTERN(code, s->vlc[0].table, &s->gb, re, VLC_BITS, 3);
+                VLC_INTERN(code, s->vlc[0].table, &s->gb, re, VLC_BITS, 3);
                 s->temp[0][4 * i + B] = code + s->temp[0][4 * i + G];
 
                 UPDATE_CACHE(re, &s->gb);
                 index = SHOW_UBITS(re, &s->gb, VLC_BITS);
-                DUAL_INTERN(code, s->vlc[2].table, &s->gb, re, VLC_BITS, 3);
+                VLC_INTERN(code, s->vlc[2].table, &s->gb, re, VLC_BITS, 3);
                 s->temp[0][4 * i + R] = code + s->temp[0][4 * i + G];
             } else {
-                DUAL_INTERN(s->temp[0][4 * i + B], s->vlc[0].table,
-                            &s->gb, re, VLC_BITS, 3);
+                VLC_INTERN(s->temp[0][4 * i + B], s->vlc[0].table,
+                           &s->gb, re, VLC_BITS, 3);
 
                 UPDATE_CACHE(re, &s->gb);
                 index = SHOW_UBITS(re, &s->gb, VLC_BITS);
-                DUAL_INTERN(s->temp[0][4 * i + G], s->vlc[1].table,
-                            &s->gb, re, VLC_BITS, 3);
+                VLC_INTERN(s->temp[0][4 * i + G], s->vlc[1].table,
+                           &s->gb, re, VLC_BITS, 3);
 
                 UPDATE_CACHE(re, &s->gb);
                 index = SHOW_UBITS(re, &s->gb, VLC_BITS);
-                DUAL_INTERN(s->temp[0][4 * i + R], s->vlc[2].table,
-                            &s->gb, re, VLC_BITS, 3);
+                VLC_INTERN(s->temp[0][4 * i + R], s->vlc[2].table,
+                           &s->gb, re, VLC_BITS, 3);
             }
             if (alpha) {
                 UPDATE_CACHE(re, &s->gb);
                 index = SHOW_UBITS(re, &s->gb, VLC_BITS);
-                DUAL_INTERN(s->temp[0][4 * i + A], s->vlc[2].table,
-                            &s->gb, re, VLC_BITS, 3);
+                VLC_INTERN(s->temp[0][4 * i + A], s->vlc[2].table,
+                           &s->gb, re, VLC_BITS, 3);
             }
         }
     }
