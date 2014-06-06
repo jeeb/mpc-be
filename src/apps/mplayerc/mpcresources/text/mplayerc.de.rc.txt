@@ -118,7 +118,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
-3		"Pan&Scan Profile"
+3		"Pan & Scan Profile"
 12		"&Neu"
 13		"&Löschen"
 14		"&Hoch"
@@ -306,7 +306,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 END
 
 BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
-5		"Farbeinstellungen für VMR-9, EVR und madVR)"
+5		"Farbeinstellungen für VMR-9, EVR und madVR"
 6		"Helligkeit:"
 7		"Kontrast:"
 8		"Farbton:"
@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 22		"Einstellungen als Datei (.ini) speichern"
 23		"&Zuletzt geöffnete Dateien merken"
 25		"&CD-ROM Menü ausblenden"
-26		"&Prozesspriorität höher als "
+26		"&Prozesspriorität "
 27		"Dateiname mit Titel ersetzen"
 28		"DVD-Wiedergabeposition merken"
 29		"Datei-Wiedergabeposition merken"
@@ -403,7 +403,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Textur-Einstellungen (Neuladen des Videos erforderlich)"
 19		"Anzahl der im Voraus gelesenen Bilder:"
 22		"Maximale Textur Auflösung:"
-23		"Untertitel sind in DirectShow verfügbar, wenn als Video-Renderer ""VMR-7\n(renderless)"", oder ""VMR-9 (renderless)"" ausgewählt wurde. VMR-7 benötigt WinXP, VMR-9\nDirectX 9. Beide benötigen eine D3D-Grafikkarte mit Hardware-Beschleunigung."
+23		"Untertitel sind in DirectShow verfügbar, wenn als Video-Renderer ""VMR-7\n(Renderless)"", oder ""VMR-9 (Renderless)"" ausgewählt wurde. VMR-7 benötigt WinXP, VMR-9\nDirectX 9. Beide benötigen eine D3D-Grafikkarte mit Hardware-Beschleunigung."
 24		"Hinweis"
 25		"Wenn Sie die Untertitel-Position anpassen und in den Einstellungen der Grafikkarte\nVollbild-Antialiasing auswählen, sehen die Untertitel zwar besser aus, aber die\nCPU-Belastung steigt extrem an."
 27		"Warnung"
