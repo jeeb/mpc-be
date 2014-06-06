@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
-5		"Verhalten bei "
+5		"Verhalten bei ""DVD/BD öffnen"""
 6		"&Standard"
 7		"&Benutzerdefiniert:"
 10		"Bevorzugte Sprachen des DVD-Navigators und des externen OGM-Splitters"
@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 22		"Einstellungen als Datei (.ini) speichern"
 23		"&Zuletzt geöffnete Dateien merken"
 25		"&CD-ROM Menü ausblenden"
-26		"&Prozesspriorität "
+26		"&Prozesspriorität ""Höher als normal"""
 27		"Dateiname mit Titel ersetzen"
 28		"DVD-Wiedergabeposition merken"
 29		"Datei-Wiedergabeposition merken"
