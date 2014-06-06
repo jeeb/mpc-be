@@ -534,7 +534,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 							else if (AMF0Array[i].name == L"framerate") {
 								double value = AMF0Array[i];
-								if (value != 0 && value != 1000) {
+								if (value > 0 && value < 120) {
 									AvgTimePerFrame = (REFERENCE_TIME)(UNITS / (int)value);
 								}
 							}
