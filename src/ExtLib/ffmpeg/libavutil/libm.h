@@ -82,6 +82,14 @@ static av_always_inline float cbrtf(float x)
 #define exp2f(x) ((float)exp2(x))
 #endif /* HAVE_EXP2F */
 
+#if !HAVE_FMINF
+#undef fminf
+static av_always_inline av_const float fminf(float x, float y)
+{
+    return FFMIN(x, y);
+}
+#endif
+
 #if !HAVE_ISINF
 static av_always_inline av_const int isinf(float x)
 {

@@ -181,6 +181,8 @@
 %define HAVE_EBX_AVAILABLE 1
 %define HAVE_EXP2 1
 %define HAVE_EXP2F 1
+%define HAVE_EXPF 1
+%define HAVE_FMINF 1
 %define HAVE_FAST_CLZ 1
 %define HAVE_FCNTL 0
 %define HAVE_FLT_LIM 1
