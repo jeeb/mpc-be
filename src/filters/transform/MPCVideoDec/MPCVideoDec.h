@@ -111,9 +111,9 @@ protected:
 	BYTE*									m_pFFBuffer2;
 	int										m_nFFBufferSize2;
 
-	REFERENCE_TIME							m_rtLastStop;			// rtStop for last delivered frame
+	REFERENCE_TIME							m_rtLastStart;			// rtStart for last delivered frame
+	REFERENCE_TIME							m_rtLastStop;			// rtStop  for last delivered frame
 	double									m_dRate;
-	REFERENCE_TIME							m_rtPrevStop;
 
 	bool									m_bUseDXVA;
 	bool									m_bUseFFmpeg;
