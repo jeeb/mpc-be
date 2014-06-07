@@ -421,14 +421,15 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		return E_UNEXPECTED;
 	}
 
-	if (FAILED(m_pD3D->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &m_caps)))
+	if (FAILED(m_pD3D->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &m_caps))) {
 		if ((m_caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
 			_Error += L"Video card does not have scanline access. Display synchronization is not possible.\n";
 			return E_UNEXPECTED;
 		}
+	}
 
 	m_uD3DRefreshRate = d3ddm.RefreshRate;
-	m_dD3DRefreshCycle = 1000.0 / (double)m_uD3DRefreshRate; // In ms
+	m_dD3DRefreshCycle = 1000.0 / m_uD3DRefreshRate; // In ms
 	m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
 	m_pGenlock->SetDisplayResolution(d3ddm.Width, d3ddm.Height);
 
@@ -730,7 +731,7 @@ HRESULT CBaseAP::ResetDXDevice(CString &_Error)
 	}
 
 	m_uD3DRefreshRate = d3ddm.RefreshRate;
-	m_dD3DRefreshCycle = 1000.0 / (double)m_uD3DRefreshRate; // In ms
+	m_dD3DRefreshCycle = 1000.0 / m_uD3DRefreshRate; // In ms
 	m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
 	m_pGenlock->SetDisplayResolution(d3ddm.Width, d3ddm.Height);
 
@@ -1439,7 +1440,7 @@ void CBaseAP::SyncStats(LONGLONG syncTime)
 	m_nNextJitter = (m_nNextJitter+1) % NB_JITTER;
 	LONGLONG jitter = syncTime - m_llLastSyncTime;
 	m_pllJitter[m_nNextJitter] = jitter;
-	double syncDeviation = ((double)m_pllJitter[m_nNextJitter] - m_fJitterMean) / 10000.0;
+	double syncDeviation = (m_pllJitter[m_nNextJitter] - m_fJitterMean) / 10000.0;
 	if (abs(syncDeviation) > (GetDisplayCycle() / 2)) {
 		m_uSyncGlitches++;
 	}
@@ -1455,11 +1456,11 @@ void CBaseAP::SyncStats(LONGLONG syncTime)
 	double DeviationSum = 0;
 
 	for (int i=0; i<NB_JITTER; i++) {
-		LONGLONG DevInt = m_pllJitter[i] - (LONGLONG)m_fJitterMean;
-		double Deviation = (double)DevInt;
-		DeviationSum += Deviation*Deviation;
-		m_MaxJitter = max(m_MaxJitter, DevInt);
-		m_MinJitter = min(m_MinJitter, DevInt);
+		double deviation = m_pllJitter[i] - m_fJitterMean;
+		DeviationSum += deviation * deviation;
+		LONGLONG deviationInt = std::llround(deviation);
+		m_MaxJitter = max(m_MaxJitter, deviationInt);
+		m_MinJitter = min(m_MinJitter, deviationInt);
 	}
 
 	m_fJitterStdDev = sqrt(DeviationSum/NB_JITTER);
@@ -1789,7 +1790,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	}
 
 	// Adjust sync
-	double frameCycle = (double)((m_llSampleTime - m_llLastSampleTime) / 10000.0);
+	double frameCycle = (m_llSampleTime - m_llLastSampleTime) / 10000.0;
 	if (frameCycle < 0) {
 		frameCycle = 0.0;    // Happens when searching.
 	}
@@ -2253,7 +2254,7 @@ void CBaseAP::EstimateRefreshTimings()
 				done = true;
 			}
 		}
-		m_dDetectedScanlineTime = (double)(endTime - startTime) / (double)((endLine - startLine) * 10000.0);
+		m_dDetectedScanlineTime = (endTime - startTime) /((endLine - startLine) * 10000.0);
 
 		// Estimate the display refresh rate from the vsyncs
 		m_pD3DDev->GetRasterStatus(0, &rasterStatus);
@@ -2274,7 +2275,7 @@ void CBaseAP::EstimateRefreshTimings()
 			// Now we're at the next vsync
 		}
 		endTime = pApp->GetPerfCounter();
-		m_dEstRefreshCycle = (double)(endTime - startTime) / ((i - 1) * 10000.0);
+		m_dEstRefreshCycle = (endTime - startTime) / ((i - 1) * 10000.0);
 	}
 }
 
@@ -3593,7 +3594,7 @@ void CSyncAP::RenderThread()
 								lLastVsyncTime = - lDisplayCycle;    // To even out glitches in the beginning
 							}
 
-							LONGLONG llNextSampleWait = (LONGLONG)(((double)lLastVsyncTime + GetDisplayCycle() - dTargetSyncOffset) * 10000); // Time from now util next safe time to Paint()
+							LONGLONG llNextSampleWait = (LONGLONG)((lLastVsyncTime + GetDisplayCycle() - dTargetSyncOffset) * 10000); // Time from now util next safe time to Paint()
 							while ((llRefClockTime + llNextSampleWait) < (m_llSampleTime + m_llHysteresis)) { // While the proposed time is in the past of sample presentation time
 								llNextSampleWait = llNextSampleWait + (LONGLONG)(GetDisplayCycle() * 10000); // Try the next possible time, one display cycle ahead
 							}
