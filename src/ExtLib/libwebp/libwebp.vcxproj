@@ -112,6 +112,7 @@
     <ClInclude Include="enc\cost.h" />
     <ClInclude Include="enc\vp8enci.h" />
     <ClInclude Include="utils\bit_reader.h" />
+    <ClInclude Include="utils\bit_reader_inl.h" />
     <ClInclude Include="utils\bit_writer.h" />
     <ClInclude Include="utils\quant_levels_dec.h" />
     <ClInclude Include="utils\random.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="dsp\upsampling.c" />
     <ClCompile Include="dsp\upsampling_sse2.c" />
     <ClCompile Include="dsp\yuv.c" />
+    <ClCompile Include="dsp\yuv_sse2.c" />
     <ClCompile Include="enc\alpha.c" />
     <ClCompile Include="enc\analysis.c" />
     <ClCompile Include="enc\backward_references.c" />
