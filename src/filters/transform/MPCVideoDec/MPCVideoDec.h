@@ -169,6 +169,7 @@ protected:
 	HRESULT				ChangeOutputMediaFormat(int nType);
 
 	HRESULT				ReopenVideo();
+	void				SetThreadCount();
 	HRESULT				FindDecoderConfiguration();
 
 	HRESULT				InitDecoder(const CMediaType *pmt);
