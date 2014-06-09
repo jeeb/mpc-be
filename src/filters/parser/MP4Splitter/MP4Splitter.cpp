@@ -1262,7 +1262,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		// FIXME: slow search & stss->m_Entries is private
 		if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-			if (stss->m_Entries.ItemCount() > 0) {
+			if (stss->m_Entries.ItemCount() > 1) {
 				AP4_Cardinal i = 1;
 				bool bFoundKeyFrame = false;
 				while (i < stss->m_Entries.ItemCount()) {
@@ -1272,7 +1272,6 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					}
 					++i;
 				}
-				//ASSERT(pPair->m_value.index == stss->m_Entries[i-1] - 1); // fast seek test
 				if (!bFoundKeyFrame && pPair->m_value.index > stss->m_Entries.ItemCount()) {
 					i = stss->m_Entries.ItemCount();
 				}
