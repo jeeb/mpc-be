@@ -24,25 +24,23 @@
 #define MPC_WND_CLASS_NAME L"MPC-BE"
 
 // CMPCBEContextMenu
-#define PLAY_MPC_RU		_T("&Воспроизвести в MPC-BE")
-#define ADDTO_MPC_RU	_T("&Добавить в плейлист MPC-BE")
+#define PLAY_MPC_RU		L"&Воспроизвести в MPC-BE"
+#define ADDTO_MPC_RU	L"&Добавить в плейлист MPC-BE"
 
-#define PLAY_MPC_EN		_T("&Play with MPC-BE")
-#define ADDTO_MPC_EN	_T("&Add to MPC-BE Playlist")
+#define PLAY_MPC_EN		L"&Play with MPC-BE"
+#define ADDTO_MPC_EN	L"&Add to MPC-BE Playlist"
 
 HBITMAP TransparentBMP(HBITMAP hBmp)
 {
-	HBITMAP RetBmp=NULL;
+	HBITMAP RetBmp = NULL;
 	if (hBmp) {	
-		HDC BufferDC=CreateCompatibleDC(NULL);	// DC for Source Bitmap
-
+		HDC BufferDC = CreateCompatibleDC(NULL);	// DC for Source Bitmap
 		if (BufferDC) {
 
-			HGDIOBJ PreviousBufferObject=SelectObject(BufferDC,hBmp);
+			HGDIOBJ PreviousBufferObject = SelectObject(BufferDC,hBmp);
 			// here BufferDC contains the bitmap
 
-			HDC DirectDC=CreateCompatibleDC(NULL); // DC for working
-
+			HDC DirectDC = CreateCompatibleDC(NULL); // DC for working
 			if (DirectDC) {
 				// Get bitmap size
 
@@ -55,11 +53,11 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 
 				BITMAPINFO RGB32BitsBITMAPINFO; 
 				ZeroMemory(&RGB32BitsBITMAPINFO,sizeof(BITMAPINFO));
-				RGB32BitsBITMAPINFO.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-				RGB32BitsBITMAPINFO.bmiHeader.biWidth=bm.bmWidth;
-				RGB32BitsBITMAPINFO.bmiHeader.biHeight=bm.bmHeight;
-				RGB32BitsBITMAPINFO.bmiHeader.biPlanes=1;
-				RGB32BitsBITMAPINFO.bmiHeader.biBitCount=32;
+				RGB32BitsBITMAPINFO.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
+				RGB32BitsBITMAPINFO.bmiHeader.biWidth		= bm.bmWidth;
+				RGB32BitsBITMAPINFO.bmiHeader.biHeight		= bm.bmHeight;
+				RGB32BitsBITMAPINFO.bmiHeader.biPlanes		= 1;
+				RGB32BitsBITMAPINFO.bmiHeader.biBitCount	= 32;
 
 				// pointer used for direct Bitmap pixels access
 				UINT * ptPixels;	
@@ -71,7 +69,7 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 					NULL, 0);
 				if (DirectBitmap) {
 					// here DirectBitmap!=NULL so ptPixels!=NULL no need to test
-					HGDIOBJ PreviousObject=SelectObject(DirectDC, DirectBitmap);
+					HGDIOBJ PreviousObject = SelectObject(DirectDC, DirectBitmap);
 					BitBlt(DirectDC,0,0,
 						bm.bmWidth,bm.bmHeight,
 						BufferDC,0,0,SRCCOPY);
@@ -82,7 +80,7 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 					SelectObject(DirectDC,PreviousObject);
 
 					// finish
-					RetBmp=DirectBitmap;
+					RetBmp = DirectBitmap;
 				}
 				// clean up
 				DeleteDC(DirectDC);
@@ -96,7 +94,7 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 	return RetBmp;
 }
 
-bool IsVistaOrAbove()
+static bool IsVistaOrAbove()
 {
 	OSVERSIONINFO osver;
 	osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -139,18 +137,18 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 	CString ADDTO_MPC	= (GetUserDefaultUILanguage() == 1049) ? ADDTO_MPC_RU	: ADDTO_MPC_EN;				
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 		TCHAR path_buff[MAX_PATH];
 		memset(path_buff, 0, sizeof(path_buff));
 		ULONG len = sizeof(path_buff);
 
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("Play"), path_buff, &len)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"Play", path_buff, &len)) {
 			PLAY_MPC = path_buff;
 		}
 
 		memset(path_buff, 0, sizeof(path_buff));
 		len = sizeof(path_buff);
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("Add"), path_buff, &len)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"Add", path_buff, &len)) {
 			ADDTO_MPC = path_buff;
 		}
 
@@ -216,8 +214,8 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 			DragQueryFile((HDROP)medium.hGlobal, i, strFilePath, MAX_PATH);
 			if (::GetFileAttributes(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
 				size_t nLen = _tcslen(strFilePath);
-				if (strFilePath[nLen-1] != _T('\\')) {
-					wcscat_s(strFilePath, _T("\\"));
+				if (strFilePath[nLen - 1] != L'\\') {
+					wcscat_s(strFilePath, L"\\");
 				}
 			}
 			// Add the file name to the list
@@ -227,7 +225,7 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 		
 		// sort list by path
 		pStrCmpLogicalW = NULL;
-		HMODULE h = LoadLibrary(_T("Shlwapi.dll"));
+		HMODULE h = LoadLibrary(L"Shlwapi.dll");
 		if (h) {
 			pStrCmpLogicalW = (StrCmpLogicalWPtr)GetProcAddress(h, "StrCmpLogicalW");
 			if (pStrCmpLogicalW) {
@@ -271,14 +269,14 @@ STDMETHODIMP CMPCBEContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 void CMPCBEContextMenu::SendData(bool add_pl)
 {
 	if (add_pl) {
-		m_listFileNames.AddTail(_T("/add"));
+		m_listFileNames.AddTail(L"/add");
 	}
 
 	int bufflen = sizeof(DWORD);
 
 	POSITION pos = m_listFileNames.GetHeadPosition();
 	while(pos) {
-		bufflen += (m_listFileNames.GetNext(pos).GetLength()+1)*sizeof(TCHAR);
+		bufflen += (m_listFileNames.GetNext(pos).GetLength() + 1) * sizeof(TCHAR);
 	}
 
 	CAutoVectorPtr<BYTE> buff;
@@ -294,7 +292,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 	pos = m_listFileNames.GetHeadPosition();
 	while(pos) {
 		CString s = m_listFileNames.GetNext(pos); 
-		int len = (s.GetLength()+1)*sizeof(TCHAR);
+		int len = (s.GetLength() + 1) * sizeof(TCHAR);
 		memcpy(p, s, len);
 		p += len;
 	}
@@ -312,18 +310,18 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 		ULONG len = sizeof(path_buff);
 		CString mpc_path;
 		
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+			if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExists(path_buff)) {
 				mpc_path = path_buff;
 			}
 			key.Close();
 		}
 
 		if (mpc_path.Trim().IsEmpty()) {
-			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
+			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 				memset(path_buff, 0, sizeof(path_buff));
 				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
 					mpc_path = path_buff;
 				}
 				key.Close();
@@ -332,10 +330,10 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 
 #ifdef _WIN64
 		if (mpc_path.Trim().IsEmpty()) {
-			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
+			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
 				memset(path_buff, 0, sizeof(path_buff));
 				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
 					mpc_path = path_buff;
 				}
 				key.Close();
@@ -344,11 +342,11 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 #endif
 
 		if (!mpc_path.Trim().IsEmpty()) {
-			if (HINSTANCE(HINSTANCE_ERROR) < ShellExecute(NULL, _T(""), path_buff, NULL, 0, SW_SHOWDEFAULT)) {
+			if (HINSTANCE(HINSTANCE_ERROR) < ShellExecute(NULL, L"", path_buff, NULL, 0, SW_SHOWDEFAULT)) {
 				Sleep(100);
 				int wait_count = 0;
 				HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
-				while (!hWnd && (wait_count++<200)) {
+				while (!hWnd && (wait_count++ < 200)) {
 					Sleep(100);
 					hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
 				}

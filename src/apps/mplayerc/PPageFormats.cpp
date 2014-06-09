@@ -948,6 +948,10 @@ BOOL CPPageFormats::OnApply()
 		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 			key.SetStringValue(L"Play", ResStr(IDS_OPEN_WITH_MPC));
 			key.SetStringValue(L"Add", ResStr(IDS_ADD_TO_PLAYLIST));
+
+			key.SetDWORDValue(L"ShowFiles", !!m_fContextFiles.GetCheck());
+			key.SetDWORDValue(L"ShowDir", !!m_fContextDir.GetCheck());
+
 			key.Close();
 		}
 

@@ -29,8 +29,8 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 	if (wcslen(lpszPath)) {
 		if (::PathFileExists(lpszPath)) {
 			CRegKey key;
-			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-				key.SetStringValue(_T("MpcPath"), lpszPath);
+			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+				key.SetStringValue(L"MpcPath", lpszPath);
 				key.Close();
 				return S_OK;
 			}
@@ -45,18 +45,18 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 	ULONG len = sizeof(path_buff);
 	unsigned count = 0;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
 			count++;
 		}
 		key.Close();
 	}
 #ifdef _WIN64
 	// x86 application on x64 system
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
 			count++;
 		}
 		key.Close();
@@ -72,13 +72,13 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 		memset(path_buff, 0, sizeof(path_buff));
 		len = sizeof(path_buff);
 
-		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
+			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
 				CString path(path_buff);
 				key.Close();
 
-				if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-					key.SetStringValue(_T("MpcPath"), path);
+				if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+					key.SetStringValue(L"MpcPath", path);
 					key.Close();
 					return S_OK;
 				}
@@ -102,7 +102,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 	return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 }
 
-CString GetFileOnly(LPCTSTR Path)
+static CString GetFileOnly(LPCTSTR Path)
 {
 	// Strip off the path and return just the filename part
 	CString temp = (LPCTSTR) Path; // Force CString to make a copy
@@ -111,7 +111,7 @@ CString GetFileOnly(LPCTSTR Path)
 	return temp;
 }
 
-CString GetKeyName()
+static CString GetKeyName()
 {
 	CString KeyName;
 	TCHAR path_buff[MAX_PATH];
@@ -119,8 +119,8 @@ CString GetKeyName()
 	ULONG len = sizeof(path_buff);
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExists(path_buff)) {
 			KeyName = GetFileOnly(path_buff);
 			KeyName.Truncate(KeyName.GetLength() - 4);
 		}
@@ -130,6 +130,20 @@ CString GetKeyName()
 	return KeyName;
 }
 
+static BOOL GetKeyValue(CString value)
+{
+	BOOL bValue = TRUE;
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		DWORD dw = 0;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(value, dw)) {
+			bValue = !!dw;
+		}
+		key.Close();
+	}
+
+	return bValue;
+}
 // DllRegisterServer - Adds entries to the system registry
 #define	IS_KEY_LEN 256
 STDAPI DllRegisterServer(void)
@@ -147,29 +161,32 @@ STDAPI DllRegisterServer(void)
 
 		if (::StringFromGUID2(CLSID_MPCBEContextMenu, strWideCLSID, 50) > 0) {
 			CRegKey key;
-			key.SetValue(HKEY_CLASSES_ROOT, _T("directory\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\"), strWideCLSID);
-
-			CRegKey reg;
-			if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
-				DWORD dwIndex = 0;
-				DWORD cbName = IS_KEY_LEN;
-				TCHAR szSubKeyName[IS_KEY_LEN];
-				LONG lRet;
-
-				while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
-					if (lRet == ERROR_SUCCESS) {
-						CString key_name = szSubKeyName;
-						if (!key_name.Find(KeyName)) {
-							key_name.Append(_T("\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\"));
-							key.SetValue(HKEY_CLASSES_ROOT, key_name, strWideCLSID);
-						}
-					}
-					dwIndex++;
-					cbName = IS_KEY_LEN;
-				}
-				reg.Close();
+			if (GetKeyValue(L"ShowDir")) {
+				key.SetValue(HKEY_CLASSES_ROOT, L"directory\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\", strWideCLSID);
 			}
 
+			if (GetKeyValue(L"ShowFiles")) {
+				CRegKey reg;
+				if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
+					DWORD dwIndex = 0;
+					DWORD cbName = IS_KEY_LEN;
+					TCHAR szSubKeyName[IS_KEY_LEN];
+					LONG lRet;
+
+					while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
+						if (lRet == ERROR_SUCCESS) {
+							CString key_name = szSubKeyName;
+							if (!key_name.Find(KeyName)) {
+								key_name.Append(L"\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\");
+								key.SetValue(HKEY_CLASSES_ROOT, key_name, strWideCLSID);
+							}
+						}
+						dwIndex++;
+						cbName = IS_KEY_LEN;
+					}
+					reg.Close();
+				}
+			}
 		}
 	}
 
@@ -183,8 +200,8 @@ STDAPI DllUnregisterServer(void)
 	HRESULT hr = _AtlModule.DllUnregisterServer();
 
 	if (SUCCEEDED(hr)) {
-		if (key.Open(HKEY_CLASSES_ROOT, _T("directory\\shellex\\ContextMenuHandlers\\")) == ERROR_SUCCESS) {
-			key.DeleteSubKey(_T("MPCBEShellExt"));
+		if (key.Open(HKEY_CLASSES_ROOT, L"directory\\shellex\\ContextMenuHandlers\\") == ERROR_SUCCESS) {
+			key.DeleteSubKey(L"MPCBEShellExt");
 		}
 
 		CString KeyName = GetKeyName();
@@ -204,14 +221,14 @@ STDAPI DllUnregisterServer(void)
 					CString key_name = szSubKeyName;
 					if (!key_name.Find(KeyName)) {
 						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
-							key.RecurseDeleteKey(_T("shellex"));
+							key.RecurseDeleteKey(L"shellex");
 						}
 						/*
-						key_name.Append(_T("\\shellex\\ContextMenuHandlers\\"));
+						key_name.Append(L"\\shellex\\ContextMenuHandlers\\");
 
 						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
 							key.DeleteValue(NULL);
-							key.DeleteSubKey(_T("MPCBEShellExt"));
+							key.DeleteSubKey(L"MPCBEShellExt");
 						}
 						*/
 					}
@@ -231,7 +248,7 @@ STDAPI DllUnregisterServer(void)
 STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 {
     HRESULT hr = E_FAIL;
-    static const wchar_t szUserSwitch[] = _T("user");
+    static const wchar_t szUserSwitch[] = L"user";
 
     if (pszCmdLine != NULL) {
     	if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0) {
