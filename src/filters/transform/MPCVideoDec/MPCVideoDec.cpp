@@ -2576,7 +2576,7 @@ void CMPCVideoDecFilter::SetThreadCount()
 {
 	if (m_pAVCtx) {
 		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-		m_pAVCtx->thread_count = max(1, min(m_nCodecId == AV_CODEC_ID_MPEG4 ? 1 : nThreadNumber, MAX_AUTO_THREADS));
+		m_pAVCtx->thread_count = max(1, min((IsDXVASupported() || m_nCodecId == AV_CODEC_ID_MPEG4) ? 1 : nThreadNumber, MAX_AUTO_THREADS));
 	}
 }
 
