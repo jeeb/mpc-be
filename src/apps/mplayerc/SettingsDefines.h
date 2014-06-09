@@ -303,3 +303,6 @@
 #define IDS_R_FILTERS_PRIORITY				_T("\\Filters Priority")
 
 #define IDS_RS_LASTFILEINFOPAGE				_T("LastFileInfoPage")
+
+#define IDS_RS_CONTEXTFILES					_T("ShowContextFiles")
+#define IDS_RS_CONTEXTDIR					_T("ShowContextDir")

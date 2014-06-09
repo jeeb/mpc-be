@@ -138,6 +138,25 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 	CString PLAY_MPC	= (GetUserDefaultUILanguage() == 1049) ? PLAY_MPC_RU	: PLAY_MPC_EN;
 	CString ADDTO_MPC	= (GetUserDefaultUILanguage() == 1049) ? ADDTO_MPC_RU	: ADDTO_MPC_EN;				
 
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+		TCHAR path_buff[MAX_PATH];
+		memset(path_buff, 0, sizeof(path_buff));
+		ULONG len = sizeof(path_buff);
+
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("Play"), path_buff, &len)) {
+			PLAY_MPC = path_buff;
+		}
+
+		memset(path_buff, 0, sizeof(path_buff));
+		len = sizeof(path_buff);
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("Add"), path_buff, &len)) {
+			ADDTO_MPC = path_buff;
+		}
+
+		key.Close();
+	}
+
 	if (m_listFileNames.GetCount() > 0) {
 		::InsertMenu(hmenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
 

@@ -606,6 +606,10 @@ void CAppSettings::SaveSettings()
 
 	// Associated types with icon or not...
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, fAssociatedWithIcons);
+	// file/dir context menu
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
+
 	// Last Open Dir
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
@@ -895,7 +899,7 @@ void CAppSettings::SaveExternalFilters()
 	}
 }
 
-void CAppSettings::LoadSettings()
+void CAppSettings::LoadSettings(bool bForce/* = false*/)
 {
 	CWinApp* pApp = AfxGetApp();
 	ASSERT(pApp);
@@ -903,7 +907,7 @@ void CAppSettings::LoadSettings()
 	UINT len;
 	BYTE* ptr = NULL;
 
-	if (fInitialized) {
+	if (fInitialized && !bForce) {
 		return;
 	}
 
@@ -1007,7 +1011,11 @@ void CAppSettings::LoadSettings()
 	strOSDFont= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, IsWinVistaOrLater() ? _T("Segoe UI") : _T("Arial"));
 
 	// Associated types with icon or not...
-	fAssociatedWithIcons = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, 1);
+	fAssociatedWithIcons	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, 1);
+	// file/dir context menu
+	bSetContextFiles		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, 0);
+	bSetContextDir			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, 0);
+
 	// Last Open Dir
 	strLastOpenDir = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, L"C:\\");
 	// Last Saved Playlist Dir

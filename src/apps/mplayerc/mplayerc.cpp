@@ -1089,9 +1089,9 @@ BOOL CMPlayerCApp::InitInstance()
 			CPPageFormats::RegisterApp();
 
 			BOOL bIs64 = IsW64();
-			CPPageFormats::UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+			CPPageFormats::UnRegisterShellExt(ShellExt);
 			if (bIs64) {
-				CPPageFormats::UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+				CPPageFormats::UnRegisterShellExt(ShellExt64);
 			}
 
 			CMediaFormats& mf = m_s.m_Formats;
@@ -1111,9 +1111,9 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 
-			CPPageFormats::RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+			CPPageFormats::RegisterShellExt(ShellExt);
 			if (bIs64) {
-				CPPageFormats::RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+				CPPageFormats::RegisterShellExt(ShellExt64);
 			}
 
 			if (IsWinEightOrLater()) {

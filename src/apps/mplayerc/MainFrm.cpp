@@ -18639,6 +18639,8 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
 	UpdateThumbarButton();
+
+	AfxGetAppSettings().SaveSettings();
 }
 
 void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)

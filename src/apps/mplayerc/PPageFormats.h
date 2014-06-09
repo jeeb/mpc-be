@@ -25,6 +25,8 @@
 #include "PPageBase.h"
 #include "PlayerListCtrl.h"
 
+#define ShellExt	GetModulePath(false) + L"\\MPCBEShellExt.dll"
+#define ShellExt64	GetModulePath(false) + L"\\MPCBEShellExt64.dll"
 
 // CPPageFormats dialog
 
@@ -57,10 +59,8 @@ private:
 	static CString GetEnqueueCommand();
 
 	static CComPtr<IApplicationAssociationRegistration>	m_pAAR;
-	static bool											m_bSetContextFiles;
 
-	CAtlList<CString>									m_lUnRegisterExts;
-	bool												m_bSetAssociatedWithIcon;
+	CAtlList<CString> m_lUnRegisterExts;
 
 public:
 	CPPageFormats();
@@ -70,7 +70,7 @@ public:
 
 	static bool		RegisterApp();
 	static bool		IsRegistered(CString ext);
-	static bool		RegisterExt(CString ext, CString strLabel, filetype_t filetype, bool setAssociatedWithIcon = true);
+	static bool		RegisterExt(CString ext, CString strLabel, filetype_t filetype, bool SetContextFiles = false, bool setAssociatedWithIcon = true);
 	static bool		UnRegisterExt(CString ext);
 	static HRESULT	RegisterUI();
 	static bool		RegisterShellExt(LPCTSTR lpszLibrary);
@@ -115,7 +115,7 @@ public:
 	afx_msg void OnBnClickedDefault();
 	afx_msg void OnBnClickedSet();
 	afx_msg void OnBnClickedNone();
-	afx_msg void OnBnVistaModify();
+	afx_msg void OnBnRunAdmin();
 	afx_msg void OnFilesAssocModified();
 	afx_msg void OnUpdateButtonDefault(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateButtonSet(CCmdUI* pCmdUI);

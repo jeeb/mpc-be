@@ -499,6 +499,9 @@ public:
 	bool			fAssociatedWithIcons;
 	engine_t		iRtspHandler;
 	bool			fRtspFileExtFirst;
+	// file/dir context menu
+	bool			bSetContextFiles;
+	bool			bSetContextDir;
 
 	// Keys
 	CList<wmcmd>	wmcmds;
@@ -790,7 +793,6 @@ public:
 
 	bool			IsISRSelect() const;
 	bool			IsISRAutoLoadEnabled() const;
-
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;
@@ -812,7 +814,7 @@ public:
 	virtual ~CAppSettings();
 	void			SaveSettings();
 	void			SaveExternalFilters();
-	void			LoadSettings();
+	void			LoadSettings(bool bForce = false);
 	void			SaveShaders();
 	void			LoadShaders();
 

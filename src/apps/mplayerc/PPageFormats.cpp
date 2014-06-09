@@ -30,8 +30,16 @@
 
 // CPPageFormats dialog
 
+static BOOL ShellExtExists()
+{
+	if (IsW64()) {
+		return ::PathFileExists(ShellExt64);
+	}
+
+	return ::PathFileExists(ShellExt);
+}
+
 CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
-bool CPPageFormats::m_bSetContextFiles = false;
 
 // TODO: change this along with the root key for settings and the mutex name to
 //       avoid possible risks of conflict with the old MPC (non BE version).
@@ -48,7 +56,6 @@ CPPageFormats::CPPageFormats()
 	, m_iRtspHandler(0)
 	, m_fRtspFileExtFirst(FALSE)
 	, m_bInsufficientPrivileges(false)
-	, m_bSetAssociatedWithIcon(true)
 {
 	if (m_pAAR == NULL) {
 		// Default manager (requires at least Vista)
@@ -147,18 +154,6 @@ bool CPPageFormats::IsRegistered(CString ext)
 
 		bIsDefault = (buff == strProgID);
 	}
-	if (!m_bSetContextFiles) {
-		CRegKey key;
-		TCHAR   buff[_MAX_PATH];
-		ULONG   len = _countof(buff);
-
-		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open"), KEY_READ)) {
-			CString strCommand = ResStr(IDS_OPEN_WITH_MPC);
-			if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
-				m_bSetContextFiles = (strCommand.CompareNoCase(CString(buff)) == 0);
-			}
-		}
-	}
 
 	// Check if association is for this instance of MPC
 	if (bIsDefault) {
@@ -235,7 +230,7 @@ bool CPPageFormats::RegisterApp()
 	return true;
 }
 
-bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filetype, bool setAssociatedWithIcon)
+bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filetype, bool SetContextFiles/* = false*/, bool setAssociatedWithIcon/* = true*/)
 {
 	CRegKey key;
 	CString strProgID = PROGID + ext;
@@ -252,7 +247,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	}
 
 	// Add to playlist option
-	if (m_bSetContextFiles) {
+	if (SetContextFiles && !ShellExtExists()) {
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\enqueue"))) {
 			return false;
 		}
@@ -276,7 +271,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open"))) {
 		return false;
 	}
-	if (m_bSetContextFiles) {
+	if (SetContextFiles && !ShellExtExists()) {
 		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC))) {
 			return false;
 		}
@@ -614,7 +609,7 @@ BEGIN_MESSAGE_MAP(CPPageFormats, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON_EXT_SET, OnBnClickedSet)
 	ON_BN_CLICKED(IDC_BUTTON4, OnBnClickedVideo)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedAudio)
-	ON_BN_CLICKED(IDC_BUTTON5, OnBnVistaModify)
+	ON_BN_CLICKED(IDC_BUTTON5, OnBnRunAdmin)
 	ON_BN_CLICKED(IDC_BUTTON6, OnBnClickedNone)
 	ON_BN_CLICKED(IDC_CHECK7, OnFilesAssocModified)
 	ON_BN_CLICKED(IDC_CHECK8, OnFilesAssocModified)
@@ -654,9 +649,9 @@ BOOL CPPageFormats::OnInitDialog()
 		engine_t e = mf[i].GetEngineType();
 		m_list.SetItemText(iItem, COL_ENGINE,
 						   e == DirectShow ? _T("DirectShow") :
-						   e == RealMedia ? _T("RealMedia") :
-						   e == QuickTime ? _T("QuickTime") :
-						   e == ShockWave ? _T("ShockWave") : _T("-"));
+						   e == RealMedia  ? _T("RealMedia") :
+						   e == QuickTime  ? _T("QuickTime") :
+						   e == ShockWave  ? _T("ShockWave") : _T("-"));
 	}
 
 	//	m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
@@ -669,7 +664,7 @@ BOOL CPPageFormats::OnInitDialog()
 	AppSettings& s = AfxGetAppSettings();
 	bool fRtspFileExtFirst;
 	engine_t e = s.GetRtspHandler(fRtspFileExtFirst);
-	m_iRtspHandler = (e==RealMedia ? 0 : e == QuickTime ? 1 : 2);
+	m_iRtspHandler = (e == RealMedia ? 0 : e == QuickTime ? 1 : 2);
 	m_fRtspFileExtFirst = fRtspFileExtFirst;
 
 	UpdateData(FALSE);
@@ -677,7 +672,10 @@ BOOL CPPageFormats::OnInitDialog()
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		SetListItemState(i);
 	}
-	m_fContextFiles.SetCheck(m_bSetContextFiles);
+
+	m_fContextFiles.SetCheck(s.bSetContextFiles);
+	m_fContextDir.SetCheck(s.bSetContextDir);
+	m_fAssociatedWithIcons.SetCheck(s.fAssociatedWithIcons);
 
 	m_apvideo.SetCheck(IsAutoPlayRegistered(AP_VIDEO));
 	m_apmusic.SetCheck(IsAutoPlayRegistered(AP_MUSIC));
@@ -711,20 +709,6 @@ BOOL CPPageFormats::OnInitDialog()
 	} else {
 		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_HIDE);
 	}
-
-	CRegKey key;
-	TCHAR   buff[_MAX_PATH];
-	ULONG   len = _countof(buff);
-
-	int fContextDir = 0;
-	if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".play\\command"), KEY_READ)) {
-		CString strCommand = GetOpenCommand();
-		if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
-			fContextDir = (strCommand.CompareNoCase(CString(buff)) == 0);
-		}
-	}
-	m_fContextDir.SetCheck(fContextDir);
-	m_fAssociatedWithIcons.SetCheck(s.fAssociatedWithIcons);
 
 	m_lUnRegisterExts.RemoveAll();
 
@@ -894,7 +878,13 @@ void GetUnRegisterExts(CString saved_ext, CString new_ext, CAtlList<CString>& Un
 
 BOOL CPPageFormats::OnApply()
 {
+	bool bSetAssociatedWithIconOld	= !!m_fAssociatedWithIcons.GetCheck();
+	bool bSetContextFileOld			= !!m_fContextFiles.GetCheck();
+
 	UpdateData();
+
+	AppSettings& s = AfxGetAppSettings();
+	CMediaFormats& mf = s.m_Formats;
 
 	{
 		int i = m_list.GetSelectionMark();
@@ -902,8 +892,6 @@ BOOL CPPageFormats::OnApply()
 			i = (int)m_list.GetItemData(i);
 		}
 		if (i >= 0) {
-			CMediaFormats& mf = AfxGetAppSettings().m_Formats;
-
 			if (i > 0) {
 				GetUnRegisterExts(mf[i].GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
 			}
@@ -920,28 +908,22 @@ BOOL CPPageFormats::OnApply()
 		}
 	}
 
-	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
-
 	RegisterApp();
 
-	m_bSetContextFiles			= !!m_fContextFiles.GetCheck();
-	m_bSetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
+	bool bSetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
+	bool bSetContextFile		= !!m_fContextFiles.GetCheck();
+
+	BOOL bIs64 = IsW64();
+	UnRegisterShellExt(ShellExt);
+	if (bIs64) {
+		UnRegisterShellExt(ShellExt64);
+	}
+
+	m_bFileExtChanged = m_bFileExtChanged || (bSetContextFileOld != bSetContextFile || bSetAssociatedWithIconOld != bSetAssociatedWithIcon);
 
 	if (m_bFileExtChanged) {
-		BOOL bIs64 = IsW64();
-
-		UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
-		if (bIs64) {
-			UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
-		}
-
-		int nRegExtCount = 0;
 		for (int i = 0; i < m_list.GetItemCount(); i++) {
 			int iChecked = GetChecked(i);
-
-			if (iChecked) {
-				nRegExtCount++;
-			}
 
 			if (iChecked == 2) {
 				continue;
@@ -953,22 +935,30 @@ BOOL CPPageFormats::OnApply()
 			POSITION pos = exts.GetHeadPosition();
 			while (pos) {
 				if (iChecked) {
-					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].GetFileType(), m_bSetAssociatedWithIcon);
+					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].GetFileType(), bSetContextFile, bSetAssociatedWithIcon);
 				} else {
 					UnRegisterExt(exts.GetNext(pos));
 				}
 			}
 		}
+	}
 
-		if (nRegExtCount) {
-			RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
-			if (bIs64) {
-				RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
-			}
+	if (m_fContextFiles.GetCheck() || m_fContextDir.GetCheck()) {
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+			key.SetStringValue(L"Play", ResStr(IDS_OPEN_WITH_MPC));
+			key.SetStringValue(L"Add", ResStr(IDS_ADD_TO_PLAYLIST));
+			key.Close();
+		}
+
+		RegisterShellExt(ShellExt);
+		if (bIs64) {
+			RegisterShellExt(ShellExt64);
 		}
 	}
+
 	CRegKey key;
-	if (m_fContextDir.GetCheck()) {
+	if (m_fContextDir.GetCheck() && !ShellExtExists()) {
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".enqueue"))) {
 			key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST));
 		}
@@ -990,9 +980,7 @@ BOOL CPPageFormats::OnApply()
 		key.RecurseDeleteKey(_T("Directory\\shell\\") PROGID _T(".play"));
 	}
 
-	{
-		SetListItemState(m_list.GetSelectionMark());
-	}
+	SetListItemState(m_list.GetSelectionMark());
 
 	AddAutoPlayToRegistry(AP_VIDEO,		!!m_apvideo.GetCheck());
 	AddAutoPlayToRegistry(AP_MUSIC,		!!m_apmusic.GetCheck());
@@ -1000,9 +988,11 @@ BOOL CPPageFormats::OnApply()
 	AddAutoPlayToRegistry(AP_DVDMOVIE,	!!m_apdvd.GetCheck());
 	AddAutoPlayToRegistry(AP_BDMOVIE,	!!m_apdvd.GetCheck());
 
-	AppSettings& s = AfxGetAppSettings();
 	s.SetRtspHandler(m_iRtspHandler == 0 ? RealMedia : m_iRtspHandler == 1 ? QuickTime:DirectShow, !!m_fRtspFileExtFirst);
-	s.fAssociatedWithIcons = !!m_fAssociatedWithIcons.GetCheck();
+	
+	s.bSetContextFiles		= !!m_fContextFiles.GetCheck();
+	s.bSetContextDir		= !!m_fContextDir.GetCheck();
+	s.fAssociatedWithIcons	= !!m_fAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged && IsWinEightOrLater()) {
 		HRESULT hr = RegisterUI();
@@ -1159,19 +1149,31 @@ void CPPageFormats::OnBnClickedAudio()
 	SetModified();
 }
 
-void CPPageFormats::OnBnVistaModify()
+void CPPageFormats::OnBnRunAdmin()
 {
 	CString strCmd;
-	TCHAR   strApp[_MAX_PATH];
+	TCHAR   strApp[_MAX_PATH] = { 0 };
 
-	strCmd.Format (_T("/adminoption %d"), IDD);
-	GetModuleFileNameEx (GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
+	strCmd.Format(_T("/adminoption %d"), IDD);
+	::GetModuleFileNameEx(GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
 
-	AfxGetMyApp()->RunAsAdministrator (strApp, strCmd, true);
+	AfxGetMyApp()->RunAsAdministrator(strApp, strCmd, true);
 
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		SetListItemState(i);
 	}
+
+	AppSettings& s = AfxGetAppSettings();
+	s.LoadSettings(true);
+
+	m_fContextFiles.SetCheck(s.bSetContextFiles);
+	m_fContextDir.SetCheck(s.bSetContextDir);
+	m_fAssociatedWithIcons.SetCheck(s.fAssociatedWithIcons);
+
+	m_apvideo.SetCheck(IsAutoPlayRegistered(AP_VIDEO));
+	m_apmusic.SetCheck(IsAutoPlayRegistered(AP_MUSIC));
+	m_apaudiocd.SetCheck(IsAutoPlayRegistered(AP_AUDIOCD));
+	m_apdvd.SetCheck(IsAutoPlayRegistered(AP_DVDMOVIE));
 }
 
 void CPPageFormats::OnBnClickedNone()
