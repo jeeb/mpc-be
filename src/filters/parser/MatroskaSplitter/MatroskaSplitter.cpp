@@ -235,6 +235,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				bool interlaced = false;
 
 				mt.majortype = MEDIATYPE_Video;
+				mt.bFixedSizeSamples = FALSE;
 
 				if (CodecID == "V_MS/VFW/FOURCC") {
 					mt.formattype = FORMAT_VideoInfo;
@@ -253,10 +254,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							pvih->bmiHeader.biBitCount == 24 ? MEDIASUBTYPE_RGB24 :
 							pvih->bmiHeader.biBitCount == 32 ? MEDIASUBTYPE_ARGB32 :
 							MEDIASUBTYPE_NULL;
+						mt.bFixedSizeSamples = TRUE;
 						break;
 					//case BI_RLE8: mt.subtype = MEDIASUBTYPE_RGB8; break;
 					//case BI_RLE4: mt.subtype = MEDIASUBTYPE_RGB4; break;
 					case FCC('v210'):
+						mt.bFixedSizeSamples = TRUE;
 						pvih->bmiHeader.biBitCount = 20; // fixed incorrect bitdepth (ffmpeg bug)
 						pvih->bmiHeader.biSizeImage = pvih->bmiHeader.biWidth * pvih->bmiHeader.biHeight * pvih->bmiHeader.biBitCount / 8;
 						break;
@@ -417,7 +420,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					vih->hdr.dwPictAspectRatioX = (thdr[14]<<16)|(thdr[15]<<8)|thdr[16];
 					vih->hdr.dwPictAspectRatioY = (thdr[17]<<16)|(thdr[18]<<8)|thdr[19];
-					mt.bFixedSizeSamples = 0;
 
 					vih->cbSequenceHeader = (DWORD)pTE->CodecPrivate.GetCount();
 					memcpy (&vih->dwSequenceHeader, pTE->CodecPrivate.GetData(), vih->cbSequenceHeader);
@@ -485,6 +487,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() == 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
 					} else if (CodecID == "V_UNCOMPRESSED") {
+						mt.bFixedSizeSamples = TRUE;
 						fourcc = FCC((DWORD)pTE->v.ColourSpace);
 						switch (fourcc) {
 						case FCC('Y8  '):
