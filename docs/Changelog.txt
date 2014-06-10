@@ -30,7 +30,7 @@ Changes (*):
 	* libwebp 0.4.0 git-bdfeebaa;
 	* MediaInfo 0.7.69+ svn rev.6320;
 	* Little-CMS 2.7 beta git-1948a466;
-	* ZenLib 0.4.29+ svn rev.478;
+	* ZenLib 0.4.29+ svn rev.480;
 	 ... and many more.
 
 
