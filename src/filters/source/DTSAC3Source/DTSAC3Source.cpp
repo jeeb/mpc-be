@@ -416,7 +416,7 @@ HRESULT CDTSAC3Stream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut,
 	UNREFERENCED_PARAMETER(subtype);
 
 	if (*majortype == MEDIATYPE_Audio) {
-		m_file.Seek(m_dataStart + nFrame*m_framesize, CFile::begin);
+		m_file.Seek(m_dataStart + (__int64)nFrame * m_framesize, CFile::begin);
 		if ((int)m_file.Read(pOut, m_framesize) < m_framesize) {
 			return S_FALSE;
 		}
