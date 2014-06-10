@@ -1068,8 +1068,8 @@ void File__Analyze::Get_VL_Prepare(vlc_fast &Vlc)
         if (Vlc.Vlc[Pos].bit_increment==255)
             break;
         Increment+=Vlc.Vlc[Pos].bit_increment;
-        size_t Value=Vlc.Vlc[Pos].value<<(Vlc.Size-Increment);
-        size_t ToFill_Size=1<<(Vlc.Size-Increment);
+        size_t Value = ((size_t)Vlc.Vlc[Pos].value) << (Vlc.Size - Increment);
+        size_t ToFill_Size=((size_t)1)<<(Vlc.Size-Increment);
         for (size_t ToFill_Pos=0; ToFill_Pos<ToFill_Size; ToFill_Pos++)
         {
             Vlc.Array[Value+ToFill_Pos]=Pos;
@@ -1210,7 +1210,7 @@ void File__Analyze::Get_ISO_6937_2(int64u Bytes, Ztring &Info)
 {
     INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
     Info.clear();
-    size_t End=Buffer_Offset+(size_t)Element_Offset+Bytes;
+    size_t End = Buffer_Offset + (size_t)Element_Offset + (size_t)Bytes;
     for (size_t Pos=Buffer_Offset+(size_t)Element_Offset; Pos<End; ++Pos)
     {
         wchar_t EscapeChar=__T('\x0000');
@@ -1332,7 +1332,7 @@ void File__Analyze::Get_ISO_8859_5(int64u Bytes, Ztring &Info)
 {
     INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
     Info.clear();
-    size_t End=Buffer_Offset+(size_t)Element_Offset+Bytes;
+    size_t End = Buffer_Offset + (size_t)Element_Offset + (size_t)Bytes;
     for (size_t Pos=Buffer_Offset+(size_t)Element_Offset; Pos<End; ++Pos)
     {
         switch (Buffer[Pos])

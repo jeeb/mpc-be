@@ -240,16 +240,16 @@ void File_Aaf::Header_Parse()
     switch (Step)
     {
         case Step_Fat           : Header_Fill_Code(0, "FAT");
-                                  Header_Fill_Size(1<<SectorShift);
+                                  Header_Fill_Size(((int64u)1) << SectorShift);
                                   break;
         case Step_MiniFat       : Header_Fill_Code(0, "MiniFAT");
-                                  Header_Fill_Size(1<<SectorShift);
+                                  Header_Fill_Size(((int64u)1) << SectorShift);
                                   break;
         case Step_Directory     : Header_Fill_Code(0, "Directory");
-                                  Header_Fill_Size(1<<SectorShift);
+                                  Header_Fill_Size(((int64u)1) << SectorShift);
                                   break;
         case Step_Stream        : Header_Fill_Code(0, "Stream");
-                                  Header_Fill_Size(1<<(Streams[0]->Size<MiniSectorCutoff?MiniSectorShift:SectorShift));
+                                  Header_Fill_Size(((int64u)1) << (Streams[0]->Size<MiniSectorCutoff ? MiniSectorShift : SectorShift));
                                   break;
         default                 : ;
     }
@@ -393,10 +393,11 @@ void File_Aaf::Directory_Entry()
     else if (mse==2 && Size) //If stream
     {
         Param_Info1("StreamOffset");
-        stream* Stream=new stream;
-        Stream->Directory_Pos=Directory_Pos;
-        Stream->Size=Size;
-        Stream->Name=ab;
+        stream* Stream = new stream(
+                                    ab,
+                                    Directory_Pos,
+                                    Size
+                                   );
         if (Size<MiniSectorCutoff) //MiniFAT
         {
             int32u Pointers_Pos=SectStart;

@@ -111,6 +111,10 @@ void Reader_File_Thread::Entry()
             break;
         Yield();
     }
+
+    #ifdef WINDOWS
+        SetEvent(Base->Condition_WaitingForMoreData); //Sending the last event in case the main threading is waiting for more data
+    #endif //WINDOWS
 }
 #endif //MEDIAINFO_READTHREAD
 
@@ -292,6 +296,9 @@ size_t Reader_File::Format_Test_PerParser(MediaInfo_Internal* MI, const String &
 //---------------------------------------------------------------------------
 size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
 {
+    if (MI == NULL)
+        return 0;
+    
     bool StopAfterFilled=MI->Config.File_StopAfterFilled_Get();
     bool ShouldContinue=true;
     if (MI->Info)
@@ -533,15 +540,17 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                         if (MI->Config.File_Buffer_Size)
                             break;
 
-                        CS.Leave();
-                        #ifdef WINDOWS
-                            WaitForSingleObject(Condition_WaitingForMoreData, INFINITE);
-                        #else //WINDOWS
-                            Sleep(0);
-                        #endif //WINDOWS
-                        CS.Enter();
-
                         if (ThreadInstance->IsExited())
+                        {
+                            CS.Leave();
+                            #ifdef WINDOWS
+                                WaitForSingleObject(Condition_WaitingForMoreData, INFINITE);
+                            #else //WINDOWS
+                                Sleep(0);
+                            #endif //WINDOWS
+                            CS.Enter();
+                        }
+                        else
                         {
                             if (IsLooping)
                             {
@@ -722,7 +731,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
         std::cout<<"Total: "<<std::dec<<Reader_File_BytesRead_Total<<" bytes in "<<Reader_File_Count<<" blocks"<<std::endl;
     #endif //MEDIAINFO_DEBUG
 
-    if (MI==NULL || !MI->Config.File_KeepInfo_Get())
+    if (!MI->Config.File_KeepInfo_Get())
     {
         //File
         F.Close();
