@@ -39,7 +39,7 @@ static filter_t s_filters[] = {
 	{_T("FLI/FLC"),					SOURCE_FILTER, SRC_FLIC,			0},
 	{_T("FLAC"),					SOURCE_FILTER, SRC_FLAC,			0},
 	{_T("FLV"),						SOURCE_FILTER, SRC_FLV,				0},
-	{_T("Matroska"),				SOURCE_FILTER, SRC_MATROSKA,		0},
+	{_T("Matroska/WebM"),			SOURCE_FILTER, SRC_MATROSKA,		0},
 	{_T("MP4/MOV"),					SOURCE_FILTER, SRC_MP4,				0},
 	{_T("MPEG Audio"),				SOURCE_FILTER, SRC_MPA,				IDS_SRC_MPA},
 	{_T("MPEG PS/TS/PVA"),			SOURCE_FILTER, SRC_MPEG,			0},
