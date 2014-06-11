@@ -375,6 +375,7 @@ SRCS_C = \
 	libavcodec/vorbisdec.c \
 	libavcodec/vorbisdsp.c \
 	libavcodec/vp3.c \
+	libavcodec/vp3_parser.c \
 	libavcodec/vp3dsp.c \
 	libavcodec/vp5.c \
 	libavcodec/vp56.c \
@@ -384,8 +385,10 @@ SRCS_C = \
 	libavcodec/vp6.c \
 	libavcodec/vp6dsp.c \
 	libavcodec/vp8.c \
+	libavcodec/vp8_parser.c \
 	libavcodec/vp8dsp.c \
 	libavcodec/vp9.c \
+	libavcodec/vp9_parser.c \
 	libavcodec/vp9dsp.c \
 	libavcodec/wavpack.c \
 	libavcodec/wma.c \

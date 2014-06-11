@@ -213,12 +213,16 @@ void avcodec_register_all(void)
     REGISTER_PARSER (AC3, ac3);
     REGISTER_PARSER (DCA, dca);
     REGISTER_PARSER (DNXHD, dnxhd);
-    REGISTER_PARSER (MLP, mlp);
-    REGISTER_PARSER (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER (H264, h264);
     REGISTER_PARSER (HEVC, hevc);
+    REGISTER_PARSER (MJPEG, mjpeg);
+    REGISTER_PARSER (MLP, mlp);
+    REGISTER_PARSER (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER (MPEGVIDEO, mpegvideo);
     REGISTER_PARSER (TAK, tak);
+    REGISTER_PARSER (VP3, vp3);
+    REGISTER_PARSER (VP8, vp8);
+    REGISTER_PARSER (VP9, vp9);
 
     /* external libraries */
     REGISTER_DECODER (LIBOPENJPEG, libopenjpeg);

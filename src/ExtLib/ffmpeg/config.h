@@ -761,6 +761,9 @@ Note: when adding a new codec, you have to:
 #define CONFIG_MLP_PARSER 1
 #define CONFIG_MPEGVIDEO_PARSER 1
 #define CONFIG_TAK_PARSER 1
+#define CONFIG_VP3_PARSER 1
+#define CONFIG_VP8_PARSER 1
+#define CONFIG_VP9_PARSER 1
 
 #define CONFIG_AMRNB_DECODER 1
 #define CONFIG_AMRWB_DECODER 1
