@@ -42,6 +42,7 @@
 #include "Ap4AtomSampleTable.h"
 #include "Ap4SdpAtom.h"
 #include "Ap4MdhdAtom.h"
+#include "Ap4ElstAtom.h"
 
 /*----------------------------------------------------------------------
 |       AP4_Track::AP4_Track
@@ -128,7 +129,8 @@ AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
     m_SampleTableIsOwned(true),
     m_MovieTimeScale(movie_time_scale),
     m_MediaTimeScale(0),
-    m_hasPalette(false)
+    m_hasPalette(false),
+    m_TimeShift(0)
 {
     // find the handler type
     AP4_Atom* sub = atom.FindChild("mdia/hdlr");
@@ -167,6 +169,18 @@ AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
     if (stbl) {
         m_SampleTable = new AP4_AtomSampleTable(stbl, sample_stream);
     }
+
+    AP4_ElstAtom* elst = dynamic_cast<AP4_ElstAtom*>(
+        atom.FindChild("edts/elst"));
+    if (elst) {
+        AP4_UI64 delay = elst->GetDelay();
+        AP4_UI64 start = elst->GetStart();
+        m_TimeShift = delay + AP4_ConvertTime(start, m_MediaTimeScale, m_MovieTimeScale);
+
+        if (m_SampleTable) {
+            (dynamic_cast<AP4_AtomSampleTable*>(m_SampleTable))->SetTimeShift(AP4_ConvertTime(delay, m_MovieTimeScale, m_MediaTimeScale) + start);
+		}
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -204,7 +218,7 @@ AP4_Track::SetId(AP4_UI32 id)
 AP4_UI64
 AP4_Track::GetDuration()
 {
-    return m_TrakAtom->GetDuration();
+    return m_TrakAtom->GetDuration() + m_TimeShift;
 }
 
 /*----------------------------------------------------------------------
@@ -213,7 +227,7 @@ AP4_Track::GetDuration()
 AP4_Duration
 AP4_Track::GetDurationMs()
 {
-    AP4_UI64 duration = m_TrakAtom->GetDuration();
+    AP4_UI64 duration = m_TrakAtom->GetDuration() + m_TimeShift;
     return AP4_DurationMsFromUnits(duration, m_MovieTimeScale);
 }
 

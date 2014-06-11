@@ -75,6 +75,8 @@ class AP4_AtomSampleTable : public AP4_SampleTable
     virtual AP4_Result GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
                                                   AP4_Ordinal& index);
 
+    AP4_Result SetTimeShift(AP4_UI64 timeShift);
+
 private:
     // members
     AP4_ByteStream& m_SampleStream;
@@ -86,6 +88,8 @@ private:
     AP4_CttsAtom*   m_CttsAtom;
     AP4_StsdAtom*   m_StsdAtom;
     AP4_StssAtom*   m_StssAtom;
+
+    AP4_UI64 m_TimeShift;
 };
 
 #endif // _AP4_ATOM_SAMPLE_TABLE_H_

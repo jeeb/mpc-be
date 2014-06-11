@@ -50,6 +50,7 @@
 AP4_AtomSampleTable::AP4_AtomSampleTable(AP4_ContainerAtom* stbl, 
                                          AP4_ByteStream&    sample_stream) :
     m_SampleStream(sample_stream)
+    , m_TimeShift(0)
 {
     m_StscAtom = dynamic_cast<AP4_StscAtom*>(stbl->GetChild(AP4_ATOM_TYPE_STSC));
     m_StcoAtom = dynamic_cast<AP4_StcoAtom*>(stbl->GetChild(AP4_ATOM_TYPE_STCO));
@@ -159,18 +160,18 @@ AP4_AtomSampleTable::GetSample(AP4_Ordinal index,
 
     // set the dts and cts
     AP4_TimeStamp dts;
-	AP4_Duration duration;
+    AP4_Duration duration;
     result = m_SttsAtom->GetDts(index, dts, duration);
     if (AP4_FAILED(result)) return result;
-    sample.SetDts(dts);
-	sample.SetDuration(duration);
+    sample.SetDts(dts + m_TimeShift);
+    sample.SetDuration(duration);
     if (m_CttsAtom == NULL) {
-        sample.SetCts(dts);
+        sample.SetCts(dts + m_TimeShift);
     } else {
-		AP4_UI32 cts_offset;
+        AP4_UI32 cts_offset;
         result = m_CttsAtom->GetCtsOffset(index, cts_offset); 
-	    if (AP4_FAILED(result)) return result;
-        sample.SetCts(dts + *((signed long*)&cts_offset)); // HACK: it shouldn't be signed, but such files exist unfortunatelly
+        if (AP4_FAILED(result)) return result;
+        sample.SetCts(dts + *((signed long*)&cts_offset) + m_TimeShift); // HACK: it shouldn't be signed, but such files exist unfortunatelly
     }     
 
     // set the size
@@ -269,4 +270,17 @@ AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
 {
     return m_SttsAtom ? m_SttsAtom->GetSampleIndexForTimeStamp(ts, index) 
                       : AP4_FAILURE;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_AtomSampleTable::SetTimeShift
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_AtomSampleTable::SetTimeShift(AP4_UI64 timeShift)
+{
+    m_TimeShift = timeShift;
+    if (m_SttsAtom) {
+        m_SttsAtom->SetTimeShift(m_TimeShift);
+	}
+    return AP4_SUCCESS;
 }

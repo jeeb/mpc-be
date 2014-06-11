@@ -76,6 +76,7 @@ class AP4_SttsAtom : public AP4_Atom
     // MPC-BE custom code start
     AP4_Duration GetTotalDuration() { return m_TotalDuration; }
     AP4_UI32 GetTotalFrames() { return m_TotalFrames; }
+    AP4_Result SetTimeShift(AP4_UI64 timeShift);
     // MPC-BE custom code end
 
  private:
@@ -84,6 +85,7 @@ class AP4_SttsAtom : public AP4_Atom
     // MPC-BE custom code start
     AP4_Duration m_TotalDuration;
     AP4_UI32 m_TotalFrames;
+    AP4_UI64 m_TimeShift;
     // MPC-BE custom code end
 };
 

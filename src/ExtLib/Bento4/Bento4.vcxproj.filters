@@ -246,6 +246,9 @@
     <ClInclude Include="Core\Ap4ChapAtom.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Ap4ElstAtom.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Ap4Atom.cpp">
@@ -457,6 +460,9 @@
     </ClCompile>
     <ClCompile Include="precomp.cpp" />
     <ClCompile Include="Core\Ap4ChapAtom.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Ap4ElstAtom.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

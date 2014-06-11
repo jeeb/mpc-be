@@ -108,6 +108,8 @@ class AP4_Track {
     AP4_Result    SetPalette(AP4_UI32* Palette);
     bool          m_hasPalette;
 
+    AP4_UI64      GetTimeShift() const { return m_TimeShift; }
+
  protected:
     // members
     AP4_TrakAtom*    m_TrakAtom;
@@ -119,6 +121,8 @@ class AP4_Track {
     AP4_UI32         m_MediaTimeScale;
 
     AP4_UI32         m_Palette[256];
+
+    AP4_UI64         m_TimeShift;
 };
 
 #endif // _AP4_TRAK_H_

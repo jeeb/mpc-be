@@ -41,7 +41,8 @@ AP4_SttsAtom::AP4_SttsAtom() :
     AP4_Atom(AP4_ATOM_TYPE_STTS, AP4_FULL_ATOM_HEADER_SIZE+4, true),
     // MPC-BE custom code start
     m_TotalDuration(0),
-    m_TotalFrames(0)
+    m_TotalFrames(0),
+    m_TimeShift(0)
     // MPC-BE custom code end
 {
 }
@@ -153,6 +154,9 @@ AP4_SttsAtom::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordinal& sample)
     // init
     AP4_Cardinal entry_count = m_Entries.ItemCount();
     AP4_Duration accumulated = 0;
+    // MPC-BE custom code start
+    accumulated = m_TimeShift;
+    // MPC-BE custom code end
     sample = 0;
     
     for (AP4_Ordinal i=0; i<entry_count; i++) {
@@ -161,7 +165,10 @@ AP4_SttsAtom::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordinal& sample)
         
         // check if the ts is in the range of this entry
         if (ts < next_accumulated) {
-            sample += (AP4_Ordinal) ((ts - accumulated) / m_Entries[i].m_SampleDuration);
+            // MPC-BE custom code start
+            // sample += (AP4_Ordinal) ((ts - accumulated) / m_Entries[i].m_SampleDuration);
+            sample += (AP4_Ordinal) ((ts > m_TimeShift ? ts - accumulated : 0) / m_Entries[i].m_SampleDuration);
+            // MPC-BE custom code end
             return AP4_SUCCESS;
         }
 
@@ -184,3 +191,14 @@ AP4_SttsAtom::InspectFields(AP4_AtomInspector& inspector)
 
     return AP4_SUCCESS;
 }
+
+// MPC-BE custom code start
+/*----------------------------------------------------------------------
+|       AP4_SttsAtom::SetTimeShift
++---------------------------------------------------------------------*/
+AP4_Result AP4_SttsAtom::SetTimeShift(AP4_UI64 timeShift)
+{
+    m_TimeShift = timeShift;
+    return AP4_SUCCESS;
+}
+// MPC-BE custom code end
