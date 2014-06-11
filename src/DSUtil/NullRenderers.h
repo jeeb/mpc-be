@@ -41,6 +41,7 @@ protected:
 
 public:
 	CNullVideoRenderer(LPUNKNOWN pUnk, HRESULT* phr);
+	virtual HRESULT DoRenderSample(IMediaSample* pSample);
 };
 
 class __declspec(uuid("DD9ED57D-6ABF-42E8-89A2-11D04798DC58"))
