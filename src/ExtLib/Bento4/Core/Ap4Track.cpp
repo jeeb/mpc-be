@@ -64,7 +64,8 @@ AP4_Track::AP4_Track(Type             type,
                      movie_time_scale : 
                      AP4_TRACK_DEFAULT_MOVIE_TIMESCALE),
     m_MediaTimeScale(media_time_scale),
-    m_hasPalette(false)
+    m_hasPalette(false),
+    m_TimeShift(0)
 {
     // compute the default volume value
     unsigned int volume = 0;

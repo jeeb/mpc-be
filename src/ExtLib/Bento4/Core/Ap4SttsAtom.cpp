@@ -54,7 +54,8 @@ AP4_SttsAtom::AP4_SttsAtom(AP4_Size size, AP4_ByteStream& stream) :
     AP4_Atom(AP4_ATOM_TYPE_STTS, size, true, stream),
     // MPC-BE custom code start
     m_TotalDuration(0),
-    m_TotalFrames(0)
+    m_TotalFrames(0),
+    m_TimeShift(0)
     // MPC-BE custom code end
 {
     AP4_UI32 entry_count;
