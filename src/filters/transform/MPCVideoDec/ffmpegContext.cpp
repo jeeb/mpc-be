@@ -40,11 +40,12 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/337.12/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/337.25/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
 	0x0FC6, // GeForce GTX 650
+	0x0FC8, // GeForce GT 740
 	0x0FCD, // GeForce GT 755M
 	0x0FD1, // GeForce GT 650M
 	0x0FD2, // GeForce GT 640M
@@ -71,6 +72,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FFD, // NVS 510
 	0x0FFE, // Quadro K2000
 	0x0FFF, // Quadro 410
+	0x1001, // GeForce GTX TITAN Z
 	0x1004, // GeForce GTX 780
 	0x1005, // GeForce GTX TITAN
 	0x1007, // GeForce GTX 780
