@@ -26,10 +26,11 @@
 #include "../../DSUtil/MPCSocket.h"
 #include "../../DSUtil/Log.h"
 
-#define MATCH_STREAM_MAP_START	"\"url_encoded_fmt_stream_map\": \""
-#define MATCH_WIDTH_START		"meta property=\"og:video:width\" content=\""
-#define MATCH_DASHMPD_START		"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
-#define MATCH_END				"\""
+#define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\": \""
+#define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\": \""
+#define MATCH_WIDTH_START			"meta property=\"og:video:width\" content=\""
+#define MATCH_DASHMPD_START			"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
+#define MATCH_END					"\""
 
 #define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit \""
 
@@ -47,20 +48,20 @@ bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, co
 	const YOUTUBE_PROFILES* current = getProfile(itag_current);
 
 	if (current->iTag <= 0
-			|| current->Container != sets->Container
-			|| current->Resolution > sets->Resolution) {
+			|| current->type != sets->type
+			|| current->quality > sets->quality) {
 		return false;
 	}
 
 	if (itag_final != 0) {
 		const YOUTUBE_PROFILES* fin = getProfile(itag_final);
-		if (current->Resolution < fin->Resolution) {
+		if (current->quality < fin->quality) {
 			return false;
 		}
 	}
 
 	itag_final = current->iTag;
-	ext_final = '.' + CString(current->Container).MakeLower();
+	ext_final = '.' + CString(current->ext);
 
 	return true;
 }
@@ -132,6 +133,9 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		int stream_map_start = 0;
 		int stream_map_len = 0;
 
+		int adaptive_fmts_start = 0;
+		int adaptive_fmts_len = 0;
+
 		int video_width_start = 0;
 		int video_width_len = 0;
 
@@ -183,6 +187,14 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 						stream_map_len = strpos(data + stream_map_start, MATCH_END);
 					}
 
+					// adaptive_fmts
+					if (!adaptive_fmts_start && (adaptive_fmts_start = strpos(data, MATCH_ADAPTIVE_FMTS_START)) != 0) {
+						adaptive_fmts_start += strlen(MATCH_STREAM_MAP_START);
+					}
+					if (adaptive_fmts_start && !adaptive_fmts_len) {
+						adaptive_fmts_len = strpos(data + adaptive_fmts_start, MATCH_END);
+					}
+
 					// <meta property="og:video:width" content="....">
 					if (!video_width_start && (video_width_start = strpos(data, MATCH_WIDTH_START)) != 0) {
 						video_width_start += strlen(MATCH_WIDTH_START);
@@ -191,22 +203,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 						video_width_len = strpos(data + video_width_start, MATCH_END);
 					}
 
-#if 0
-					// detect MAX resolution for this video
-					if (bIsFullHD && video_width_len && !nMaxWidth) {
-						char* tmp = DNew char[video_width_len + 1];
-						memcpy(tmp, data + video_width_start, video_width_len);
-						tmp[video_width_len] = 0;
-
-						if (sscanf_s(tmp, "%d", &nMaxWidth) != 1) {
-							nMaxWidth = -1;
-						}
-						delete[] tmp;
-					}
-#endif
-
 					// optimization - to not download the entire page
-					if (stream_map_len) {
+					if (stream_map_len && adaptive_fmts_len) {
 						if (nMaxWidth != 1920) {
 							break;
 						}
@@ -233,89 +231,20 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 		CString Title = PlayerYouTubeSearchTitle(data);
 
-#if 0
-		DWORD dashmpd_start	= strpos(data, MATCH_DASHMPD_START);
-		if (bIsFullHD && dashmpd_start && nMaxWidth == 1920) {
-			DWORD dashmpd_len = strpos(data + dashmpd_start + strlen(MATCH_DASHMPD_START), MATCH_END);
-			if (dashmpd_len) {
-				dashmpd_start	+= strlen(MATCH_DASHMPD_START);
-				char* dashmpd	= DNew char[dashmpd_len + 1];
-				memset(dashmpd, 0, dashmpd_len + 1);
-				memcpy(dashmpd, data + dashmpd_start, dashmpd_len);
-
-				CString str_dashmpd = UTF8ToString(UrlDecode(UrlDecode(CStringA(dashmpd))));
-				str_dashmpd.Replace(L"\\/", L"&");
-				int fpos = 0;
-
-				CString str_dashmpd_clear;
-				for (int i = 0; i < str_dashmpd.GetLength(); i++) {
-					TCHAR c = str_dashmpd[i];
-					if (c == '&') {
-						fpos++;
-						if (fpos % 2) {
-							c = '=';
-						}
-					}
-
-					str_dashmpd_clear.AppendChar(c);
-				}
-				delete [] dashmpd;
-
-				CString s_url = L"http://www.youtube.com/videoplayback?";
-				s_url.AppendFormat(L"%s&ratebypass=yes&itag=%d", str_dashmpd_clear, sApp.iYoutubeTag);
-
-				BOOL bValidateUrl = FALSE;
-				CMPCSocket socket;
-				if (socket.Create()) {
-					socket.SetTimeOut(3000);
-					if (socket.Connect(s_url, TRUE)) {
-						bValidateUrl = TRUE;
-					}
-
-					socket.Close();
-				}
-
-				if (bValidateUrl) {
-
-					if (out_Title) {
-						CString ext = L".mp4";
-						Title.Replace(ext, _T(""));
-						*out_Title = Title + ext;
-					}
-					if (out_Author) {
-						*out_Author = Author;
-					}
-
-#ifdef _DEBUG
-					LOG2FILE(_T("final url = \'%s\'"), s_url);
-					LOG2FILE(_T("------"));
-#endif
-					free(data);
-					return s_url;
-				}
-			}
-		}
-#endif
-
-		char *tmp = DNew char[stream_map_len + 1];
+		char *tmp = DNew char[stream_map_len + adaptive_fmts_len + 2];
 		memcpy(tmp, data + stream_map_start, stream_map_len);
-		tmp[stream_map_len] = 0;
+		tmp[stream_map_len] = ',';
+		memcpy(tmp + stream_map_len, data + adaptive_fmts_start, adaptive_fmts_len);
+		tmp[stream_map_len + adaptive_fmts_len] = 0;
 		free(data);
 
 		CStringA strA = CStringA(tmp);
 		delete[] tmp;
 		strA.Replace("\\u0026", "&");
-		//str.Replace(_T("\\u0022"), _T("\""));
-		//str.Replace(_T("\\u0027"), _T("'"));
-		//str.Replace(_T("\\u003c"), _T("<"));
-		//str.Replace(_T("\\u003e"), _T(">"));
 
 		CString final_url;
 		CString final_ext;
 		int final_itag = 0;
-
-
-		//str = UTF8ToString(UrlDecode(UrlDecode(CStringA(tmp))));
 
 		CAtlList<CStringA> linesA;
 		Explode(strA, linesA, ',');

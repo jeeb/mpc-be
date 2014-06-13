@@ -28,40 +28,62 @@
 #define YOUTU_BE_URL	_T("://youtu.be/")
 #define VIMEO_URL		_T("://vimeo.com/")
 
+#define ENABLE_YOUTUBE_3D	0
+#define ENABLE_YOUTUBE_DASH	0
+
+enum ytype {
+	y_unknown,
+	y_mp4,
+	y_webm,
+	y_flv,
+	y_3gp,
+	y_3d_mp4,
+	y_3d_webm,
+	y_apple_live,
+	y_dash_mp4_video,
+	y_dash_mp4_audio,
+	y_dash_webm_video,
+	y_dash_webm_audio,
+};
+
 typedef struct {
 	const int		iTag;
-	const LPCTSTR	Container;
-	const int		Resolution;
-
+	const ytype     type;
+	const int		quality;
+	LPCTSTR	ext;
 } YOUTUBE_PROFILES;
 
 static const YOUTUBE_PROFILES youtubeProfiles[] = {
-//	{38,	_T("MP4"),	3072}, // High
-//	{37,	_T("MP4"),	1080}, // High
-	{22,	_T("MP4"),	720 }, // High
-	{18,	_T("MP4"),	360 }, // Baseline
-	{35,	_T("FLV"),	480 }, // Main
-	{34,	_T("FLV"),	360 }, // Main
-	{6,		_T("FLV"),	270 }, // N/A
-	{5,		_T("FLV"),	240 }, // N/A
-	{36,	_T("3GP"),	240 }, // Simple
-	{17,	_T("3GP"),	144 }, // Simple
-//	{13,	_T("3GP"),	144 }, // N/A
-//	{46,	_T("WebM"),	1080}, // N/A
-	{45,	_T("WebM"),	720 }, // N/A
-	{44,	_T("WebM"),	480 }, // N/A
-	{43,	_T("WebM"),	360 }, // N/A
-//	{82,	_T("MP4"),	360 }, // 3D
-//	{83,	_T("MP4"),	240 }, // 3D
-//	{84,	_T("MP4"),	720 }, // 3D
-//	{85,	_T("MP4"),	520 }, // 3D
-//	{100,	_T("WebM"),	360 }, // 3D
-//	{101,	_T("WebM"),	360 }, // 3D
-//	{102,	_T("WebM"),	720 }, // 3D
-//	{120,	_T("FLV"),	720 }, // Main@L3.1
+	{22,	y_mp4,				 720,	_T("mp4") },
+	{18,	y_mp4,				 360,	_T("mp4") },
+	{43,	y_webm,				 360,	_T("webm")},
+	{5,		y_flv,				 240,	_T("flv") },
+	{36,	y_3gp,				 240,	_T("3gp") },
+	{17,	y_3gp,				 144,	_T("3gp") },
+#if ENABLE_YOUTUBE_3D
+	{84,	y_3d_mp4,			 720,	_T("mp4") },
+	{83,	y_3d_mp4,			 480,	_T("mp4") },
+	{82,	y_3d_mp4,			 360,	_T("mp4") },
+	{100,	y_3d_webm,			 360,	_T("webm")},
+#endif
+#if ENABLE_YOUTUBE_DASH
+	{137,	y_dash_mp4_video,	1080,	_T("mp4") },
+	{136,	y_dash_mp4_video,	 720,	_T("mp4") },
+	{135,	y_dash_mp4_video,	 480,	_T("mp4") },
+	{134,	y_dash_mp4_video,	 360,	_T("mp4") },
+	{133,	y_dash_mp4_video,	 240,	_T("mp4") },
+	{160,	y_dash_mp4_video,	 144,	_T("mp4") },
+	{140,	y_dash_mp4_audio,	 128,	_T("m4a") },
+	{248,	y_dash_webm_video,	1080,	_T("webm")},
+	{247,	y_dash_webm_video,	 720,	_T("webm")},
+	{244,	y_dash_webm_video,	 480,	_T("webm")},
+	{243,	y_dash_webm_video,	 360,	_T("webm")},
+	{242,	y_dash_webm_video,	 240,	_T("webm")},
+	{171,	y_dash_webm_audio,	  48,	_T("webm")},
+#endif
 };
 
-static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), 0};
+static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, y_unknown, 0};
 
 static DWORD strpos(char* h, char* n)
 {

@@ -61,7 +61,40 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	for (size_t i = 0; i < _countof(youtubeProfiles); i++) {
 		CString fmt;
-		fmt.Format(_T("%s@%dp"), youtubeProfiles[i].Container, youtubeProfiles[i].Resolution);
+		switch (youtubeProfiles[i].type)
+		{
+		case y_mp4:
+			fmt = L"MP4";
+			break;
+		case y_webm:
+			fmt = L"WebP";
+			break;
+		case y_flv:
+			fmt = L"FLV";
+			break;
+		case y_3gp:
+			fmt = L"3GP";
+			break;
+#if ENABLE_YOUTUBE_3D
+		case y_3d_mp4:
+			fmt = L"3D MP4";
+			break;
+		case y_3d_webm:
+			fmt = L"3D WebP";
+			break;
+#endif
+#if ENABLE_YOUTUBE_DASH
+		case y_dash_mp4_video:
+			fmt = L"DASH MP4";
+			break;
+		case y_dash_webm_video:
+			fmt = L"DASH WebP";
+			break;
+#endif
+		default:
+			continue;
+		}
+		fmt.AppendFormat(_T("@%dp"), youtubeProfiles[i].quality);
 
 		m_iYoutubeFormatCtrl.AddString(fmt);
 		m_iYoutubeFormatCtrl.SetItemData(i, youtubeProfiles[i].iTag);
