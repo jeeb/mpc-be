@@ -201,12 +201,17 @@ static const WORD PCID_INTEL_4K [] = {
 	0x0156, // Intel HD Graphics 2500 Mobile
 	0x015A, // Intel HD Graphics P2500
 	0x0162, // Intel HD Graphics 4000        (fully tested)
-	0x0166, // Intel HD Graphics 4000 Mobile (not tested)
-	0x016A, // Intel HD Graphics P4000       (not tested)
-	// Haswell (not tested)
-	0x0412, // Intel HD Graphics HD4600
-	0x0416, // Intel HD Graphics HD4600 Mobile
+	0x0166, // Intel HD Graphics 4000 Mobile
+	0x016A, // Intel HD Graphics P4000
+	// Haswell
+	0x0402, // Intel HD Graphics
+	0x0406, // Intel HD Graphics Mobile
+	0x0412, // Intel HD Graphics 4600
+	0x0416, // Intel HD Graphics 4600 Mobile
 	0x041A, // Intel HD Graphics P4600/P4700
+	0x041E, // Intel HD Graphics 4400"
+	0x0A06, // Intel HD Graphics
+	0x0A0E, // Intel HD Graphics
 	0x0A16, // Intel HD Graphics Family
 	0x0A1E, // Intel HD Graphics Family
 	0x0A26, // Intel HD Graphics 5000
