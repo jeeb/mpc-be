@@ -23,7 +23,7 @@
 	* Обновлен Китайский (Simplified) перевод (автор insolo);
 	* Обновлен Немецкий перевод (автор Sylt);
 	* Обновлен Украинский перевод (автор Arestarh1986);
-	* ffmpeg 2.2.x git-6286bb5c;
+	* ffmpeg 2.2.x git-97c285e6;
 	* libpng 1.7.0 b35 git-f3b1eb68;
 	* libwebp 0.4.0 git-79020767;
 	* MediaInfo 0.7.69+ svn rev.6337;

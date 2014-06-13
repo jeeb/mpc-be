@@ -2398,9 +2398,6 @@
     <ClCompile Include="libavcodec\tiff_data.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\tpel_template.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\tpeldsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2835,6 +2832,9 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\pel_template.c">
+      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

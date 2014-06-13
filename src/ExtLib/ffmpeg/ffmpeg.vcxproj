@@ -707,6 +707,7 @@
     <ClCompile Include="libavcodec\opus_parser.c" />
     <ClCompile Include="libavcodec\opus_silk.c" />
     <ClCompile Include="libavcodec\parser.c" />
+    <ClCompile Include="libavcodec\pel_template.c" />
     <ClCompile Include="libavcodec\png.c" />
     <ClCompile Include="libavcodec\pngdec.c" />
     <ClCompile Include="libavcodec\pngdsp.c" />
@@ -758,7 +759,6 @@
     <ClCompile Include="libavcodec\tiff_common.c" />
     <ClCompile Include="libavcodec\tiff_data.c" />
     <ClCompile Include="libavcodec\tpeldsp.c" />
-    <ClCompile Include="libavcodec\tpel_template.c" />
     <ClCompile Include="libavcodec\truespeech.c" />
     <ClCompile Include="libavcodec\tscc.c" />
     <ClCompile Include="libavcodec\tscc2.c" />

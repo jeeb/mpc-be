@@ -3,6 +3,7 @@
 
 #ifdef __GNUC__
 	#define HAVE_MMX2 HAVE_MMXEXT
+	#define SWS_MAX_FILTER_SIZE 256
 	#define ARCH_X86 1
 	#define HAVE_INLINE_ASM 1
 	#define HAVE_AMD3DNOW 1
