@@ -605,9 +605,15 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 			// tested H.264, VC-1 and MPEG-2 on VP4 (feature set C) (G210M, GT220)
 			return TRUE;
 		}
+// disabled because unstable
+//	} else if (nPCIVendor == PCIV_ATI) {
+//		if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
+//			// tested H.264 on UVD 2.2 (HD5670, HD5770, HD5850)
+//			// it may also work if width = 2064, but unstable
+//			return TRUE;
+//		}
 	} else if (nPCIVendor == PCIV_Intel && nPCIDevice == PCID_Intel_HD4000) {
-		//if (width <= 4096 && height <= 4096 && width * height <= 56672 * 16 * 16) {
-		if (width <= 4096 && height <= 4096) { // driver v.9.17.10.2867
+		if (width <= 4096 && height <= 4096) { // driver >= v.9.17.10.2867
 			// complete test was performed
 			return TRUE;
 		}
