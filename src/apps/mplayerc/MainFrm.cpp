@@ -13056,7 +13056,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pMRU->ReadList();
 			pMRU->Add(fn);
 			pMRU->WriteList();
-			if (fn.Mid(1, 2) == L":\\" || fn.Left(2) == L"\\\\") { // fast path detector
+			if (fn.Mid(1, 2) == L":\\" || fn.Left(2) == L"\\\\") { // stupid path detector
 				// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
 				SHAddToRecentDocs(SHARD_PATH, fn);
 			}
