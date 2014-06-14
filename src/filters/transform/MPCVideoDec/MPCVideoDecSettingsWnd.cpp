@@ -232,7 +232,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + IPP_SCALE(85) - m_fontheight;
-	int btn_w = IPP_SCALE(70);
+	int btn_w = IPP_SCALE(75);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle|BS_MULTILINE, CRect(p + CPoint(0, - (m_fontheight + 6)), CSize(btn_w, m_fontheight*2 + 6)), this, IDC_PP_RESET);
 	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
 
