@@ -1590,8 +1590,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
-			|| m_nCodecId == AV_CODEC_ID_VP3
-			|| m_nCodecId == AV_CODEC_ID_VP8
 			|| m_nCodecId == AV_CODEC_ID_VP9
 			|| pmt->subtype == MEDIASUBTYPE_H264
 			|| pmt->subtype == MEDIASUBTYPE_h264
