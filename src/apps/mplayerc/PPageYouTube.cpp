@@ -67,7 +67,7 @@ BOOL CPPageYoutube::OnInitDialog()
 			fmt = L"MP4";
 			break;
 		case y_webm:
-			fmt = L"WebP";
+			fmt = L"WebM";
 			break;
 		case y_flv:
 			fmt = L"FLV";
@@ -80,7 +80,7 @@ BOOL CPPageYoutube::OnInitDialog()
 			fmt = L"3D MP4";
 			break;
 		case y_3d_webm:
-			fmt = L"3D WebP";
+			fmt = L"3D WebM";
 			break;
 #endif
 #if ENABLE_YOUTUBE_DASH
@@ -88,7 +88,7 @@ BOOL CPPageYoutube::OnInitDialog()
 			fmt = L"DASH MP4";
 			break;
 		case y_dash_webm_video:
-			fmt = L"DASH WebP";
+			fmt = L"DASH WebM";
 			break;
 #endif
 		default:
