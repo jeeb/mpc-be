@@ -256,7 +256,6 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			int itag = 0;
 			CStringA url;
 			CString ext;
-			int resolution = 0;
 
 			CAtlList<CStringA> paramsA;
 			Explode(lineA, paramsA, '&');

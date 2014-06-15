@@ -143,7 +143,9 @@ BYTE* CMPCPngImage::BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int he
 {
 	int k = bpp / 8, kbr = 100;
 	int size = width * height * k;
-	double R, G, B, brn, rcn, gcn, bcn;
+	double R, G, B;
+	/*
+	double brn, rcn, gcn, bcn;
 
 	if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 
@@ -162,6 +164,7 @@ BYTE* CMPCPngImage::BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int he
 			bcn = 0.5;
 		}
 	}
+	*/
 
 	for (int i = 0; i < size; i += k) {
 

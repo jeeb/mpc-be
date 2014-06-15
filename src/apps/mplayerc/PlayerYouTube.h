@@ -47,10 +47,10 @@ enum ytype {
 };
 
 typedef struct {
-	const int		iTag;
-	const ytype     type;
-	const int		quality;
-	LPCTSTR	ext;
+	const int	iTag;
+	const ytype	type;
+	const int	quality;
+	LPCTSTR		ext;
 } YOUTUBE_PROFILES;
 
 static const YOUTUBE_PROFILES youtubeProfiles[] = {
@@ -83,7 +83,7 @@ static const YOUTUBE_PROFILES youtubeProfiles[] = {
 #endif
 };
 
-static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, y_unknown, 0};
+static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, y_unknown, 0, NULL};
 
 static DWORD strpos(char* h, char* n)
 {

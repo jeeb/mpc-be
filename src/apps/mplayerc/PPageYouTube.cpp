@@ -61,8 +61,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	for (size_t i = 0; i < _countof(youtubeProfiles); i++) {
 		CString fmt;
-		switch (youtubeProfiles[i].type)
-		{
+		switch (youtubeProfiles[i].type) {
 		case y_mp4:
 			fmt = L"MP4";
 			break;

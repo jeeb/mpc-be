@@ -742,9 +742,6 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			nDuration = -1;
 		}
 
-		int temp_m_FontSize		= m_FontSize;
-		CString temp_m_OSD_Font	= m_OSD_Font;
-
 		m_FontSize = FontSize ? FontSize : AfxGetAppSettings().nOSDSize;
 
 		if (m_FontSize < 10 || m_FontSize > 26) {
@@ -790,9 +787,6 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			}
 			nDuration = -1;
 		}
-
-		int temp_m_FontSize		= m_FontSize;
-		CString temp_m_OSD_Font	= m_OSD_Font;
 
 		m_FontSize = FontSize ? FontSize : AfxGetAppSettings().nOSDSize;
 
