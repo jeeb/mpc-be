@@ -84,6 +84,7 @@ clean:
 # Objects
 SRCS_C = \
 	config.c \
+	\
 	libavcodec/8bps.c \
 	libavcodec/aac_ac3_parser.c \
 	libavcodec/aac_parser.c \
@@ -401,6 +402,7 @@ SRCS_C = \
 	libavcodec/wmv2dec.c \
 	libavcodec/wmv2dsp.c \
 	libavcodec/xiph.c \
+	\
 	libavcodec/x86/ac3dsp_init.c \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
@@ -448,6 +450,7 @@ SRCS_C = \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
 	libavcodec/x86/vp9dsp_init.c \
+	\
 	libavfilter/af_atempo.c \
 	libavfilter/af_biquads.c \
 	libavfilter/allfilters.c \
@@ -461,6 +464,7 @@ SRCS_C = \
 	libavfilter/formats.c \
 	libavfilter/pthread.c \
 	libavfilter/video.c \
+	\
 	libavresample/audio_convert.c \
 	libavresample/audio_data.c \
 	libavresample/audio_mix.c \
@@ -469,9 +473,11 @@ SRCS_C = \
 	libavresample/options.c \
 	libavresample/resample.c \
 	libavresample/utils.c \
+	\
 	libavresample/x86/audio_convert_init.c \
 	libavresample/x86/audio_mix_init.c \
 	libavresample/x86/dither_init.c \
+	\
 	libavutil/atomic.c \
 	libavutil/audio_fifo.c \
 	libavutil/avstring.c \
@@ -513,15 +519,19 @@ SRCS_C = \
 	libavutil/threadmessage.c \
 	libavutil/timecode.c \
 	libavutil/utils.c \
+	\
 	libavutil/x86/cpu.c \
 	libavutil/x86/float_dsp_init.c \
 	libavutil/x86/lls_init.c \
+	\
 	libswresample/audioconvert.c \
 	libswresample/dither.c\
 	libswresample/rematrix.c \
 	libswresample/resample.c \
 	libswresample/swresample.c \
+	\
 	libswresample/x86/swresample_x86.c \
+	\
 	libswscale/input.c \
 	libswscale/options.c \
 	libswscale/output.c \
@@ -530,6 +540,7 @@ SRCS_C = \
 	libswscale/swscale_unscaled.c \
 	libswscale/utils.c \
 	libswscale/yuv2rgb.c \
+	\
 	libswscale/x86/rgb2rgb.c \
 	libswscale/x86/swscale.c \
 	libswscale/x86/yuv2rgb.c
@@ -587,16 +598,20 @@ SRCS_YASM = \
 	libavcodec/x86/vp9itxfm.asm \
 	libavcodec/x86/vp9lpf.asm \
 	libavcodec/x86/vp9mc.asm \
+	\
 	libavresample/x86/audio_convert.asm \
 	libavresample/x86/audio_mix.asm \
 	libavresample/x86/dither.asm \
 	libavresample/x86/util.asm \
+	\
 	libavutil/x86/cpuid.asm \
 	libavutil/x86/emms.asm \
 	libavutil/x86/float_dsp.asm \
 	libavutil/x86/lls.asm \
+	\
 	libswresample/x86/audio_convert.asm \
 	libswresample/x86/rematrix.asm \
+	\
 	libswscale/x86/input.asm \
 	libswscale/x86/output.asm \
 	libswscale/x86/scale.asm
