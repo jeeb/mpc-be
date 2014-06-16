@@ -896,6 +896,12 @@ HRESULT CueTrackPosition::Parse(CMatroskaNode* pMN0)
 	case 0xF7:
 		CueTrack.Parse(pMN);
 		break;
+	case 0xB2:
+		CueDuration.Parse(pMN);
+		break;
+	case 0xF0:
+		CueRelativePosition.Parse(pMN);
+		break;
 	case 0xF1:
 		CueClusterPosition.Parse(pMN);
 		break;

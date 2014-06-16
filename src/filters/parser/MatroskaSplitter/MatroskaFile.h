@@ -439,7 +439,7 @@ namespace MatroskaReader
 	class CueTrackPosition
 	{
 	public:
-		CUInt CueTrack, CueClusterPosition, CueBlockNumber, CueCodecState;
+		CUInt CueTrack, CueDuration, CueRelativePosition, CueClusterPosition, CueBlockNumber, CueCodecState;
 		CNode<CueReference> CueReferences;
 
 		CueTrackPosition() {
