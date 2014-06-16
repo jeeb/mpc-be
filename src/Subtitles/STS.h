@@ -142,10 +142,10 @@ public:
 	CSTSStyleMap m_styles;
 
 	enum EPARCompensationType {
-		EPCTDisabled = 0,
-		EPCTDownscale = 1,
-		EPCTUpscale = 2,
-		EPCTAccurateSize = 3
+		EPCTDisabled,
+		EPCTDownscale,
+		EPCTUpscale,
+		EPCTAccurateSize
 	};
 
 	EPARCompensationType m_ePARCompensationType;

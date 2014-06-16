@@ -31,6 +31,7 @@ CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
 	: m_encoding(encoding)
 	, m_defaultencoding(defaultencoding)
 	, m_offset(0)
+	, m_posInFile(0)
 	, m_posInBuffer(0)
 	, m_nInBuffer(0)
 {
@@ -78,6 +79,8 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 		}
 	} else if (m_offset == 0) { // No BOM detected, ensure the file is read from the beginning
 		Seek(0, begin);
+	} else {
+		m_posInFile = __super::GetPosition();
 	}
 
 	return true;
@@ -151,33 +154,43 @@ ULONGLONG CTextFile::GetLength() const
 
 ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 {
-	ULONGLONG pos = GetPosition();
-	ULONGLONG len = GetLength();
-
-	switch (nFrom) {
-		default:
-		case begin:
-			break;
-		case current:
-			lOff = pos + lOff;
-			break;
-		case end:
-			lOff = len - lOff;
-			break;
-	}
-
-	lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll);
-
 	ULONGLONG newPos;
 
-	// Try to reuse the buffer if possible
-	m_posInBuffer += LONGLONG(ULONGLONG(lOff) - pos);
-	if (m_posInBuffer < 0 || m_posInBuffer >= m_nInBuffer) {
-		m_nInBuffer = m_posInBuffer = 0;
-		newPos = CStdioFile::Seek(lOff + m_offset, begin) - m_offset;
-	} else {
-		newPos = ULONGLONG(lOff);
+	// Try to reuse the buffer if any
+	if (m_nInBuffer > 0) {
+		ULONGLONG pos = GetPosition();
+		ULONGLONG len = GetLength();
+
+		switch (nFrom) {
+			default:
+			case begin:
+			    break;
+			case current:
+			    lOff = pos + lOff;
+			    break;
+			case end:
+			    lOff = len - lOff;
+			    break;
+		}
+
+		lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll);
+
+		m_posInBuffer += LONGLONG(ULONGLONG(lOff) - pos);
+		if (m_posInBuffer < 0 || m_posInBuffer >= m_nInBuffer) {
+			// If we would have to end up out of the buffer, we just reset it and seek normally
+			m_nInBuffer = m_posInBuffer = 0;
+			newPos = CStdioFile::Seek(lOff + m_offset, begin) - m_offset;
+		} else { // If we can reuse the buffer, we have nothing special to do
+			newPos = ULONGLONG(lOff);
+		}
+	} else { // No buffer, we can use the base implementation
+		if (nFrom == begin) {
+			lOff += m_offset;
+		}
+		newPos = CStdioFile::Seek(lOff, nFrom) - m_offset;
 	}
+
+	m_posInFile = newPos + m_offset + (m_nInBuffer - m_posInBuffer);
 
 	return newPos;
 }
@@ -215,7 +228,7 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
 			DWORD c = (WORD)str[i];
 
-			if (0 <= c && c < 0x80) { // 0xxxxxxx
+			if (c < 0x80) { // 0xxxxxxx
 				Write(&c, 1);
 			} else if (0x80 <= c && c < 0x800) { // 110xxxxx 10xxxxxx
 				c = 0xc080 | ((c << 2) & 0x1f00) | (c & 0x003f);
@@ -257,15 +270,21 @@ bool CTextFile::FillBuffer()
 	if (nBytesRead) {
 		m_nInBuffer += nBytesRead;
 	}
+	m_posInFile = __super::GetPosition();
 
 	return !nBytesRead;
+}
+
+ULONGLONG CTextFile::GetPositionFastBuffered() const
+{
+	return (m_posInFile - m_offset - (m_nInBuffer - m_posInBuffer));
 }
 
 BOOL CTextFile::ReadString(CStringA& str)
 {
 	bool fEOF = true;
 
-	str.Empty();
+	str.Truncate(0);
 
 	if (m_encoding == ASCII) {
 		CString s;
@@ -313,7 +332,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 			}
 		} while (!bLineEndFound);
 	} else if (m_encoding == UTF8) {
-		ULONGLONG lineStartPos = GetPosition();
+		ULONGLONG lineStartPos = GetPositionFastBuffered();
 		bool bValid = true;
 		bool bLineEndFound = false;
 		fEOF = false;
@@ -481,7 +500,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 {
 	bool fEOF = true;
 
-	str.Empty();
+	str.Truncate(0);
 
 	if (m_encoding == ASCII) {
 		CString s;
@@ -530,7 +549,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 			}
 		} while (!bLineEndFound);
 	} else if (m_encoding == UTF8) {
-		ULONGLONG lineStartPos = GetPosition();
+		ULONGLONG lineStartPos = GetPositionFastBuffered();
 		bool bValid = true;
 		bool bLineEndFound = false;
 		fEOF = false;

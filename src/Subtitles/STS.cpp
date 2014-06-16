@@ -28,7 +28,7 @@
 #include "USFSubtitles.h"
 #include "../DSUtil/WinAPIUtils.h"
 
-struct htmlcolor {
+static struct htmlcolor {
 	TCHAR* name;
 	DWORD color;
 } hmtlcolors[] = {
@@ -246,7 +246,7 @@ static DWORD CharSetToCodePage(DWORD dwCharSet)
 	return cs.ciACP;
 }
 
-int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
+static int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
 {
 	if (fUnicode) {
 		return str.Find(c, pos);
@@ -433,7 +433,7 @@ static CStringW MBCSSSAToUnicode(CStringW str, int CharSet)
 	return ret;
 }
 
-CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
+static CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
 {
 	str.Replace (L"{\\i1}", L"<i>");
 	str.Replace (L"{\\i}", L"</i>");
@@ -893,7 +893,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 			}
 		}
 
-		memset(fRestore, 0, sizeof(bool)*fRestoreLen);
+		memset(fRestore, 0, sizeof(bool) * fRestoreLen);
 
 		ret += L"\\N";
 	}
@@ -1184,7 +1184,7 @@ static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	return (ret.GetCount() > 0);
 }
 
-CStringW GetStrW(CStringW& buff, char sep = ',') //throw(...)
+static CStringW GetStrW(CStringW& buff, char sep = ',') //throw(...)
 {
 	buff.TrimLeft();
 
@@ -1198,13 +1198,13 @@ CStringW GetStrW(CStringW& buff, char sep = ',') //throw(...)
 
 	CStringW ret = buff.Left(pos);
 	if (pos < buff.GetLength()) {
-		buff = buff.Mid(pos+1);
+		buff.Delete(0, pos + 1);
 	}
 
 	return ret;
 }
 
-int GetInt(CStringW& buff, char sep = ',') //throw(...)
+static int GetInt(CStringW& buff, char sep = ',') //throw(...)
 {
 	CStringW str;
 
@@ -1228,7 +1228,7 @@ int GetInt(CStringW& buff, char sep = ',') //throw(...)
 	return ret;
 }
 
-double GetFloat(CStringW& buff, char sep = ',') //throw(...)
+static double GetFloat(CStringW& buff, char sep = ',') //throw(...)
 {
 	CStringW str;
 
@@ -1867,7 +1867,7 @@ void CSimpleTextSubtitle::Copy(CSimpleTextSubtitle& sts)
 void CSimpleTextSubtitle::Append(CSimpleTextSubtitle& sts, int timeoff)
 {
 	if (timeoff < 0) {
-		timeoff = GetCount() > 0 ? GetAt(GetCount()-1).end : 0;
+		timeoff = GetCount() > 0 ? GetAt(GetCount() - 1).end : 0;
 	}
 
 	for (size_t i = 0, j = GetCount(); i < j; i++) {
@@ -2099,7 +2099,7 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
 				if (fReport) {
 					CString msg;
 					msg.Format(_T("Unknown style found: \"%s\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."), stse.style);
-					if (MessageBox(NULL, msg, _T("Warning"), MB_OKCANCEL|MB_ICONWARNING|MB_SYSTEMMODAL) != IDOK) {
+					if (MessageBox(NULL, msg, _T("Warning"), MB_OKCANCEL | MB_ICONWARNING | MB_SYSTEMMODAL) != IDOK) {
 						fReport = false;
 					}
 				}
