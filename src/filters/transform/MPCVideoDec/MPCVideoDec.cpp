@@ -2583,7 +2583,6 @@ void CMPCVideoDecFilter::SetThreadCount()
 
 HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 {
-	CAutoLock cAutoLock(&m_csReceive);
 	HRESULT			hr;
 	BYTE*			pDataIn;
 	int				nSize;

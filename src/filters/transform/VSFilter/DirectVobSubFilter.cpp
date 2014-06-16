@@ -52,6 +52,7 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	, m_fps(25)
 	, m_pVideoOutputFormat(NULL)
 	, m_nVideoOutputCount(0)
+	, m_hEvtTransform(NULL)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -97,6 +98,8 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	m_frd.RefreshEvent.Create(0, FALSE, FALSE, 0);
 
 	memset(&m_CurrentVIH2, 0, sizeof(VIDEOINFOHEADER2));
+
+	m_hEvtTransform = CreateEvent(NULL, FALSE, TRUE, NULL);
 }
 
 CDirectVobSubFilter::~CDirectVobSubFilter()
@@ -128,6 +131,11 @@ CDirectVobSubFilter::~CDirectVobSubFilter()
 
 	m_frd.EndThreadEvent.Set();
 	CAMThread::Close();
+
+	if (m_hEvtTransform) {
+		CloseHandle(m_hEvtTransform);
+		m_hEvtTransform = NULL;
+	}
 }
 
 STDMETHODIMP CDirectVobSubFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -177,8 +185,7 @@ void CDirectVobSubFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int&
 
 HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 {
-	HRESULT hr;
-
+	EXECUTE_ASSERT(WAIT_OBJECT_0 == WaitForSingleObject(m_hEvtTransform, INFINITE));
 
 	REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
 	if (SUCCEEDED(pIn->GetTime(&rtStart, &rtStop))) {
@@ -208,6 +215,7 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 
 	BYTE* pDataIn = NULL;
 	if (FAILED(pIn->GetPointer(&pDataIn)) || !pDataIn) {
+		SetEvent(m_hEvtTransform);
 		return S_FALSE;
 	}
 
@@ -231,6 +239,7 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 	CSize in(bihIn.biWidth, bihIn.biHeight);
 
 	if (FAILED(Copy((BYTE*)m_pTempPicBuff, pDataIn, sub, in, bpp, mt.subtype, black))) {
+		SetEvent(m_hEvtTransform);
 		return E_FAIL;
 	}
 
@@ -244,9 +253,11 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		BYTE* pSubU = pSubV + (sub.cx*bpp>>3)*sub.cy;
 		BYTE* pInU = pInV + (in.cx*bpp>>3)*in.cy;
 		if (FAILED(Copy(pSubV, pInV, sub, in, bpp, mt.subtype, 0x80808080))) {
+			SetEvent(m_hEvtTransform);
 			return E_FAIL;
 		}
 		if (FAILED(Copy(pSubU, pInU, sub, in, bpp, mt.subtype, 0x80808080))) {
+			SetEvent(m_hEvtTransform);
 			return E_FAIL;
 		}
 	}
@@ -257,16 +268,19 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		sub.cy >>= 1;
 		in.cy >>= 1;
 		if (FAILED(Copy(pSubUV, pInUV, sub, in, bpp, mt.subtype, mt.subtype == MEDIASUBTYPE_NV12 ? 0x80808080 : 0x80008000))) {
+			SetEvent(m_hEvtTransform);
 			return E_FAIL;
 		}
 	}
 
 	SubPicDesc spd = m_spd;
 
+	HRESULT hr;
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = NULL;
 	if (FAILED(hr = GetDeliveryBuffer(spd.w, spd.h, &pOut))
 			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
+		SetEvent(m_hEvtTransform);
 		return hr;
 	}
 
@@ -332,6 +346,7 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		}
 	}
 
+	SetEvent(m_hEvtTransform);
 	PrintMessages(pDataOut);
 	return m_pOutput->Deliver(pOut);
 }
@@ -711,13 +726,11 @@ REFERENCE_TIME CDirectVobSubFilter::CalcCurrentTime()
 
 void CDirectVobSubFilter::InitSubPicQueue()
 {
+	EXECUTE_ASSERT(WAIT_OBJECT_0 == WaitForSingleObject(m_hEvtTransform, INFINITE));
+
 	CAutoLock cAutoLock(&m_csQueueLock);
 
 	m_pSubPicQueue = NULL;
-
-    // VtX: remove this later.
-	//m_pTempPicBuff.Free();
-	//m_pTempPicBuff.Allocate(4*m_w*m_h);
 
 	const GUID& subtype = m_pInput->CurrentMediaType().subtype;
 
@@ -753,7 +766,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	m_spd.pitch = m_spd.w * m_spd.bpp >> 3;
 
 	m_pTempPicBuff.Free();
-	if(m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_NV12) {
+	if (m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_NV12) {
 		m_pTempPicBuff.Allocate(4 * m_spd.pitch * m_spd.h);
 	} else if (m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
 		m_pTempPicBuff.Allocate(m_spd.pitch * m_spd.h + m_spd.pitch * m_spd.h / 2);
@@ -771,7 +784,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	ASSERT(window == CSize(m_w, m_h));
 
 	pSubPicAllocator->SetCurSize(window);
-	pSubPicAllocator->SetCurVidRect(CRect(CPoint((window.cx - video.cx)/2, (window.cy - video.cy)/2), video));
+	pSubPicAllocator->SetCurVidRect(CRect(CPoint((window.cx - video.cx) / 2, (window.cy - video.cy) / 2), video));
 
 	HRESULT hr = S_OK;
 
@@ -794,7 +807,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 		m_hdc = NULL;
 	}
 
-	struct {
+	static struct {
 		BITMAPINFOHEADER bih;
 		DWORD mask[3];
 	} b = {{sizeof(BITMAPINFOHEADER), m_w, -(int)m_h, 1, 32, BI_BITFIELDS, 0, 0, 0, 0, 0}, 0xFF0000, 0x00FF00, 0x0000FF};
@@ -803,7 +816,9 @@ void CDirectVobSubFilter::InitSubPicQueue()
 
 	BITMAP bm;
 	GetObject(m_hbm, sizeof(bm), &bm);
-	memsetd(bm.bmBits, 0xFF000000, bm.bmHeight*bm.bmWidthBytes);
+	memsetd(bm.bmBits, 0xFF000000, bm.bmHeight * bm.bmWidthBytes);
+
+	SetEvent(m_hEvtTransform);
 }
 
 bool CDirectVobSubFilter::AdjustFrameSize(CSize& s)
