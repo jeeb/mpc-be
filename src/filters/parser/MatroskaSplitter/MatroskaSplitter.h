@@ -88,6 +88,8 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 
 	CAutoPtr<MatroskaReader::CMatroskaNode> m_pSegment, m_pCluster, m_pBlock;
 
+	REFERENCE_TIME m_Seek_rt;
+
 private:
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts;

@@ -94,6 +94,7 @@ CFilterApp theApp;
 CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CMatroskaSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_bLoadEmbeddedFonts(true)
+	, m_Seek_rt(INVALID_TIME)
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -197,7 +198,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			|| !(m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER))) {
 		return E_FAIL;
 	}
-
 
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
@@ -550,7 +550,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				} 
 
 				if (AvgTimePerFrame < 166666) { // incorrect fps - calculate avarage value
-					DbgLog((LOG_TRACE, 3, _T("CMatroskaSplitterFilter::CreateOutputs() : calculate AvgTimePerFrame")));
+					DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : calculate AvgTimePerFrame"));
 
 					CMatroskaNode Root(m_pFile);
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
@@ -639,7 +639,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											}
 
 											timecodes.Add(tc);
-											DbgLog((LOG_TRACE, 3, _T("	=> Frame: %02d, TimeCode: %5I64d = %10I64d"), timecodes.GetCount(), tc, m_pFile->m_segment.GetRefTime(tc)));
+											DbgLog((LOG_TRACE, 3, L"	=> Frame: %02d, TimeCode: %5I64d = %10I64d", timecodes.GetCount(), tc, m_pFile->m_segment.GetRefTime(tc)));
 
 											if (timecodes.GetCount() >= 50) {
 												readmore = false;
@@ -702,7 +702,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							for (size_t i = 0; i < timecodes_diff.GetCount(); i++) {
 								timecode += timecodes_diff[i];
 								count++;
-								DbgLog((LOG_TRACE, 3, _T("	=> TimeCode_Diff: %02d : %5I64d"), count, timecodes_diff[i]));
+								DbgLog((LOG_TRACE, 3, L"	=> TimeCode_Diff: %02d : %5I64d", count, timecodes_diff[i]));
 							}
 
 							AvgTimePerFrame = m_pFile->m_segment.SegmentInfo.TimeCodeScale * (timecode) / (count * 100);
@@ -1023,7 +1023,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (mts.IsEmpty()) {
-				TRACE(_T("CMatroskaSourceFilter: Unsupported TrackType %s (%I64d)\n"), CString(CodecID), (UINT64)pTE->TrackType);
+				DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%s' (%I64d)", CString(CodecID), (UINT64)pTE->TrackType));
 				continue;
 			}
 
@@ -1279,7 +1279,7 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 			}
 
 			if (FAILED(hr)) {
-				TRACE(_T("ERROR: Vorbis initialization failed for stream %I64d\n"), TrackNumber);
+				DbgLog((LOG_TRACE, 3, L"MatroskaSplitterFilter::SendVorbisHeaderSample() - ERROR: Vorbis initialization failed for stream %I64d", TrackNumber));
 			}
 		}
 	}
@@ -1356,6 +1356,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 	m_pBlock.Free();
+
+	m_Seek_rt = INVALID_TIME;
 
 	if (rt > 0) {
 		rt += m_pFile->m_rtOffset;
@@ -1434,8 +1436,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						}
 
 						if (fPassedCueTime && seek_rt > 0) {
-							TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek One - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
-							return;
+							DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Seek One - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
+							goto end;
 						}
 					}
 				}
@@ -1445,14 +1447,14 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
 
 				if (seek_rt2 > 0) {
-					TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek Two - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt2), rt, seek_rt2);
-					return;
+					DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Seek Two - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt2), rt, seek_rt2));
+					goto end;
 				}
 			}
 
 			if (seek_rt > 0 && seek_rt < rt) {
-				TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek Three - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
-				return;
+				DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Seek Three - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
+				goto end;
 			}
 		}
 
@@ -1486,8 +1488,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
 
 					if (s.GetRefTime(c.TimeCode) == seek_rt) {
-						TRACE(_T("CMatroskaSplitterFilter::DemuxSeek(), plan B : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
-						return;
+						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek(), plan B : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
+						goto end;
 					}
 				} while (m_pCluster->Next());
 			}
@@ -1495,7 +1497,12 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		// epic fail ...
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-		TRACE(_T("CMatroskaSplitterFilter::DemuxSeek(), epic fail ...\n"));
+		DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek(), epic fail ... start from begin"));
+
+	end:
+		Cluster c;
+		c.ParseTimeCode(m_pCluster);
+		m_Seek_rt = s.GetRefTime(c.TimeCode);
 	}
 }
 
@@ -1504,6 +1511,135 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
+
+	if (m_Seek_rt > 0) {
+		CAtlList<UINT64> TrackNumbers;
+
+		Segment& s = m_pFile->m_segment;
+		POSITION pos1 = s.Tracks.GetHeadPosition();
+		while (pos1) {
+			Track* pT = s.Tracks.GetNext(pos1);
+
+			POSITION pos2 = pT->TrackEntries.GetHeadPosition();
+			while (pos2) {
+				TrackEntry* pTE = pT->TrackEntries.GetNext(pos2);
+
+				if (pTE->TrackType == TrackEntry::TypeSubtitle) {
+					TrackNumbers.AddTail(pTE->TrackNumber);
+				}
+			}
+		}
+
+		if (TrackNumbers.GetCount()) {
+			CMatroskaNode Root(m_pFile);
+			CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+			if (pCluster) {
+				pos1 = s.Cues.GetHeadPosition();
+				while (pos1) {
+					Cue* pCue = s.Cues.GetNext(pos1);
+
+					POSITION pos2 = pCue->CuePoints.GetTailPosition();
+					while (pos2) {
+						CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
+
+						REFERENCE_TIME cueTime = s.GetRefTime(pCuePoint->CueTime);
+						if (cueTime > m_Seek_rt) {
+							continue;
+						}
+
+						POSITION pos3 = pCuePoint->CueTrackPositions.GetHeadPosition();
+						while (pos3) {
+							CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
+
+							if (!TrackNumbers.Find(pCueTrackPositions->CueTrack)) {
+								continue;
+							}
+
+							if (!pCueTrackPositions->CueDuration || !pCueTrackPositions->CueRelativePosition) {
+								continue;
+							}
+
+							REFERENCE_TIME cueDuration = s.GetRefTime(pCueTrackPositions->CueDuration);
+							if (cueTime + cueDuration > m_Seek_rt) {
+								pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
+								if (FAILED(pCluster->Parse())) {
+									continue;
+								}
+
+								QWORD pos = pCluster->GetPos();
+
+								Cluster c;
+								c.ParseTimeCode(pCluster);
+							
+								pCluster->SeekTo(pos + pCueTrackPositions->CueRelativePosition);
+								CAutoPtr<CMatroskaNode> pBlock(DNew CMatroskaNode(pCluster));
+
+								if (!pBlock) {
+									continue;
+								}
+
+								CBlockGroupNode bgn;
+								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+									bgn.Parse(pBlock, true);
+								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+									bg->Block.Parse(pBlock, true);
+									if (!(bg->Block.Lacing & 0x80)) {
+										bg->ReferenceBlock.Set(0);    // not a kf
+									}
+									bgn.AddTail(bg);
+								}
+
+								while (bgn.GetCount()) {
+									CAutoPtr<MatroskaPacket> p(DNew MatroskaPacket());
+									p->bg = bgn.RemoveHead();
+
+									if (!TrackNumbers.Find(p->bg->Block.TrackNumber)) {
+										continue;
+									}
+
+									p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
+									p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
+
+									TrackEntry* pTE = NULL;
+
+									if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
+										continue;
+									}
+
+									p->rtStart = s.GetRefTime((REFERENCE_TIME)c.TimeCode + p->bg->Block.TimeCode);
+									p->rtStop = p->rtStart + (p->bg->BlockDuration.IsValid() ? s.GetRefTime(p->bg->BlockDuration) : 1);
+
+									// Fix subtitle with duration = 0
+									if (!p->bg->BlockDuration.IsValid()) {
+										p->bg->BlockDuration.Set(1); // just setting it to be valid
+										p->rtStop = p->rtStart;
+									}
+
+									POSITION pos = p->bg->Block.BlockData.GetHeadPosition();
+									while (pos) {
+										CBinary* pb = p->bg->Block.BlockData.GetNext(pos);
+										pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+									}
+
+									// HACK
+									p->rtStart -= m_pFile->m_rtOffset;
+									p->rtStop -= m_pFile->m_rtOffset;
+
+									hr = DeliverPacket(p);
+								};
+							
+								pBlock.Free();
+							}
+						}
+					}
+				}
+
+				pCluster.Free();
+			}
+		}
+	}
 
 	do {
 		Cluster c;
@@ -1539,7 +1675,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 				TrackEntry* pTE = NULL;
 
-				if (!m_pTrackEntryMap.Lookup (p->TrackNumber, pTE) || !pTE) {
+				if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
 					continue;
 				}
 
