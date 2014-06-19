@@ -250,6 +250,9 @@
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\blockdsp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -1374,6 +1377,9 @@
     </ClInclude>
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\blockdsp.h">
+      <Filter>libavcodec</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2853,6 +2859,12 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\blockdsp_mmx.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\blockdsp.c">
+      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

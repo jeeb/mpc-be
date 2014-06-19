@@ -125,6 +125,7 @@ SRCS_LC = \
 	libavcodec/binkaudio.c \
 	libavcodec/binkdsp.c \
 	libavcodec/bitstream.c \
+	libavcodec/blockdsp.c \
 	libavcodec/cabac.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
@@ -402,6 +403,7 @@ SRCS_LC = \
 	libavcodec/xiph.c \
 	\
 	libavcodec/x86/ac3dsp_init.c \
+	libavcodec/x86/blockdsp_mmx.c \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
 	libavcodec/x86/dct_init.c \
@@ -553,6 +555,7 @@ SRCS_LS = \
 # Yasm objects
 SRCS_YASM_LC = \
 	libavcodec/x86/ac3dsp.asm \
+	libavcodec/x86/blockdsp.asm \
 	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
 	libavcodec/x86/deinterlace.asm \

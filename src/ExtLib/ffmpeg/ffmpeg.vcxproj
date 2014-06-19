@@ -21,6 +21,7 @@
   <ItemGroup>
     <None Include="config.asm" />
     <None Include="libavcodec\x86\ac3dsp.asm" />
+    <None Include="libavcodec\x86\blockdsp.asm" />
     <None Include="libavcodec\x86\dcadsp.asm" />
     <None Include="libavcodec\x86\dct32.asm" />
     <None Include="libavcodec\x86\deinterlace.asm" />
@@ -130,6 +131,7 @@
     <ClInclude Include="libavcodec\bgmc.h" />
     <ClInclude Include="libavcodec\binkdata.h" />
     <ClInclude Include="libavcodec\binkdsp.h" />
+    <ClInclude Include="libavcodec\blockdsp.h" />
     <ClInclude Include="libavcodec\bytestream.h" />
     <ClInclude Include="libavcodec\cabac.h" />
     <ClInclude Include="libavcodec\cabac_functions.h" />
@@ -514,6 +516,7 @@
     <ClCompile Include="libavcodec\binkdsp.c" />
     <ClCompile Include="libavcodec\bitstream.c" />
     <ClCompile Include="libavcodec\bit_depth_template.c" />
+    <ClCompile Include="libavcodec\blockdsp.c" />
     <ClCompile Include="libavcodec\cabac.c" />
     <ClCompile Include="libavcodec\celp_filters.c" />
     <ClCompile Include="libavcodec\celp_math.c" />
@@ -811,6 +814,7 @@
     <ClCompile Include="libavcodec\wmv2dec.c" />
     <ClCompile Include="libavcodec\wmv2dsp.c" />
     <ClCompile Include="libavcodec\x86\ac3dsp_init.c" />
+    <ClCompile Include="libavcodec\x86\blockdsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\constants.c" />
     <ClCompile Include="libavcodec\x86\dcadsp_init.c" />
     <ClCompile Include="libavcodec\x86\dct_init.c" />
