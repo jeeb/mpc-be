@@ -495,11 +495,14 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Alapértelmezett oldal:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 5		"Preferred format"
 7		"Select Source"
 8		"Internal"
 9		"File Source"
+10		"Initial buffer size"
+11		"% of source file size"
+12		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

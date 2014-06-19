@@ -12776,13 +12776,13 @@ UINT CMainFrame::YoutubeThreadProc()
 		if (f) {
 
 			DWORD cb = sizeof(DWORD);
-			if (!HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH|HTTP_QUERY_FLAG_NUMBER, &m_YoutubeTotal, &cb, 0)) {
+			if (!HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &m_YoutubeTotal, &cb, 0)) {
 				m_YoutubeTotal = 0;
 			}
 
 			if (GetTemporaryFilePath(GetFileExt(GetAltFileName()).MakeLower(), m_YoutubeFile)) {
 				HANDLE hFile;
-				hFile = CreateFile(m_YoutubeFile, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, 0 ,CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+				hFile = CreateFile(m_YoutubeFile, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0 ,CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
 				if (hFile != INVALID_HANDLE_VALUE) {
 					AfxGetAppSettings().slTMPFilesList.AddTail(m_YoutubeFile);
 
@@ -12804,7 +12804,7 @@ UINT CMainFrame::YoutubeThreadProc()
 						}
 
 						m_YoutubeCurrent += dwBytesRead;
-						if (m_YoutubeCurrent > min(MEGABYTE, m_YoutubeTotal ? m_YoutubeTotal/2 : MEGABYTE)) {
+						if (m_YoutubeCurrent > min(MEGABYTE, m_YoutubeTotal ? m_YoutubeTotal / 2 : MEGABYTE)) {
 							m_fYoutubeThreadWork = TH_WORK;
 						}
 					}

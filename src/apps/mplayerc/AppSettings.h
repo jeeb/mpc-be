@@ -786,8 +786,12 @@ public:
 
 	CString			strLastOpenFilterDir;
 
+	// youtube
 	int				iYoutubeTag;
 	int				iYoutubeSource;
+	int				iYoutubeMemoryType;
+	DWORD			iYoutubePercentMemory;
+	DWORD			iYoutubeMbMemory;
 
 	DWORD			nLastFileInfoPage;
 

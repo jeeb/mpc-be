@@ -495,11 +495,14 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Startseite:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 5		"Bevorzugtes Format"
 7		"Quelle auswählen"
 8		"Intern"
 9		"Dateiquelle"
+10		"Initial buffer size"
+11		"% of source file size"
+12		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

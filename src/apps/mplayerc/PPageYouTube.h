@@ -39,6 +39,16 @@ public:
 
 	enum { IDD = IDD_PPAGEYOUTUBE };
 	int m_iYoutubeSourceType;
+	int m_iYoutubeMemoryType;
+	CSpinButtonCtrl m_nPercentMemoryCtrl;
+	CSpinButtonCtrl m_nMbMemoryCtrl;
+	DWORD m_iYoutubePercentMemory;
+	DWORD m_iYoutubeMbMemory;
+
+	afx_msg void OnBnClickedRadio12(UINT nID);
+	afx_msg void OnBnClickedRadio34(UINT nID);
+
+	void UpdateMemoryCtrl();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -46,7 +56,4 @@ protected:
 	virtual BOOL OnApply();
 
 	DECLARE_MESSAGE_MAP()
-
-public:
-	afx_msg void OnBnClickedRadio12(UINT nID);
 };

@@ -292,6 +292,9 @@
 
 #define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
 #define IDS_RS_YOUTUBE_SOURCE				_T("YoutubeSourceType")
+#define IDS_RS_YOUTUBE_MEMTYPE				_T("YoutubeMemoryType")
+#define IDS_RS_YOUTUBE_PERCENT_MEM			_T("YoutubePercentMemory")
+#define IDS_RS_YOUTUBE_MB_MEM				_T("YoutubeMbMemory")
 
 #define IDS_R_PERFOMANCE					_T("\\Perfomance")
 #define IDS_RS_PERFOMANCE_CACHE_LENGTH		_T("CacheLen")
