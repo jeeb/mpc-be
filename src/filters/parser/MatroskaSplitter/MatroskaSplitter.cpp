@@ -95,6 +95,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CMatroskaSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_bLoadEmbeddedFonts(true)
 	, m_Seek_rt(INVALID_TIME)
+	, m_bSupportCueDuration(FALSE)
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -1349,6 +1350,26 @@ bool CMatroskaSplitterFilter::DemuxInit()
 	m_pCluster.Free();
 	m_pBlock.Free();
 
+	POSITION pos1 = m_pFile->m_segment.Cues.GetHeadPosition();
+	while (pos1) {
+		Cue* pCue = m_pFile->m_segment.Cues.GetNext(pos1);
+
+		POSITION pos2 = pCue->CuePoints.GetTailPosition();
+		while (pos2) {
+			CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
+
+			POSITION pos3 = pCuePoint->CueTrackPositions.GetHeadPosition();
+			while (pos3) {
+				CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
+
+				if (pCueTrackPositions->CueDuration && pCueTrackPositions->CueRelativePosition) {
+					m_bSupportCueDuration = TRUE;
+					break;
+				}
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -1503,6 +1524,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		Cluster c;
 		c.ParseTimeCode(m_pCluster);
 		m_Seek_rt = s.GetRefTime(c.TimeCode);
+		DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Final(Cluster timecode) - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(m_Seek_rt), rt, m_Seek_rt));
 	}
 }
 
@@ -1552,91 +1574,188 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 						while (pos3) {
 							CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
 
-							if (!TrackNumbers.Find(pCueTrackPositions->CueTrack)) {
+							if (m_bSupportCueDuration && !TrackNumbers.Find(pCueTrackPositions->CueTrack)) {
 								continue;
 							}
 
-							if (!pCueTrackPositions->CueDuration || !pCueTrackPositions->CueRelativePosition) {
+							if (m_bSupportCueDuration && (!pCueTrackPositions->CueDuration || !pCueTrackPositions->CueRelativePosition)) {
 								continue;
 							}
 
-							REFERENCE_TIME cueDuration = s.GetRefTime(pCueTrackPositions->CueDuration);
-							if (cueTime + cueDuration > m_Seek_rt) {
+							if (m_bSupportCueDuration) {
+								REFERENCE_TIME cueDuration = s.GetRefTime(pCueTrackPositions->CueDuration);
+								if (cueTime + cueDuration > m_Seek_rt) {
+									pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
+									if (FAILED(pCluster->Parse())) {
+										continue;
+									}
+
+									QWORD pos = pCluster->GetPos();
+
+									Cluster c;
+									c.ParseTimeCode(pCluster);
+							
+									pCluster->SeekTo(pos + pCueTrackPositions->CueRelativePosition);
+									CAutoPtr<CMatroskaNode> pBlock(DNew CMatroskaNode(pCluster));
+
+									if (!pBlock) {
+										continue;
+									}
+
+									CBlockGroupNode bgn;
+									if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+										bgn.Parse(pBlock, true);
+									} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+										CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+										bg->Block.Parse(pBlock, true);
+										if (!(bg->Block.Lacing & 0x80)) {
+											bg->ReferenceBlock.Set(0);    // not a kf
+										}
+										bgn.AddTail(bg);
+									}
+
+									while (bgn.GetCount()) {
+										CAutoPtr<MatroskaPacket> p(DNew MatroskaPacket());
+										p->bg = bgn.RemoveHead();
+
+										if (!TrackNumbers.Find(p->bg->Block.TrackNumber)) {
+											continue;
+										}
+
+										p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
+										p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
+
+										TrackEntry* pTE = NULL;
+
+										if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
+											continue;
+										}
+
+										p->rtStart = s.GetRefTime((REFERENCE_TIME)c.TimeCode + p->bg->Block.TimeCode);
+										p->rtStop = p->rtStart + (p->bg->BlockDuration.IsValid() ? s.GetRefTime(p->bg->BlockDuration) : 1);
+
+										// Fix subtitle with duration = 0
+										if (!p->bg->BlockDuration.IsValid()) {
+											p->bg->BlockDuration.Set(1); // just setting it to be valid
+											p->rtStop = p->rtStart;
+										}
+
+										if (p->rtStart >= m_Seek_rt || p->rtStop < m_Seek_rt) {
+											continue;
+										}
+
+
+										POSITION pos = p->bg->Block.BlockData.GetHeadPosition();
+										while (pos) {
+											CBinary* pb = p->bg->Block.BlockData.GetNext(pos);
+											pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+										}
+
+										// HACK
+										p->rtStart -= m_pFile->m_rtOffset;
+										p->rtStop -= m_pFile->m_rtOffset;
+
+										hr = DeliverPacket(p);
+									};
+								}
+							} else if (cueTime + 60 * 10000000i64 >= m_Seek_rt) { // look no earlier than 5 minutes ...
 								pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
 								if (FAILED(pCluster->Parse())) {
 									continue;
 								}
 
-								QWORD pos = pCluster->GetPos();
-
 								Cluster c;
 								c.ParseTimeCode(pCluster);
-							
-								pCluster->SeekTo(pos + pCueTrackPositions->CueRelativePosition);
-								CAutoPtr<CMatroskaNode> pBlock(DNew CMatroskaNode(pCluster));
 
-								if (!pBlock) {
-									continue;
+								CAutoPtrList<CBlockGroupNode> bgnList;
+								if (CAutoPtr<CMatroskaNode> pBlock = pCluster->GetFirstBlock()) {
+									do {
+										CAutoPtr<CBlockGroupNode> bgn(DNew CBlockGroupNode());
+
+										if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+											bgn->Parse(pBlock, true);
+										} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+											CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+											bg->Block.Parse(pBlock, true);
+											if (!(bg->Block.Lacing & 0x80)) {
+												bg->ReferenceBlock.Set(0); // not a kf
+											}
+											bgn->AddTail(bg);
+										}
+
+										BOOL bIsValid = FALSE;
+										POSITION pos = bgn->GetHeadPosition();
+										while (pos) {
+											BlockGroup* bg = bgn->GetNext(pos);
+
+											if (!TrackNumbers.Find(bg->Block.TrackNumber)) {
+												continue;
+											}
+
+											if (bg->BlockDuration.IsValid() && (cueTime + s.GetRefTime(bg->BlockDuration) > m_Seek_rt)) {
+												bIsValid = TRUE;
+												break;
+											}
+										}
+
+										if (bIsValid) {
+											bgnList.AddTail(bgn);
+										}
+									} while (pBlock->NextBlock());
 								}
 
-								CBlockGroupNode bgn;
-								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-									bgn.Parse(pBlock, true);
-								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-									bg->Block.Parse(pBlock, true);
-									if (!(bg->Block.Lacing & 0x80)) {
-										bg->ReferenceBlock.Set(0);    // not a kf
+								if (bgnList.GetCount()) {
+									while (bgnList.GetCount()) {
+										CAutoPtr<CBlockGroupNode> bgn = bgnList.RemoveHead();
+
+										while (bgn->GetCount() && SUCCEEDED(hr)) {
+											CAutoPtr<MatroskaPacket> p(DNew MatroskaPacket());
+											p->bg = bgn->RemoveHead();
+
+											if (!TrackNumbers.Find(p->bg->Block.TrackNumber)) {
+												continue;
+											}
+
+											p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
+											p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
+
+											TrackEntry* pTE = NULL;
+
+											if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
+												continue;
+											}
+
+											p->rtStart = m_pFile->m_segment.GetRefTime((REFERENCE_TIME)c.TimeCode + p->bg->Block.TimeCode);
+											p->rtStop = p->rtStart + (p->bg->BlockDuration.IsValid() ? m_pFile->m_segment.GetRefTime(p->bg->BlockDuration) : 1);
+
+											// Fix subtitle with duration = 0
+											if (pTE->TrackType == TrackEntry::TypeSubtitle && !p->bg->BlockDuration.IsValid()) {
+												p->bg->BlockDuration.Set(1); // just setting it to be valid
+												p->rtStop = p->rtStart;
+											}
+
+											if (p->rtStart >= m_Seek_rt || p->rtStop < m_Seek_rt) {
+												continue;
+											}
+
+											POSITION pos = p->bg->Block.BlockData.GetHeadPosition();
+											while (pos) {
+												CBinary* pb = p->bg->Block.BlockData.GetNext(pos);
+												pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+											}
+
+											// HACK
+											p->rtStart -= m_pFile->m_rtOffset;
+											p->rtStop -= m_pFile->m_rtOffset;
+
+											hr = DeliverPacket(p);
+										}
 									}
-									bgn.AddTail(bg);
 								}
-
-								while (bgn.GetCount()) {
-									CAutoPtr<MatroskaPacket> p(DNew MatroskaPacket());
-									p->bg = bgn.RemoveHead();
-
-									if (!TrackNumbers.Find(p->bg->Block.TrackNumber)) {
-										continue;
-									}
-
-									p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
-									p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
-
-									TrackEntry* pTE = NULL;
-
-									if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
-										continue;
-									}
-
-									p->rtStart = s.GetRefTime((REFERENCE_TIME)c.TimeCode + p->bg->Block.TimeCode);
-									p->rtStop = p->rtStart + (p->bg->BlockDuration.IsValid() ? s.GetRefTime(p->bg->BlockDuration) : 1);
-
-									// Fix subtitle with duration = 0
-									if (!p->bg->BlockDuration.IsValid()) {
-										p->bg->BlockDuration.Set(1); // just setting it to be valid
-										p->rtStop = p->rtStart;
-									}
-
-									POSITION pos = p->bg->Block.BlockData.GetHeadPosition();
-									while (pos) {
-										CBinary* pb = p->bg->Block.BlockData.GetNext(pos);
-										pTE->Expand(*pb, ContentEncoding::AllFrameContents);
-									}
-
-									// HACK
-									p->rtStart -= m_pFile->m_rtOffset;
-									p->rtStop -= m_pFile->m_rtOffset;
-
-									hr = DeliverPacket(p);
-								};
-							
-								pBlock.Free();
 							}
 						}
 					}
 				}
-
-				pCluster.Free();
 			}
 		}
 	}
