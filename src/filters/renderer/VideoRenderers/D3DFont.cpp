@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <tchar.h>
-#include <d3dx9.h>
+#include <dx/d3dx9.h>
 #include "D3DFont.h"
 #include "../../../DSUtil/DSUtil.h"
 

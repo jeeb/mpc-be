@@ -29,7 +29,7 @@
 #include <videoacc.h>
 #include <InitGuid.h>
 #include <d3d9.h>
-#include <d3dx9.h>
+#include <dx/d3dx9.h>
 #include <vmr9.h>
 #include <evr.h>
 #include <mfapi.h>

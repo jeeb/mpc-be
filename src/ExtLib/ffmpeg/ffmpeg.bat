@@ -46,8 +46,6 @@ FOR %%A IN (%ARG%) DO (
 	IF /I "%%A" == "rebuild" SET "BUILDTYPE=rebuild"
 	IF /I "%%A" == "64" SET "BIT=64BIT=yes"
 	IF /I "%%A" == "Debug" SET "DEBUG=DEBUG=yes"
-	IF /I "%%A" == "VS2010" SET "VS=VS2010=yes"
-	IF /I "%%A" == "VS2012" SET "VS=VS2012=yes"
 )
 
 IF /I "%BUILDTYPE%" == "rebuild" (
@@ -94,16 +92,6 @@ SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
 SET "BINDIR=..\..\..\bin13"
 SET "VSNAME=Visual Studio 2013"
 
-IF /I "%VS%" == "VS2012=yes" (
-  SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
-  SET "BINDIR=..\..\..\bin12"
-  SET "VSNAME=Visual Studio 2012"
-) ELSE IF /I "%VS%" == "VS2010=yes" (
-  SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
-  SET "BINDIR=..\..\..\bin"
-  SET "VSNAME=Visual Studio 2010"
-)
-
 IF "%BUILDTYPE%" NEQ "clean" (
   IF NOT DEFINED VSCOMNTOOLS (
     ECHO ERROR: "%VSNAME% environment variable(s) is missing - possible it's not installed on your PC"
@@ -126,7 +114,7 @@ EXIT /B
 :SHOWHELP
 TITLE "%~nx0 %1"
 ECHO. & ECHO.
-ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug] [VS2010^|VS2012]
+ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug]
 ECHO.
 ECHO Notes:   The arguments are not case sensitive.
 ECHO. & ECHO.

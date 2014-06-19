@@ -25,7 +25,7 @@
 #include "../../../../include/stdafx_common_afx.h"
 #include "../../../../include/stdafx_common_dshow.h"
 
-#include <d3dx9.h>
+#include <dx/d3dx9.h>
 #include <evr.h>
 #include <mfapi.h>
 #include <Mferror.h>

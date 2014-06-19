@@ -23,7 +23,7 @@
 #include "RenderersSettings.h"
 #include "../../../apps/mplayerc/mplayerc.h"
 #include <version.h>
-#include <d3dx9.h>
+#include <dx/d3dx9.h>
 
 void CRenderersSettings::UpdateData(bool fSave)
 {

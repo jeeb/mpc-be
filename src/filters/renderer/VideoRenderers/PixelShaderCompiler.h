@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <d3dx9shader.h>
+#include <dx/d3dx9shader.h>
 
 
 class CPixelShaderCompiler

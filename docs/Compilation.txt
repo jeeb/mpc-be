@@ -1,19 +1,8 @@
-﻿Part A: Preparing the Visual Studio 2010 (or Visual Studio 2012, Visual Studio 2013) environment
-
- Visual Studio 2010
-  1. Install Visual C++ 2010, part of Visual Studio 2010 Professional (Express won't work, other editions work fine).
-  2. Install Visual Studio 2010 Service Pack 1 -> http://www.microsoft.com/en-us/download/details.aspx?id=23691
-  3. Install the DirectX SDK (June 2010) -> http://www.microsoft.com/en-us/download/details.aspx?id=6812
-
-Visual Studio 2012
-  1. Install Visual C++ 2012, part of Visual Studio 2012 (Express won't work, other editions work fine) -> http://www.microsoft.com/en-us/download/details.aspx?id=30678 .
-  2. Install Visual Studio 2012 Update 4 -> http://www.microsoft.com/en-us/download/details.aspx?id=39305
-  3. Install the DirectX SDK (June 2010) -> http://www.microsoft.com/en-us/download/details.aspx?id=6812
+﻿Part A: Preparing the Visual Studio 2013 environment
 
 Visual Studio 2013
   1. Install Visual C++ 2013, part of Visual Studio 2013 (Express won't work, other editions work fine) -> http://www.microsoft.com/en-us/download/details.aspx?id=40763 .
-  2. Install Visual Studio 2013 Update 1 -> http://www.microsoft.com/en-us/download/details.aspx?id=41650
-  3. Install the DirectX SDK (June 2010) -> http://www.microsoft.com/en-us/download/details.aspx?id=6812
+  2. Install Visual Studio 2013 Update 2 -> http://www.microsoft.com/en-US/download/details.aspx?id=42666
 
 Part B: Preparing the GCC environment
  NOTES:
@@ -44,8 +33,8 @@ Part C: Downloading and compiling the MPC-BE source
 
 3. Open folder "C:\mpc-be\"
    Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders "lib" and "lib64")
-4. Open the solution file: C:\mpc-be\mpc-be.sln (for Visual Studio 2010), C:\mpc-be\mpc-be_2012.sln (for Visual Studio 2012), C:\mpc-be\mpc-be_2013.sln (for Visual Studio 2013)
-    Change the solution's configuration to "Release" (in the toolbar).
+4. Open the solution file: C:\mpc-be\mpc-be_2013.sln 
+   Change the solution's configuration to "Release" (in the toolbar).
 
 5. Press OK to save the changes and close the Properties window.
 6. Press F7 to build the solution.

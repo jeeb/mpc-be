@@ -23,7 +23,7 @@
 #include "AllocatorCommon.h"
 #include "RenderersSettings.h"
 #include <d3d9.h>
-#include <d3dx9.h>
+#include <dx/d3dx9.h>
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
 

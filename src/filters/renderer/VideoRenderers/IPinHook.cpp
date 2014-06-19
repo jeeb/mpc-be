@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 
-#include <d3dx9.h>
+#include <dx/d3dx9.h>
 #include <dxva.h>
 #include <dxva2api.h>
 #include <moreuuids.h>
