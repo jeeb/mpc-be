@@ -25,6 +25,12 @@ endif
 
 OBJ_DIR		= $(BIN_DIR)/obj/$(MY_DIR_PREFIX)_$(MY_ARCH)/ffmpeg/
 TARGET_LIB_DIR = $(BIN_DIR)/lib/$(MY_DIR_PREFIX)_$(MY_ARCH)
+LIB_LIBAVCODEC = $(OBJ_DIR)libavcodec.a
+LIB_LIBAVFILTER = $(OBJ_DIR)libavfilter.a
+LIB_LIBAVRESAMPLE = $(OBJ_DIR)libavresample.a
+LIB_LIBAVUTIL = $(OBJ_DIR)libavutil.a
+LIB_LIBSWRESAMPLE = $(OBJ_DIR)libswresample.a
+LIB_LIBSWSCALE = $(OBJ_DIR)libswscale.a
 TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
 
 # Compiler and yasm flags
@@ -71,7 +77,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(TARGET_LIB_DIR)
 
 # Targets
-all: make_objdirs $(TARGET_LIB)
+all: make_objdirs $(LIB_LIBAVCODEC) $(LIB_LIBAVFILTER) $(LIB_LIBSWSCALE) $(LIB_LIBAVUTIL) $(LIB_LIBAVRESAMPLE) $(LIB_LIBSWRESAMPLE)
 
 make_objdirs: $(OBJ_DIRS)
 $(OBJ_DIRS):
@@ -82,7 +88,7 @@ clean:
 	rm -rf $(OBJ_DIR)
 
 # Objects
-SRCS_C = \
+SRCS_LC = \
 	config.c \
 	\
 	libavcodec/8bps.c \
@@ -449,8 +455,9 @@ SRCS_C = \
 	libavcodec/x86/vp3dsp_init.c \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
-	libavcodec/x86/vp9dsp_init.c \
-	\
+	libavcodec/x86/vp9dsp_init.c
+
+SRCS_LF = \
 	libavfilter/af_atempo.c \
 	libavfilter/af_biquads.c \
 	libavfilter/allfilters.c \
@@ -463,8 +470,9 @@ SRCS_C = \
 	libavfilter/buffersrc.c \
 	libavfilter/formats.c \
 	libavfilter/pthread.c \
-	libavfilter/video.c \
-	\
+	libavfilter/video.c
+
+SRCS_LBR = \
 	libavresample/audio_convert.c \
 	libavresample/audio_data.c \
 	libavresample/audio_mix.c \
@@ -476,8 +484,9 @@ SRCS_C = \
 	\
 	libavresample/x86/audio_convert_init.c \
 	libavresample/x86/audio_mix_init.c \
-	libavresample/x86/dither_init.c \
-	\
+	libavresample/x86/dither_init.c
+
+SRCS_LU = \
 	libavutil/atomic.c \
 	libavutil/audio_fifo.c \
 	libavutil/avstring.c \
@@ -522,16 +531,20 @@ SRCS_C = \
 	\
 	libavutil/x86/cpu.c \
 	libavutil/x86/float_dsp_init.c \
-	libavutil/x86/lls_init.c \
-	\
+	libavutil/x86/lls_init.c
+
+SRCS_LR = \
 	libswresample/audioconvert.c \
 	libswresample/dither.c\
 	libswresample/rematrix.c \
 	libswresample/resample.c \
+	libswresample/resample_dsp.c \
 	libswresample/swresample.c \
 	\
-	libswresample/x86/swresample_x86.c \
-	\
+	libswresample/x86/resample_x86_dsp.c \
+	libswresample/x86/swresample_x86.c
+
+SRCS_LS = \
 	libswscale/input.c \
 	libswscale/options.c \
 	libswscale/output.c \
@@ -546,7 +559,7 @@ SRCS_C = \
 	libswscale/x86/yuv2rgb.c
 
 # Yasm objects
-SRCS_YASM = \
+SRCS_YASM_LC = \
 	libavcodec/x86/ac3dsp.asm \
 	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
@@ -572,6 +585,7 @@ SRCS_YASM = \
 	libavcodec/x86/h264_weight.asm \
 	libavcodec/x86/h264_weight_10bit.asm \
 	libavcodec/x86/hevc_deblock.asm \
+	libavcodec/x86/hevc_idct.asm \
 	libavcodec/x86/hevc_mc.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/huffyuvdsp.asm \
@@ -597,28 +611,51 @@ SRCS_YASM = \
 	libavcodec/x86/vp9intrapred.asm \
 	libavcodec/x86/vp9itxfm.asm \
 	libavcodec/x86/vp9lpf.asm \
-	libavcodec/x86/vp9mc.asm \
-	\
+	libavcodec/x86/vp9mc.asm
+
+SRCS_YASM_LBR = \
 	libavresample/x86/audio_convert.asm \
 	libavresample/x86/audio_mix.asm \
 	libavresample/x86/dither.asm \
-	libavresample/x86/util.asm \
-	\
+	libavresample/x86/util.asm
+
+SRCS_YASM_LU = \
 	libavutil/x86/cpuid.asm \
 	libavutil/x86/emms.asm \
 	libavutil/x86/float_dsp.asm \
-	libavutil/x86/lls.asm \
-	\
+	libavutil/x86/lls.asm
+
+SRCS_YASM_LR = \
 	libswresample/x86/audio_convert.asm \
-	libswresample/x86/rematrix.asm \
-	\
+	libswresample/x86/rematrix.asm
+
+SRCS_YASM_LS = \
 	libswscale/x86/input.asm \
 	libswscale/x86/output.asm \
 	libswscale/x86/scale.asm
 
-OBJS = \
-	$(SRCS_C:%.c=$(OBJ_DIR)%.o) \
-	$(SRCS_YASM:%.asm=$(OBJ_DIR)%.o)
+OBJS_LC = \
+	$(SRCS_LC:%.c=$(OBJ_DIR)%.o) \
+	$(SRCS_YASM_LC:%.asm=$(OBJ_DIR)%.o)
+
+OBJS_LF = \
+	$(SRCS_LF:%.c=$(OBJ_DIR)%.o)
+
+OBJS_LBR = \
+	$(SRCS_LBR:%.c=$(OBJ_DIR)%.o) \
+	$(SRCS_YASM_LBR:%.asm=$(OBJ_DIR)%.o)
+
+OBJS_LU = \
+	$(SRCS_LU:%.c=$(OBJ_DIR)%.o) \
+	$(SRCS_YASM_LU:%.asm=$(OBJ_DIR)%.o)
+
+OBJS_LR = \
+	$(SRCS_LR:%.c=$(OBJ_DIR)%.o) \
+	$(SRCS_YASM_LR:%.asm=$(OBJ_DIR)%.o)
+
+OBJS_LS = \
+	$(SRCS_LS:%.c=$(OBJ_DIR)%.o) \
+	$(SRCS_YASM_LS:%.asm=$(OBJ_DIR)%.o)
 
 # Commands
 $(OBJ_DIR)%.o: %.c
@@ -629,10 +666,35 @@ $(OBJ_DIR)%.o: %.asm
 	@echo $<
 	@yasm $(YASMFLAGS) -I$(<D)/ -o $@ $<
 
-$(TARGET_LIB): $(OBJS)
+$(LIB_LIBAVCODEC): $(OBJS_LC)
 	@echo $@
-	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS)
+	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LC)
 
--include $(SRCS_C:%.c=$(OBJ_DIR)%.d)
+$(LIB_LIBAVFILTER): $(OBJS_LF)
+	@echo $@
+	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LF)
+
+$(LIB_LIBAVRESAMPLE): $(OBJS_LBR)
+	@echo $@
+	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LBR)
+
+$(LIB_LIBAVUTIL): $(OBJS_LU)
+	@echo $@
+	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LU)
+
+$(LIB_LIBSWSCALE): $(OBJS_LS)
+	@echo $@
+	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LS)
+
+$(LIB_LIBSWRESAMPLE): $(OBJS_LR)
+	@echo $@
+	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LR)
+
+-include $(SRCS_LC:%.c=$(OBJ_DIR)%.d)
+-include $(SRCS_LF:%.c=$(OBJ_DIR)%.d)
+-include $(SRCS_LBR:%.c=$(OBJ_DIR)%.d)
+-include $(SRCS_LU:%.c=$(OBJ_DIR)%.d)
+-include $(SRCS_LR:%.c=$(OBJ_DIR)%.d)
+-include $(SRCS_LS:%.c=$(OBJ_DIR)%.d)
 
 .PHONY: clean make_objdirs $(OBJ_DIRS)

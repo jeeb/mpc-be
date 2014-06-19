@@ -45,6 +45,7 @@
     <None Include="libavcodec\x86\h264_weight.asm" />
     <None Include="libavcodec\x86\h264_weight_10bit.asm" />
     <None Include="libavcodec\x86\hevc_deblock.asm" />
+    <None Include="libavcodec\x86\hevc_idct.asm" />
     <None Include="libavcodec\x86\hevc_mc.asm" />
     <None Include="libavcodec\x86\hpeldsp.asm" />
     <None Include="libavcodec\x86\huffyuvdsp.asm" />
@@ -455,6 +456,7 @@
     <ClInclude Include="libavutil\x86\timer.h" />
     <ClInclude Include="libavutil\x86_cpu.h" />
     <ClInclude Include="libswresample\audioconvert.h" />
+    <ClInclude Include="libswresample\resample.h" />
     <ClInclude Include="libswresample\swresample.h" />
     <ClInclude Include="libswresample\swresample_internal.h" />
     <ClInclude Include="libswresample\version.h" />
@@ -784,6 +786,7 @@
     <ClCompile Include="libavcodec\vorbis_data.c" />
     <ClCompile Include="libavcodec\vp3.c" />
     <ClCompile Include="libavcodec\vp3dsp.c" />
+    <ClCompile Include="libavcodec\vp3_parser.c" />
     <ClCompile Include="libavcodec\vp5.c" />
     <ClCompile Include="libavcodec\vp56.c" />
     <ClCompile Include="libavcodec\vp56data.c" />
@@ -793,6 +796,7 @@
     <ClCompile Include="libavcodec\vp6dsp.c" />
     <ClCompile Include="libavcodec\vp8.c" />
     <ClCompile Include="libavcodec\vp8dsp.c" />
+    <ClCompile Include="libavcodec\vp8_parser.c" />
     <ClCompile Include="libavcodec\vp9.c" />
     <ClCompile Include="libavcodec\vp9dsp.c" />
     <ClCompile Include="libavcodec\vp9_parser.c" />
@@ -935,8 +939,10 @@
     <ClCompile Include="libswresample\rematrix.c" />
     <ClCompile Include="libswresample\rematrix_template.c" />
     <ClCompile Include="libswresample\resample.c" />
+    <ClCompile Include="libswresample\resample_dsp.c" />
     <ClCompile Include="libswresample\resample_template.c" />
     <ClCompile Include="libswresample\swresample.c" />
+    <ClCompile Include="libswresample\x86\resample_x86_dsp.c" />
     <ClCompile Include="libswresample\x86\swresample_x86.c" />
     <ClCompile Include="libswscale\bayer_template.c" />
     <ClCompile Include="libswscale\input.c" />

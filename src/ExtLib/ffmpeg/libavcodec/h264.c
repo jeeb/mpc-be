@@ -1959,14 +1959,7 @@ again:
                         ff_vdpau_h264_picture_start(h);
                 }
 
-                if (hx->redundant_pic_count == 0 &&
-                    (avctx->skip_frame < AVDISCARD_NONREF ||
-                     hx->nal_ref_idc) &&
-                    (avctx->skip_frame < AVDISCARD_BIDIR  ||
-                     hx->slice_type_nos != AV_PICTURE_TYPE_B) &&
-                    (avctx->skip_frame < AVDISCARD_NONKEY ||
-                     hx->slice_type_nos == AV_PICTURE_TYPE_I) &&
-                    avctx->skip_frame < AVDISCARD_ALL) {
+                if (hx->redundant_pic_count == 0) {
                     // ==> Start patch MPC
                     if (h->avctx->using_dxva && nal_pass <= 2) {
                         DXVA_Context* ctx = (DXVA_Context*)h->dxva_context;
@@ -2006,7 +1999,7 @@ again:
                 hx->intra_gb_ptr =
                 hx->inter_gb_ptr = NULL;
 
-                if ((err = ff_h264_decode_slice_header(hx, h)) < 0) {
+                if ((err = ff_h264_decode_slice_header(hx, h))) {
                     /* make sure data_partitioning is cleared if it was set
                      * before, so we don't try decoding a slice without a valid
                      * slice header later */
@@ -2034,7 +2027,7 @@ again:
                     (avctx->skip_frame < AVDISCARD_NONREF || hx->nal_ref_idc) &&
                     (avctx->skip_frame < AVDISCARD_BIDIR  ||
                      hx->slice_type_nos != AV_PICTURE_TYPE_B) &&
-                    (avctx->skip_frame < AVDISCARD_NONKEY ||
+                    (avctx->skip_frame < AVDISCARD_NONINTRA ||
                      hx->slice_type_nos == AV_PICTURE_TYPE_I) &&
                     avctx->skip_frame < AVDISCARD_ALL)
                     context_count++;
@@ -2081,8 +2074,9 @@ again:
                 context_count = 0;
             }
 
-            if (err < 0) {
-                av_log(h->avctx, AV_LOG_ERROR, "decode_slice_header error\n");
+            if (err < 0 || err == SLICE_SKIPED) {
+                if (err < 0)
+                    av_log(h->avctx, AV_LOG_ERROR, "decode_slice_header error\n");
                 h->ref_count[0] = h->ref_count[1] = h->list_count = 0;
             } else if (err == 1) {
                 /* Slice could not be decoded in parallel mode, copy down

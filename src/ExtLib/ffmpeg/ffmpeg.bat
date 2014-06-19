@@ -1,5 +1,4 @@
 @ECHO OFF
-REM $Id$
 REM
 REM (C) 2009-2013 see Authors.txt
 REM
@@ -76,8 +75,50 @@ IF "%BUILDTYPE%" == "clean" (
 
 make.exe -f ffmpeg.mak %BUILDTYPE% -j%JOBS% %BIT% %DEBUG% %VS%
 
+SET "VCVARSTYPE=x86"
+IF /I "%BIT%" == "64BIT=yes" (
+  SET "ARCHBUILDS=x64"
+  IF "%PROCESSOR_ARCHITECTURE%" == "AMD64" (SET "VCVARSTYPE=amd64") ELSE (SET "VCVARSTYPE=x86_amd64")
+) ELSE (
+  SET "ARCHBUILDS=Win32"
+)
+
+IF /I "%DEBUG%" == "Debug=yes" (
+  SET "CONFIGBUILDS=Debug"
+) ELSE (
+  SET "CONFIGBUILDS=Release"
+)
+
+SET "TARGETFOLDER=%CONFIGBUILDS%_%ARCHBUILDS%"
+SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
+SET "BINDIR=..\..\..\bin13"
+SET "VSNAME=Visual Studio 2013"
+
+IF /I "%VS%" == "VS2012=yes" (
+  SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
+  SET "BINDIR=..\..\..\bin12"
+  SET "VSNAME=Visual Studio 2012"
+) ELSE IF /I "%VS%" == "VS2010=yes" (
+  SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
+  SET "BINDIR=..\..\..\bin"
+  SET "VSNAME=Visual Studio 2010"
+)
+
+IF "%BUILDTYPE%" NEQ "clean" (
+  IF NOT DEFINED VSCOMNTOOLS (
+    ECHO ERROR: "%VSNAME% environment variable(s) is missing - possible it's not installed on your PC"
+    ENDLOCAL
+    EXIT /B
+  )
+
+  CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" %VCVARSTYPE%
+  lib /NOLOGO /ignore:4006,4221 /OUT:%BINDIR%\lib\%TARGETFOLDER%\ffmpeg.lib %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavcodec.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavfilter.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavresample.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavutil.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswresample.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswscale.a
+)
+
 REM Visual Studio creates a "obj" sub-folder. Since there is no way to disable it - just delete it.
-rd "%~dp0obj" /S /Q
+IF EXIST "%~dp0obj" (
+  rd "%~dp0obj" /S /Q
+)
 
 ENDLOCAL
 EXIT /B

@@ -121,6 +121,9 @@
     <None Include="libavcodec\x86\hevc_deblock.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\hevc_idct.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\hevc_mc.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -1348,6 +1351,9 @@
     <ClInclude Include="libswresample\audioconvert.h">
       <Filter>libswresample</Filter>
     </ClInclude>
+    <ClInclude Include="libswresample\resample.h">
+      <Filter>libswresample</Filter>
+    </ClInclude>
     <ClInclude Include="libswresample\swresample.h">
       <Filter>libswresample</Filter>
     </ClInclude>
@@ -2248,6 +2254,9 @@
     <ClCompile Include="libavcodec\parser.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\pel_template.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\png.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2473,6 +2482,9 @@
     <ClCompile Include="libavcodec\vp3.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\vp3_parser.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\vp3dsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2486,6 +2498,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\vp8.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\vp8_parser.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\vp8dsp.c">
@@ -2755,6 +2770,9 @@
     <ClCompile Include="libavutil\utils.c">
       <Filter>libavutil</Filter>
     </ClCompile>
+    <ClCompile Include="libswresample\x86\resample_x86_dsp.c">
+      <Filter>libswresample\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libswresample\x86\swresample_x86.c">
       <Filter>libswresample\x86</Filter>
     </ClCompile>
@@ -2777,6 +2795,9 @@
       <Filter>libswresample</Filter>
     </ClCompile>
     <ClCompile Include="libswresample\resample.c">
+      <Filter>libswresample</Filter>
+    </ClCompile>
+    <ClCompile Include="libswresample\resample_dsp.c">
       <Filter>libswresample</Filter>
     </ClCompile>
     <ClCompile Include="libswresample\resample_template.c">
@@ -2832,9 +2853,6 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\pel_template.c">
-      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
