@@ -21,7 +21,7 @@
 #pragma once
 
 #define KILOBYTE				1024
-#define MEGABYTE				1024*KILOBYTE
+#define MEGABYTE				1024 * KILOBYTE
 
 #define DEFAULT_CACHE_LENGTH	64		// in Kb
 

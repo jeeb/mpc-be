@@ -1196,11 +1196,12 @@ private:
 		TH_WORK,
 		TH_CLOSE
 	};
-	TH_STATE	m_fYoutubeThreadWork;
-	CString		m_YoutubeFile;
-	CWinThread*	m_YoutubeThread;
-	DWORD		m_YoutubeCurrent;
-	DWORD		m_YoutubeTotal;
+	volatile TH_STATE	m_fYoutubeThreadWork;
+	volatile DWORD		m_YoutubeCurrent;
+	volatile DWORD		m_YoutubeTotal;
+	CString				m_YoutubeFile;
+	CWinThread*			m_YoutubeThread;
+
 	HRESULT		QueryProgressYoutube(LONGLONG *pllTotal, LONGLONG *pllCurrent) {
 		if (m_YoutubeTotal > 0 && m_YoutubeCurrent < m_YoutubeTotal) {
 			if (pllTotal) {

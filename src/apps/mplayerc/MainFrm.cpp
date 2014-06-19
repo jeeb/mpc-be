@@ -12767,6 +12767,7 @@ static UINT YoutubeThreadProc(LPVOID pParam)
 
 UINT CMainFrame::YoutubeThreadProc()
 {
+	AppSettings& sApp = AfxGetAppSettings();
 	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
 	if (s) {
 #ifdef _DEBUG
@@ -12776,15 +12777,17 @@ UINT CMainFrame::YoutubeThreadProc()
 		if (f) {
 
 			DWORD cb = sizeof(DWORD);
-			if (!HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &m_YoutubeTotal, &cb, 0)) {
-				m_YoutubeTotal = 0;
+			DWORD dw = 0;
+			m_YoutubeTotal = 0;
+			if (HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &dw, &cb, 0)) {
+				m_YoutubeTotal = dw;
 			}
 
 			if (GetTemporaryFilePath(GetFileExt(GetAltFileName()).MakeLower(), m_YoutubeFile)) {
 				HANDLE hFile;
 				hFile = CreateFile(m_YoutubeFile, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0 ,CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
 				if (hFile != INVALID_HANDLE_VALUE) {
-					AfxGetAppSettings().slTMPFilesList.AddTail(m_YoutubeFile);
+					sApp.slTMPFilesList.AddTail(m_YoutubeFile);
 
 					HANDLE hMapping = INVALID_HANDLE_VALUE;
 					if (m_YoutubeTotal > 0) {
@@ -12792,6 +12795,20 @@ UINT CMainFrame::YoutubeThreadProc()
 						if (hMapping != INVALID_HANDLE_VALUE) {
 							CloseHandle(hMapping);
 						}
+					}
+
+					DWORD dwWaitSize = MEGABYTE;
+					switch (sApp.iYoutubeMemoryType) {
+						case 0:
+							if (m_YoutubeTotal && sApp.iYoutubePercentMemory && sApp.iYoutubePercentMemory <= 100) {
+								dwWaitSize = m_YoutubeTotal * sApp.iYoutubePercentMemory / 100;
+							}
+							break;
+						case 1:
+							if (sApp.iYoutubeMbMemory) {
+								dwWaitSize = m_YoutubeTotal ? min(sApp.iYoutubeMbMemory, m_YoutubeTotal) : sApp.iYoutubeMbMemory;
+							}
+							break;
 					}
 
 					DWORD dwBytesWritten	= 0;
@@ -12804,7 +12821,7 @@ UINT CMainFrame::YoutubeThreadProc()
 						}
 
 						m_YoutubeCurrent += dwBytesRead;
-						if (m_YoutubeCurrent > min(MEGABYTE, m_YoutubeTotal ? m_YoutubeTotal / 2 : MEGABYTE)) {
+						if (m_YoutubeCurrent > dwWaitSize) {
 							m_fYoutubeThreadWork = TH_WORK;
 						}
 					}
