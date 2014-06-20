@@ -1197,8 +1197,8 @@ private:
 		TH_CLOSE
 	};
 	volatile TH_STATE	m_fYoutubeThreadWork;
-	volatile DWORD		m_YoutubeCurrent;
-	volatile DWORD		m_YoutubeTotal;
+	volatile QWORD		m_YoutubeCurrent;
+	volatile QWORD		m_YoutubeTotal;
 	CString				m_YoutubeFile;
 	CWinThread*			m_YoutubeThread;
 

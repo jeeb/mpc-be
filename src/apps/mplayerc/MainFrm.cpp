@@ -12775,12 +12775,13 @@ UINT CMainFrame::YoutubeThreadProc()
 #endif
 		f = InternetOpenUrl(s, m_YoutubeFile, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (f) {
-
-			DWORD cb = sizeof(DWORD);
-			DWORD dw = 0;
-			m_YoutubeTotal = 0;
-			if (HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &dw, &cb, 0)) {
-				m_YoutubeTotal = dw;
+			TCHAR QuerySizeText[100] = { 0 };
+			DWORD dw = _countof(QuerySizeText) * sizeof(TCHAR);
+			if (HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH, QuerySizeText, &dw, 0)) {
+				QWORD val = 0;
+				if (1 == swscanf_s(QuerySizeText, L"%I64d", &val)) {
+					m_YoutubeTotal = val;
+				}
 			}
 
 			if (GetTemporaryFilePath(GetFileExt(GetAltFileName()).MakeLower(), m_YoutubeFile)) {
@@ -12791,17 +12792,19 @@ UINT CMainFrame::YoutubeThreadProc()
 
 					HANDLE hMapping = INVALID_HANDLE_VALUE;
 					if (m_YoutubeTotal > 0) {
-						hMapping = CreateFileMapping(hFile, 0, PAGE_READWRITE, 0, m_YoutubeTotal, NULL);
+						ULARGE_INTEGER usize;
+						usize.QuadPart = m_YoutubeTotal;
+						hMapping = CreateFileMapping(hFile, 0, PAGE_READWRITE, usize.HighPart, usize.LowPart, NULL);
 						if (hMapping != INVALID_HANDLE_VALUE) {
 							CloseHandle(hMapping);
 						}
 					}
 
-					DWORD dwWaitSize = MEGABYTE;
+					QWORD dwWaitSize = MEGABYTE;
 					switch (sApp.iYoutubeMemoryType) {
 						case 0:
 							if (m_YoutubeTotal && sApp.iYoutubePercentMemory && sApp.iYoutubePercentMemory <= 100) {
-								dwWaitSize = m_YoutubeTotal * sApp.iYoutubePercentMemory / 100;
+								dwWaitSize = m_YoutubeTotal * ((float)sApp.iYoutubePercentMemory / 100);
 							}
 							break;
 						case 1:
