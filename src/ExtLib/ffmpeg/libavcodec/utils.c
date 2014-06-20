@@ -2714,41 +2714,17 @@ void avsubtitle_free(AVSubtitle *sub)
     memset(sub, 0, sizeof(AVSubtitle));
 }
 
-av_cold int ff_codec_close_recursive(AVCodecContext *avctx)
-{
-    int ret = 0;
-
-    // ==> Start patch MPC
-    ff_unlock_avcodec(avctx);
-    // ==> End patch MPC
-
-    ret = avcodec_close(avctx);
-
-    ff_lock_avcodec(NULL);
-    return ret;
-}
-
 av_cold int avcodec_close(AVCodecContext *avctx)
 {
-    int ret;
-
     if (!avctx)
         return 0;
-
-    ret = ff_lock_avcodec(avctx);
-    if (ret < 0)
-        return ret;
 
     if (avcodec_is_open(avctx)) {
         FramePool *pool = avctx->internal->pool;
         int i;
         if (CONFIG_FRAME_THREAD_ENCODER &&
             avctx->internal->frame_thread_encoder && avctx->thread_count > 1) {
-            // ==> Start patch MPC
-            ff_unlock_avcodec(avctx);
-            // ==> End patch MPC
             ff_frame_thread_encoder_free(avctx);
-            ff_lock_avcodec(avctx);
         }
         if (HAVE_THREADS && avctx->internal->thread_ctx)
             ff_thread_free(avctx);
@@ -2778,9 +2754,6 @@ av_cold int avcodec_close(AVCodecContext *avctx)
     avctx->codec = NULL;
     avctx->active_thread_type = 0;
 
-    // ==> Start patch MPC
-    ff_unlock_avcodec(avctx);
-    // ==> End patch MPC
     return 0;
 }
 
