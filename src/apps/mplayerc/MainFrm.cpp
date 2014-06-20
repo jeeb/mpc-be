@@ -12939,8 +12939,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 							m_fYoutubeThreadWork = TH_START;
 							m_YoutubeFile = tmpName;
 							m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
-							while (m_fYoutubeThreadWork == TH_START) {
+							while (m_fYoutubeThreadWork == TH_START && !m_fOpeningAborted) {
 								Sleep(50);
+							}
+							if (m_fOpeningAborted) {
+								m_fYoutubeThreadWork = TH_CLOSE;
+								hr = E_ABORT;
 							}
 
 							if (m_fYoutubeThreadWork == TH_WORK && ::PathFileExists(m_YoutubeFile)) {
@@ -12953,16 +12957,18 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					}
 				}
 
-				TCHAR path[MAX_PATH]	= {0};
-				BOOL bIsDirSet			= FALSE;
-				if (!::PathIsURL(tmpName) && GetCurrentDirectory(sizeof(path), path)) {
-					bIsDirSet = SetCurrentDirectory(GetFolderOnly(tmpName));
-				}
+				if (SUCCEEDED(hr)) {
+					TCHAR path[MAX_PATH]	= {0};
+					BOOL bIsDirSet			= FALSE;
+					if (!::PathIsURL(tmpName) && GetCurrentDirectory(sizeof(path), path)) {
+						bIsDirSet = SetCurrentDirectory(GetFolderOnly(tmpName));
+					}
 
-				hr = m_pGB->RenderFile(tmpName, NULL);
+					hr = m_pGB->RenderFile(tmpName, NULL);
 
-				if (bIsDirSet) {
-					SetCurrentDirectory(path);
+					if (bIsDirSet) {
+						SetCurrentDirectory(path);
+					}
 				}
 			}
 		}
