@@ -1194,7 +1194,8 @@ private:
 	enum TH_STATE {
 		TH_START,
 		TH_WORK,
-		TH_CLOSE
+		TH_CLOSE,
+		TH_ERROR
 	};
 	volatile TH_STATE	m_fYoutubeThreadWork;
 	volatile QWORD		m_YoutubeCurrent;

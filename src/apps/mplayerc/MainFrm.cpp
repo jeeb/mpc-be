@@ -12818,15 +12818,19 @@ UINT CMainFrame::YoutubeThreadProc()
 					DWORD dwBytesRead		= 0;
 					DWORD dataSize			= 0;
 					BYTE buf[64 * KILOBYTE];
-					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork != TH_CLOSE) {
+					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork == TH_START) {
 						if (FALSE == WriteFile(hFile, (LPCVOID)buf, dwBytesRead, &dwBytesWritten, NULL) || dwBytesRead != dwBytesWritten) {
 							break;
 						}
 
 						m_YoutubeCurrent += dwBytesRead;
-						if (m_YoutubeCurrent > dwWaitSize) {
+						if (m_YoutubeCurrent >= dwWaitSize) {
 							m_fYoutubeThreadWork = TH_WORK;
 						}
+					}
+
+					if (m_fYoutubeThreadWork == TH_START) {
+						m_fYoutubeThreadWork = TH_WORK;
 					}
 #ifdef _DEBUG
 					if (m_YoutubeCurrent) {
@@ -12836,14 +12840,24 @@ UINT CMainFrame::YoutubeThreadProc()
 					}
 #endif
 					CloseHandle(hFile);
+				} else {
+					m_fYoutubeThreadWork = TH_ERROR;
 				}
+			} else {
+				m_fYoutubeThreadWork = TH_ERROR;
 			}
 			InternetCloseHandle(f);
+		} else {
+			m_fYoutubeThreadWork = TH_ERROR;
 		}
 		InternetCloseHandle(s);
+	} else {
+		m_fYoutubeThreadWork = TH_ERROR;
 	}
 
-	m_fYoutubeThreadWork = TH_CLOSE;
+	if (m_fYoutubeThreadWork != TH_ERROR) {
+		m_fYoutubeThreadWork = TH_CLOSE;
+	}
 
 	return (UINT)m_fYoutubeThreadWork;
 }
@@ -12943,11 +12957,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 								Sleep(50);
 							}
 							if (m_fOpeningAborted) {
-								m_fYoutubeThreadWork = TH_CLOSE;
+								m_fYoutubeThreadWork = TH_ERROR;
 								hr = E_ABORT;
 							}
 
-							if (m_fYoutubeThreadWork == TH_WORK && ::PathFileExists(m_YoutubeFile)) {
+							if (m_fYoutubeThreadWork != TH_ERROR && ::PathFileExists(m_YoutubeFile)) {
 								tmpName = m_YoutubeFile;
 							} else {
 								tmpName.Empty();
