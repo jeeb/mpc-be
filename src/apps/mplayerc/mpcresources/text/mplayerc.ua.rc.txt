@@ -500,9 +500,9 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
 7		"Вибір фільтра джерела"
 8		"Внутрішній"
 9		"Системний"
-10		"Initial buffer size"
-11		"% of source file size"
-12		"Mb"
+10		"Початковий розмір буфера"
+11		"% від розміру файла джерела"
+12		"Мб"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
