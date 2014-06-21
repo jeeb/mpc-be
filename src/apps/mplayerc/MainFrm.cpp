@@ -12809,7 +12809,7 @@ UINT CMainFrame::YoutubeThreadProc()
 							break;
 						case 1:
 							if (sApp.iYoutubeMbMemory) {
-								dwWaitSize = m_YoutubeTotal ? min(sApp.iYoutubeMbMemory, m_YoutubeTotal) : sApp.iYoutubeMbMemory;
+								dwWaitSize = m_YoutubeTotal ? min(sApp.iYoutubeMbMemory * MEGABYTE, m_YoutubeTotal) : sApp.iYoutubeMbMemory;
 							}
 							break;
 					}
