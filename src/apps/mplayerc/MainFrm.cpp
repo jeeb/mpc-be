@@ -12818,7 +12818,7 @@ UINT CMainFrame::YoutubeThreadProc()
 					DWORD dwBytesRead		= 0;
 					DWORD dataSize			= 0;
 					BYTE buf[64 * KILOBYTE];
-					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork == TH_START) {
+					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork != TH_ERROR && m_fYoutubeThreadWork != TH_CLOSE) {
 						if (FALSE == WriteFile(hFile, (LPCVOID)buf, dwBytesRead, &dwBytesWritten, NULL) || dwBytesRead != dwBytesWritten) {
 							break;
 						}
