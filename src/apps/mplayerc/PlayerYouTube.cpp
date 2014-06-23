@@ -23,9 +23,6 @@
 #include "PlayerYouTube.h"
 #include "PlayerVimeo.h"
 
-#include "../../DSUtil/MPCSocket.h"
-#include "../../DSUtil/Log.h"
-
 #define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\": \""
 #define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\": \""
 #define MATCH_WIDTH_START			"meta property=\"og:video:width\" content=\""
@@ -119,11 +116,6 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 	}
 
 	if (PlayerYouTubeCheck(fn)) {
-
-#ifdef _DEBUG
-		LOG2FILE(_T("------"));
-		LOG2FILE(_T("Youtube parser"));
-#endif
 
 		CString Author;
 
