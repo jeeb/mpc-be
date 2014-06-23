@@ -1449,7 +1449,7 @@ void Rasterizer::Draw_noAlpha_sp_Body_sse2(RasterizerNfo& rnfo)
 	// xo is the offset (usually negative) we have moved into the image
 	// So if we have passed the switchpoint (?) switch to another colour
 	// (So switchpts stores both colours *and* coordinates?)
-	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
+	int gran = min(max(0, (int)rnfo.sw[3] - rnfo.xo), rnfo.w); // gran should not be less than 0
 	int end_gran = ((gran - 1) / 8) * 8;
 	int end_w = gran + ((rnfo.w - gran - 1) / 8) * 8;
 	int color2 = rnfo.sw[2];
