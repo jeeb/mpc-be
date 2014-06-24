@@ -117,6 +117,7 @@ SRCS_LC = \
 	libavcodec/apedec.c \
 	libavcodec/atrac.c \
 	libavcodec/atrac3.c \
+	libavcodec/audiodsp.c \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
 	libavcodec/avpicture.c \
@@ -126,6 +127,7 @@ SRCS_LC = \
 	libavcodec/binkdsp.c \
 	libavcodec/bitstream.c \
 	libavcodec/blockdsp.c \
+	libavcodec/bswapdsp.c \
 	libavcodec/cabac.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
@@ -259,6 +261,7 @@ SRCS_LC = \
 	libavcodec/mpc.c \
 	libavcodec/mpc7.c \
 	libavcodec/mpc8.c \
+	libavcodec/mpeg_er.c \
 	libavcodec/mpeg12.c \
 	libavcodec/mpeg12data.c \
 	libavcodec/mpeg12dec.c \
@@ -280,6 +283,7 @@ SRCS_LC = \
 	libavcodec/mpegvideo.c \
 	libavcodec/mpegvideo_motion.c \
 	libavcodec/mpegvideo_parser.c \
+	libavcodec/mpegvideodsp.c \
 	libavcodec/msmpeg4.c \
 	libavcodec/msmpeg4data.c \
 	libavcodec/msmpeg4dec.c \
@@ -403,7 +407,9 @@ SRCS_LC = \
 	libavcodec/xiph.c \
 	\
 	libavcodec/x86/ac3dsp_init.c \
+	libavcodec/x86/audiodsp_init.c \
 	libavcodec/x86/blockdsp_mmx.c \
+	libavcodec/x86/bswapdsp_init.c \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
 	libavcodec/x86/dct_init.c \
@@ -432,6 +438,7 @@ SRCS_LC = \
 	libavcodec/x86/motion_est.c \
 	libavcodec/x86/mpegaudiodsp.c \
 	libavcodec/x86/mpegvideo.c \
+	libavcodec/x86/mpegvideodsp.c \
 	libavcodec/x86/pngdsp_init.c \
 	libavcodec/x86/proresdsp_init.c \
 	libavcodec/x86/qpeldsp_init.c \
@@ -555,7 +562,9 @@ SRCS_LS = \
 # Yasm objects
 SRCS_YASM_LC = \
 	libavcodec/x86/ac3dsp.asm \
+	libavcodec/x86/audiodsp.asm \
 	libavcodec/x86/blockdsp.asm \
+	libavcodec/x86/bswapdsp.asm \
 	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
 	libavcodec/x86/deinterlace.asm \
