@@ -1258,4 +1258,5 @@ public:
 
 protected:
 	HANDLE		m_VHDHandle;
+	BOOL		OpenIso(CString pathName);
 };

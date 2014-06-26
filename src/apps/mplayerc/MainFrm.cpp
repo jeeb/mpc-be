@@ -5593,144 +5593,18 @@ void CMainFrame::OnFileOpenIso()
 		return;
 	}
 
-	CString path;
-	if (IsWinEightOrLater()) {
-		if (m_AttachVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
-			DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT;
+	if (IsWinEightOrLater() && m_AttachVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
+		DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT;
 
-			TCHAR szFilters[] = L"Iso Files (*.iso)|*.iso||";
-			CFileDialog fd(TRUE, L"Iso Files", L"*.iso", dwFlags, szFilters);
-			if (fd.DoModal() != IDOK) {
-				return;
-			}
-
-			CString ISOVolumeName;
-
-			CString pathName = fd.GetPathName();
-			if (pathName.Right(4).MakeLower() == L".iso") {
-				VIRTUAL_STORAGE_TYPE vst;
-				memset(&vst, 0, sizeof(VIRTUAL_STORAGE_TYPE));
-				vst.DeviceId = VIRTUAL_STORAGE_TYPE_DEVICE_ISO;
-				vst.VendorId = VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
-
-				OPEN_VIRTUAL_DISK_PARAMETERS openParameters;
-				memset(&openParameters, 0, sizeof(openParameters));
-				openParameters.Version = OPEN_VIRTUAL_DISK_VERSION_1;
-
-				HANDLE tmpVHDHandle = INVALID_HANDLE_VALUE;
-				DWORD ret_code = m_OpenVirtualDiskFunc(&vst, pathName, VIRTUAL_DISK_ACCESS_READ, OPEN_VIRTUAL_DISK_FLAG_NONE, &openParameters, &tmpVHDHandle);
-				if (ret_code == ERROR_SUCCESS) {
-					SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-					m_VHDHandle = tmpVHDHandle;
-
-					ATTACH_VIRTUAL_DISK_PARAMETERS avdp;
-					memset(&avdp, 0, sizeof(ATTACH_VIRTUAL_DISK_PARAMETERS));
-					avdp.Version = ATTACH_VIRTUAL_DISK_VERSION_1;
-					ret_code = m_AttachVirtualDiskFunc(m_VHDHandle, NULL, ATTACH_VIRTUAL_DISK_FLAG_READ_ONLY, 0, &avdp, NULL);
-
-					if (ret_code == ERROR_SUCCESS) {
-						TCHAR physicalDriveName[MAX_PATH] = L"";
-						DWORD physicalDriveNameSize = _countof(physicalDriveName);
-
-						ret_code = m_GetVirtualDiskPhysicalPathFunc(m_VHDHandle, &physicalDriveNameSize, physicalDriveName);
-						if (ret_code == ERROR_SUCCESS) {
-							TCHAR volumeNameBuffer[MAX_PATH] = L"";
-							DWORD volumeNameBufferSize = _countof(volumeNameBuffer);
-							HANDLE hVol = ::FindFirstVolume(volumeNameBuffer, volumeNameBufferSize);
-							if (hVol != INVALID_HANDLE_VALUE) {
-								do {
-									size_t len = wcslen(volumeNameBuffer);
-									if (volumeNameBuffer[len - 1] == '\\') {
-										volumeNameBuffer[len - 1] = 0;
-									}
-										
-									HANDLE volumeHandle = ::CreateFile(volumeNameBuffer, 
-																		GENERIC_READ,  
-																		FILE_SHARE_READ | FILE_SHARE_WRITE,  
-																		NULL, 
-																		OPEN_EXISTING, 
-																		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, 
-																		NULL);
-
-									if (volumeHandle != INVALID_HANDLE_VALUE) {
-										PSTORAGE_DEVICE_DESCRIPTOR	devDesc = {0};
-										char						outBuf[512] = {0};
-										STORAGE_PROPERTY_QUERY		query;
-
-										memset(&query, 0, sizeof(STORAGE_PROPERTY_QUERY));
-										query.PropertyId	= StorageDeviceProperty;
-										query.QueryType		= PropertyStandardQuery;
-
-										BOOL bIsVirtualDVD	= FALSE;
-										ULONG bytesUsed		= 0;
-
-										if (::DeviceIoControl(volumeHandle,
-																IOCTL_STORAGE_QUERY_PROPERTY,
-																&query,
-																sizeof(STORAGE_PROPERTY_QUERY),
-																&outBuf,
-																_countof(outBuf),
-																&bytesUsed,
-																NULL) && bytesUsed) {
-
-											devDesc = (PSTORAGE_DEVICE_DESCRIPTOR)outBuf;
-											if (devDesc->ProductIdOffset && outBuf[devDesc->ProductIdOffset]) {
-												char* productID = DNew char[bytesUsed];
-												memcpy(productID, &outBuf[devDesc->ProductIdOffset], bytesUsed);
-												bIsVirtualDVD = !strncmp(productID, "Virtual DVD-ROM", 15);
-
-												delete [] productID;
-											}
-										}
-
-
-										if (bIsVirtualDVD) {
-											STORAGE_DEVICE_NUMBER deviceInfo = {0};
-											if (::DeviceIoControl(volumeHandle,
-																	IOCTL_STORAGE_GET_DEVICE_NUMBER,
-																	NULL,
-																	0,
-																	&deviceInfo,
-																	sizeof(deviceInfo),
-																	&bytesUsed,
-																	NULL)) {
-												
-												CString tmp_physicalDriveName;
-												tmp_physicalDriveName.Format(L"\\\\.\\CDROM%d", deviceInfo.DeviceNumber);
-												if (physicalDriveName == tmp_physicalDriveName) {
-													volumeNameBuffer[len - 1] = '\\';
-													WCHAR VolumeName[MAX_PATH] = L"";
-													DWORD VolumeNameSize = _countof(VolumeName);
-													BOOL bRes = GetVolumePathNamesForVolumeName(volumeNameBuffer, VolumeName, VolumeNameSize, &VolumeNameSize);
-													if (bRes) {
-														ISOVolumeName = VolumeName;
-													}
-												}
-											}
-										}
-										CloseHandle(volumeHandle);
-									}
-								} while(::FindNextVolume(hVol, volumeNameBuffer, volumeNameBufferSize) != FALSE && ISOVolumeName.IsEmpty());
-								::FindVolumeClose(hVol);
-							}
-						}
-					}
-				}
-
-				path = ISOVolumeName;
-			}
+		TCHAR szFilters[] = L"Iso Files (*.iso)|*.iso||";
+		CFileDialog fd(TRUE, L"Iso Files", L"*.iso", dwFlags, szFilters);
+		if (fd.DoModal() != IDOK) {
+			return;
 		}
-		
-		if (!path.IsEmpty()) {
-			if (!OpenBD(path)) {
-				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
-				p->path = AddSlash(path);
-				p->path.Replace('/', '\\');
 
-				OpenMedia(p);
-			}
-		} else if (m_VHDHandle != INVALID_HANDLE_VALUE) {
-			CloseHandle(m_VHDHandle);
+		CString pathName = fd.GetPathName();
+		if (GetFileExt(pathName).MakeLower() == L".iso") {
+			OpenIso(pathName);
 		}
 	}
 }
@@ -20600,6 +20474,143 @@ CString CMainFrame::GetCurFileName()
 	}
 
 	return fn;
+}
+
+BOOL CMainFrame::OpenIso(CString pathName)
+{
+	if (IsWinEightOrLater()
+			&& m_AttachVirtualDiskFunc
+			&& m_AttachVirtualDiskFunc
+			&& m_GetVirtualDiskPhysicalPathFunc
+			&& GetFileExt(pathName).MakeLower() == L".iso"
+			&& ::PathFileExists(pathName)) {
+		CString ISOVolumeName;
+
+		VIRTUAL_STORAGE_TYPE vst;
+		memset(&vst, 0, sizeof(VIRTUAL_STORAGE_TYPE));
+		vst.DeviceId = VIRTUAL_STORAGE_TYPE_DEVICE_ISO;
+		vst.VendorId = VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
+
+		OPEN_VIRTUAL_DISK_PARAMETERS openParameters;
+		memset(&openParameters, 0, sizeof(OPEN_VIRTUAL_DISK_PARAMETERS));
+		openParameters.Version = OPEN_VIRTUAL_DISK_VERSION_1;
+
+		HANDLE tmpVHDHandle = INVALID_HANDLE_VALUE;
+		DWORD ret_code = m_OpenVirtualDiskFunc(&vst, pathName, VIRTUAL_DISK_ACCESS_READ, OPEN_VIRTUAL_DISK_FLAG_NONE, &openParameters, &tmpVHDHandle);
+		if (ret_code == ERROR_SUCCESS) {
+			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+			m_VHDHandle = tmpVHDHandle;
+
+			ATTACH_VIRTUAL_DISK_PARAMETERS avdp;
+			memset(&avdp, 0, sizeof(ATTACH_VIRTUAL_DISK_PARAMETERS));
+			avdp.Version = ATTACH_VIRTUAL_DISK_VERSION_1;
+			ret_code = m_AttachVirtualDiskFunc(m_VHDHandle, NULL, ATTACH_VIRTUAL_DISK_FLAG_READ_ONLY, 0, &avdp, NULL);
+
+			if (ret_code == ERROR_SUCCESS) {
+				TCHAR physicalDriveName[MAX_PATH] = L"";
+				DWORD physicalDriveNameSize = _countof(physicalDriveName);
+
+				ret_code = m_GetVirtualDiskPhysicalPathFunc(m_VHDHandle, &physicalDriveNameSize, physicalDriveName);
+				if (ret_code == ERROR_SUCCESS) {
+					TCHAR volumeNameBuffer[MAX_PATH] = L"";
+					DWORD volumeNameBufferSize = _countof(volumeNameBuffer);
+					HANDLE hVol = ::FindFirstVolume(volumeNameBuffer, volumeNameBufferSize);
+					if (hVol != INVALID_HANDLE_VALUE) {
+						do {
+							size_t len = wcslen(volumeNameBuffer);
+							if (volumeNameBuffer[len - 1] == '\\') {
+								volumeNameBuffer[len - 1] = 0;
+							}
+										
+							HANDLE volumeHandle = ::CreateFile(volumeNameBuffer, 
+																GENERIC_READ,  
+																FILE_SHARE_READ | FILE_SHARE_WRITE,  
+																NULL, 
+																OPEN_EXISTING, 
+																FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, 
+																NULL);
+
+							if (volumeHandle != INVALID_HANDLE_VALUE) {
+								PSTORAGE_DEVICE_DESCRIPTOR	devDesc = {0};
+								char						outBuf[512] = {0};
+								STORAGE_PROPERTY_QUERY		query;
+
+								memset(&query, 0, sizeof(STORAGE_PROPERTY_QUERY));
+								query.PropertyId	= StorageDeviceProperty;
+								query.QueryType		= PropertyStandardQuery;
+
+								BOOL bIsVirtualDVD	= FALSE;
+								ULONG bytesUsed		= 0;
+
+								if (::DeviceIoControl(volumeHandle,
+													  IOCTL_STORAGE_QUERY_PROPERTY,
+													  &query,
+													  sizeof(STORAGE_PROPERTY_QUERY),
+													  &outBuf,
+													  _countof(outBuf),
+													  &bytesUsed,
+													  NULL) && bytesUsed) {
+
+									devDesc = (PSTORAGE_DEVICE_DESCRIPTOR)outBuf;
+									if (devDesc->ProductIdOffset && outBuf[devDesc->ProductIdOffset]) {
+										char* productID = DNew char[bytesUsed];
+										memcpy(productID, &outBuf[devDesc->ProductIdOffset], bytesUsed);
+										bIsVirtualDVD = !strncmp(productID, "Virtual DVD-ROM", 15);
+
+										delete [] productID;
+									}
+								}
+
+
+								if (bIsVirtualDVD) {
+									STORAGE_DEVICE_NUMBER deviceInfo = {0};
+									if (::DeviceIoControl(volumeHandle,
+														  IOCTL_STORAGE_GET_DEVICE_NUMBER,
+														  NULL,
+														  0,
+														  &deviceInfo,
+														  sizeof(deviceInfo),
+														  &bytesUsed,
+														  NULL)) {
+												
+										CString tmp_physicalDriveName;
+										tmp_physicalDriveName.Format(L"\\\\.\\CDROM%d", deviceInfo.DeviceNumber);
+										if (physicalDriveName == tmp_physicalDriveName) {
+											volumeNameBuffer[len - 1] = '\\';
+											WCHAR VolumeName[MAX_PATH] = L"";
+											DWORD VolumeNameSize = _countof(VolumeName);
+											BOOL bRes = GetVolumePathNamesForVolumeName(volumeNameBuffer, VolumeName, VolumeNameSize, &VolumeNameSize);
+											if (bRes) {
+												ISOVolumeName = VolumeName;
+											}
+										}
+									}
+								}
+								CloseHandle(volumeHandle);
+							}
+						} while(::FindNextVolume(hVol, volumeNameBuffer, volumeNameBufferSize) != FALSE && ISOVolumeName.IsEmpty());
+						::FindVolumeClose(hVol);
+					}
+				}
+			}
+		}
+		
+		if (!ISOVolumeName.IsEmpty()) {
+			if (!OpenBD(ISOVolumeName)) {
+				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
+				p->path = AddSlash(ISOVolumeName);
+				p->path.Replace('/', '\\');
+
+				OpenMedia(p);
+			}
+
+			return TRUE;
+		} else if (m_VHDHandle != INVALID_HANDLE_VALUE) {
+			CloseHandle(m_VHDHandle);
+		}
+	}
+
+	return FALSE;
 }
 
 void CMainFrame::CheckMenuRadioItem(UINT first, UINT last, UINT check)
