@@ -5698,18 +5698,9 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 		return;
 	}
 
-	CAtlList<CString> sl;
-
 	UINT nFiles = ::DragQueryFile(hDropInfo, (UINT)-1, NULL, 0);
 
-	if (nFiles == 1) {
-		CString path;
-		path.ReleaseBuffer(::DragQueryFile(hDropInfo, 0, path.GetBuffer(_MAX_PATH), _MAX_PATH));
-		if (OpenBD(path)) {
-			return;
-		}
-	}
-
+	CAtlList<CString> sl;
 	for (UINT iFile = 0; iFile < nFiles; iFile++) {
 		CString fn;
 		fn.ReleaseBuffer(::DragQueryFile(hDropInfo, iFile, fn.GetBuffer(_MAX_PATH), _MAX_PATH));
@@ -5784,6 +5775,19 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 	if (m_iMediaLoadState == MLS_LOADING) {
 		return;
+	}
+
+	if (sl.GetCount() == 1) {
+		CString path = sl.GetHead();
+		if (OpenBD(path)) {
+			return;
+		}
+
+		if (IsWinEightOrLater() && m_AttachVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
+			if (GetFileExt(path).MakeLower() == L".iso" && OpenIso(path)) {
+				return;
+			}
+		}
 	}
 
 	m_wndPlaylistBar.Open(sl, true);
