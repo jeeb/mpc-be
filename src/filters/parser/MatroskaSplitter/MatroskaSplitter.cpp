@@ -557,7 +557,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
-					QWORD lastCueClusterPosition = (QWORD)-1;
+					QWORD lastCueClusterPosition = ULONGLONG_MAX;
 
 					CAtlArray<INT64> timecodes;
 					bool readmore = true;
@@ -1383,7 +1383,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	if (rt > 0) {
 		rt += m_pFile->m_rtOffset;
 
-		QWORD lastCueClusterPosition = (QWORD)-1;
+		QWORD lastCueClusterPosition = ULONGLONG_MAX;
 
 		Segment& s = m_pFile->m_segment;
 
@@ -1556,6 +1556,8 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			CMatroskaNode Root(m_pFile);
 			CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
+			QWORD lastCueClusterPosition = ULONGLONG_MAX;
+
 			if (pCluster) {
 				pos1 = s.Cues.GetHeadPosition();
 				while (pos1) {
@@ -1581,6 +1583,11 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 							if (m_bSupportCueDuration && (!pCueTrackPositions->CueDuration || !pCueTrackPositions->CueRelativePosition)) {
 								continue;
 							}
+
+							if (lastCueClusterPosition == pCueTrackPositions->CueClusterPosition) {
+								continue;
+							}
+							lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
 
 							if (m_bSupportCueDuration) {
 								REFERENCE_TIME cueDuration = s.GetRefTime(pCueTrackPositions->CueDuration);
