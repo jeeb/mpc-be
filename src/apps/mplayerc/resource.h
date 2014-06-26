@@ -346,6 +346,8 @@
 #define ID_AFTERPLAYBACK_NEXT_LOOPED        1079
 #define ID_AFTERPLAYBACK_EVERYTIMEDONOTHING 1080
 
+#define ID_FILE_OPENISO                 1090
+
 #define ID_SUB_POS_UP                   1100
 #define ID_SUB_POS_DOWN                 1101
 #define ID_SUB_POS_LEFT                 1102
