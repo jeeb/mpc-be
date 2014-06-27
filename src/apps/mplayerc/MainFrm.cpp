@@ -5443,7 +5443,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			sl.AddTailList(&s.slDubs);
 		}
 
-		if (OpenBD(s.slFiles.GetHead())) {
+		if (!fMulti && (OpenBD(s.slFiles.GetHead()) || OpenIso(s.slFiles.GetHead()))) {
 			if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
 				SetForegroundWindow();
 			}
@@ -5779,23 +5779,12 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 	if (sl.GetCount() == 1) {
 		CString path = sl.GetHead();
-		if (OpenBD(path)) {
+		if (OpenBD(path) || OpenIso(path)) {
 			return;
-		}
-
-		if (IsWinEightOrLater() && m_AttachVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
-			if (GetFileExt(path).MakeLower() == L".iso" && OpenIso(path)) {
-				return;
-			}
 		}
 	}
 
 	m_wndPlaylistBar.Open(sl, true);
-
-	if (OpenBD(sl.GetHead())) {
-		return;
-	}
-
 	OpenCurPlaylistItem();
 }
 
@@ -20600,18 +20589,22 @@ BOOL CMainFrame::OpenIso(CString pathName)
 		}
 		
 		if (!ISOVolumeName.IsEmpty()) {
-			if (!OpenBD(ISOVolumeName)) {
-				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
-				p->path = AddSlash(ISOVolumeName);
-				p->path.Replace('/', '\\');
-
-				OpenMedia(p);
+			if (OpenBD(ISOVolumeName)) {
+				return TRUE;
 			}
 
-			return TRUE;
-		} else if (m_VHDHandle != INVALID_HANDLE_VALUE) {
-			CloseHandle(m_VHDHandle);
+			if (::PathFileExists(ISOVolumeName + L"VIDEO_TS\\VIDEO_TS.IFO")) {
+				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
+				p->path = ISOVolumeName;
+				OpenMedia(p);
+
+				return TRUE;
+			}
 		}
+	}
+
+	if (m_VHDHandle != INVALID_HANDLE_VALUE) {
+		CloseHandle(m_VHDHandle);
 	}
 
 	return FALSE;
