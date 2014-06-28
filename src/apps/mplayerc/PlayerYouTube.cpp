@@ -226,8 +226,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		char *tmp = DNew char[stream_map_len + adaptive_fmts_len + 2];
 		memcpy(tmp, data + stream_map_start, stream_map_len);
 		tmp[stream_map_len] = ',';
-		memcpy(tmp + stream_map_len, data + adaptive_fmts_start, adaptive_fmts_len);
-		tmp[stream_map_len + adaptive_fmts_len] = 0;
+		memcpy(tmp + stream_map_len + 1, data + adaptive_fmts_start, adaptive_fmts_len);
+		tmp[stream_map_len + 1 + adaptive_fmts_len] = 0;
 		free(data);
 
 		CStringA strA = CStringA(tmp);
