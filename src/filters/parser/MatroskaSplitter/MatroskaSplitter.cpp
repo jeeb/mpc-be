@@ -1310,7 +1310,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 			Cluster c;
 			c.ParseTimeCode(m_pCluster);
 
-			m_pFile->m_segment.SegmentInfo.Duration.Set((float)c.TimeCode - m_pFile->m_rtOffset/10000);
+			m_pFile->m_segment.SegmentInfo.Duration.Set((float)c.TimeCode - m_pFile->m_rtOffset / 10000);
 
 			CAutoPtr<CuePoint> pCuePoint(DNew CuePoint());
 			CAutoPtr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
@@ -1320,7 +1320,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 			pCuePoint->CueTrackPositions.AddTail(pCueTrackPosition);
 			pCue->CuePoints.AddTail(pCuePoint);
 
-			m_nOpenProgress = m_pFile->GetPos()*100/m_pFile->GetLength();
+			m_nOpenProgress = m_pFile->GetPos() * 100 / m_pFile->GetLength();
 
 			DWORD cmd;
 			if (CheckRequest(&cmd)) {

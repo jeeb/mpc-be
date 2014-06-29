@@ -50,7 +50,7 @@ using namespace MatroskaReader;
  
 static void bswap(BYTE* s, int len)
 {
-	for (BYTE* d = s + len-1; s < d; s++, d--) {
+	for (BYTE* d = s + len - 1; s < d; s++, d--) {
 		*s ^= *d, *d ^= *s, *s ^= *d;
 	}
 }
@@ -766,7 +766,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 	switch ((Lacing & 0x06) >> 1) {
 		case 0:
 			// No lacing
-			lens.AddTail((pMN->m_start+pMN->m_len) - (pMN->GetPos()+tlen));
+			lens.AddTail((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
 			break;
 		case 1:
 			// Xiph lacing
@@ -782,13 +782,13 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 				lens.AddTail(len);
 				tlen += len;
 			}
-			lens.AddTail((pMN->m_start+pMN->m_len) - (pMN->GetPos()+tlen));
+			lens.AddTail((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
 			break;
 		case 2:
 			// Fixed-size lacing
 			pMN->Read(FramesInLaceLessOne);
 			FramesInLaceLessOne++;
-			FrameSize = ((pMN->m_start+pMN->m_len) - (pMN->GetPos()+tlen)) / FramesInLaceLessOne;
+			FrameSize = ((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen)) / FramesInLaceLessOne;
 			while (FramesInLaceLessOne-- > 0) {
 				lens.AddTail(FrameSize);
 			}
@@ -811,7 +811,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 				lens.AddTail(FrameSize);
 				tlen += FrameSize;
 			}
-			lens.AddTail((pMN->m_start+pMN->m_len) - (pMN->GetPos()+tlen));
+			lens.AddTail((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
 			break;
 	}
 
@@ -1115,8 +1115,8 @@ bool CBinary::Compress(ContentCompression& cc)
 		BYTE* dst = NULL;
 		int n = 0;
 		do {
-			dst = (BYTE*)realloc(dst, ++n*10);
-			c_stream.next_out = &dst[(n-1)*10];
+			dst = (BYTE*)realloc(dst, ++n * 10);
+			c_stream.next_out = &dst[(n - 1) * 10];
 			c_stream.avail_out = 10;
 			if (Z_OK != (res = deflate(&c_stream, Z_FINISH)) && Z_STREAM_END != res) {
 				free(dst);
@@ -1157,8 +1157,8 @@ bool CBinary::Decompress(ContentCompression& cc)
 		BYTE* dst = NULL;
 		int n = 0;
 		do {
-			dst = (unsigned char *)realloc(dst, ++n*1000);
-			d_stream.next_out = &dst[(n-1)*1000];
+			dst = (unsigned char *)realloc(dst, ++n * 1000);
+			d_stream.next_out = &dst[(n - 1) * 1000];
 			d_stream.avail_out = 1000;
 			if (Z_OK != (res = inflate(&d_stream, Z_NO_FLUSH)) && Z_STREAM_END != res) {
 				free(dst);
@@ -1209,7 +1209,7 @@ HRESULT CUTF8::Parse(CMatroskaNode* pMN)
 HRESULT CUInt::Parse(CMatroskaNode* pMN)
 {
 	m_val = 0;
-	for (int i = 0; i < (int)pMN->m_len; i++) {
+	for (UINT64 i = 0; i < pMN->m_len; i++) {
 		m_val <<= 8;
 		HRESULT hr = pMN->Read(*(BYTE*)&m_val);
 		if (FAILED(hr)) {
@@ -1223,13 +1223,13 @@ HRESULT CUInt::Parse(CMatroskaNode* pMN)
 HRESULT CInt::Parse(CMatroskaNode* pMN)
 {
 	m_val = 0;
-	for (int i = 0; i < (int)pMN->m_len; i++) {
-		HRESULT hr = pMN->Read(*((BYTE*)&m_val+7-i));
+	for (UINT64 i = 0; i < pMN->m_len; i++) {
+		HRESULT hr = pMN->Read(*((BYTE*)&m_val + 7 - i));
 		if (FAILED(hr)) {
 			return hr;
 		}
 	}
-	m_val >>= (8-pMN->m_len)*8;
+	m_val >>= (8 - pMN->m_len) * 8;
 	m_fValid = true;
 	return S_OK;
 }
@@ -1344,7 +1344,7 @@ HRESULT CLength::Parse(CMatroskaNode* pMN)
 
 	//int nMoreBytesTmp = nMoreBytes;
 
-	QWORD UnknownSize = (1i64<<(7*(nMoreBytes+1)))-1;
+	QWORD UnknownSize = (1i64 << (7 * (nMoreBytes + 1))) - 1;
 
 	while (nMoreBytes-- > 0) {
 		m_val <<= 8;
@@ -1503,10 +1503,10 @@ bool CMatroskaNode::Next(bool fSame)
 		if (/*m_pParent->m_id == MATROSKA_ID_SEGMENT && */m_len > m_pParent->m_len) {
 			TRACE(_T("CMatroskaNode::Next() : skip invalid element : len = %I64d, parent element len = %I64d\n"), __int64(m_len), __int64(m_pParent->m_len));
 			SeekTo(m_start + 1);
-		} else if (m_start+m_len >= m_pParent->m_start+m_pParent->m_len) {
+		} else if (m_start + m_len >= m_pParent->m_start + m_pParent->m_len) {
 			break;
 		} else {
-			SeekTo(m_start+m_len);
+			SeekTo(m_start + m_len);
 		}
 
 		if (FAILED(Parse())) {
@@ -1616,8 +1616,8 @@ bool CMatroskaNode::NextBlock()
 
 	CID id = m_id;
 
-	while (m_start+m_len < m_pParent->m_start+m_pParent->m_len) {
-		SeekTo(m_start+m_len);
+	while (m_start + m_len < m_pParent->m_start + m_pParent->m_len) {
+		SeekTo(m_start + m_len);
 
 		if (FAILED(Parse())) {
 			if (!Resync()) {
@@ -1633,7 +1633,7 @@ bool CMatroskaNode::NextBlock()
 	return false;
 }
 
-#define MAXFAILEDCOUNT (20*1024*1024)
+#define MAXFAILEDCOUNT (20 * 1024 * 1024)
 bool CMatroskaNode::Resync()
 {
 	if (m_pParent->m_id == MATROSKA_ID_SEGMENT) {
@@ -1646,23 +1646,23 @@ bool CMatroskaNode::Resync()
 			}
 
 			DWORD dw = b;
-			Read((BYTE*)&dw+1, 3);
+			Read((BYTE*)&dw + 1, 3);
 			bswap((BYTE*)&dw, 4);
 
 			switch (dw) {
-			case MATROSKA_ID_INFO:			// SegmentInfo
-			case MATROSKA_ID_SEEKHEAD:		// MetaSeekInfo
-			case MATROSKA_ID_TRACKS:		// Tracks
-			case MATROSKA_ID_CLUSTER:		// Clusters
-			case MATROSKA_ID_CUES:			// Cues
-			case MATROSKA_ID_ATTACHMENTS:	// Attachments
-			case MATROSKA_ID_CHAPTERS:		// Chapters
-			case MATROSKA_ID_TAGS:			// Tags
-				SeekTo(GetPos()-4);
-				return SUCCEEDED(Parse());
+				case MATROSKA_ID_INFO:			// SegmentInfo
+				case MATROSKA_ID_SEEKHEAD:		// MetaSeekInfo
+				case MATROSKA_ID_TRACKS:		// Tracks
+				case MATROSKA_ID_CLUSTER:		// Clusters
+				case MATROSKA_ID_CUES:			// Cues
+				case MATROSKA_ID_ATTACHMENTS:	// Attachments
+				case MATROSKA_ID_CHAPTERS:		// Chapters
+				case MATROSKA_ID_TAGS:			// Tags
+					SeekTo(GetPos() - 4);
+					return SUCCEEDED(Parse());
 			}
 
-			SeekTo(GetPos()-3);
+			SeekTo(GetPos() - 3);
 		}
 	}
 
