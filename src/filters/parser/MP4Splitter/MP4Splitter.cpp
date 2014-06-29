@@ -1088,6 +1088,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (ChapterTrackId == track->GetId()) {
 
+					char buff[256] = { 0 };
 					for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
 						AP4_Sample sample;
 						AP4_DataBuffer data;
@@ -1099,13 +1100,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if (avail > 2) {
 							AP4_UI16 size = (ptr[0] << 8) | ptr[1];
+							memcpy(buff, &ptr[2], size);
+							buff[size] = 0;
 
-							ChapterName = ConvertStr((const char*)&ptr[2]);
-						}
-
-						REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+							ChapterName = ConvertStr(buff);
+							REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
 					
-						ChapAppend(rtStart, ChapterName);
+							ChapAppend(rtStart, ChapterName);
+						}
 					}
 
 					break;
