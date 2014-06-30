@@ -195,23 +195,19 @@ CString CPlayerStatusBar::GetStatusMessage()
 
 void CPlayerStatusBar::SetStatusTimer(CString str)
 {
-	CString tmp;
-	m_time.GetWindowText(tmp);
+	if (GetStatusTimer() != str) {
+		m_time.SetRedraw(FALSE);
+		if (OpenImageCheck(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn)) {
+			m_time.SetWindowText(L"");
+		} else {
+			str.Trim();
+			m_time.SetWindowText(str);
+		}
+		m_time.SetRedraw(TRUE);
 
-	if (tmp == str) {
-		return;
+		Relayout();
+		Invalidate();
 	}
-
-	if (OpenImageCheck(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn)) {
-		m_time.SetWindowText(_T(""));
-	} else {
-		str.Trim();
-		m_time.SetWindowText(str);
-	}
-
-	Relayout();
-
-	Invalidate();
 }
 
 void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID* pTimeFormat)

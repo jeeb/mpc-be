@@ -8951,11 +8951,22 @@ void CMainFrame::OnPlaySeekKey(UINT nID)
 
 		rtCurrent += 10;
 
+		{
+			__int64 start	= 0;
+			__int64 stop	= 0;
+			m_wndSeekBar.GetRange(start, stop);
+			GUID tf;
+			m_pMS->GetTimeFormat(&tf);
+			if (rtCurrent > stop) {
+				rtCurrent = stop;
+			}
+			m_wndStatusBar.SetStatusTimer(rtCurrent, stop, !!m_wndSubresyncBar.IsWindowVisible(), &tf);
+			m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1500);
+		}
+
 		hr = m_pMS->SetPositions(
 				 &rtCurrent, AM_SEEKING_AbsolutePositioning|AM_SEEKING_SeekToKeyFrame,
 				 NULL, AM_SEEKING_NoPositioning);
-
-		m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1500);
 	}
 }
 
