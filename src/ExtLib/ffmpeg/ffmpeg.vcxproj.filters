@@ -259,6 +259,9 @@
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
     </None>
+    <None Include="libswresample\x86\resample.asm">
+      <Filter>libswresample\x86</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />

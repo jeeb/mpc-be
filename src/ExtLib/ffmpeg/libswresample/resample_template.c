@@ -32,7 +32,6 @@
 #    define DELEM  double
 #    define FELEM  double
 #    define FELEM2 double
-#    define FELEML double
 #    define OUT(d, v) d = v
 
 #    if defined(TEMPLATE_RESAMPLE_DBL)
@@ -43,27 +42,16 @@
 #        define RENAME(N) N ## _double_sse2
 #    endif
 
-#elif    defined(TEMPLATE_RESAMPLE_FLT)     \
-      || defined(TEMPLATE_RESAMPLE_FLT_SSE) \
-      || defined(TEMPLATE_RESAMPLE_FLT_AVX)
+#elif    defined(TEMPLATE_RESAMPLE_FLT)
 
 #    define FILTER_SHIFT 0
 #    define DELEM  float
 #    define FELEM  float
 #    define FELEM2 float
-#    define FELEML float
 #    define OUT(d, v) d = v
 
 #    if defined(TEMPLATE_RESAMPLE_FLT)
 #        define RENAME(N) N ## _float
-#    elif defined(TEMPLATE_RESAMPLE_FLT_SSE)
-#        define COMMON_CORE COMMON_CORE_FLT_SSE
-#        define LINEAR_CORE LINEAR_CORE_FLT_SSE
-#        define RENAME(N) N ## _float_sse
-#    elif defined(TEMPLATE_RESAMPLE_FLT_AVX)
-#        define COMMON_CORE COMMON_CORE_FLT_AVX
-#        define LINEAR_CORE LINEAR_CORE_FLT_AVX
-#        define RENAME(N) N ## _float_avx
 #    endif
 
 #elif defined(TEMPLATE_RESAMPLE_S32)
@@ -72,7 +60,6 @@
 #    define DELEM  int32_t
 #    define FELEM  int32_t
 #    define FELEM2 int64_t
-#    define FELEML int64_t
 #    define FELEM_MAX INT32_MAX
 #    define FELEM_MIN INT32_MIN
 #    define OUT(d, v) v = (v + (1<<(FILTER_SHIFT-1)))>>FILTER_SHIFT;\
@@ -169,6 +156,9 @@ int RENAME(swri_resample_linear)(ResampleContext *c,
     int index= c->index;
     int frac= c->frac;
     int sample_index = index >> c->phase_shift;
+#if FILTER_SHIFT == 0
+    double inv_src_incr = 1.0 / c->src_incr;
+#endif
 
     index &= c->phase_mask;
     for (dst_index = 0; dst_index < n; dst_index++) {
@@ -184,7 +174,15 @@ int RENAME(swri_resample_linear)(ResampleContext *c,
             v2  += src[sample_index + i] * (FELEM2)filter[i + c->filter_alloc];
         }
 #endif
+#ifdef FELEML
         val += (v2 - val) * (FELEML) frac / c->src_incr;
+#else
+#    if FILTER_SHIFT == 0
+        val += (v2 - val) * inv_src_incr * frac;
+#    else
+        val += (v2 - val) / c->src_incr * frac;
+#    endif
+#endif
         OUT(dst[dst_index], val);
 
         frac += c->dst_incr_mod;

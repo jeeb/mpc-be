@@ -631,7 +631,8 @@ SRCS_YASM_LU = \
 
 SRCS_YASM_LR = \
 	libswresample/x86/audio_convert.asm \
-	libswresample/x86/rematrix.asm
+	libswresample/x86/rematrix.asm \
+	libswresample/x86/resample.asm
 
 SRCS_YASM_LS = \
 	libswscale/x86/input.asm \

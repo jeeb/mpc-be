@@ -88,6 +88,7 @@
     <None Include="libavutil\x86\x86util.asm" />
     <None Include="libswresample\x86\audio_convert.asm" />
     <None Include="libswresample\x86\rematrix.asm" />
+    <None Include="libswresample\x86\resample.asm" />
     <None Include="libswscale\x86\input.asm" />
     <None Include="libswscale\x86\output.asm" />
     <None Include="libswscale\x86\scale.asm" />
