@@ -5592,7 +5592,7 @@ void CMainFrame::OnFileOpenIso()
 		return;
 	}
 
-	if (IsWinEightOrLater() && m_AttachVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
+	if (IsWinEightOrLater() && m_OpenVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
 		DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT;
 
 		TCHAR szFilters[] = L"Iso Files (*.iso)|*.iso||";
@@ -20485,7 +20485,7 @@ CString CMainFrame::GetCurFileName()
 BOOL CMainFrame::OpenIso(CString pathName)
 {
 	if (IsWinEightOrLater()
-			&& m_AttachVirtualDiskFunc
+			&& m_OpenVirtualDiskFunc
 			&& m_AttachVirtualDiskFunc
 			&& m_GetVirtualDiskPhysicalPathFunc
 			&& GetFileExt(pathName).MakeLower() == L".iso"
