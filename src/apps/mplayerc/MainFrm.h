@@ -193,11 +193,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		TIMER_FLYBARWINDOWHIDER,
 		TIMER_EXCLUSIVEBARHIDER
 	};
-	enum {
-		SEEK_DIRECTION_NONE,
-		SEEK_DIRECTION_BACKWARD,
-		SEEK_DIRECTION_FORWARD
-	};
 
 	friend class CPPageFileInfoSheet;
 	friend class CPPageLogo;
@@ -530,7 +525,8 @@ protected:
 	CGraphThread* m_pGraphThread;
 	bool m_bOpenedThruThread;
 
-	CAtlArray<REFERENCE_TIME> m_kfs;
+	void LoadKeyFrames();
+	std::vector<REFERENCE_TIME> m_kfs;
 
 	bool m_fOpeningAborted;
 	bool m_bWasSnapped;
@@ -564,7 +560,9 @@ public:
 
 	OAFilterState GetMediaState();
 	REFERENCE_TIME GetPos(), GetDur();
-	void SeekTo(REFERENCE_TIME rt, bool fSeekToKeyFrame = false);
+	bool GetNeighbouringKeyFrames(REFERENCE_TIME rtTarget, std::pair<REFERENCE_TIME, REFERENCE_TIME>& keyframes) const;
+	REFERENCE_TIME GetClosestKeyFrame(REFERENCE_TIME rtTarget) const;
+	void SeekTo(REFERENCE_TIME rt, bool bShowOSD = true);
 	bool ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop);
 
 	bool GetBufferingProgress(int* Progress);
@@ -1137,26 +1135,6 @@ public:
 	HBITMAP		m_ThumbCashedBitmap;
 	CSize		m_ThumbCashedSize;
 
-	HMODULE		m_hVirtualModule;
-	HRESULT		(__stdcall * m_OpenVirtualDiskFunc)(
-				__in     PVIRTUAL_STORAGE_TYPE         VirtualStorageType,
-				__in     PCWSTR                        Path,
-				__in     VIRTUAL_DISK_ACCESS_MASK      VirtualDiskAccessMask,
-				__in     OPEN_VIRTUAL_DISK_FLAG        Flags,
-				__in_opt POPEN_VIRTUAL_DISK_PARAMETERS Parameters,
-				__out    PHANDLE                       Handle);
-	HRESULT		(__stdcall * m_AttachVirtualDiskFunc)(
-				__in     HANDLE                          VirtualDiskHandle,
-				__in_opt PSECURITY_DESCRIPTOR            SecurityDescriptor,
-				__in     ATTACH_VIRTUAL_DISK_FLAG        Flags,
-				__in     ULONG                           ProviderSpecificFlags,
-				__in_opt PATTACH_VIRTUAL_DISK_PARAMETERS Parameters,
-				__in_opt LPOVERLAPPED                    Overlapped);
-	HRESULT		(__stdcall * m_GetVirtualDiskPhysicalPathFunc)(
-				__in                              HANDLE VirtualDiskHandle,
-				__inout                           PULONG DiskPathSizeInBytes,
-				__out_bcount(DiskPathSizeInBytes) PWSTR  DiskPath);
-
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	void WTSRegisterSessionNotification();
@@ -1166,9 +1144,7 @@ protected:
 	void SetStatusMessage(CString m_msg);
 	CString FillMessage();
 
-	DWORD m_nMenuHideTick;
-	UINT m_nSeekDirection;
-
+	DWORD	m_nMenuHideTick;
 	bool	m_fValidDVDOpen;
 
 	CComPtr<IBaseFilter> m_pBFmadVR;
@@ -1257,6 +1233,26 @@ public:
 	CString		GetCurFileName();
 
 protected:
+	HMODULE		m_hVirtualModule;
+	HRESULT		(__stdcall * m_OpenVirtualDiskFunc)(
+				__in     PVIRTUAL_STORAGE_TYPE         VirtualStorageType,
+				__in     PCWSTR                        Path,
+				__in     VIRTUAL_DISK_ACCESS_MASK      VirtualDiskAccessMask,
+				__in     OPEN_VIRTUAL_DISK_FLAG        Flags,
+				__in_opt POPEN_VIRTUAL_DISK_PARAMETERS Parameters,
+				__out    PHANDLE                       Handle);
+	HRESULT		(__stdcall * m_AttachVirtualDiskFunc)(
+				__in     HANDLE                          VirtualDiskHandle,
+				__in_opt PSECURITY_DESCRIPTOR            SecurityDescriptor,
+				__in     ATTACH_VIRTUAL_DISK_FLAG        Flags,
+				__in     ULONG                           ProviderSpecificFlags,
+				__in_opt PATTACH_VIRTUAL_DISK_PARAMETERS Parameters,
+				__in_opt LPOVERLAPPED                    Overlapped);
+	HRESULT		(__stdcall * m_GetVirtualDiskPhysicalPathFunc)(
+				__in                              HANDLE VirtualDiskHandle,
+				__inout                           PULONG DiskPathSizeInBytes,
+				__out_bcount(DiskPathSizeInBytes) PWSTR  DiskPath);
+
 	HANDLE		m_VHDHandle;
 	BOOL		OpenIso(CString pathName);
 };

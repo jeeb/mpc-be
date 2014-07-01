@@ -53,7 +53,6 @@ private:
 	void SetPosInternal(__int64 pos);
 
 	void MoveThumb2(CPoint point);
-	__int64 CalculatePosition2(CPoint point);
 	void SetPosInternal2(__int64 pos);
 
 	CCritSec m_CBLock;

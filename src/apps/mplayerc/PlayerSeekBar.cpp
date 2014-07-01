@@ -134,11 +134,11 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fDisableXPToolbars) {
-		if (m_pos == pos || m_stop <= pos) return;
-	} else {
-		if (m_pos == pos) {
+		if (m_pos == pos || m_stop <= pos) {
 			return;
 		}
+	} else if (m_pos == pos) {
+		return;
 	}
 
 	CRect before = GetThumbRect();
@@ -153,21 +153,21 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 	}
 }
 
-void CPlayerSeekBar::SetPosInternal2(__int64 pos2)
+void CPlayerSeekBar::SetPosInternal2(__int64 pos)
 {
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fDisableXPToolbars) {
-		if (m_pos2 == pos2 || m_stop <= pos2) return;
-	} else {
-		if (m_pos2 == pos2) {
+		if (m_pos2 == pos || m_stop <= pos) {
 			return;
 		}
+	} else if (m_pos2 == pos) {
+		return;
 	}
 
 	CRect before = GetThumbRect();
-	m_pos2 = min(max(pos2, m_start), m_stop);
-	m_posreal2 = pos2;
+	m_pos2 = min(max(pos, m_start), m_stop);
+	m_posreal2 = pos;
 	CRect after = GetThumbRect();
 
 	if (before != after) {
@@ -234,51 +234,42 @@ __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 		__int64 w = r.right - r.left;
 
 		if (m_start < m_stop) {
-			pos = m_start + ((m_stop - m_start) * (point.x - r.left) + (w/2)) / w;
+			pos = m_start + ((m_stop - m_start) * (point.x - r.left) + (w / 2)) / w;
 		}
 	}
 
 	return pos;
 }
 
-__int64 CPlayerSeekBar::CalculatePosition2(CPoint point)
-{
-	__int64 pos2 = -1;
-	CRect r = GetChannelRect();
-
-	if (r.left >= r.right) {
-		pos2 = -1;
-	} else if (point.x < r.left) {
-		pos2 = m_start;
-	} else if (point.x >= r.right) {
-		pos2 = m_stop;
-	} else {
-		__int64 w = r.right - r.left;
-
-		if (m_start < m_stop) {
-			pos2 = m_start + ((m_stop - m_start) * (point.x - r.left) + (w/2)) / w;
-		}
-	}
-
-	return pos2;
-}
-
-
 void CPlayerSeekBar::MoveThumb(CPoint point)
 {
 	__int64 pos = CalculatePosition(point);
 
 	if (pos >= 0) {
+		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
+			const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
+			if (p_MainWnd) {
+				pos = ((CMainFrame*)p_MainWnd)->GetClosestKeyFrame(pos);
+			}
+		}
+
 		SetPosInternal(pos);
 	}
 }
 
 void CPlayerSeekBar::MoveThumb2(CPoint point)
 {
-	__int64 pos2 = CalculatePosition2(point);
+	__int64 pos = CalculatePosition(point);
 
-	if (pos2 >= 0) {
-		SetPosInternal2(pos2);
+	if (pos >= 0) {
+		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
+			const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
+			if (p_MainWnd) {
+				pos = ((CMainFrame*)p_MainWnd)->GetClosestKeyFrame(pos);
+			}
+		}
+
+		SetPosInternal2(pos);
 	}
 }
 
@@ -709,7 +700,9 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (fs != -1) {
 		MoveThumb2(point);
-		if (pFrame->CanPreviewUse()) UpdateToolTipPosition(point);
+		if (pFrame->CanPreviewUse()) {
+			UpdateToolTipPosition(point);
+		}
 	} else {
 		pFrame->PreviewWindowHide();
 	}

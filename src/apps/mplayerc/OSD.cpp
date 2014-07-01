@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "OSD.h"
 #include "../../DSUtil/SysVersion.h"
+#include "MainFrm.h"
 
 #define SEEKBAR_HEIGHT			60
 #define SLIDER_BAR_HEIGHT		10
@@ -557,6 +558,13 @@ void COSD::UpdateSeekBarPos(CPoint point)
 	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax-m_llSeekMin) / (m_rectBar.Width() - SLIDER_CURSOR_WIDTH);
 	m_llSeekPos = max (m_llSeekPos, m_llSeekMin);
 	m_llSeekPos = min (m_llSeekPos, m_llSeekMax);
+
+	if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
+		const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
+		if (p_MainWnd) {
+			m_llSeekPos = ((CMainFrame*)p_MainWnd)->GetClosestKeyFrame(m_llSeekPos);
+		}
+	}
 
 	if (m_pWnd) {
 		AfxGetApp()->GetMainWnd()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
