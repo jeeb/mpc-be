@@ -78,21 +78,25 @@ BOOL CPPageMisc::OnInitDialog()
 	m_SliBrightness.SetRange		(-100, 100, TRUE);
 	m_SliBrightness.SetTic			(0);
 	m_SliBrightness.SetPos			(m_iBrightness);
+	m_SliBrightness.SetPageSize		(10);
 
 	m_SliContrast.EnableWindow		(TRUE);
 	m_SliContrast.SetRange			(-100, 100, TRUE);
 	m_SliContrast.SetTic			(0);
 	m_SliContrast.SetPos			(m_iContrast);
+	m_SliContrast.SetPageSize		(10);
 
 	m_SliHue.EnableWindow			(TRUE);
 	m_SliHue.SetRange				(-180, 180, TRUE);
 	m_SliHue.SetTic					(0);
 	m_SliHue.SetPos					(m_iHue);
+	m_SliHue.SetPageSize			(10);
 
 	m_SliSaturation.EnableWindow	(TRUE);
 	m_SliSaturation.SetRange		(-100, 100, TRUE);
 	m_SliSaturation.SetTic			(0);
 	m_SliSaturation.SetPos			(m_iSaturation);
+	m_SliSaturation.SetPageSize		(10);
 
 	m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
 	m_iContrast   ? m_sContrast.Format  (_T("%+d"), m_iContrast)   : m_sContrast   = _T("0");
