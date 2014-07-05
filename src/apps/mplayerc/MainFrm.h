@@ -1233,7 +1233,7 @@ public:
 	CString		GetCurFileName();
 
 protected:
-	HMODULE		m_hVirtualModule;
+	HMODULE		m_hVirtualDiskModule;
 	HRESULT		(__stdcall * m_OpenVirtualDiskFunc)(
 				__in     PVIRTUAL_STORAGE_TYPE         VirtualStorageType,
 				__in     PCWSTR                        Path,

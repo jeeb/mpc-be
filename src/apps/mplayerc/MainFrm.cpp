@@ -738,7 +738,7 @@ CMainFrame::CMainFrame() :
 	m_DwmSetIconicThumbnailFnc(NULL),
 	m_DwmSetIconicLivePreviewBitmapFnc(NULL),
 	m_DwmInvalidateIconicBitmapsFnc(NULL),
-	m_hVirtualModule(0),
+	m_hVirtualDiskModule(NULL),
 	m_OpenVirtualDiskFunc(NULL),
 	m_AttachVirtualDiskFunc(NULL),
 	m_GetVirtualDiskPhysicalPathFunc(NULL),
@@ -965,11 +965,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (IsWinEightOrLater()) {
 		CreateThumbnailToolbar();
 
-		m_hVirtualModule = LoadLibrary(L"VirtDisk.dll");
-		if (m_hDWMAPI) {
-			(FARPROC &)m_OpenVirtualDiskFunc			= GetProcAddress(m_hVirtualModule, "OpenVirtualDisk");
-			(FARPROC &)m_AttachVirtualDiskFunc			= GetProcAddress(m_hVirtualModule, "AttachVirtualDisk");
-			(FARPROC &)m_GetVirtualDiskPhysicalPathFunc	= GetProcAddress(m_hVirtualModule, "GetVirtualDiskPhysicalPath");
+		if (m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll")) {
+			if (m_hDWMAPI) {
+				(FARPROC &)m_OpenVirtualDiskFunc = GetProcAddress(m_hVirtualDiskModule, "OpenVirtualDisk");
+				(FARPROC &)m_AttachVirtualDiskFunc = GetProcAddress(m_hVirtualDiskModule, "AttachVirtualDisk");
+				(FARPROC &)m_GetVirtualDiskPhysicalPathFunc = GetProcAddress(m_hVirtualDiskModule, "GetVirtualDiskPhysicalPath");
+			}
+
+			if (!m_OpenVirtualDiskFunc || !m_AttachVirtualDiskFunc || !m_GetVirtualDiskPhysicalPathFunc) {
+				FreeLibrary(m_hVirtualDiskModule);
+				m_hVirtualDiskModule = NULL;
+			}
 		}
 	}
 
@@ -1117,8 +1123,8 @@ void CMainFrame::OnClose()
 		FreeLibrary(m_hDWMAPI);
 	}
 
-	if (m_hVirtualModule) {
-		FreeLibrary(m_hVirtualModule);
+	if (m_hVirtualDiskModule) {
+		FreeLibrary(m_hVirtualDiskModule);
 	}
 
 	m_InternalImage.Destroy();
@@ -5592,7 +5598,7 @@ void CMainFrame::OnFileOpenIso()
 		return;
 	}
 
-	if (IsWinEightOrLater() && m_OpenVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
+	if (m_hVirtualDiskModule) {
 		DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT;
 
 		TCHAR szFilters[] = L"Iso Files (*.iso)|*.iso||";
@@ -20484,10 +20490,7 @@ CString CMainFrame::GetCurFileName()
 
 BOOL CMainFrame::OpenIso(CString pathName)
 {
-	if (IsWinEightOrLater()
-			&& m_OpenVirtualDiskFunc
-			&& m_AttachVirtualDiskFunc
-			&& m_GetVirtualDiskPhysicalPathFunc
+	if (m_hVirtualDiskModule
 			&& GetFileExt(pathName).MakeLower() == L".iso"
 			&& ::PathFileExists(pathName)) {
 		CString ISOVolumeName;
