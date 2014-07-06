@@ -5602,7 +5602,7 @@ void CMainFrame::OnFileOpenIso()
 		DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT;
 
 		TCHAR szFilters[] = L"Iso Files (*.iso)|*.iso||";
-		CFileDialog fd(TRUE, L"Iso Files", L"*.iso", dwFlags, szFilters);
+		CFileDialog fd(TRUE, NULL, NULL, dwFlags, szFilters);
 		if (fd.DoModal() != IDOK) {
 			return;
 		}
