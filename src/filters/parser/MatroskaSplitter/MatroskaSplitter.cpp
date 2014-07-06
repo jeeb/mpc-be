@@ -237,6 +237,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				mt.majortype = MEDIATYPE_Video;
 				mt.bFixedSizeSamples = FALSE;
+				mt.bTemporalCompression = TRUE;
 
 				if (CodecID == "V_MS/VFW/FOURCC") {
 					mt.formattype = FORMAT_VideoInfo;
@@ -256,11 +257,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							pvih->bmiHeader.biBitCount == 32 ? MEDIASUBTYPE_ARGB32 :
 							MEDIASUBTYPE_NULL;
 						mt.bFixedSizeSamples = TRUE;
+						mt.bTemporalCompression = FALSE;
 						break;
 					//case BI_RLE8: mt.subtype = MEDIASUBTYPE_RGB8; break;
 					//case BI_RLE4: mt.subtype = MEDIASUBTYPE_RGB4; break;
 					case FCC('v210'):
 						mt.bFixedSizeSamples = TRUE;
+						mt.bTemporalCompression = FALSE;
 						pvih->bmiHeader.biBitCount = 20; // fixed incorrect bitdepth (ffmpeg bug)
 						pvih->bmiHeader.biSizeImage = pvih->bmiHeader.biWidth * pvih->bmiHeader.biHeight * pvih->bmiHeader.biBitCount / 8;
 						break;
@@ -467,6 +470,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					DWORD fourcc = 0;
 					WORD bitdepth = 0;
 					if (CodecID == "V_MJPEG") {
+						mt.bTemporalCompression = FALSE;
 						fourcc = FCC('MJPG');
 					} else if (CodecID == "V_MPEG4/MS/V3") {
 						fourcc = FCC('MP43');
@@ -489,6 +493,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
 					} else if (CodecID == "V_UNCOMPRESSED") {
 						mt.bFixedSizeSamples = TRUE;
+						mt.bTemporalCompression = FALSE;
 						fourcc = FCC((DWORD)pTE->v.ColourSpace);
 						switch (fourcc) {
 						case FCC('Y8  '):
