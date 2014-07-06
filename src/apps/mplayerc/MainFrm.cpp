@@ -965,12 +965,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (IsWinEightOrLater()) {
 		CreateThumbnailToolbar();
 
-		if (m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll")) {
-			if (m_hDWMAPI) {
-				(FARPROC &)m_OpenVirtualDiskFunc = GetProcAddress(m_hVirtualDiskModule, "OpenVirtualDisk");
-				(FARPROC &)m_AttachVirtualDiskFunc = GetProcAddress(m_hVirtualDiskModule, "AttachVirtualDisk");
-				(FARPROC &)m_GetVirtualDiskPhysicalPathFunc = GetProcAddress(m_hVirtualDiskModule, "GetVirtualDiskPhysicalPath");
-			}
+		m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll");
+		if (m_hVirtualDiskModule) {
+			(FARPROC &)m_OpenVirtualDiskFunc			= GetProcAddress(m_hVirtualDiskModule, "OpenVirtualDisk");
+			(FARPROC &)m_AttachVirtualDiskFunc			= GetProcAddress(m_hVirtualDiskModule, "AttachVirtualDisk");
+			(FARPROC &)m_GetVirtualDiskPhysicalPathFunc	= GetProcAddress(m_hVirtualDiskModule, "GetVirtualDiskPhysicalPath");
 
 			if (!m_OpenVirtualDiskFunc || !m_AttachVirtualDiskFunc || !m_GetVirtualDiskPhysicalPathFunc) {
 				FreeLibrary(m_hVirtualDiskModule);
