@@ -16,13 +16,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_X86_HUFFYUVDSP_H
-#define AVCODEC_X86_HUFFYUVDSP_H
+#ifndef AVCODEC_X86_IDCTDSP_H
+#define AVCODEC_X86_IDCTDSP_H
 
 #include <stdint.h>
 
-void ff_add_hfyu_median_pred_cmov(uint8_t *dst, const uint8_t *top,
-                                  const uint8_t *diff, intptr_t w,
-                                  int *left, int *left_top);
+void ff_add_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels,
+                               int line_size);
+void ff_put_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels,
+                               int line_size);
+void ff_put_signed_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels,
+                                      int line_size);
+void ff_put_signed_pixels_clamped_sse2(const int16_t *block, uint8_t *pixels,
+                                       int line_size);
 
-#endif /* AVCODEC_X86_HUFFYUVDSP_H */
+#endif /* AVCODEC_X86_IDCTDSP_H */

@@ -1,6 +1,7 @@
 ;******************************************************************************
 ;* Copyright (c) 2012 Michael Niedermayer
 ;* Copyright (c) 2014 James Almer <jamrial <at> gmail.com>
+;* Copyright (c) 2014 Ronald S. Bultje <rsbultje@gmail.com>
 ;*
 ;* This file is part of FFmpeg.
 ;*
@@ -48,18 +49,20 @@ endstruc
 
 SECTION_RODATA
 
-pf_1: dd 1.0
+pf_1:      dd 1.0
+pdbl_1:    dq 1.0
+pd_0x4000: dd 0x4000
 
 SECTION .text
 
-%macro RESAMPLE_FLOAT_FNS 0
-; int resample_common_float(ResampleContext *ctx, float *dst,
-;                           const float *src, int size, int update_ctx)
+%macro RESAMPLE_FNS 3-5 ; format [float or int16], bps, log2_bps, float op suffix [s or d], 1.0 constant
+; int resample_common_$format(ResampleContext *ctx, $format *dst,
+;                             const $format *src, int size, int update_ctx)
 %if ARCH_X86_64 ; unix64 and win64
-cglobal resample_common_float, 0, 15, 2, ctx, dst, src, phase_shift, index, frac, \
-                                         dst_incr_mod, size, min_filter_count_x4, \
-                                         min_filter_len_x4, dst_incr_div, src_incr, \
-                                         phase_mask, dst_end, filter_bank
+cglobal resample_common_%1, 0, 15, 2, ctx, dst, src, phase_shift, index, frac, \
+                                      dst_incr_mod, size, min_filter_count_x4, \
+                                      min_filter_len_x4, dst_incr_div, src_incr, \
+                                      phase_mask, dst_end, filter_bank
 
     ; use red-zone for variable storage
 %define ctx_stackq            [rsp-0x8]
@@ -85,8 +88,8 @@ cglobal resample_common_float, 0, 15, 2, ctx, dst, src, phase_shift, index, frac
     mov                   ctx_stackq, ctxq
     mov           min_filter_len_x4d, [ctxq+ResampleContext.filter_length]
     mov                dst_incr_divd, [ctxq+ResampleContext.dst_incr_div]
-    shl           min_filter_len_x4d, 2
-    lea                     dst_endq, [dstq+sizeq*4]
+    shl           min_filter_len_x4d, %3
+    lea                     dst_endq, [dstq+sizeq*%2]
 
 %if UNIX64
     mov                          ecx, [ctxq+ResampleContext.phase_shift]
@@ -109,8 +112,8 @@ cglobal resample_common_float, 0, 15, 2, ctx, dst, src, phase_shift, index, frac
     sub                         srcq, min_filter_len_x4q
     mov                   src_stackq, srcq
 %else ; x86-32
-cglobal resample_common_float, 1, 7, 2, ctx, phase_shift, dst, frac, \
-                                        index, min_filter_length_x4, filter_bank
+cglobal resample_common_%1, 1, 7, 2, ctx, phase_shift, dst, frac, \
+                                     index, min_filter_length_x4, filter_bank
 
     ; push temp variables to stack
 %define ctx_stackq            r0mp
@@ -119,7 +122,7 @@ cglobal resample_common_float, 1, 7, 2, ctx, phase_shift, dst, frac, \
 
     mov                         dstq, r1mp
     mov                           r3, r3mp
-    lea                           r3, [dstq+r3*4]
+    lea                           r3, [dstq+r3*%2]
     PUSH                              dword [ctxq+ResampleContext.dst_incr_div]
     PUSH                              dword [ctxq+ResampleContext.dst_incr_mod]
     PUSH                              dword [ctxq+ResampleContext.filter_alloc]
@@ -128,7 +131,7 @@ cglobal resample_common_float, 1, 7, 2, ctx, phase_shift, dst, frac, \
     PUSH                              dword [ctxq+ResampleContext.src_incr]
     mov        min_filter_length_x4d, [ctxq+ResampleContext.filter_length]
     mov                       indexd, [ctxq+ResampleContext.index]
-    shl        min_filter_length_x4d, 2
+    shl        min_filter_length_x4d, %3
     mov                        fracd, [ctxq+ResampleContext.frac]
     neg        min_filter_length_x4q
     mov                 filter_bankq, [ctxq+ResampleContext.filter_bank]
@@ -157,35 +160,57 @@ cglobal resample_common_float, 1, 7, 2, ctx, phase_shift, dst, frac, \
     imul                     filterd, indexd
 %if ARCH_X86_64
     mov         min_filter_count_x4q, min_filter_len_x4q
-    lea                      filterq, [filter_bankq+filterq*4]
+    lea                      filterq, [filter_bankq+filterq*%2]
 %else ; x86-32
     mov         min_filter_count_x4q, filter_bankq
-    lea                      filterq, [min_filter_count_x4q+filterq*4]
+    lea                      filterq, [min_filter_count_x4q+filterq*%2]
     mov         min_filter_count_x4q, min_filter_length_x4q
 %endif
+%ifidn %1, int16
+    movd                          m0, [pd_0x4000]
+%else ; float/double
     xorps                         m0, m0, m0
+%endif
 
     align 16
 .inner_loop:
-    movups                        m1, [srcq+min_filter_count_x4q*1]
-    mulps                         m1, m1, [filterq+min_filter_count_x4q*1]
-    addps                         m0, m0, m1
+    movu                          m1, [srcq+min_filter_count_x4q*1]
+%ifidn %1, int16
+    PMADCSWD                      m0, m1, [filterq+min_filter_count_x4q*1], m0, m1
+%else ; float/double
+%if cpuflag(fma4) || cpuflag(fma3)
+    fmaddp%4                      m0, m1, [filterq+min_filter_count_x4q*1], m0
+%else
+    mulp%4                        m1, m1, [filterq+min_filter_count_x4q*1]
+    addp%4                        m0, m0, m1
+%endif ; cpuflag
+%endif
     add         min_filter_count_x4q, mmsize
     js .inner_loop
 
-%if cpuflag(avx)
+%ifidn %1, int16
+    HADDD                         m0, m1
+    psrad                         m0, 15
+    add                        fracd, dst_incr_modd
+    packssdw                      m0, m0
+    add                       indexd, dst_incr_divd
+    movd                      [dstq], m0
+%else ; float/double
+    ; horizontal sum & store
+%if mmsize == 32
     vextractf128                 xm1, m0, 0x1
     addps                        xm0, xm1
 %endif
-
-    ; horizontal sum & store
     movhlps                      xm1, xm0
+%ifidn %1, float
     addps                        xm0, xm1
     shufps                       xm1, xm0, xm0, q0001
+%endif
     add                        fracd, dst_incr_modd
-    addps                        xm0, xm1
+    addp%4                       xm0, xm1
     add                       indexd, dst_incr_divd
-    movss                     [dstq], xm0
+    movs%4                    [dstq], xm0
+%endif
     cmp                        fracd, src_incrd
     jl .skip
     sub                        fracd, src_incrd
@@ -205,10 +230,10 @@ cglobal resample_common_float, 1, 7, 2, ctx, phase_shift, dst, frac, \
 
 .skip:
     mov                  index_incrd, indexd
-    add                         dstq, 4
+    add                         dstq, %2
     and                       indexd, phase_maskd
     sar                  index_incrd, phase_shiftb
-    lea                         srcq, [srcq+index_incrq*4]
+    lea                         srcq, [srcq+index_incrq*%2]
     cmp                         dstq, dst_endq
     jne .loop
 
@@ -228,7 +253,7 @@ cglobal resample_common_float, 1, 7, 2, ctx, phase_shift, dst, frac, \
     mov [ctxq+ResampleContext.frac ], fracd
     sub                          rax, src_stackq
     mov [ctxq+ResampleContext.index], indexd
-    shr                          rax, 2
+    shr                          rax, %3
 
 .skip_store:
 %if ARCH_X86_32
@@ -236,13 +261,24 @@ cglobal resample_common_float, 1, 7, 2, ctx, phase_shift, dst, frac, \
 %endif
     RET
 
-; int resample_linear_float(ResampleContext *ctx, float *dst,
-;                           const float *src, int size, int update_ctx)
+; int resample_linear_$format(ResampleContext *ctx, float *dst,
+;                             const float *src, int size, int update_ctx)
 %if ARCH_X86_64 ; unix64 and win64
-cglobal resample_linear_float, 0, 15, 5, ctx, dst, src, phase_shift, index, frac, \
-                                         dst_incr_mod, size, min_filter_count_x4, \
-                                         min_filter_len_x4, dst_incr_div, src_incr, \
-                                         phase_mask, dst_end, filter_bank
+%if UNIX64
+cglobal resample_linear_%1, 0, 15, 5, ctx, dst, phase_mask, phase_shift, index, frac, \
+                                      size, dst_incr_mod, min_filter_count_x4, \
+                                      min_filter_len_x4, dst_incr_div, src_incr, \
+                                      src, dst_end, filter_bank
+
+    mov                         srcq, r2mp
+%else ; win64
+cglobal resample_linear_%1, 0, 15, 5, ctx, phase_mask, src, phase_shift, index, frac, \
+                                      size, dst_incr_mod, min_filter_count_x4, \
+                                      min_filter_len_x4, dst_incr_div, src_incr, \
+                                      dst, dst_end, filter_bank
+
+    mov                         dstq, r1mp
+%endif
 
     ; use red-zone for variable storage
 %define ctx_stackq            [rsp-0x8]
@@ -269,27 +305,31 @@ cglobal resample_linear_float, 0, 15, 5, ctx, dst, src, phase_shift, index, frac
     mov                   ctx_stackq, ctxq
     mov            phase_mask_stackd, phase_maskd
     mov           min_filter_len_x4d, [ctxq+ResampleContext.filter_length]
-    cvtsi2ss                     xm0, src_incrd
-    movss                        xm4, [pf_1]
-    divss                        xm4, xm0
+%ifidn %1, int16
+    movd                          m4, [pd_0x4000]
+%else ; float/double
+    cvtsi2s%4                    xm0, src_incrd
+    movs%4                       xm4, [%5]
+    divs%4                       xm4, xm0
+%endif
     mov                dst_incr_divd, [ctxq+ResampleContext.dst_incr_div]
-    shl           min_filter_len_x4d, 2
-    lea                     dst_endq, [dstq+sizeq*4]
+    shl           min_filter_len_x4d, %3
+    lea                     dst_endq, [dstq+sizeq*%2]
 
 %if UNIX64
     mov                          ecx, [ctxq+ResampleContext.phase_shift]
     mov                          edi, [ctxq+ResampleContext.filter_alloc]
 
-    DEFINE_ARGS filter_alloc, dst, src, phase_shift, index, frac, dst_incr_mod, \
-                filter1, min_filter_count_x4, min_filter_len_x4, dst_incr_div, \
-                src_incr, filter2, dst_end, filter_bank
+    DEFINE_ARGS filter_alloc, dst, filter2, phase_shift, index, frac, filter1, \
+                dst_incr_mod, min_filter_count_x4, min_filter_len_x4, \
+                dst_incr_div, src_incr, src, dst_end, filter_bank
 %elif WIN64
     mov                          R9d, [ctxq+ResampleContext.filter_alloc]
     mov                          ecx, [ctxq+ResampleContext.phase_shift]
 
-    DEFINE_ARGS phase_shift, dst, src, filter_alloc, index, frac, dst_incr_mod, \
-                filter1, min_filter_count_x4, min_filter_len_x4, dst_incr_div, \
-                src_incr, filter2, dst_end, filter_bank
+    DEFINE_ARGS phase_shift, filter2, src, filter_alloc, index, frac, filter1, \
+                dst_incr_mod, min_filter_count_x4, min_filter_len_x4, \
+                dst_incr_div, src_incr, dst, dst_end, filter_bank
 %endif
 
     neg           min_filter_len_x4q
@@ -297,8 +337,8 @@ cglobal resample_linear_float, 0, 15, 5, ctx, dst, src, phase_shift, index, frac
     sub                         srcq, min_filter_len_x4q
     mov                   src_stackq, srcq
 %else ; x86-32
-cglobal resample_linear_float, 1, 7, 5, ctx, filter1, dst, frac, \
-                                        index, min_filter_length_x4, filter_bank
+cglobal resample_linear_%1, 1, 7, 5, ctx, min_filter_length_x4, filter2, \
+                                     frac, index, dst, filter_bank
 
     ; push temp variables to stack
 %define ctx_stackq            r0mp
@@ -307,23 +347,27 @@ cglobal resample_linear_float, 1, 7, 5, ctx, filter1, dst, frac, \
 
     mov                         dstq, r1mp
     mov                           r3, r3mp
-    lea                           r3, [dstq+r3*4]
+    lea                           r3, [dstq+r3*%2]
     PUSH                              dword [ctxq+ResampleContext.dst_incr_div]
     PUSH                              r3
     mov                           r3, dword [ctxq+ResampleContext.filter_alloc]
     PUSH                              dword [ctxq+ResampleContext.dst_incr_mod]
     PUSH                              r3
-    shl                           r3, 2
+    shl                           r3, %3
     PUSH                              r3
     mov                           r3, dword [ctxq+ResampleContext.src_incr]
     PUSH                              dword [ctxq+ResampleContext.phase_mask]
     PUSH                              r3d
-    cvtsi2ss                     xm0, r3d
-    movss                        xm4, [pf_1]
-    divss                        xm4, xm0
+%ifidn %1, int16
+    movd                          m4, [pd_0x4000]
+%else ; float/double
+    cvtsi2s%4                    xm0, r3d
+    movs%4                       xm4, [%5]
+    divs%4                       xm4, xm0
+%endif
     mov        min_filter_length_x4d, [ctxq+ResampleContext.filter_length]
     mov                       indexd, [ctxq+ResampleContext.index]
-    shl        min_filter_length_x4d, 2
+    shl        min_filter_length_x4d, %3
     mov                        fracd, [ctxq+ResampleContext.frac]
     neg        min_filter_length_x4q
     mov                 filter_bankq, [ctxq+ResampleContext.filter_bank]
@@ -333,7 +377,7 @@ cglobal resample_linear_float, 1, 7, 5, ctx, filter1, dst, frac, \
     PUSH                              filter_bankq
     PUSH                              dword [ctxq+ResampleContext.phase_shift]
 
-    DEFINE_ARGS src, filter1, dst, frac, index, min_filter_count_x4, filter2
+    DEFINE_ARGS filter1, min_filter_count_x4, filter2, frac, index, dst, src
 
 %define phase_shift_stackd    dword [rsp+0x0]
 %define filter_bankq          dword [rsp+0x4]
@@ -354,66 +398,131 @@ cglobal resample_linear_float, 1, 7, 5, ctx, filter1, dst, frac, \
     imul                    filter1d, indexd
 %if ARCH_X86_64
     mov         min_filter_count_x4q, min_filter_len_x4q
-    lea                     filter1q, [filter_bankq+filter1q*4]
-    lea                     filter2q, [filter1q+filter_allocq*4]
+    lea                     filter1q, [filter_bankq+filter1q*%2]
+    lea                     filter2q, [filter1q+filter_allocq*%2]
 %else ; x86-32
     mov         min_filter_count_x4q, filter_bankq
-    lea                     filter1q, [min_filter_count_x4q+filter1q*4]
+    lea                     filter1q, [min_filter_count_x4q+filter1q*%2]
     mov         min_filter_count_x4q, min_filter_length_x4q
     mov                     filter2q, filter1q
     add                     filter2q, filter_alloc_x4q
 %endif
+%ifidn %1, int16
+    mova                          m0, m4
+    mova                          m2, m4
+%else ; float/double
     xorps                         m0, m0, m0
     xorps                         m2, m2, m2
+%endif
 
     align 16
 .inner_loop:
-    movups                        m1, [srcq+min_filter_count_x4q*1]
-    mulps                         m3, m1, [filter2q+min_filter_count_x4q*1]
-    mulps                         m1, m1, [filter1q+min_filter_count_x4q*1]
-    addps                         m2, m2, m3
-    addps                         m0, m0, m1
+    movu                          m1, [srcq+min_filter_count_x4q*1]
+%ifidn %1, int16
+%if cpuflag(xop)
+    vpmadcswd                     m2, m1, [filter2q+min_filter_count_x4q*1], m2
+    vpmadcswd                     m0, m1, [filter1q+min_filter_count_x4q*1], m0
+%else
+    pmaddwd                       m3, m1, [filter2q+min_filter_count_x4q*1]
+    pmaddwd                       m1, [filter1q+min_filter_count_x4q*1]
+    paddd                         m2, m3
+    paddd                         m0, m1
+%endif ; cpuflag
+%else ; float/double
+%if cpuflag(fma4) || cpuflag(fma3)
+    fmaddp%4                      m2, m1, [filter2q+min_filter_count_x4q*1], m2
+    fmaddp%4                      m0, m1, [filter1q+min_filter_count_x4q*1], m0
+%else
+    mulp%4                        m3, m1, [filter2q+min_filter_count_x4q*1]
+    mulp%4                        m1, m1, [filter1q+min_filter_count_x4q*1]
+    addp%4                        m2, m2, m3
+    addp%4                        m0, m0, m1
+%endif ; cpuflag
+%endif
     add         min_filter_count_x4q, mmsize
     js .inner_loop
 
-%if cpuflag(avx)
+%ifidn %1, int16
+%if mmsize == 16
+%if cpuflag(xop)
+    vphadddq                      m2, m2
+    vphadddq                      m0, m0
+%endif
+    pshufd                        m3, m2, q0032
+    pshufd                        m1, m0, q0032
+    paddd                         m2, m3
+    paddd                         m0, m1
+%endif
+%if notcpuflag(xop)
+    PSHUFLW                       m3, m2, q0032
+    PSHUFLW                       m1, m0, q0032
+    paddd                         m2, m3
+    paddd                         m0, m1
+%endif
+    psubd                         m2, m0
+    ; This is probably a really bad idea on atom and other machines with a
+    ; long transfer latency between GPRs and XMMs (atom). However, it does
+    ; make the clip a lot simpler...
+    movd                         eax, m2
+    add                       indexd, dst_incr_divd
+    imul                              fracd
+    idiv                              src_incrd
+    movd                          m1, eax
+    add                        fracd, dst_incr_modd
+    paddd                         m0, m1
+    psrad                         m0, 15
+    packssdw                      m0, m0
+    movd                      [dstq], m0
+
+    ; note that for imul/idiv, I need to move filter to edx/eax for each:
+    ; - 32bit: eax=r0[filter1], edx=r2[filter2]
+    ; - win64: eax=r6[filter1], edx=r1[todo]
+    ; - unix64: eax=r6[filter1], edx=r2[todo]
+%else ; float/double
+    ; val += (v2 - val) * (FELEML) frac / c->src_incr;
+%if mmsize == 32
     vextractf128                 xm1, m0, 0x1
     vextractf128                 xm3, m2, 0x1
     addps                        xm0, xm1
     addps                        xm2, xm3
 %endif
-
-    ; val += (v2 - val) * (FELEML) frac / c->src_incr;
-    cvtsi2ss                     xm1, fracd
-    subps                        xm2, xm0
-    mulps                        xm1, xm4
-    shufps                       xm1, xm1, q0000
-    mulps                        xm2, xm1
-    addps                        xm0, xm2
+    cvtsi2s%4                    xm1, fracd
+    subp%4                       xm2, xm0
+    mulp%4                       xm1, xm4
+    shufp%4                      xm1, xm1, q0000
+%if cpuflag(fma4) || cpuflag(fma3)
+    fmaddp%4                     xm0, xm2, xm1, xm0
+%else
+    mulp%4                       xm2, xm1
+    addp%4                       xm0, xm2
+%endif ; cpuflag
 
     ; horizontal sum & store
     movhlps                      xm1, xm0
+%ifidn %1, float
     addps                        xm0, xm1
     shufps                       xm1, xm0, xm0, q0001
+%endif
     add                        fracd, dst_incr_modd
-    addps                        xm0, xm1
+    addp%4                       xm0, xm1
     add                       indexd, dst_incr_divd
-    movss                     [dstq], xm0
+    movs%4                    [dstq], xm0
+%endif
     cmp                        fracd, src_incrd
     jl .skip
     sub                        fracd, src_incrd
     inc                       indexd
 
 %if UNIX64
-    DEFINE_ARGS filter_alloc, dst, src, phase_shift, index, frac, dst_incr_mod, \
-                index_incr, min_filter_count_x4, min_filter_len_x4, dst_incr_div, \
-                src_incr, filter2, dst_end, filter_bank
+    DEFINE_ARGS filter_alloc, dst, filter2, phase_shift, index, frac, index_incr, \
+                dst_incr_mod, min_filter_count_x4, min_filter_len_x4, \
+                dst_incr_div, src_incr, src, dst_end, filter_bank
 %elif WIN64
-    DEFINE_ARGS phase_shift, dst, src, filter_alloc, index, frac, dst_incr_mod, \
-                index_incr, min_filter_count_x4, min_filter_len_x4, dst_incr_div, \
-                src_incr, filter2, dst_end, filter_bank
+    DEFINE_ARGS phase_shift, filter2, src, filter_alloc, index, frac, index_incr, \
+                dst_incr_mod, min_filter_count_x4, min_filter_len_x4, \
+                dst_incr_div, src_incr, dst, dst_end, filter_bank
 %else ; x86-32
-    DEFINE_ARGS src, phase_shift, dst, frac, index, index_incr
+    DEFINE_ARGS filter1, phase_shift, index_incr, frac, index, dst, src
 %endif
 
 .skip:
@@ -421,17 +530,23 @@ cglobal resample_linear_float, 1, 7, 5, ctx, filter1, dst, frac, \
     mov                 phase_shiftd, phase_shift_stackd
 %endif
     mov                  index_incrd, indexd
-    add                         dstq, 4
+    add                         dstq, %2
     and                       indexd, phase_mask_stackd
     sar                  index_incrd, phase_shiftb
-    lea                         srcq, [srcq+index_incrq*4]
+    lea                         srcq, [srcq+index_incrq*%2]
     cmp                         dstq, dst_endq
     jne .loop
 
-%if ARCH_X86_64
-    DEFINE_ARGS ctx, dst, src, phase_shift, index, frac
+%if UNIX64
+    DEFINE_ARGS ctx, dst, filter2, phase_shift, index, frac, index_incr, \
+                dst_incr_mod, min_filter_count_x4, min_filter_len_x4, \
+                dst_incr_div, src_incr, src, dst_end, filter_bank
+%elif WIN64
+    DEFINE_ARGS ctx, filter2, src, phase_shift, index, frac, index_incr, \
+                dst_incr_mod, min_filter_count_x4, min_filter_len_x4, \
+                dst_incr_div, src_incr, dst, dst_end, filter_bank
 %else ; x86-32
-    DEFINE_ARGS src, ctx, update_context, frac, index
+    DEFINE_ARGS filter1, ctx, update_context, frac, index, dst, src
 %endif
 
     cmp  dword update_context_stackd, 0
@@ -444,7 +559,7 @@ cglobal resample_linear_float, 1, 7, 5, ctx, filter1, dst, frac, \
     mov [ctxq+ResampleContext.frac ], fracd
     sub                          rax, src_stackq
     mov [ctxq+ResampleContext.index], indexd
-    shr                          rax, 2
+    shr                          rax, %3
 
 .skip_store:
 %if ARCH_X86_32
@@ -454,9 +569,32 @@ cglobal resample_linear_float, 1, 7, 5, ctx, filter1, dst, frac, \
 %endmacro
 
 INIT_XMM sse
-RESAMPLE_FLOAT_FNS
+RESAMPLE_FNS float, 4, 2, s, pf_1
 
 %if HAVE_AVX_EXTERNAL
 INIT_YMM avx
-RESAMPLE_FLOAT_FNS
+RESAMPLE_FNS float, 4, 2, s, pf_1
 %endif
+%if HAVE_FMA3_EXTERNAL
+INIT_YMM fma3
+RESAMPLE_FNS float, 4, 2, s, pf_1
+%endif
+%if HAVE_FMA4_EXTERNAL
+INIT_XMM fma4
+RESAMPLE_FNS float, 4, 2, s, pf_1
+%endif
+
+%if ARCH_X86_32
+INIT_MMX mmxext
+RESAMPLE_FNS int16, 2, 1
+%endif
+
+INIT_XMM sse2
+RESAMPLE_FNS int16, 2, 1
+%if HAVE_XOP_EXTERNAL
+INIT_XMM xop
+RESAMPLE_FNS int16, 2, 1
+%endif
+
+INIT_XMM sse2
+RESAMPLE_FNS double, 8, 3, d, pdbl_1

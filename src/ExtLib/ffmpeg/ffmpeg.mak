@@ -220,6 +220,7 @@ SRCS_LC = \
 	libavcodec/huffyuv.c \
 	libavcodec/huffyuvdec.c \
 	libavcodec/huffyuvdsp.c \
+	libavcodec/idctdsp.c \
 	libavcodec/imc.c \
 	libavcodec/imgconvert.c \
 	libavcodec/indeo3.c \
@@ -408,7 +409,7 @@ SRCS_LC = \
 	\
 	libavcodec/x86/ac3dsp_init.c \
 	libavcodec/x86/audiodsp_init.c \
-	libavcodec/x86/blockdsp_mmx.c \
+	libavcodec/x86/blockdsp_init.c \
 	libavcodec/x86/bswapdsp_init.c \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
@@ -429,9 +430,10 @@ SRCS_LC = \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
-	libavcodec/x86/huffyuvdsp_mmx.c \
 	libavcodec/x86/idct_mmx_xvid.c \
 	libavcodec/x86/idct_sse2_xvid.c \
+	libavcodec/x86/idctdsp_init.c \
+	libavcodec/x86/idctdsp_mmx.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
 	libavcodec/x86/lossless_videodsp_init.c \
 	libavcodec/x86/mlpdsp.c \
@@ -537,13 +539,15 @@ SRCS_LU = \
 SRCS_LR = \
 	libswresample/audioconvert.c \
 	libswresample/dither.c\
+	libswresample/options.c \
 	libswresample/rematrix.c \
 	libswresample/resample.c \
 	libswresample/resample_dsp.c \
 	libswresample/swresample.c \
 	\
-	libswresample/x86/resample_x86_dsp.c \
-	libswresample/x86/swresample_x86.c
+	libswresample/x86/audio_convert_init.c \
+	libswresample/x86/rematrix_init.c \
+	libswresample/x86/resample_init.c
 
 SRCS_LS = \
 	libswscale/input.c \
@@ -569,7 +573,6 @@ SRCS_YASM_LC = \
 	libavcodec/x86/dct32.asm \
 	libavcodec/x86/deinterlace.asm \
 	libavcodec/x86/diracdsp_yasm.asm \
-	libavcodec/x86/dsputil.asm \
 	libavcodec/x86/dwt_yasm.asm \
 	libavcodec/x86/fft.asm \
 	libavcodec/x86/flacdsp.asm \
@@ -593,6 +596,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/hevc_mc.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/huffyuvdsp.asm \
+	libavcodec/x86/idctdsp.asm \
 	libavcodec/x86/imdct36.asm \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \

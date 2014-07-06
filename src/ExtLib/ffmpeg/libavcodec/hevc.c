@@ -100,26 +100,26 @@ static int pic_arrays_init(HEVCContext *s, const HEVCSPS *sps)
         goto fail;
 
     s->skip_flag    = av_malloc(pic_size_in_ctb);
-    s->tab_ct_depth = av_malloc(sps->min_cb_height * sps->min_cb_width);
+    s->tab_ct_depth = av_malloc_array(sps->min_cb_height, sps->min_cb_width);
     if (!s->skip_flag || !s->tab_ct_depth)
         goto fail;
 
-    s->cbf_luma = av_malloc(sps->min_tb_width * sps->min_tb_height);
+    s->cbf_luma = av_malloc_array(sps->min_tb_width, sps->min_tb_height);
     s->tab_ipm  = av_mallocz(min_pu_size);
     s->is_pcm   = av_malloc(min_pu_size);
     if (!s->tab_ipm || !s->cbf_luma || !s->is_pcm)
         goto fail;
 
     s->filter_slice_edges = av_malloc(ctb_count);
-    s->tab_slice_address  = av_malloc(pic_size_in_ctb *
+    s->tab_slice_address  = av_malloc_array(pic_size_in_ctb,
                                       sizeof(*s->tab_slice_address));
-    s->qp_y_tab           = av_malloc(pic_size_in_ctb *
+    s->qp_y_tab           = av_malloc_array(pic_size_in_ctb,
                                       sizeof(*s->qp_y_tab));
     if (!s->qp_y_tab || !s->filter_slice_edges || !s->tab_slice_address)
         goto fail;
 
-    s->horizontal_bs = av_mallocz(2 * s->bs_width * (s->bs_height + 1));
-    s->vertical_bs   = av_mallocz(2 * s->bs_width * (s->bs_height + 1));
+    s->horizontal_bs = av_mallocz_array(2 * s->bs_width, (s->bs_height + 1));
+    s->vertical_bs   = av_mallocz_array(2 * s->bs_width, (s->bs_height + 1));
     if (!s->horizontal_bs || !s->vertical_bs)
         goto fail;
 
@@ -675,9 +675,9 @@ static int hls_slice_header(HEVCContext *s)
             av_freep(&sh->entry_point_offset);
             av_freep(&sh->offset);
             av_freep(&sh->size);
-            sh->entry_point_offset = av_malloc(sh->num_entry_point_offsets * sizeof(int));
-            sh->offset = av_malloc(sh->num_entry_point_offsets * sizeof(int));
-            sh->size = av_malloc(sh->num_entry_point_offsets * sizeof(int));
+            sh->entry_point_offset = av_malloc_array(sh->num_entry_point_offsets, sizeof(int));
+            sh->offset = av_malloc_array(sh->num_entry_point_offsets, sizeof(int));
+            sh->size = av_malloc_array(sh->num_entry_point_offsets, sizeof(int));
             if (!sh->entry_point_offset || !sh->offset || !sh->size) {
                 sh->num_entry_point_offsets = 0;
                 av_log(s->avctx, AV_LOG_ERROR, "Failed to allocate memory\n");
@@ -1048,6 +1048,7 @@ static int hls_transform_tree(HEVCContext *s, int x0, int y0,
 static int hls_pcm_sample(HEVCContext *s, int x0, int y0, int log2_cb_size)
 {
     //TODO: non-4:2:0 support
+    HEVCLocalContext *lc = s->HEVClc;
     GetBitContext gb;
     int cb_size   = 1 << log2_cb_size;
     int stride0   = s->frame->linesize[0];
@@ -1058,7 +1059,7 @@ static int hls_pcm_sample(HEVCContext *s, int x0, int y0, int log2_cb_size)
     uint8_t *dst2 = &s->frame->data[2][(y0 >> s->sps->vshift[2]) * stride2 + ((x0 >> s->sps->hshift[2]) << s->sps->pixel_shift)];
 
     int length         = cb_size * cb_size * s->sps->pcm.bit_depth + ((cb_size * cb_size) >> 1) * s->sps->pcm.bit_depth_chroma;
-    const uint8_t *pcm = skip_bytes(&s->HEVClc->cc, (length + 7) >> 3);
+    const uint8_t *pcm = skip_bytes(&lc->cc, (length + 7) >> 3);
     int ret;
 
     if (!s->sh.disable_deblocking_filter_flag)
@@ -2179,8 +2180,8 @@ static int hls_decode_entry_wpp(AVCodecContext *avctxt, void *input_ctb_row, int
 static int hls_slice_data_wpp(HEVCContext *s, const uint8_t *nal, int length)
 {
     HEVCLocalContext *lc = s->HEVClc;
-    int *ret = av_malloc((s->sh.num_entry_point_offsets + 1) * sizeof(int));
-    int *arg = av_malloc((s->sh.num_entry_point_offsets + 1) * sizeof(int));
+    int *ret = av_malloc_array(s->sh.num_entry_point_offsets + 1, sizeof(int));
+    int *arg = av_malloc_array(s->sh.num_entry_point_offsets + 1, sizeof(int));
     int offset;
     int startheader, cmpt = 0;
     int i, j, res = 0;
