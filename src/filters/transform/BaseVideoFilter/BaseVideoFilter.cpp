@@ -227,9 +227,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 
 		TRACE(L"CBaseVideoFilter::ReconnectOutput()\n");
 		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
-		TRACE(L"		SIZE : %d:%d => %d:%d(%d:%d)\n", w_org, h_org, m_w, m_h, vih_rect.Width(), vih_rect.Height());		
+		TRACE(L"		SIZE : %d:%d => %d:%d(%d:%d)\n", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height());		
 		} else {
-		TRACE(L"		SIZE : %d:%d => %d:%d\n", w_org, h_org, vih_rect.Width(), vih_rect.Height());
+		TRACE(L"		SIZE : %d:%d => %d:%d\n", m_wout, m_hout, vih_rect.Width(), vih_rect.Height());
 		}
 		TRACE(L"		AR   : %d:%d => %d:%d\n", m_arxout, m_aryout, m_arx, m_ary);
 		TRACE(L"		FPS  : %I64d => %I64d\n", nAvgTimePerFrame, AvgTimePerFrame);
