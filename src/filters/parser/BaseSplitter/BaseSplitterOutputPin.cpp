@@ -669,8 +669,9 @@ CString CBaseSplitterOutputPin::GetMediaTypeDesc(CAtlArray<CMediaType>& mts, LPC
 			const MPEG2VIDEOINFO *pInfo = GetFormatHelper(pInfo, pmt);
 			pVideoInfo2 = &pInfo->hdr;
 
-			bool bIsAVC = false;
-			bool bIsMPEG2 = false;
+			bool bIsAVC		= false;
+			bool bIsHEVC	= false;
+			bool bIsMPEG2	= false;
 
 			if (pInfo->hdr.bmiHeader.biCompression == FCC('AVC1') || pInfo->hdr.bmiHeader.biCompression == FCC('H264')) {
 				bIsAVC = true;
@@ -687,6 +688,10 @@ CString CBaseSplitterOutputPin::GetMediaTypeDesc(CAtlArray<CMediaType>& mts, LPC
 			} else if (pInfo->hdr.bmiHeader.biCompression == 0) {
 				Infos.AddTail(L"MPEG2");
 				bIsMPEG2 = true;
+				bAdd = TRUE;
+			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('HEVC') || pInfo->hdr.bmiHeader.biCompression == FCC('HVC1')) {
+				Infos.AddTail(L"HEVC (H.265)");
+				bIsHEVC = true;
 				bAdd = TRUE;
 			}
 
@@ -729,6 +734,18 @@ CString CBaseSplitterOutputPin::GetMediaTypeDesc(CAtlArray<CMediaType>& mts, LPC
 							Infos.AddTail(FormatString(L"Profile %d", pInfo->dwProfile));
 							break;
 					}
+				} else if (bIsHEVC) {
+					switch (pInfo->dwProfile) {
+						case 1:
+							Infos.AddTail(L"Main Profile");
+							break;
+						case 2:
+							Infos.AddTail(L"Main/10 Profile");
+							break;
+						default:
+							Infos.AddTail(FormatString(L"Profile %d", pInfo->dwProfile));
+							break;
+					}
 				} else {
 					Infos.AddTail(FormatString(L"Profile %d", pInfo->dwProfile));
 				}
@@ -739,7 +756,7 @@ CString CBaseSplitterOutputPin::GetMediaTypeDesc(CAtlArray<CMediaType>& mts, LPC
 			} else if (pInfo->dwLevel) {
 				if (bIsAVC) {
 					Infos.AddTail(FormatString(L"Level %1.1f", double(pInfo->dwLevel)/10.0));
-				} else {
+				} else if (!bIsHEVC) {
 					Infos.AddTail(FormatString(L"Level %d", pInfo->dwLevel));
 				}
 			}

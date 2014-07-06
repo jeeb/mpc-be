@@ -463,6 +463,22 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
 					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+
+					MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
+					BYTE * extradata		= pTE->CodecPrivate.GetData();
+					size_t size				= pTE->CodecPrivate.GetCount();
+					vc_params_t params;
+					if (ParseHEVCDecoderConfigurationRecord(extradata, size, params, false)) {
+						pm2vi->dwProfile	= params.profile;
+						pm2vi->dwLevel		= params.level;
+						pm2vi->dwFlags		= params.nal_length_size;
+					}
+					
+					if (!pm2vi->dwFlags
+							&& ((extradata[0] || extradata[1] || extradata[2] > 1 && size > 25))) {
+						pm2vi->dwFlags = (extradata[21] & 3) + 1;
+					}
+
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
