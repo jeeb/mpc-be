@@ -2283,7 +2283,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 			case SSA_fs:
 				if (!tag.paramsInt.IsEmpty()) {
 					if (!tag.params.IsEmpty() && (tag.params[0][0] == L'-' || tag.params[0][0] == L'+')) {
-						double n = CalcAnimation(style.fontSize + style.fontSize * tag.paramsInt[0] / 10, style.fontSize, fAnimate);
+						double n = CalcAnimation(style.fontSize + style.fontSize * (tag.params[0][0] == L'-' ? -1: 1) * tag.paramsInt[0] / 10, style.fontSize, fAnimate);
 						style.fontSize = (n > 0) ? n : org.fontSize;
 					} else {
 						double n = CalcAnimation(tag.paramsInt[0], style.fontSize, fAnimate);
