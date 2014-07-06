@@ -470,8 +470,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					DWORD fourcc = 0;
 					WORD bitdepth = 0;
 					if (CodecID == "V_MJPEG") {
-						mt.bTemporalCompression = FALSE;
 						fourcc = FCC('MJPG');
+						mt.bTemporalCompression = FALSE; // Motion JPEG has only I frames
 					} else if (CodecID == "V_MPEG4/MS/V3") {
 						fourcc = FCC('MP43');
 					} else if (CodecID == "V_PRORES") {
