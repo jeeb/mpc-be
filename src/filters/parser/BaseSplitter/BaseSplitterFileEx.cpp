@@ -2306,6 +2306,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt, bool find_s
 #endif
 
 			CreateMPEG2VISimple(pmt, &pbmi, 0, aspect, extradata, extrasize);
+			pmt->SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
 			free(extradata);
 		}
 

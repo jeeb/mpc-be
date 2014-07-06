@@ -3082,7 +3082,6 @@ HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TI
 	memcpy(&pm2vi->dwSequenceHeader[0], extra, extralen);
 
 	mt->subtype = FOURCCMap(pm2vi->hdr.bmiHeader.biCompression);
-	mt->SetSampleSize(pbmi->biWidth * pbmi-> biHeight * 4);
 
 	return S_OK;
 }

@@ -385,7 +385,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									Aspect.cy = pbmi.biHeight;
 								}
 								ReduceDim(Aspect);
-								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+								mt.SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
 								mts.Add(mt);
 
 								MPEG2VIDEOINFO* mvih	= (MPEG2VIDEOINFO*)mt.pbFormat;
@@ -412,7 +413,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									Aspect.cy = pbmi.biHeight;
 								}
 								ReduceDim(Aspect);
-								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+								mt.SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
 								mts.Add(mt);
 							}
 							break;
@@ -679,7 +681,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						Aspect.cy = pbmi.biHeight;
 					}
 					ReduceDim(Aspect);
-					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
+					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+					mt.SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
 
 					vc_params_t params;
 					if (ParseHEVCDecoderConfigurationRecord(data, size, params, false)) {

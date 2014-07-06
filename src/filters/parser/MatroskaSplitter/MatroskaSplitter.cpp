@@ -367,7 +367,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
-					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()); 
+					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
@@ -459,7 +459,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
-					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()); 
+					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
