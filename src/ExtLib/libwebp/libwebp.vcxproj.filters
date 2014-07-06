@@ -53,6 +53,9 @@
     <ClInclude Include="utils\bit_reader_inl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\endian_inl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dec\alpha.c">

@@ -114,6 +114,7 @@
     <ClInclude Include="utils\bit_reader.h" />
     <ClInclude Include="utils\bit_reader_inl.h" />
     <ClInclude Include="utils\bit_writer.h" />
+    <ClInclude Include="utils\endian_inl.h" />
     <ClInclude Include="utils\quant_levels_dec.h" />
     <ClInclude Include="utils\random.h" />
     <ClInclude Include="webp\decode.h" />
