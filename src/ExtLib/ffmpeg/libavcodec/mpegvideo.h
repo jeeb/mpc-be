@@ -38,6 +38,7 @@
 #include "hpeldsp.h"
 #include "idctdsp.h"
 #include "mpegvideodsp.h"
+#include "mpegvideoencdsp.h"
 #include "put_bits.h"
 #include "ratecontrol.h"
 #include "parser.h"
@@ -79,6 +80,8 @@ enum OutputFormat {
 #define MAX_MB_BYTES (30*16*16*3/8 + 120)
 
 #define INPLACE_OFFSET 16
+
+#define EDGE_WIDTH 16
 
 /* Start codes. */
 #define SEQ_END_CODE            0x000001b7
@@ -365,6 +368,7 @@ typedef struct MpegEncContext {
     HpelDSPContext hdsp;
     IDCTDSPContext idsp;
     MpegVideoDSPContext mdsp;
+    MpegvideoEncDSPContext mpvencdsp;
     QpelDSPContext qdsp;
     VideoDSPContext vdsp;
     H263DSPContext h263dsp;

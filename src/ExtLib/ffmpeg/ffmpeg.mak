@@ -285,6 +285,7 @@ SRCS_LC = \
 	libavcodec/mpegvideo_motion.c \
 	libavcodec/mpegvideo_parser.c \
 	libavcodec/mpegvideodsp.c \
+	libavcodec/mpegvideoencdsp.c \
 	libavcodec/msmpeg4.c \
 	libavcodec/msmpeg4data.c \
 	libavcodec/msmpeg4dec.c \
@@ -417,7 +418,6 @@ SRCS_LC = \
 	libavcodec/x86/dirac_dwt.c \
 	libavcodec/x86/diracdsp_mmx.c \
 	libavcodec/x86/dsputil_init.c \
-	libavcodec/x86/dsputil_mmx.c \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fft_init.c \
 	libavcodec/x86/flacdsp_init.c \
@@ -441,6 +441,7 @@ SRCS_LC = \
 	libavcodec/x86/mpegaudiodsp.c \
 	libavcodec/x86/mpegvideo.c \
 	libavcodec/x86/mpegvideodsp.c \
+	libavcodec/x86/mpegvideoencdsp_init.c \
 	libavcodec/x86/pngdsp_init.c \
 	libavcodec/x86/proresdsp_init.c \
 	libavcodec/x86/qpeldsp_init.c \
@@ -600,6 +601,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/imdct36.asm \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
+	libavcodec/x86/mpegvideoencdsp.asm \
 	libavcodec/x86/pngdsp.asm \
 	libavcodec/x86/proresdsp.asm \
 	libavcodec/x86/qpel.asm \

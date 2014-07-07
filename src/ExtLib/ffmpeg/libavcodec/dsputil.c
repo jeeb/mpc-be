@@ -26,7 +26,6 @@
  */
 
 #include "libavutil/attributes.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "avcodec.h"
 #include "copy_block.h"
@@ -34,8 +33,6 @@
 #include "dsputil.h"
 #include "simple_idct.h"
 #include "faandct.h"
-#include "imgconvert.h"
-#include "mathops.h"
 #include "mpegvideo.h"
 #include "config.h"
 
@@ -47,74 +44,6 @@ uint32_t ff_square_tab[512] = { 0, };
 
 #define BIT_DEPTH 8
 #include "dsputilenc_template.c"
-
-static int pix_sum_c(uint8_t *pix, int line_size)
-{
-    int s = 0, i, j;
-
-    for (i = 0; i < 16; i++) {
-        for (j = 0; j < 16; j += 8) {
-            s   += pix[0];
-            s   += pix[1];
-            s   += pix[2];
-            s   += pix[3];
-            s   += pix[4];
-            s   += pix[5];
-            s   += pix[6];
-            s   += pix[7];
-            pix += 8;
-        }
-        pix += line_size - 16;
-    }
-    return s;
-}
-
-static int pix_norm1_c(uint8_t *pix, int line_size)
-{
-    int s = 0, i, j;
-    uint32_t *sq = ff_square_tab + 256;
-
-    for (i = 0; i < 16; i++) {
-        for (j = 0; j < 16; j += 8) {
-#if 0
-            s += sq[pix[0]];
-            s += sq[pix[1]];
-            s += sq[pix[2]];
-            s += sq[pix[3]];
-            s += sq[pix[4]];
-            s += sq[pix[5]];
-            s += sq[pix[6]];
-            s += sq[pix[7]];
-#else
-#if HAVE_FAST_64BIT
-            register uint64_t x = *(uint64_t *) pix;
-            s += sq[x         & 0xff];
-            s += sq[(x >>  8) & 0xff];
-            s += sq[(x >> 16) & 0xff];
-            s += sq[(x >> 24) & 0xff];
-            s += sq[(x >> 32) & 0xff];
-            s += sq[(x >> 40) & 0xff];
-            s += sq[(x >> 48) & 0xff];
-            s += sq[(x >> 56) & 0xff];
-#else
-            register uint32_t x = *(uint32_t *) pix;
-            s += sq[x         & 0xff];
-            s += sq[(x >>  8) & 0xff];
-            s += sq[(x >> 16) & 0xff];
-            s += sq[(x >> 24) & 0xff];
-            x  = *(uint32_t *) (pix + 4);
-            s += sq[x         & 0xff];
-            s += sq[(x >>  8) & 0xff];
-            s += sq[(x >> 16) & 0xff];
-            s += sq[(x >> 24) & 0xff];
-#endif
-#endif
-            pix += 8;
-        }
-        pix += line_size - 16;
-    }
-    return s;
-}
 
 static int sse4_c(MpegEncContext *v, uint8_t *pix1, uint8_t *pix2,
                   int line_size, int h)
@@ -463,35 +392,6 @@ static int nsse8_c(MpegEncContext *c, uint8_t *s1, uint8_t *s2, int stride, int 
         return score1 + FFABS(score2) * c->avctx->nsse_weight;
     else
         return score1 + FFABS(score2) * 8;
-}
-
-static int try_8x8basis_c(int16_t rem[64], int16_t weight[64],
-                          int16_t basis[64], int scale)
-{
-    int i;
-    unsigned int sum = 0;
-
-    for (i = 0; i < 8 * 8; i++) {
-        int b = rem[i] + ((basis[i] * scale +
-                           (1 << (BASIS_SHIFT - RECON_SHIFT - 1))) >>
-                          (BASIS_SHIFT - RECON_SHIFT));
-        int w = weight[i];
-        b >>= RECON_SHIFT;
-        av_assert2(-512 < b && b < 512);
-
-        sum += (w * b) * (w * b) >> 4;
-    }
-    return sum >> 2;
-}
-
-static void add_8x8basis_c(int16_t rem[64], int16_t basis[64], int scale)
-{
-    int i;
-
-    for (i = 0; i < 8 * 8; i++)
-        rem[i] += (basis[i] * scale +
-                   (1 << (BASIS_SHIFT - RECON_SHIFT - 1))) >>
-                  (BASIS_SHIFT - RECON_SHIFT);
 }
 
 static int zero_cmp(MpegEncContext *s, uint8_t *a, uint8_t *b,
@@ -1037,34 +937,6 @@ WRAPPER8_16_SQ(quant_psnr8x8_c, quant_psnr16_c)
 WRAPPER8_16_SQ(rd8x8_c, rd16_c)
 WRAPPER8_16_SQ(bit8x8_c, bit16_c)
 
-/* draw the edges of width 'w' of an image of size width, height */
-// FIXME: Check that this is OK for MPEG-4 interlaced.
-static void draw_edges_8_c(uint8_t *buf, int wrap, int width, int height,
-                           int w, int h, int sides)
-{
-    uint8_t *ptr = buf, *last_line;
-    int i;
-
-    /* left and right */
-    for (i = 0; i < height; i++) {
-        memset(ptr - w, ptr[0], w);
-        memset(ptr + width, ptr[width - 1], w);
-        ptr += wrap;
-    }
-
-    /* top and bottom + corners */
-    buf -= w;
-    last_line = buf + (height - 1) * wrap;
-    if (sides & EDGE_TOP)
-        for (i = 0; i < h; i++)
-            // top
-            memcpy(buf - (i + 1) * wrap, buf, width + w + w);
-    if (sides & EDGE_BOTTOM)
-        for (i = 0; i < h; i++)
-            // bottom
-            memcpy(last_line + (i + 1) * wrap, last_line, width + w + w);
-}
-
 /* init static data */
 av_cold void ff_dsputil_static_init(void)
 {
@@ -1123,9 +995,6 @@ av_cold void ff_dsputil_init(DSPContext *c, AVCodecContext *avctx)
 
     c->sum_abs_dctelem = sum_abs_dctelem_c;
 
-    c->pix_sum   = pix_sum_c;
-    c->pix_norm1 = pix_norm1_c;
-
     /* TODO [0] 16  [1] 8 */
     c->pix_abs[0][0] = pix_abs16_c;
     c->pix_abs[0][1] = pix_abs16_x2_c;
@@ -1169,16 +1038,6 @@ av_cold void ff_dsputil_init(DSPContext *c, AVCodecContext *avctx)
 #if CONFIG_SNOW_DECODER || CONFIG_SNOW_ENCODER
     ff_dsputil_init_dwt(c);
 #endif
-
-    c->try_8x8basis = try_8x8basis_c;
-    c->add_8x8basis = add_8x8basis_c;
-
-    c->shrink[0] = av_image_copy_plane;
-    c->shrink[1] = ff_shrink22;
-    c->shrink[2] = ff_shrink44;
-    c->shrink[3] = ff_shrink88;
-
-    c->draw_edges = draw_edges_8_c;
 
     switch (avctx->bits_per_raw_sample) {
     case 9:
