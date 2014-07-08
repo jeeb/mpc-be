@@ -19663,8 +19663,6 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 				}
 			}
 
-			bool InternalMpegSplitter = AfxGetAppSettings().SrcFilters[SRC_MPEG];
-
 			{
 				CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
 				pMRU->ReadList();
@@ -19672,21 +19670,12 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 				pMRU->WriteList();
 			}
 
-			if (!InternalMpegSplitter && ext == _T(".bdmv")) {
-				return FALSE;
-			} else {
-				CAtlList<CString> sl;
-				if (InternalMpegSplitter) {
-					sl.AddTail(strPlaylistFile);
-				} else {
-					sl.AddTail(CString(Path + _T("\\BDMV\\index.bdmv")));
-				}
-
-				m_bIsBDPlay = TRUE;
-				m_wndPlaylistBar.Open(sl, false);
-				if (OpenCurPlaylistItem(rtStart)) {
-					return TRUE;
-				}
+			m_bIsBDPlay = TRUE;
+			CAtlList<CString> sl;
+			sl.AddTail(strPlaylistFile);
+			m_wndPlaylistBar.Open(sl, false);
+			if (OpenCurPlaylistItem(rtStart)) {
+				return TRUE;
 			}
 		}
 	}
@@ -20220,6 +20209,8 @@ CString CMainFrame::GetStrForTitle()
 		if (s.fTitleBarTextTitle) {
 			if (!m_strTitleAlt.IsEmpty()) {
 				return m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+			} else if (m_bIsBDPlay) {
+				return m_strFn;
 			} else {
 				BeginEnumFilters(m_pGB, pEF, pBF) {
 					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
