@@ -1154,6 +1154,7 @@ protected:
 	CDebugMonitor	m_DebugMonitor;
 
 	static DWORD WINAPI		NotifyRenderThreadEntryPoint(LPVOID lpParameter);
+	void					SetupNotifyRenderThread(CAtlArray<HANDLE>& handles);
 	DWORD					NotifyRenderThread();
 
 	CStringArray			m_ExtSubFiles;

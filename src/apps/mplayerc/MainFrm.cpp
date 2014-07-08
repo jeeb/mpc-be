@@ -980,9 +980,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_hStopNotifyRenderThreadEvent		= CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_hRefreshNotifyRenderThreadEvent	= CreateEvent(NULL, FALSE, FALSE, NULL);
-	m_ExtSubPathsHandles.RemoveAll();
-	m_ExtSubPathsHandles.Add(m_hStopNotifyRenderThreadEvent);
-	m_ExtSubPathsHandles.Add(m_hRefreshNotifyRenderThreadEvent);
 
 	DWORD ThreadId;
 	m_hNotifyRenderThread = ::CreateThread(NULL, 0, NotifyRenderThreadEntryPoint, (LPVOID)this, 0, &ThreadId);
@@ -1048,11 +1045,6 @@ void CMainFrame::OnDestroy()
 	m_ExtSubFiles.RemoveAll();
 	m_ExtSubFilesTime.RemoveAll();
 	m_ExtSubPaths.RemoveAll();
-	for (size_t i = 2; i < m_ExtSubPathsHandles.GetCount(); i++) {
-		FindCloseChangeNotification(m_ExtSubPathsHandles[i]);
-	}
-
-	m_ExtSubPathsHandles.RemoveAll();
 
 	CloseHandle(m_hStopNotifyRenderThreadEvent);
 	CloseHandle(m_hRefreshNotifyRenderThreadEvent);
@@ -4420,14 +4412,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_ExtSubFiles.RemoveAll();
 	m_ExtSubFilesTime.RemoveAll();
 	m_ExtSubPaths.RemoveAll();
-	for (size_t i = 2; i < m_ExtSubPathsHandles.GetCount(); i++) {
-		FindCloseChangeNotification(m_ExtSubPathsHandles[i]);
-	}
-
 	m_ExtSubPathsHandles.RemoveAll();
-	m_ExtSubPathsHandles.Add(m_hStopNotifyRenderThreadEvent);
-	m_ExtSubPathsHandles.Add(m_hRefreshNotifyRenderThreadEvent);
-
 	SetEvent(m_hRefreshNotifyRenderThreadEvent);
 
 	m_wndSeekBar.Enable(false);
@@ -14862,14 +14847,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_ExtSubFiles.RemoveAll();
 	m_ExtSubFilesTime.RemoveAll();
 	m_ExtSubPaths.RemoveAll();
-	for (size_t i = 2; i < m_ExtSubPathsHandles.GetCount(); i++) {
-		FindCloseChangeNotification(m_ExtSubPathsHandles[i]);
-	}
-
 	m_ExtSubPathsHandles.RemoveAll();
-	m_ExtSubPathsHandles.Add(m_hStopNotifyRenderThreadEvent);
-	m_ExtSubPathsHandles.Add(m_hRefreshNotifyRenderThreadEvent);
-
 	SetEvent(m_hRefreshNotifyRenderThreadEvent);
 
 	ClearDXVAState();
@@ -17247,14 +17225,13 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 				if (h != INVALID_HANDLE_VALUE) {
 					m_ExtSubPaths.Add(fn);
 					m_ExtSubPathsHandles.Add(h);
-
 					SetEvent(m_hRefreshNotifyRenderThreadEvent);
 				}
 			}
 		}
 	}
 
-	return(!!pSubStream);
+	return !!pSubStream;
 }
 
 void CMainFrame::UpdateSubtitle(bool fDisplayMessage, bool fApplyDefStyle)
@@ -20268,16 +20245,30 @@ IBaseFilter* CMainFrame::GetVSFilter()
 	return _pDVS;
 }
 
+void CMainFrame::SetupNotifyRenderThread(CAtlArray<HANDLE>& handles)
+{
+	for (size_t i = 2; i < handles.GetCount(); i++) {
+		FindCloseChangeNotification(handles[i]);
+	}
+	handles.RemoveAll();
+	handles.Add(m_hStopNotifyRenderThreadEvent);
+	handles.Add(m_hRefreshNotifyRenderThreadEvent);
+	handles.Append(m_ExtSubPathsHandles);
+}
+
 DWORD CMainFrame::NotifyRenderThread()
 {
+	CAtlArray<HANDLE> handles;
+	SetupNotifyRenderThread(handles);
+
 	while (true) {
-		DWORD idx = WaitForMultipleObjects(m_ExtSubPathsHandles.GetCount(), m_ExtSubPathsHandles.GetData(), FALSE, INFINITE);
+		DWORD idx = WaitForMultipleObjects(handles.GetCount(), handles.GetData(), FALSE, INFINITE);
 		if (idx == WAIT_OBJECT_0) { // m_hStopNotifyRenderThreadEvent
 			break;
 		} else if (idx == (WAIT_OBJECT_0 + 1)) { // m_hRefreshNotifyRenderThreadEvent
-			continue;
-		} else if (idx > (WAIT_OBJECT_0 + 1) && idx < (WAIT_OBJECT_0 + m_ExtSubPathsHandles.GetCount())) {
-			if (FindNextChangeNotification(m_ExtSubPathsHandles[idx - WAIT_OBJECT_0]) == FALSE) {
+			SetupNotifyRenderThread(handles);
+		} else if (idx > (WAIT_OBJECT_0 + 1) && idx < (WAIT_OBJECT_0 + handles.GetCount())) {
+			if (FindNextChangeNotification(handles[idx - WAIT_OBJECT_0]) == FALSE) {
 				break;
 			}
 
@@ -20302,6 +20293,10 @@ DWORD CMainFrame::NotifyRenderThread()
 			ASSERT(FALSE);
 			break;
 		}
+	}
+
+	for (size_t i = 2; i < handles.GetCount(); i++) {
+		FindCloseChangeNotification(handles[i]);
 	}
 
 	return 0;
