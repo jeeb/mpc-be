@@ -2613,10 +2613,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			}
 			EndEnumFilters;
 
-			if (GetPlaybackMode() == PM_FILE) {
-				SetupChapters();
-			}
-
 			if (GetPlaybackMode() == PM_DVD) { // we also use this timer to update the info panel for DVD playback
 				ULONG ulAvailable, ulCurrent;
 
@@ -3311,8 +3307,8 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				m_wndPlaylistBar.SetCurTime(rtDur);
 				OnTimer(TIMER_STREAMPOSPOLLER);
 				OnTimer(TIMER_STREAMPOSPOLLER2);
-				LoadKeyFrames();
 				SetupChapters();
+				LoadKeyFrames();
 			}
 			break;
 			case EC_BG_AUDIO_CHANGED:
@@ -4336,8 +4332,6 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	s.nCLSwitches &= ~CLSW_OPEN;
 
 	SendNowPlayingToApi();
-	SetupChapters();
-	LoadKeyFrames();
 
 	if (s.AutoChangeFullscrRes.bEnabled == 1 && m_fFullScreen) {
 		AutoChangeMonitorMode();
@@ -13203,6 +13197,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 
 	SetPlaybackMode(PM_FILE);
+
+	SetupChapters();
+	LoadKeyFrames();
 
 	return _T("");
 }
