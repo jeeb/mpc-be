@@ -281,6 +281,6 @@ AP4_AtomSampleTable::SetTimeShift(AP4_UI64 timeShift)
     m_TimeShift = timeShift;
     if (m_SttsAtom) {
         m_SttsAtom->SetTimeShift(m_TimeShift);
-	}
+    }
     return AP4_SUCCESS;
 }

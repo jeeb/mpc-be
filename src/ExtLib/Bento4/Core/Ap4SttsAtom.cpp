@@ -165,7 +165,7 @@ AP4_SttsAtom::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordinal& sample)
             + m_Entries[i].m_SampleCount * m_Entries[i].m_SampleDuration;
         
         // check if the ts is in the range of this entry
-        if (ts < next_accumulated) {
+        if (ts < next_accumulated && m_Entries[i].m_SampleDuration) {
             // MPC-BE custom code start
             // sample += (AP4_Ordinal) ((ts - accumulated) / m_Entries[i].m_SampleDuration);
             sample += (AP4_Ordinal) ((ts > m_TimeShift ? ts - accumulated : 0) / m_Entries[i].m_SampleDuration);

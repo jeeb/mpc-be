@@ -180,7 +180,7 @@ AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
 
         if (m_SampleTable) {
             (dynamic_cast<AP4_AtomSampleTable*>(m_SampleTable))->SetTimeShift(AP4_ConvertTime(delay, m_MovieTimeScale, m_MediaTimeScale) + start);
-		}
+        }
     }
 }
 
