@@ -197,7 +197,7 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 {
 	if (GetStatusTimer() != str) {
 		m_time.SetRedraw(FALSE);
-		if (OpenImageCheck(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn)) {
+		if (OpenImageCheck(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull)) {
 			m_time.SetWindowText(L"");
 		} else {
 			str.Trim();

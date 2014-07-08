@@ -2391,7 +2391,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 
 					if (m_bOSDFileName) {
-						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_strFn : str_temp = m_strFn;
+						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_strCurPlaybackLabel : str_temp = m_strCurPlaybackLabel;
 					}
 
 					if (bmadvr) {
@@ -14041,7 +14041,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 		}
 	}
 
-	m_strFn = fn;
+	m_strCurPlaybackLabel = fn;
 
 	if (i == 1) {
 		if (s.fTitleBarTextTitle) {
@@ -15177,7 +15177,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	ASSERT(m_iMediaLoadState == MLS_CLOSING);
 
-	m_strFn.Empty();
+	m_strCurPlaybackLabel.Empty();
 	m_strFnFull.Empty();
 	m_strUrl.Empty();
 	m_strTitleAlt.Empty();
@@ -19883,7 +19883,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 
 	bool extimage = false;
 
-	if (OpenImageCheck(m_strFn)) {
+	if (OpenImageCheck(m_strFnFull)) {
 		m_InternalImage.Attach(OpenImage(m_strFnFull));
 		bLoadRes = true;
 		extimage = true;
@@ -20183,8 +20183,8 @@ CString CMainFrame::GetStrForTitle()
 		if (s.fTitleBarTextTitle) {
 			if (!m_strTitleAlt.IsEmpty()) {
 				return m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
-			} else if (m_bIsBDPlay) {
-				return m_strFn;
+			} else if (m_bIsBDPlay || GetPlaybackMode() == PM_DVD) {
+				return m_strCurPlaybackLabel;
 			} else {
 				BeginEnumFilters(m_pGB, pEF, pBF) {
 					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
@@ -20210,7 +20210,7 @@ CString CMainFrame::GetStrForTitle()
 				}
 			}
 		}
-		return m_strFn;
+		return m_strCurPlaybackLabel;
 	} else {
 		return m_strFnFull;
 	}

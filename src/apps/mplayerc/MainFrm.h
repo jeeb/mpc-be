@@ -1067,7 +1067,7 @@ public:
 	long		m_lSubtitleShift;
 	__int64		m_rtCurSubPos;
 	CString		m_strTitle;
-	CString		m_strFn;
+	CString		m_strCurPlaybackLabel;
 	CString		m_strFnFull;
 	CString		m_strUrl;
 	CString		m_strTitleAlt;
