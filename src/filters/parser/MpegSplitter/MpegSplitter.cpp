@@ -482,12 +482,10 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_AC3CoreOnly(0)
 	, m_AlternativeDuration(false)
 	, m_SubEmptyPin(false)
+	, bIsStreamingSupport(FALSE)
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	TCHAR buff[256];
-	ULONG len;
-
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit, KEY_READ)) {
 		DWORD dw;
 
@@ -495,8 +493,8 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 			m_ForcedSub = !!dw;
 		}
 
-		len = _countof(buff);
-		memset(buff, 0, sizeof(buff));
+		TCHAR buff[256] = { 0 };
+		ULONG len = _countof(buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioLangOrder, buff, &len)) {
 			m_AudioLanguageOrder = CString(buff);
 		}
@@ -570,7 +568,7 @@ STDMETHODIMP CMpegSplitterFilter::GetClassID(CLSID* pClsID)
 	CheckPointer (pClsID, E_POINTER);
 
 	if (m_pPipoBimbo) {
-		memcpy (pClsID, &CLSID_WMAsfReader, sizeof (GUID));
+		memcpy(pClsID, &CLSID_WMAsfReader, sizeof(GUID));
 		return S_OK;
 	} else {
 		return __super::GetClassID(pClsID);
@@ -1139,12 +1137,31 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
 	if (m_rtPlaylistDuration) {
-		m_rtNewStop = m_rtStop = m_rtDuration = m_rtPlaylistDuration;
+		m_rtDuration = m_rtPlaylistDuration;
+	} else if (rt_IfoDuration) {
+		m_rtDuration = rt_IfoDuration;
 	} else if (m_pFile->IsRandomAccess() && m_pFile->m_rate) {
-		m_rtNewStop = m_rtStop = m_rtDuration = rt_IfoDuration ? rt_IfoDuration : (UNITS * m_pFile->GetLength() / m_pFile->m_rate);
+		bIsStreamingSupport = TRUE;
+		m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
+	}
+
+	m_rtNewStop = m_rtStop = m_rtDuration;
+
+	if (bIsStreamingSupport) {
+		m_pFile->StartStreamingDetect();
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+}
+
+STDMETHODIMP CMpegSplitterFilter::GetDuration(LONGLONG* pDuration)
+{
+	CheckPointer(pDuration, E_POINTER);
+	CheckPointer(m_pFile, VFW_E_NOT_CONNECTED);
+
+	*pDuration = !bIsStreamingSupport ? m_rtDuration : (m_rtNewStop = m_rtStop = m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate);
+
+	return S_OK;
 }
 
 bool CMpegSplitterFilter::DemuxInit()
@@ -1324,7 +1341,7 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 {
 	m_rtPlaylistDuration = 0;
 
-	bool res = SUCCEEDED (m_ClipInfo.ReadPlaylist (pszFileName, m_rtPlaylistDuration, Items, TRUE));
+	bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, TRUE));
 	if (res) {
 		m_rtMin = Items.GetHead()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;

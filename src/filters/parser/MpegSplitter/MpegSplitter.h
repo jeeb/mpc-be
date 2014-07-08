@@ -47,6 +47,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 	void	ReadClipInfo(LPCOLESTR pszFileName);
 
+	STDMETHODIMP GetDuration(LONGLONG* pDuration);
+
 	bool DemuxInit();
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
@@ -61,6 +63,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	REFERENCE_TIME m_rtPlaylistDuration;
 	REFERENCE_TIME m_rtMin, m_rtMax;
+
+	BOOL bIsStreamingSupport;
 
 private:
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;

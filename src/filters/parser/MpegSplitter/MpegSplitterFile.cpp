@@ -42,6 +42,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_SubEmptyPin(SubEmptyPin)
 	, m_bOpeningCompleted(FALSE)
 	, m_bIsBadPacked(FALSE)
+	, m_lastLen(0)
 {
 	memset(m_psm, 0, sizeof(m_psm));
 	if (SUCCEEDED(hr)) {
@@ -151,11 +152,11 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			fp = min(GetLength() - MEGABYTE/2, fp);
 			fp = max(pfp, fp);
 			__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/4);
-			SearchStreams(fp, nfp, pAsyncReader);
+			SearchStreams(fp, nfp);
 			pfp = nfp;
 		}
 	} else {
-		SearchStreams(0, MEGABYTE/2, pAsyncReader);
+		SearchStreams(0, MEGABYTE/2);
 	}
 
 	if (!m_bIsBD) {
@@ -174,11 +175,11 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 						fp = min(GetLength() - MEGABYTE/8, fp);
 						fp = max(pfp, fp);
 						__int64 nfp = fp + (pfp == 0 ? MEGABYTE : MEGABYTE/16);
-						SearchStreams(fp, nfp, pAsyncReader, TRUE);
+						SearchStreams(fp, nfp, TRUE);
 						pfp = nfp;
 					}
 				} else {
-					SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
+					SearchStreams(0, MEGABYTE/2, TRUE);
 				}
 			}
 
@@ -198,7 +199,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		m_AlternativeDuration = bAlternativeDuration;
 
 		int indicated_rate = m_rate;
-		int detected_rate = int(m_rtMax > m_rtMin ? 10000000i64 * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
+		int detected_rate = int(m_rtMax > m_rtMin ? UNITS * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
 
 		m_rate = detected_rate ? detected_rate : m_rate;
 #if (0)
@@ -266,31 +267,21 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	m_lastLen = GetLength();
 	Seek(0);
 
 	return S_OK;
 }
 
-void CMpegSplitterFile::OnComplete(IAsyncReader* pAsyncReader)
+void CMpegSplitterFile::OnUpdateDuration()
 {
 	__int64 pos = GetPos();
-
-	{
-		SearchStreams(GetLength() - 500*1024, GetLength(), pAsyncReader, TRUE);
-		int indicated_rate = m_rate;
-		int detected_rate = int(m_rtMax > m_rtMin ? 10000000i64 * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
-
-		m_rate = detected_rate ? detected_rate : m_rate;
-#if (0)
-		// normally "detected" should always be less than "indicated", but sometimes it can be a few percent higher (+10% is allowed here)
-		// (update: also allowing +/-50k/s)
-		if (indicated_rate == 0 || ((float)detected_rate / indicated_rate) < 1.1 || abs(detected_rate - indicated_rate) < 50*1024) {
-			m_rate = detected_rate;
-		} else {
-			;    // TODO: in this case disable seeking, or try doing something less drastical...
-		}
-#endif
-	}
+	
+	__int64 len = GetLength();
+	SearchStreams(max(m_lastLen, len - MEGABYTE / 2), len, TRUE);
+	int detected_rate = int(m_rtMax > m_rtMin ? UNITS * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
+	m_rate = detected_rate ? detected_rate : m_rate;
+	m_lastLen = len;
 
 	Seek(pos);
 }
@@ -393,7 +384,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 }
 
-void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader* pAsyncReader, BOOL CalcDuration)
+void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDuration)
 {
 	Seek(start);
 	stop = min(stop, GetLength());

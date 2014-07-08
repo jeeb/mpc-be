@@ -37,6 +37,8 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	, m_cachepos(0), m_cachelen(0)
 	, m_available(0)
 	, m_hThread(NULL)
+	, m_hThread_Duration(NULL)
+	, m_evUpdate_Duration_Set(TRUE)
 {
 	if (!m_pAsyncReader) {
 		hr = E_UNEXPECTED;
@@ -61,6 +63,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 		m_evStop.Reset();
 		DWORD ThreadId = 0;
 		m_hThread = ::CreateThread(NULL, 0, StaticThreadProc, (LPVOID)this, CREATE_SUSPENDED, &ThreadId);
+		UNREFERENCED_PARAMETER(ThreadId);
 		SetThreadPriority(m_hThread, THREAD_PRIORITY_BELOW_NORMAL);
 		ResumeThread(m_hThread);
 	}
@@ -79,7 +82,14 @@ CBaseSplitterFile::~CBaseSplitterFile()
 	if (m_hThread != NULL) {
 		m_evStop.Set();
 		if (WaitForSingleObject(m_hThread, 500) == WAIT_TIMEOUT) {
-			TerminateThread (m_hThread, 0xDEAD);
+			TerminateThread(m_hThread, 0xDEAD);
+		}
+	}
+
+	if (m_hThread_Duration != NULL) {
+		m_evStop_Duration.Set();
+		if (WaitForSingleObject(m_hThread_Duration, 1000) == WAIT_TIMEOUT) {
+			TerminateThread(m_hThread_Duration, 0xDEAD);
 		}
 	}
 }
@@ -94,7 +104,7 @@ DWORD CBaseSplitterFile::ThreadProc()
 	HANDLE hEvts[] = {m_evStop};
 
 	for(int i = 0; i < 20; i++) {
-		DWORD dwObject = WaitForMultipleObjects (_countof(hEvts), hEvts, FALSE, 100);
+		DWORD dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, 100);
 		if (dwObject == WAIT_OBJECT_0) {
 			return 0;
 		} else {
@@ -108,6 +118,39 @@ DWORD CBaseSplitterFile::ThreadProc()
 			}
 
 			m_available = available;
+		}
+	}
+
+	return 0;
+}
+
+DWORD WINAPI CBaseSplitterFile::StaticThreadProc_Duration(LPVOID lpParam)
+{
+	return ((CBaseSplitterFile*)lpParam)->ThreadProc_Duration();
+}
+
+DWORD CBaseSplitterFile::ThreadProc_Duration()
+{
+	HANDLE hEvts[] = {m_evStop_Duration};
+	m_evUpdate_Duration_Set.Set();
+
+	for (;;) {
+		DWORD dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, 1000);
+		if (dwObject == WAIT_OBJECT_0) {
+			return 0;
+		} else if (m_evUpdate_Duration_Set.Check()) {
+			LONGLONG total, available = 0;
+			m_pAsyncReader->Length(&total, &available);
+			UNREFERENCED_PARAMETER(total);
+
+			/*
+			Do not remove these lines - leave for the future
+			if (m_available && m_available < available) {
+				m_evUpdate_Duration.Set();
+			}
+			*/
+
+			m_len = m_available = available;
 		}
 	}
 
@@ -175,16 +218,12 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 {
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);
 
-	HRESULT hr = S_OK;
+	/*
+	Do not remove these lines - leave for the future
+	UpdateDuration();
+	*/
 
-	if (!m_fRandomAccess) {
-		LONGLONG total = 0, available = -1;
-		m_pAsyncReader->Length(&total, &available);
-		if (total == available) {
-			m_fRandomAccess = true;
-			OnComplete();
-		}
-	}
+	HRESULT hr = S_OK;
 
 	if (m_cachetotal == 0 || !m_pCache) {
 		hr = m_pAsyncReader->SyncRead(m_pos, (long)len, pData);
@@ -300,7 +339,7 @@ UINT64 CBaseSplitterFile::UExpGolombRead()
 INT64 CBaseSplitterFile::SExpGolombRead()
 {
 	UINT64 k = UExpGolombRead();
-	return ((k&1) ? 1 : -1) * ((k + 1) >> 1);
+	return ((k & 1) ? 1 : -1) * ((k + 1) >> 1);
 }
 
 HRESULT CBaseSplitterFile::HasMoreData(__int64 len, DWORD ms)
@@ -361,5 +400,33 @@ void CBaseSplitterFile::ForceMode(MODE mode) {
 
 		m_fStreaming	= false;
 		m_fRandomAccess	= true;
+	}
+}
+
+void CBaseSplitterFile::StartStreamingDetect()
+{
+	if (m_hThread_Duration == NULL) {
+		m_evStop_Duration.Reset();
+		DWORD ThreadId = 0;
+		m_hThread_Duration = ::CreateThread(NULL, 0, StaticThreadProc_Duration, (LPVOID)this, CREATE_SUSPENDED, &ThreadId);
+		UNREFERENCED_PARAMETER(ThreadId);
+		SetThreadPriority(m_hThread_Duration, THREAD_PRIORITY_BELOW_NORMAL);
+		ResumeThread(m_hThread_Duration);
+	}
+}
+
+void CBaseSplitterFile::StopStreamingDetect()
+{
+	if (m_hThread_Duration != NULL) {
+		m_evStop_Duration.Set();
+	}
+}
+
+void CBaseSplitterFile::UpdateDuration()
+{
+	if (m_evUpdate_Duration.Check()) {
+		m_evUpdate_Duration_Set.Reset();
+		OnUpdateDuration();
+		m_evUpdate_Duration_Set.Set();
 	}
 }

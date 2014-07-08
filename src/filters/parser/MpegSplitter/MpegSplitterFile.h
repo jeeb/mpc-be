@@ -67,7 +67,9 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	BOOL m_bOpeningCompleted;
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
-	void OnComplete(IAsyncReader* pAsyncReader);
+	
+	__int64 m_lastLen;
+	virtual void OnUpdateDuration();
 
 public:
 	bool m_bIsBD;
@@ -183,7 +185,7 @@ public:
 
 	} m_streams[unknown];
 
-	void SearchStreams(__int64 start, __int64 stop, IAsyncReader* pAsyncReader, BOOL CalcDuration = FALSE);
+	void SearchStreams(__int64 start, __int64 stop, BOOL CalcDuration = FALSE);
 	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream = TRUE);
 	void  AddHdmvPGStream(WORD pid, const char* language_code);
 	CAtlList<stream>* GetMasterStream();

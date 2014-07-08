@@ -34,17 +34,23 @@ class CBaseSplitterFile
 	__int64 m_available;
 
 	virtual HRESULT Read(BYTE* pData, __int64 len); // use ByteRead
+	virtual void OnUpdateDuration() {};
 
 protected:
 	UINT64 m_bitbuff;
 	int m_bitlen;
 
-	virtual void OnComplete() {}
-
 	DWORD ThreadProc();
 	static DWORD WINAPI StaticThreadProc(LPVOID lpParam);
 	HANDLE m_hThread;
 	CAMEvent m_evStop;
+
+	DWORD ThreadProc_Duration();
+	static DWORD WINAPI StaticThreadProc_Duration(LPVOID lpParam);
+	HANDLE m_hThread_Duration;
+	CAMEvent m_evStop_Duration;
+	CAMEvent m_evUpdate_Duration;
+	CAMEvent m_evUpdate_Duration_Set;
 
 public:
 	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
@@ -83,4 +89,8 @@ public:
 		RandomAccess,
 	} MODE;
 	void ForceMode(MODE mode);
+
+	void StartStreamingDetect();
+	void StopStreamingDetect();
+	void UpdateDuration();
 };
