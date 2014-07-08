@@ -169,6 +169,7 @@
     <ClInclude Include="libavcodec\faandct.h" />
     <ClInclude Include="libavcodec\faanidct.h" />
     <ClInclude Include="libavcodec\faxcompr.h" />
+    <ClInclude Include="libavcodec\fdctdsp.h" />
     <ClInclude Include="libavcodec\fft-internal.h" />
     <ClInclude Include="libavcodec\fft.h" />
     <ClInclude Include="libavcodec\fft_table.h" />
@@ -565,6 +566,7 @@
     <ClCompile Include="libavcodec\exif.c" />
     <ClCompile Include="libavcodec\faandct.c" />
     <ClCompile Include="libavcodec\faanidct.c" />
+    <ClCompile Include="libavcodec\fdctdsp.c" />
     <ClCompile Include="libavcodec\fft_fixed.c" />
     <ClCompile Include="libavcodec\fft_fixed_32.c" />
     <ClCompile Include="libavcodec\fft_float.c" />
@@ -839,6 +841,7 @@
     <ClCompile Include="libavcodec\x86\dirac_dwt.c" />
     <ClCompile Include="libavcodec\x86\dsputil_init.c" />
     <ClCompile Include="libavcodec\x86\fdct.c" />
+    <ClCompile Include="libavcodec\x86\fdctdsp_init.c" />
     <ClCompile Include="libavcodec\x86\fft_init.c" />
     <ClCompile Include="libavcodec\x86\flacdsp_init.c" />
     <ClCompile Include="libavcodec\x86\fmtconvert_init.c" />

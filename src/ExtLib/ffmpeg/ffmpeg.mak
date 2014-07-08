@@ -164,6 +164,7 @@ SRCS_LC = \
 	libavcodec/exif.c \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
+	libavcodec/fdctdsp.c \
 	libavcodec/fft_template.c \
 	libavcodec/fft_fixed.c \
 	libavcodec/fft_fixed_32.c \
@@ -419,6 +420,7 @@ SRCS_LC = \
 	libavcodec/x86/diracdsp_mmx.c \
 	libavcodec/x86/dsputil_init.c \
 	libavcodec/x86/fdct.c \
+	libavcodec/x86/fdctdsp_init.c \
 	libavcodec/x86/fft_init.c \
 	libavcodec/x86/flacdsp_init.c \
 	libavcodec/x86/fmtconvert_init.c \
