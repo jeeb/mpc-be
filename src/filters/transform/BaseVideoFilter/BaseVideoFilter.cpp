@@ -283,8 +283,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 								CMediaType mt = *pmt;
 								m_pOutput->SetMediaType(&mt);
 								DeleteMediaType(pmt);
-							} else { // stupid overlay mixer won't let us know the new pitch...
+							} else {
 								if (m_bOverlayMixer) {
+									// stupid overlay mixer won't let us know the new pitch...
 									long size = pOut->GetSize();
 									pBMI->biWidth = size ? (size / abs(pBMI->biHeight) * 8 / pBMI->biBitCount) : pBMI->biWidth;
 								}
