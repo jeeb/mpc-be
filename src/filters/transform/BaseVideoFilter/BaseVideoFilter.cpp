@@ -218,21 +218,25 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 	}
 
 	if (bNeedReconnect) {
-		if (CLSID_VideoRenderer == GetCLSID(m_pOutput->GetConnected())) {
+		CLSID clsid = GetCLSID(m_pOutput->GetConnected());
+		if (clsid == CLSID_VideoRenderer) {
 			NotifyEvent(EC_ERRORABORT, 0, 0);
 			return E_FAIL;
 		}
+		BOOL m_bOverlayMixer = (clsid == CLSID_OverlayMixer);
 
 		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
-		TRACE(L"CBaseVideoFilter::ReconnectOutput()\n");
+		DbgLog((LOG_TRACE, 3, L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect"));
 		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
-		TRACE(L"		SIZE : %d:%d => %d:%d(%d:%d)\n", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height());		
+			DbgLog((LOG_TRACE, 3, L"	SIZE : %d:%d => %d:%d(%d:%d)\n", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height()));
 		} else {
-		TRACE(L"		SIZE : %d:%d => %d:%d\n", m_wout, m_hout, vih_rect.Width(), vih_rect.Height());
+			DbgLog((LOG_TRACE, 3, L"	SIZE : %d:%d => %d:%d\n", m_wout, m_hout, vih_rect.Width(), vih_rect.Height()));
 		}
-		TRACE(L"		AR   : %d:%d => %d:%d\n", m_arxout, m_aryout, m_arx, m_ary);
-		TRACE(L"		FPS  : %I64d => %I64d\n", nAvgTimePerFrame, AvgTimePerFrame);
+		{
+			DbgLog((LOG_TRACE, 3, L"	AR   : %d:%d => %d:%d\n", m_arxout, m_aryout, m_arx, m_ary));
+			DbgLog((LOG_TRACE, 3, L"	FPS  : %I64d => %I64d\n", nAvgTimePerFrame, AvgTimePerFrame));
+		}
 
 		BITMAPINFOHEADER* pBMI	= NULL;
 		if (mt.formattype == FORMAT_VideoInfo) {
@@ -280,8 +284,10 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 								m_pOutput->SetMediaType(&mt);
 								DeleteMediaType(pmt);
 							} else { // stupid overlay mixer won't let us know the new pitch...
-								long size = pOut->GetSize();
-								pBMI->biWidth = size ? (size / abs(pBMI->biHeight) * 8 / pBMI->biBitCount) : pBMI->biWidth;
+								if (m_bOverlayMixer) {
+									long size = pOut->GetSize();
+									pBMI->biWidth = size ? (size / abs(pBMI->biHeight) * 8 / pBMI->biBitCount) : pBMI->biWidth;
+								}
 								m_pOutput->SetMediaType(&mt);
 							}
 						} else {
@@ -292,10 +298,10 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 					}
 				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryTimeout >= 0) {
 					if (tryTimeout > 0) {
-						TRACE(L"		VFW_E_BUFFERS_OUTSTANDING, retrying in 10ms ...\n");
+						DbgLog((LOG_TRACE, 3, L"	VFW_E_BUFFERS_OUTSTANDING, retrying in 10ms ..."));
 						Sleep(10);
 					} else {
-						TRACE(L"		VFW_E_BUFFERS_OUTSTANDING, flush data ...\n");
+						DbgLog((LOG_TRACE, 3, L"	VFW_E_BUFFERS_OUTSTANDING, flush data ..."));
 						m_pOutput->BeginFlush();
 						m_pOutput->EndFlush();
 					}
@@ -303,7 +309,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 					tryTimeout -= 10;
 					continue;
 				} else {
-					TRACE(L"		ReceiveConnection() failed (hr: %x); QueryAccept: %x\n", hr, hrQA);
+					DbgLog((LOG_TRACE, 3, L"	ReceiveConnection() failed (hr: %x); QueryAccept: %x\n", hr, hrQA));
 				}
 				
 				break;
