@@ -76,7 +76,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 			this->h = h;
 			this->pitch = pitch;
 			int size = pitch*h;
-			buf_base = (BYTE*)_aligned_malloc(size*3+6*32, 32);
+			buf_base = (BYTE*)_aligned_malloc(size * 3 + 6 * 32, 32);
 			BYTE* p = buf_base;
 			buf[0] = p;
 			p += (size + 31) & ~31;
@@ -122,8 +122,7 @@ public:
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	HRESULT DeliverFast();
-	HRESULT DeliverNormal();
+	HRESULT Deliver();
 	HRESULT Deliver(bool fRepeatLast);
 
 	int GetPinCount();
@@ -154,8 +153,6 @@ protected:
 	bool m_fInterlaced;
 	bool m_bReadARFromStream;
 
-	static void CalcBrCont(BYTE* YTbl, float bright, float cont);
-	static void CalcHueSat(BYTE* UTbl, BYTE* VTbl, float hue, float sat);
 	void ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int w, int h, int pitch);
 
 public:
@@ -185,6 +182,7 @@ public:
 	STDMETHODIMP EnablePlanarYUV(bool fEnable);
 	STDMETHODIMP_(bool) IsPlanarYUVEnabled();
 	STDMETHODIMP Apply();
+	
 	// IMpeg2DecFilter2
 
 	STDMETHODIMP EnableInterlaced(bool fEnable);

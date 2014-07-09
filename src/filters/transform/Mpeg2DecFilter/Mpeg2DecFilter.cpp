@@ -132,13 +132,13 @@ BOOL WINAPI Mine_IsDebuggerPresent()
 
 LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 {
-	if (dwFlags&CDS_VIDEOPARAMETERS) {
+	if (dwFlags & CDS_VIDEOPARAMETERS) {
 		VIDEOPARAMETERS* vp = (VIDEOPARAMETERS*)lParam;
 
 		if (vp->Guid == GUIDFromCString(_T("{02C62061-1097-11d1-920F-00A024DF156E}"))
-				&& (vp->dwFlags&VP_FLAGS_COPYPROTECT)) {
+				&& (vp->dwFlags & VP_FLAGS_COPYPROTECT)) {
 			if (vp->dwCommand == VP_COMMAND_GET) {
-				if ((vp->dwTVStandard&VP_TV_STANDARD_WIN_VGA) && vp->dwTVStandard != VP_TV_STANDARD_WIN_VGA) {
+				if ((vp->dwTVStandard & VP_TV_STANDARD_WIN_VGA) && vp->dwTVStandard != VP_TV_STANDARD_WIN_VGA) {
 					TRACE(_T("Ooops, tv-out enabled? macrovision checks suck...\n"));
 					vp->dwTVStandard = VP_TV_STANDARD_WIN_VGA;
 				}
@@ -168,7 +168,7 @@ class CMpeg2DecFilterApp : public CFilterApp
 {
 public:
 	BOOL InitInstance() {
-		long		lError;
+		long lError;
 
 		if (!__super::InitInstance()) {
 			return FALSE;
@@ -183,7 +183,7 @@ public:
 		DetourAttach(&(PVOID&)Real_ChangeDisplaySettingsExW, (PVOID)Mine_ChangeDisplaySettingsExW);
 
 		lError = DetourTransactionCommit();
-		ASSERT (lError == NOERROR);
+		ASSERT(lError == NOERROR);
 
 		return TRUE;
 	}
@@ -607,60 +607,55 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 				m_dec->m_picture->rtStart = rtStart;
 				rtStart = INVALID_TIME;
 				m_dec->m_picture->fDelivered = false;
-				m_dec->mpeg2_skip(m_fDropFrames && (m_dec->m_picture->flags&PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B);
+				m_dec->mpeg2_skip(m_fDropFrames && (m_dec->m_picture->flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B);
 				break;
 			case STATE_SLICE:
 			case STATE_END: {
-				mpeg2_picture_t* picture = m_dec->m_info.m_display_picture;
-				mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
+					mpeg2_picture_t* picture = m_dec->m_info.m_display_picture;
+					mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
 
-				if (picture && !(picture->flags&PIC_FLAG_SKIP) && fbuf) {
-					ASSERT(!picture->fDelivered);
+					if (picture && !(picture->flags & PIC_FLAG_SKIP) && fbuf) {
+						ASSERT(!picture->fDelivered);
 
-					picture->fDelivered = true;
+						picture->fDelivered = true;
 
-					// frame buffer
+						// frame buffer
 
-					int w = m_dec->m_info.m_sequence->picture_width;
-					int h = m_dec->m_info.m_sequence->picture_height;
-					int pitch = (m_dec->m_info.m_sequence->width + 31) & ~31;
+						int w = m_dec->m_info.m_sequence->picture_width;
+						int h = m_dec->m_info.m_sequence->picture_height;
+						int pitch = (m_dec->m_info.m_sequence->width + 31) & ~31;
 
-					if (m_fb.w != w || m_fb.h != h || m_fb.pitch != pitch) {
-						m_fb.Alloc(w, h, pitch);
-						m_fInitializedBuffer = false;
-					}
+						if (m_fb.w != w || m_fb.h != h || m_fb.pitch != pitch) {
+							m_fb.Alloc(w, h, pitch);
+							m_fInitializedBuffer = false;
+						}
 
-					// start - end
+						// start - end
 
-					m_fb.rtStart = picture->rtStart;
-					if (m_fb.rtStart == INVALID_TIME) {
-						m_fb.rtStart = m_fb.rtStop;
-					}
-					m_fb.rtStop = m_fb.rtStart + m_AvgTimePerFrame * picture->nb_fields / (m_dec->m_info.m_display_picture_2nd ? 1 : 2);
+						m_fb.rtStart = picture->rtStart;
+						if (m_fb.rtStart == INVALID_TIME) {
+							m_fb.rtStart = m_fb.rtStop;
+						}
+						m_fb.rtStop = m_fb.rtStart + m_AvgTimePerFrame * picture->nb_fields / (m_dec->m_info.m_display_picture_2nd ? 1 : 2);
 
-					REFERENCE_TIME rtStart = m_fb.rtStart;
-					REFERENCE_TIME rtStop = m_fb.rtStop;
-					UNREFERENCED_PARAMETER(rtStart);
-					UNREFERENCED_PARAMETER(rtStop);
+						REFERENCE_TIME rtStart = m_fb.rtStart;
+						REFERENCE_TIME rtStop = m_fb.rtStop;
+						UNREFERENCED_PARAMETER(rtStart);
+						UNREFERENCED_PARAMETER(rtStop);
 
-					//
+						SetDeinterlaceMethod();
+						UpdateAspectRatio();
 
-					SetDeinterlaceMethod();
-					UpdateAspectRatio();
-
-					hr = DeliverFast();
-					if (hr != S_OK) {
-						hr = DeliverNormal();
-					}
-					if (hr != S_OK) {
-						return hr;
-					}
-					if (hr == S_OK && !m_fWaitForKeyFrame) {
-						m_fInitializedBuffer = true;
+						hr = Deliver();
+						if (hr != S_OK) {
+							return hr;
+						}
+						if (hr == S_OK && !m_fWaitForKeyFrame) {
+							m_fInitializedBuffer = true;
+						}
 					}
 				}
-			}
-			break;
+				break;
 			default:
 				break;
 		}
@@ -679,115 +674,7 @@ void CMpeg2DecFilter::UpdateAspectRatio()
 	}
 }
 
-HRESULT CMpeg2DecFilter::DeliverFast()
-{
-	HRESULT hr;
-
-	CAutoLock cAutoLock(&m_csReceive);
-
-	mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
-	if (!fbuf) {
-		return S_FALSE;
-	}
-
-	{
-		CAutoLock cAutoLock2(&m_csProps);
-
-		if (GetCLSID(m_pInput->GetConnected()) == CLSID_DVDNavigator
-				|| m_pSubpicInput->HasAnythingToRender(m_fb.rtStart)
-				|| fabs(m_bright) > EPSILON || fabs(m_cont-1.0) > EPSILON
-				|| fabs(m_hue) > EPSILON || fabs(m_sat-1.0) > EPSILON) {
-			return S_FALSE;
-		}
-	}
-
-	if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_I) {
-		m_fWaitForKeyFrame = false;
-	}
-
-	if (m_fb.rtStart < 0 || m_fWaitForKeyFrame) {
-		return S_OK;
-	}
-
-	const CMediaType& mt = m_pOutput->CurrentMediaType();
-
-	if (mt.subtype != MEDIASUBTYPE_I420 && mt.subtype != MEDIASUBTYPE_IYUV && mt.subtype != MEDIASUBTYPE_YV12) {
-		return S_FALSE;
-	}
-
-	CComPtr<IMediaSample> pOut;
-	BYTE* pDataOut = NULL;
-	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame))
-			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
-		return hr;
-	}
-
-	if (mt.subtype != MEDIASUBTYPE_I420 && mt.subtype != MEDIASUBTYPE_IYUV && mt.subtype != MEDIASUBTYPE_YV12) {
-		return S_FALSE;
-	}
-
-	BITMAPINFOHEADER bihOut;
-	ExtractBIH(&mt, &bihOut);
-
-	int w = bihOut.biWidth;
-	int h = abs(bihOut.biHeight);
-	int srcpitch = m_dec->m_info.m_sequence->width; // TODO (..+7)&~7; ?
-	int dstpitch = bihOut.biWidth;
-
-	BYTE* y = pDataOut;
-	BYTE* u = y + dstpitch*h;
-	BYTE* v = y + dstpitch*h*5/4;
-
-	if (bihOut.biCompression == '21VY') {
-		BYTE* tmp = u;
-		u = v;
-		v = tmp;
-	}
-
-	if (m_fb.di == DIWeave) {
-		BitBltFromI420ToI420(w, h, y, u, v, dstpitch, fbuf->buf[0], fbuf->buf[1], fbuf->buf[2], srcpitch);
-	} else if (m_fb.di == DIBlend) {
-		DeinterlaceBlend(y, fbuf->buf[0], w, h, dstpitch, srcpitch);
-		DeinterlaceBlend(u, fbuf->buf[1], w/2, h/2, dstpitch/2, srcpitch/2);
-		DeinterlaceBlend(v, fbuf->buf[2], w/2, h/2, dstpitch/2, srcpitch/2);
-	} else { // TODO
-		return S_FALSE;
-	}
-
-	if (h == 1088) {
-		memset(y + dstpitch*(h-8), 0xff, dstpitch*8);
-		memset(u + dstpitch*(h-8)/4, 0x80, dstpitch*8/4);
-		memset(v + dstpitch*(h-8)/4, 0x80, dstpitch*8/4);
-	}
-
-	if (CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput)) {
-		CAutoLock cAutoLock(&pPin->m_csRateLock);
-
-		if (m_rate.Rate != pPin->m_ratechange.Rate) {
-			m_rate.Rate = pPin->m_ratechange.Rate;
-			m_rate.StartTime = m_fb.rtStart;
-		}
-	}
-
-	REFERENCE_TIME rtStart = m_fb.rtStart;
-	REFERENCE_TIME rtStop = m_fb.rtStop;
-
-	rtStart = m_rate.StartTime + (rtStart - m_rate.StartTime) * m_rate.Rate / 10000;
-	rtStop = m_rate.StartTime + (rtStop - m_rate.StartTime) * m_rate.Rate / 10000;
-
-	pOut->SetTime(&rtStart, &rtStop);
-	pOut->SetMediaTime(NULL, NULL);
-
-	//
-
-	SetTypeSpecificFlags(pOut);
-
-	//
-
-	return m_pOutput->Deliver(pOut);
-}
-
-HRESULT CMpeg2DecFilter::DeliverNormal()
+HRESULT CMpeg2DecFilter::Deliver()
 {
 	HRESULT hr = S_OK;
 
@@ -806,10 +693,9 @@ HRESULT CMpeg2DecFilter::DeliverNormal()
 	REFERENCE_TIME rtStart = m_fb.rtStart;
 	REFERENCE_TIME rtStop = m_fb.rtStop;
 
-	bool tff = !!(m_fb.flags&PIC_FLAG_TOP_FIELD_FIRST);
+	bool tff = !!(m_fb.flags & PIC_FLAG_TOP_FIELD_FIRST);
 
 	// deinterlace
-
 	if (m_fb.di == DIWeave) {
 		BitBltFromI420ToI420(w, h, m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], dpitch, fbuf->buf[0], fbuf->buf[1], fbuf->buf[2], spitch);
 	} else if (m_fb.di == DIBlend) {
@@ -836,11 +722,9 @@ HRESULT CMpeg2DecFilter::DeliverNormal()
 	}
 
 	// postproc
-
 	ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
 
 	// deliver
-
 	if (m_fb.di == DIWeave || m_fInitializedBuffer) {
 		hr = Deliver(false);
 		if (FAILED(hr)) {
@@ -857,11 +741,9 @@ HRESULT CMpeg2DecFilter::DeliverNormal()
 		m_fb.rtStop = rtStop;
 
 		// postproc
-
 		ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
 
 		// deliver
-
 		hr = Deliver(false);
 	} else if (m_fb.di == DIFieldShift) {
 		int soffset = !tff ? 0 : spitch;
@@ -886,7 +768,7 @@ HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	if ((m_fb.flags&PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_I) {
+	if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_I) {
 		m_fWaitForKeyFrame = false;
 	}
 
@@ -923,8 +805,6 @@ HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 
 	CopyBuffer(pDataOut, buf, (m_fb.w+7)&~7, m_fb.h, m_fb.pitch, MEDIASUBTYPE_I420, !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME));
 
-	//
-
 	if (CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput)) {
 		CAutoLock cAutoLock(&pPin->m_csRateLock);
 
@@ -943,11 +823,7 @@ HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
 
-	//
-
 	SetTypeSpecificFlags(pOut);
-
-	//
 
 	hr = m_pOutput->Deliver(pOut);
 
@@ -1076,11 +952,6 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 
 HRESULT CMpeg2DecFilter::StopStreaming()
 {
-	/*
-		CString str;
-		str.Format(_T("%d"), clock()-g_clock);
-		AfxMessageBox(str);
-	*/
 	m_dec.Free();
 
 	return __super::StopStreaming();
@@ -1143,7 +1014,7 @@ STDMETHODIMP_(ditype) CMpeg2DecFilter::GetDeinterlaceMethod()
 	return m_ditype;
 }
 
-void CMpeg2DecFilter::CalcBrCont(BYTE* YTbl, float bright, float cont)
+static void CalcBrCont(BYTE* YTbl, float bright, float cont)
 {
 	int Cont = (int)(cont * 512);
 	int Bright = (int)bright;
@@ -1155,7 +1026,7 @@ void CMpeg2DecFilter::CalcBrCont(BYTE* YTbl, float bright, float cont)
 	}
 }
 
-void CMpeg2DecFilter::CalcHueSat(BYTE* UTbl, BYTE* VTbl, float hue, float sat)
+static void CalcHueSat(BYTE* UTbl, BYTE* VTbl, float hue, float sat)
 {
 	int Sat = (int)(sat * 512);
 	double Hue = (hue * 3.1415926) / 180.0;
@@ -1182,11 +1053,11 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (fabs(m_bright) > EPSILON || fabs(m_cont-1.0) > EPSILON) {
+	if (fabs(m_bright) > EPSILON || fabs(m_cont - 1.0) > EPSILON) {
 		int size = pitch*h;
 
-		if ((g_cpuid.m_flags&CCpuID::sse2) && ((DWORD_PTR)srcy & 15) == 0) {
-			short Cont = (short)(min(max(m_cont, 0) * 512, (1<<16)-1));
+		if ((g_cpuid.m_flags & CCpuID::sse2) && ((DWORD_PTR)srcy & 15) == 0) {
+			short Cont = (short)(min(max(m_cont, 0) * 512, (1 << 16) - 1));
 			short Bright = (short)(m_bright + 16);
 
 			__m128i bc = _mm_set_epi16(Bright, Cont, Bright, Cont, Bright, Cont, Bright, Cont);
@@ -1195,8 +1066,8 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 			__m128i _16 = _mm_set1_epi16(16);
 			__m128i _512 = _mm_set1_epi16(512);
 
-			for (int i = 0, j = size>>4; i < j; i++) {
-				__m128i r = _mm_load_si128((__m128i*)&srcy[i*16]);
+			for (int i = 0, j = size >> 4; i < j; i++) {
+				__m128i r = _mm_load_si128((__m128i*)&srcy[i * 16]);
 
 				__m128i rl = _mm_unpacklo_epi8(r, zero);
 				__m128i rh = _mm_unpackhi_epi8(r, zero);
@@ -1224,7 +1095,7 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 
 				r = _mm_packus_epi16(rl, rh);
 
-				_mm_store_si128((__m128i*)&srcy[i*16], r);
+				_mm_store_si128((__m128i*)&srcy[i * 16], r);
 			}
 
 			srcy += size>>4;
@@ -1236,13 +1107,12 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 		}
 	}
 
-	pitch /= 2;
-	w /= 2;
-	h /= 2;
-
-	if (fabs(m_hue) > EPSILON || fabs(m_sat-1.0) > EPSILON) {
+	if (fabs(m_hue) > EPSILON || fabs(m_sat - 1.0) > EPSILON) {
+		pitch /= 2;
+		w /= 2;
+		h /= 2;
 		for (int size = pitch*h; size > 0; size--) {
-			WORD uv = (*srcv<<8)|*srcu;
+			WORD uv = (*srcv << 8) | *srcu;
 			*srcu++ = m_UTbl[uv];
 			*srcv++ = m_VTbl[uv];
 		}
@@ -1433,14 +1303,14 @@ STDMETHODIMP CMpeg2DecInputPin::Get(REFGUID PropSet, ULONG Id, LPVOID pInstanceD
 			case AM_RATE_MaxFullDataRate: {
 				AM_MaxFullDataRate* p = (AM_MaxFullDataRate*)pPropertyData;
 				UNREFERENCED_PARAMETER(p);
-				*p = 8*10000;
+				*p = 8 * 10000;
 				*pBytesReturned = sizeof(AM_MaxFullDataRate);
 			}
 			break;
 			case AM_RATE_QueryFullFrameRate: {
 				AM_QueryRate* p = (AM_QueryRate*)pPropertyData;
-				p->lMaxForwardFullFrame = 8*10000;
-				p->lMaxReverseFullFrame = 8*10000;
+				p->lMaxForwardFullFrame = 8 * 10000;
+				p->lMaxReverseFullFrame = 8 * 10000;
 				*pBytesReturned = sizeof(AM_QueryRate);
 			}
 			break;
@@ -1901,7 +1771,7 @@ STDMETHODIMP CSubpicInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG* p
 static __inline BYTE GetNibble(BYTE* p, DWORD* offset, int& nField, int& fAligned)
 {
 	BYTE ret = (p[offset[nField]] >> (fAligned << 2)) & 0x0f;
-	offset[nField] += 1-fAligned;
+	offset[nField] += 1 - fAligned;
 	fAligned = !fAligned;
 	return ret;
 }
@@ -1912,7 +1782,7 @@ static __inline BYTE GetHalfNibble(BYTE* p, DWORD* offset, int& nField, int& n)
 	if (!n) {
 		offset[nField]++;
 	}
-	n = (n-1+4)&3;
+	n = (n - 1 + 4) & 3;
 	return ret;
 }
 
@@ -1922,7 +1792,7 @@ static __inline void DrawPixel(BYTE** yuv, CPoint pt, int pitch, AM_DVD_YUV& c)
 		return;
 	}
 
-	BYTE* p = &yuv[0][pt.y*pitch + pt.x];
+	BYTE* p = &yuv[0][pt.y * pitch + pt.x];
 	//*p = (*p*(15-contrast) + sppal[color].Y*contrast)>>4;
 	*p -= (*p - c.Y) * c.Reserved >> 4;
 
@@ -1936,11 +1806,11 @@ static __inline void DrawPixel(BYTE** yuv, CPoint pt, int pitch, AM_DVD_YUV& c)
 
 	// U/V is exchanged? wierd but looks true when comparing the outputted colors from other decoders
 
-	p = &yuv[1][pt.y*pitch + pt.x];
+	p = &yuv[1][pt.y * pitch + pt.x];
 	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)sppal[color].V-0x80)*contrast) >> 4) + 0x80);
 	*p -= (*p - c.V) * c.Reserved >> 4;
 
-	p = &yuv[2][pt.y*pitch + pt.x];
+	p = &yuv[2][pt.y * pitch + pt.x];
 	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)sppal[color].U-0x80)*contrast) >> 4) + 0x80);
 	*p -= (*p - c.U) * c.Reserved >> 4;
 
@@ -1971,7 +1841,7 @@ static __inline void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, AM_DV
 		}
 
 		if (pt.y < rc.top || pt.y >= rc.bottom
-				|| pt.x+len < rc.left || pt.x >= rc.right) {
+				|| pt.x + len < rc.left || pt.x >= rc.right) {
 			return;
 		}
 	}
@@ -1990,8 +1860,8 @@ bool CSubpicInputPin::dvdspu::Parse()
 
 	BYTE* p = GetData();
 
-	WORD packetsize = (p[0]<<8)|p[1];
-	WORD datasize = (p[2]<<8)|p[3];
+	WORD packetsize = (p[0] << 8) | p[1];
+	WORD datasize = (p[2] << 8) | p[3];
 
 	if (packetsize > GetCount() || datasize > packetsize) {
 		return false;
@@ -1999,7 +1869,7 @@ bool CSubpicInputPin::dvdspu::Parse()
 
 	int i, next = datasize;
 
-#define GetWORD (p[i]<<8)|p[i+1]; i += 2
+#define GetWORD (p[i] << 8) | p[i + 1]; i += 2
 
 	do {
 		i = next;
@@ -2011,7 +1881,7 @@ bool CSubpicInputPin::dvdspu::Parse()
 			return false;
 		}
 
-		REFERENCE_TIME rt = m_rtStart + 1024*PTS2RT(pts);
+		REFERENCE_TIME rt = m_rtStart + 1024 * PTS2RT(pts);
 
 		for (bool fBreak = false; !fBreak; ) {
 			int len = 0;
@@ -2062,26 +1932,26 @@ bool CSubpicInputPin::dvdspu::Parse()
 					m_rtStop = rt;
 					break;
 				case 0x03:
-					m_sphli.ColCon.emph2col = p[i]>>4;
-					m_sphli.ColCon.emph1col = p[i]&0xf;
-					m_sphli.ColCon.patcol = p[i+1]>>4;
-					m_sphli.ColCon.backcol = p[i+1]&0xf;
+					m_sphli.ColCon.emph2col	= p[i] >> 4;
+					m_sphli.ColCon.emph1col	= p[i] & 0xf;
+					m_sphli.ColCon.patcol	= p[i + 1] >> 4;
+					m_sphli.ColCon.backcol	= p[i + 1] & 0xf;
 					i += 2;
 					break;
 				case 0x04:
-					if (p[i] || p[i+1]) {
-						m_sphli.ColCon.emph2con = p[i]>>4;
-						m_sphli.ColCon.emph1con = p[i]&0xf;
-						m_sphli.ColCon.patcon = p[i+1]>>4;
-						m_sphli.ColCon.backcon = p[i+1]&0xf;
+					if (p[i] || p[i + 1]) {
+						m_sphli.ColCon.emph2con	= p[i] >> 4;
+						m_sphli.ColCon.emph1con	= p[i] & 0xf;
+						m_sphli.ColCon.patcon	= p[i + 1] >> 4;
+						m_sphli.ColCon.backcon	= p[i + 1] & 0xf;
 					}
 					i += 2;
 					break;
 				case 0x05:
-					m_sphli.StartX = (p[i]<<4) + (p[i+1]>>4);
-					m_sphli.StopX = ((p[i+1]&0x0f)<<8) + p[i+2]+1;
-					m_sphli.StartY = (p[i+3]<<4) + (p[i+4]>>4);
-					m_sphli.StopY = ((p[i+4]&0x0f)<<8) + p[i+5]+1;
+					m_sphli.StartX	= (p[i] << 4) + (p[i + 1] >> 4);
+					m_sphli.StopX	= ((p[i + 1] & 0x0f) << 8) + p[i + 2] + 1;
+					m_sphli.StartY	= (p[i + 3] << 4) + (p[i + 4] >> 4);
+					m_sphli.StopY	= ((p[i + 4] & 0x0f) << 8) + p[i + 5] + 1;
 					i += 6;
 					break;
 				case 0x06:
@@ -2146,9 +2016,9 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	int nField = 0;
 	int fAligned = 1;
 
-	DWORD end[2] = {offset[1], (p[2]<<8)|p[3]};
+	DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
 	if (offset[0] > offset[1]) {
-		end[0] = (p[2]<<8)|p[3];
+		end[0] = (p[2] << 8) | p[3];
 		end[1] = offset[0];
 	}
 
@@ -2183,8 +2053,8 @@ bool CSubpicInputPin::cvdspu::Parse()
 {
 	BYTE* p = GetData();
 
-	WORD packetsize = (p[0]<<8)|p[1];
-	WORD datasize = (p[2]<<8)|p[3];
+	WORD packetsize = (p[0] << 8) | p[1];
+	WORD datasize = (p[2] << 8) | p[3];
 
 	if (packetsize > GetCount() || datasize > packetsize) {
 		return false;
@@ -2192,54 +2062,54 @@ bool CSubpicInputPin::cvdspu::Parse()
 
 	p = GetData() + datasize;
 
-	for (int i = datasize, j = packetsize-4; i <= j; i+=4, p+=4) {
+	for (int i = datasize, j = packetsize-4; i <= j; i += 4, p += 4) {
 		switch (p[0]) {
 			case 0x0c:
 				break;
 			case 0x04:
-				m_rtStop = m_rtStart + 10000i64*((p[1]<<16)|(p[2]<<8)|p[3])/90;
+				m_rtStop = m_rtStart + 10000i64 * ((p[1] << 16) | (p[2] << 8) | p[3]) / 90;
 				break;
 			case 0x17:
-				m_sphli.StartX = ((p[1]&0x0f)<<6) + (p[2]>>2);
-				m_sphli.StartY = ((p[2]&0x03)<<8) + p[3];
+				m_sphli.StartX = ((p[1] & 0x0f) << 6) + (p[2] >> 2);
+				m_sphli.StartY = ((p[2] & 0x03) << 8) + p[3];
 				break;
 			case 0x1f:
-				m_sphli.StopX = ((p[1]&0x0f)<<6) + (p[2]>>2);
-				m_sphli.StopY = ((p[2]&0x03)<<8) + p[3];
+				m_sphli.StopX = ((p[1] & 0x0f) << 6) + (p[2] >> 2);
+				m_sphli.StopY = ((p[2] & 0x03) << 8) + p[3];
 				break;
 			case 0x24:
 			case 0x25:
 			case 0x26:
 			case 0x27:
-				m_sppal[0][p[0]-0x24].Y = p[1];
-				m_sppal[0][p[0]-0x24].U = p[2];
-				m_sppal[0][p[0]-0x24].V = p[3];
+				m_sppal[0][p[0] - 0x24].Y = p[1];
+				m_sppal[0][p[0] - 0x24].U = p[2];
+				m_sppal[0][p[0] - 0x24].V = p[3];
 				break;
 			case 0x2c:
 			case 0x2d:
 			case 0x2e:
 			case 0x2f:
-				m_sppal[1][p[0]-0x2c].Y = p[1];
-				m_sppal[1][p[0]-0x2c].U = p[2];
-				m_sppal[1][p[0]-0x2c].V = p[3];
+				m_sppal[1][p[0] - 0x2c].Y = p[1];
+				m_sppal[1][p[0] - 0x2c].U = p[2];
+				m_sppal[1][p[0] - 0x2c].V = p[3];
 				break;
 			case 0x37:
-				m_sppal[0][3].Reserved = p[2]>>4;
-				m_sppal[0][2].Reserved = p[2]&0xf;
-				m_sppal[0][1].Reserved = p[3]>>4;
-				m_sppal[0][0].Reserved = p[3]&0xf;
+				m_sppal[0][3].Reserved = p[2] >> 4;
+				m_sppal[0][2].Reserved = p[2] & 0xf;
+				m_sppal[0][1].Reserved = p[3] >> 4;
+				m_sppal[0][0].Reserved = p[3] & 0xf;
 				break;
 			case 0x3f:
-				m_sppal[1][3].Reserved = p[2]>>4;
-				m_sppal[1][2].Reserved = p[2]&0xf;
-				m_sppal[1][1].Reserved = p[3]>>4;
-				m_sppal[1][0].Reserved = p[3]&0xf;
+				m_sppal[1][3].Reserved = p[2] >> 4;
+				m_sppal[1][2].Reserved = p[2] & 0xf;
+				m_sppal[1][1].Reserved = p[3] >> 4;
+				m_sppal[1][0].Reserved = p[3] & 0xf;
 				break;
 			case 0x47:
-				m_offset[0] = (p[2]<<8)|p[3];
+				m_offset[0] = (p[2] << 8) | p[3];
 				break;
 			case 0x4f:
-				m_offset[1] = (p[2]<<8)|p[3];
+				m_offset[1] = (p[2] << 8) | p[3];
 				break;
 			default:
 				break;
@@ -2262,25 +2132,25 @@ void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	*/
 
 	CSize size(m_sphli.StopX - m_sphli.StartX, m_sphli.StopY - m_sphli.StartY);
-	CPoint pt((rcclip.Width() - size.cx) / 2, (rcclip.Height()*3 - size.cy*1) / 4);
+	CPoint pt((rcclip.Width() - size.cx) / 2, (rcclip.Height() * 3 - size.cy * 1) / 4);
 	CRect rc(pt, size);
 
 	int nField = 0;
 	int fAligned = 1;
 
-	DWORD end[2] = {offset[1], (p[2]<<8)|p[3]};
+	DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
 		BYTE code;
 
 		if ((code = GetNibble(p, offset, nField, fAligned)) >= 0x4) {
-			DrawPixels(yuv, w, pt, code >> 2, m_sppal[0][code&3], rcclip);
+			DrawPixels(yuv, w, pt, code >> 2, m_sppal[0][code & 3], rcclip);
 			pt.x += code >> 2;
 			continue;
 		}
 
 		code = GetNibble(p, offset, nField, fAligned);
-		DrawPixels(yuv, w, pt, rc.right - pt.x, m_sppal[0][code&3], rcclip);
+		DrawPixels(yuv, w, pt, rc.right - pt.x, m_sppal[0][code & 3], rcclip);
 
 		if (!fAligned) {
 			GetNibble(p, offset, nField, fAligned);    // align to byte
@@ -2303,29 +2173,29 @@ bool CSubpicInputPin::svcdspu::Parse()
 		return false;
 	}
 
-	WORD packetsize = (p[0]<<8)|p[1];
+	WORD packetsize = (p[0] << 8) | p[1];
 	p += 2;
 
 	if (packetsize > GetCount()) {
 		return false;
 	}
 
-	bool duration = !!(*p++&0x04);
+	bool duration = !!(*p++ & 0x04);
 
 	*p++; // unknown
 
 	if (duration) {
-		m_rtStop = m_rtStart + 10000i64*((p[0]<<24)|(p[1]<<16)|(p[2]<<8)|p[3])/90;
+		m_rtStop = m_rtStart + 10000i64 * ((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]) / 90;
 		p += 4;
 	}
 
-	m_sphli.StartX = m_sphli.StopX = (p[0]<<8)|p[1];
+	m_sphli.StartX = m_sphli.StopX = (p[0] << 8) | p[1];
 	p += 2;
-	m_sphli.StartY = m_sphli.StopY = (p[0]<<8)|p[1];
+	m_sphli.StartY = m_sphli.StopY = (p[0] << 8) | p[1];
 	p += 2;
-	m_sphli.StopX += (p[0]<<8)|p[1];
+	m_sphli.StopX += (p[0] << 8) | p[1];
 	p += 2;
-	m_sphli.StopY += (p[0]<<8)|p[1];
+	m_sphli.StopY += (p[0] << 8) | p[1];
 	p += 2;
 
 	for (int i = 0; i < 4; i++) {
@@ -2339,7 +2209,7 @@ bool CSubpicInputPin::svcdspu::Parse()
 		p += 4;    // duration of the shift operation should be here, but it is untested
 	}
 
-	m_offset[1] = (p[0]<<8)|p[1];
+	m_offset[1] = (p[0] << 8) | p[1];
 	p += 2;
 
 	m_offset[0] = p - p0;
@@ -2361,19 +2231,19 @@ void CSubpicInputPin::svcdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int 
 	*/
 
 	CSize size(m_sphli.StopX - m_sphli.StartX, m_sphli.StopY - m_sphli.StartY);
-	CPoint pt((rcclip.Width() - size.cx) / 2, (rcclip.Height()*3 - size.cy*1) / 4);
+	CPoint pt((rcclip.Width() - size.cx) / 2, (rcclip.Height() * 3 - size.cy * 1) / 4);
 	CRect rc(pt, size);
 
 	int nField = 0;
 	int n = 3;
 
-	DWORD end[2] = {offset[1], (p[2]<<8)|p[3]};
+	DWORD end[2] = {offset[1], (p[2] << 8) | p[3]};
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
 		BYTE code = GetHalfNibble(p, offset, nField, n);
 		BYTE repeat = 1 + (code == 0 ? GetHalfNibble(p, offset, nField, n) : 0);
 
-		DrawPixels(yuv, w, pt, repeat, m_sppal[code&3], rcclip);
+		DrawPixels(yuv, w, pt, repeat, m_sppal[code & 3], rcclip);
 		if ((pt.x += repeat) < rc.right) {
 			continue;
 		}
