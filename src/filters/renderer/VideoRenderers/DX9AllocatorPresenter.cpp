@@ -29,6 +29,7 @@
 #include "IPinHook.h"
 #include <Version.h>
 #include "../DSUtil/WinAPIUtils.h"
+#include "../../transform/VSFilter/IDirectVobSub.h"
 
 CCritSec g_ffdshowReceive;
 bool queue_ffdshow_support = false;
@@ -2286,4 +2287,34 @@ STDMETHODIMP CDX9AllocatorPresenter::SetPixelShader2(LPCSTR pSrcData, LPCSTR pTa
 	CAutoLock cRenderLock(&m_RenderLock);
 
 	return SetCustomPixelShader(pSrcData, pTarget, bScreenSpace);
+}
+
+void CDX9AllocatorPresenter::FillAddingField(CComPtr<IPin> pPin, CMediaType* mt)
+{
+	ExtractAvgTimePerFrame(mt, m_rtTimePerFrame);
+
+	BITMAPINFOHEADER bih;
+	if (ExtractBIH(mt, &bih)) {
+		m_InputVCodec = GetGUIDString(mt->subtype);
+		m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
+	}
+
+	m_Decoder.Empty();
+	CComPtr<IPin> pPinTo;
+	if (pPin && SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
+		IBaseFilter* pBF = GetFilterFromPin(pPinTo);
+		if (CComQIPtr<IDirectVobSub> pDVS = pBF) {
+			pPin = GetFirstPin(pBF);
+			pPin = GetUpStreamPin(pBF, pPin);
+			if (pPin) {
+				pBF = GetFilterFromPin(pPin);
+				if (pBF) {
+					m_Decoder = GetFilterName(pBF);
+				}
+			}
+		}
+		if (m_Decoder.IsEmpty()) {
+			m_Decoder = GetFilterName(GetFilterFromPin(pPinTo));
+		}
+	}
 }

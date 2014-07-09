@@ -328,18 +328,8 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 		if (SUCCEEDED (m_pIVMRSurfAllocNotify->QueryInterface (__uuidof(IBaseFilter), (void**)&pVMR9)) &&
 				SUCCEEDED (pVMR9->FindPin(L"VMR Input0", &pPin)) &&
 				SUCCEEDED (pPin->ConnectionMediaType(&mt)) ) {
-			ExtractAvgTimePerFrame (&mt, m_rtTimePerFrame);
 
-			CComPtr<IPin> pPinTo;
-			if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
-				m_Decoder = GetFilterName(GetFilterFromPin(pPinTo));
-			}
-
-			BITMAPINFOHEADER bih;
-			if (ExtractBIH(&mt, &bih)) {
-				m_InputVCodec = GetGUIDString(mt.subtype);
-				m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
-			}
+			FillAddingField(pPin, &mt);
 
 			CSize NativeVideoSize = m_NativeVideoSize;
 			CSize AspectRatio = m_AspectRatio;

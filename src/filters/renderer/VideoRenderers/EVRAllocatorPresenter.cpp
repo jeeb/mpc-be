@@ -1591,18 +1591,7 @@ void CEVRAllocatorPresenter::GetMixerThread()
 					if (SUCCEEDED(m_pOuterEVR->FindPin(L"EVR Input0", &pPin)) &&
 						SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
 
-						ExtractAvgTimePerFrame(&mt, m_rtTimePerFrame);
-
-						CComPtr<IPin> pPinTo;
-						if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
-							m_Decoder = GetFilterName(GetFilterFromPin(pPinTo));
-						}
-
-						BITMAPINFOHEADER bih;
-						if (ExtractBIH(&mt, &bih)) {
-							m_InputVCodec = GetGUIDString(mt.subtype);
-							m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
-						}
+						FillAddingField(pPin, &mt);
 					}
 					// If framerate not set by Video Decoder - choose 23.976
 					if (m_rtTimePerFrame == 1) {

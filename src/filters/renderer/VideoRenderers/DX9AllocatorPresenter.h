@@ -283,8 +283,9 @@ namespace DSObjects
 		CString					m_D3D9DeviceName;
 
 		CString					m_Decoder;
-
 		CString					m_InputVCodec;
+
+		void					FillAddingField(CComPtr<IPin> pPin, CMediaType* mt);
 
 		CString					m_MonitorName;
 		UINT16					m_nMonitorHorRes, m_nMonitorVerRes;
