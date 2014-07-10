@@ -1374,6 +1374,10 @@ STDMETHODIMP CMpegSplitterFilter::Count(DWORD* pcStreams)
 		(*pcStreams) += m_pFile->m_streams[i].GetCount();
 	}
 
+	if (m_pFile->m_programs.GetValidCount() > 1) {
+		(*pcStreams) += m_pFile->m_programs.GetValidCount();
+	}
+
 	return S_OK;
 }
 
@@ -1383,10 +1387,46 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 		return E_NOTIMPL;
 	}
 
+	if (m_pFile->m_programs.GetValidCount() > 1) {
+		if (lIndex < (long)m_pFile->m_programs.GetValidCount()) {
+			POSITION pos = m_pFile->m_programs.GetStartPosition();
+			int j = 0;
+			while (pos) {
+				CMpegSplitterFile::program* p = &m_pFile->m_programs.GetNextValue(pos);
+				if (!p->streamCount(&m_pFile->m_streams)) {
+					continue;
+				}
+				if (j == lIndex) {
+					for (size_t i = 0; i < _countof(p->streams); i++) {
+						if (p->streams[i].pid) {
+							long index = m_pFile->m_programs.GetValidCount();
+							for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+								POSITION pos2 = m_pFile->m_streams[type].GetHeadPosition();
+								while (pos2) {
+									CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos2);
+									if (s.pid == p->streams[i].pid) {
+										Enable(index, dwFlags);
+									}
+									index++;
+								}
+							}
+						}
+					}
+					break;
+				}
+				j++;
+			}
+
+			return S_OK;
+		}
+
+		lIndex -= m_pFile->m_programs.GetValidCount();
+	}
+
 	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type < _countof(m_pFile->m_streams); type++) {
 		int cnt = m_pFile->m_streams[type].GetCount();
 
-		if (lIndex >= j && lIndex < j+cnt) {
+		if (lIndex >= j && lIndex < j + cnt) {
 			lIndex -= j;
 
 			POSITION pos = m_pFile->m_streams[type].FindIndex(lIndex);
@@ -1453,6 +1493,84 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 
 STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk)
 {
+	if (m_pFile->m_programs.GetValidCount() > 1) {
+		if (lIndex < (long)m_pFile->m_programs.GetValidCount()) {
+			int type = -1;
+			for (type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+				if (m_pFile->m_streams[type].GetCount()) {
+					break;
+				}
+			}
+
+			WORD pidEnabled = -1;
+			if (type == CMpegSplitterFile::stream_type::video
+					|| type == CMpegSplitterFile::stream_type::audio) {
+				CMpegSplitterFile::CStreamList& lst = m_pFile->m_streams[type];
+				POSITION pos = lst.GetHeadPosition();
+				while (pos) {
+					CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
+					if (GetOutputPin(s)) {
+						pidEnabled = s;
+						break;
+					}
+				}
+			}
+
+			POSITION pos = m_pFile->m_programs.GetStartPosition();
+			int j = 0;
+			while (pos) {
+				CMpegSplitterFile::program* p = &m_pFile->m_programs.GetNextValue(pos);
+				if (!p->streamCount(&m_pFile->m_streams)) {
+					continue;
+				}
+			
+				if (j == lIndex) {
+					if (ppmt) {
+						*ppmt = NULL;
+					}
+					if (pdwFlags) {
+						*pdwFlags = 0;
+
+						for (size_t i = 0; i < _countof(p->streams); i++) {
+							if (p->streams[i].pid == pidEnabled) {
+								*pdwFlags = AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE;
+								break;
+							}
+						}
+					}
+					if (plcid) {
+						*plcid = 0;
+					}
+					if (pdwGroup) {
+						*pdwGroup = 0x67458F;
+					}
+					if (ppObject) {
+						*ppObject = NULL;
+					}
+					if (ppUnk) {
+						*ppUnk = NULL;
+					}
+					if (ppszName) {
+						CString str;
+						str.Format(_T("Program - %d"), p->program_number);
+
+						*ppszName = (WCHAR*)CoTaskMemAlloc((str.GetLength() + 1) * sizeof(WCHAR));
+						if (*ppszName == NULL) {
+							return E_OUTOFMEMORY;
+						}
+
+						wcscpy_s(*ppszName, str.GetLength()+1, str);
+					}
+					return S_OK;
+				}
+				j++;
+			}
+
+			return S_OK;
+		}
+		lIndex -= m_pFile->m_programs.GetValidCount();
+	}
+
 	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type < _countof(m_pFile->m_streams); type++) {
 		int cnt = m_pFile->m_streams[type].GetCount();
 
@@ -1471,7 +1589,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 				*ppmt = CreateMediaType(&s.mts[0]);
 			}
 			if (pdwFlags) {
-				*pdwFlags = GetOutputPin(s) ? (AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE) : 0;
+				*pdwFlags = GetOutputPin(s) ? (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE) : 0;
 			}
 			if (plcid) {
 				CStringA lang_name	= s.lang;

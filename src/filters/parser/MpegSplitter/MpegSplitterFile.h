@@ -169,10 +169,10 @@ public:
 				type == audio	? L"Audio" :
 				type == subpic	? L"Subtitle" :
 				type == stereo	? L"Stereo" :
-				L"Unknown";
+								  L"Unknown";
 		}
 
-		const stream* FindStream(int pid) {
+		const stream* FindStream(WORD pid) {
 			for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
 				const stream& s = GetAt(pos);
 				if (s.pid == pid) {
@@ -182,8 +182,9 @@ public:
 
 			return NULL;
 		}
-
-	} m_streams[unknown];
+	};
+	typedef CStreamList CStreamsList[unknown];
+	CStreamsList m_streams;
 
 	void SearchStreams(__int64 start, __int64 stop, BOOL CalcDuration = FALSE);
 	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream = TRUE);
@@ -209,8 +210,58 @@ public:
 		struct program() {
 			memset(this, 0, sizeof(*this));
 		}
+
+		size_t streamCount(CStreamsList* s) {
+			size_t cnt = 0;
+			for (size_t i = 0; i < _countof(streams); i++) {
+				if (streams[i].pid) {
+					for (int type = stream_type::video; type < stream_type::unknown; type++) {
+						if (s[stream_type::video]->FindStream(streams[i].pid)) {
+							cnt++;
+							break;
+						}
+					}
+				}
+			}
+
+			return cnt;
+		}
 	};
-	CAtlMap<WORD, program> m_programs;
+
+	class CPrograms : public CAtlMap<WORD, program>
+	{
+		CStreamsList* s;
+	public:
+		CPrograms(CStreamsList* sList) {
+			s = sList;
+		}
+		size_t GetValidCount() {
+			size_t cnt = 0;
+			POSITION pos = GetStartPosition();
+			while (pos) {
+				program* p = &GetNextValue(pos);
+				if (p->streamCount(s)) {
+					cnt++;
+				}
+			}
+
+			return cnt;
+		}
+
+		const program* FindProgram(WORD pid) {
+			POSITION pos = GetStartPosition();
+			while (pos) {
+				program* p = &GetNextValue(pos);
+				for (size_t i = 0; i < _countof(p->streams); i++) {
+					if (p->streams[i].pid == pid) {
+						return p;
+					}
+				}
+			}
+
+			return NULL;
+		}
+	} m_programs;
 
 	void SearchPrograms(__int64 start, __int64 stop);
 	void UpdatePrograms(const trhdr& h, bool UpdateLang = true);

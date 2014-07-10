@@ -43,6 +43,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_bOpeningCompleted(FALSE)
 	, m_bIsBadPacked(FALSE)
 	, m_lastLen(0)
+	, m_programs(&m_streams)
 {
 	memset(m_psm, 0, sizeof(m_psm));
 	if (SUCCEEDED(hr)) {
@@ -1087,14 +1088,14 @@ void CMpegSplitterFile::UpdatePrograms(const trhdr& h, bool UpdateLang)
 
 			POSITION pos = m_programs.GetStartPosition();
 			while (pos) {
-				const CAtlMap<WORD, program>::CPair* pPair = m_programs.GetNext(pos);
+				const CPrograms::CPair* pPair = m_programs.GetNext(pos);
 
 				if (!newprograms.Lookup(pPair->m_value.program_number)) {
 					m_programs.RemoveKey(pPair->m_key);
 				}
 			}
 		}
-	} else if (CAtlMap<WORD, program>::CPair* pPair = m_programs.Lookup(h.pid)) {
+	} else if (CPrograms::CPair* pPair = m_programs.Lookup(h.pid)) {
 		if (h.payload && h.payloadstart) {
 			trsechdr h2;
 			if (Read(h2) && h2.table_id == 2) {
@@ -1138,8 +1139,7 @@ void CMpegSplitterFile::UpdatePrograms(const trhdr& h, bool UpdateLang)
 
 void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLang)
 {
-	if (CAtlMap<WORD, program>::CPair* pPair = m_programs.Lookup(pid))
-	{
+	if (CPrograms::CPair* pPair = m_programs.Lookup(pid)) {
 		memset(pPair->m_value.streams, 0, sizeof(pPair->m_value.streams));
 
 		int len = gb.GetSize();
@@ -1169,8 +1169,11 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 			UNREFERENCED_PARAMETER(nreserved1);
 			UNREFERENCED_PARAMETER(nreserved2);
 
-			pPair->m_value.streams[i].pid	= pid;
-			pPair->m_value.streams[i].type	= (PES_STREAM_TYPE)stream_type;
+
+			if (!m_programs.FindProgram(pid)) {
+				pPair->m_value.streams[i].pid	= pid;
+				pPair->m_value.streams[i].type	= (PES_STREAM_TYPE)stream_type;
+			}
 
 			len -= (5 + ES_info_length);
 			if (len < 0) {
