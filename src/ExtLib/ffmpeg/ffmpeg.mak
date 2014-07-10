@@ -310,6 +310,7 @@ SRCS_LC = \
 	libavcodec/opus_silk.c \
 	libavcodec/opusdec.c \
 	libavcodec/parser.c \
+	libavcodec/pixblockdsp.c \
 	libavcodec/png.c \
 	libavcodec/pngdec.c \
 	libavcodec/pngdsp.c \
@@ -444,6 +445,7 @@ SRCS_LC = \
 	libavcodec/x86/mpegvideo.c \
 	libavcodec/x86/mpegvideodsp.c \
 	libavcodec/x86/mpegvideoencdsp_init.c \
+	libavcodec/x86/pixblockdsp_init.c \
 	libavcodec/x86/pngdsp_init.c \
 	libavcodec/x86/proresdsp_init.c \
 	libavcodec/x86/qpeldsp_init.c \
@@ -604,6 +606,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
 	libavcodec/x86/mpegvideoencdsp.asm \
+	libavcodec/x86/pixblockdsp.asm \
 	libavcodec/x86/pngdsp.asm \
 	libavcodec/x86/proresdsp.asm \
 	libavcodec/x86/qpel.asm \

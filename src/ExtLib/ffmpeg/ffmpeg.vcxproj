@@ -56,6 +56,7 @@
     <None Include="libavcodec\x86\lossless_audiodsp.asm" />
     <None Include="libavcodec\x86\lossless_videodsp.asm" />
     <None Include="libavcodec\x86\mpegvideoencdsp.asm" />
+    <None Include="libavcodec\x86\pixblockdsp.asm" />
     <None Include="libavcodec\x86\pngdsp.asm" />
     <None Include="libavcodec\x86\proresdsp.asm" />
     <None Include="libavcodec\x86\qpel.asm" />
@@ -161,6 +162,7 @@
     <ClInclude Include="libavcodec\dv.h" />
     <ClInclude Include="libavcodec\dvdata.h" />
     <ClInclude Include="libavcodec\dv_profile.h" />
+    <ClInclude Include="libavcodec\dv_profile_internal.h" />
     <ClInclude Include="libavcodec\dv_tablegen.h" />
     <ClInclude Include="libavcodec\eac3enc.h" />
     <ClInclude Include="libavcodec\eac3_data.h" />
@@ -269,6 +271,7 @@
     <ClInclude Include="libavcodec\opus.h" />
     <ClInclude Include="libavcodec\opus_imdct.h" />
     <ClInclude Include="libavcodec\parser.h" />
+    <ClInclude Include="libavcodec\pixblockdsp.h" />
     <ClInclude Include="libavcodec\pixels.h" />
     <ClInclude Include="libavcodec\png.h" />
     <ClInclude Include="libavcodec\pngdsp.h" />
@@ -553,7 +556,6 @@
     <ClCompile Include="libavcodec\dnxhddec.c" />
     <ClCompile Include="libavcodec\dnxhd_parser.c" />
     <ClCompile Include="libavcodec\dsputil.c" />
-    <ClCompile Include="libavcodec\dsputilenc_template.c" />
     <ClCompile Include="libavcodec\dv.c" />
     <ClCompile Include="libavcodec\dvdata.c" />
     <ClCompile Include="libavcodec\dvdec.c" />
@@ -730,6 +732,8 @@
     <ClCompile Include="libavcodec\opus_silk.c" />
     <ClCompile Include="libavcodec\parser.c" />
     <ClCompile Include="libavcodec\pel_template.c" />
+    <ClCompile Include="libavcodec\pixblockdsp.c" />
+    <ClCompile Include="libavcodec\pixblockdsp_template.c" />
     <ClCompile Include="libavcodec\png.c" />
     <ClCompile Include="libavcodec\pngdec.c" />
     <ClCompile Include="libavcodec\pngdsp.c" />
@@ -868,6 +872,7 @@
     <ClCompile Include="libavcodec\x86\mpegvideoencdsp_init.c" />
     <ClCompile Include="libavcodec\x86\mpegvideoenc_qns_template.c" />
     <ClCompile Include="libavcodec\x86\mpegvideoenc_template.c" />
+    <ClCompile Include="libavcodec\x86\pixblockdsp_init.c" />
     <ClCompile Include="libavcodec\x86\pngdsp_init.c" />
     <ClCompile Include="libavcodec\x86\proresdsp_init.c" />
     <ClCompile Include="libavcodec\x86\qpeldsp_init.c" />
