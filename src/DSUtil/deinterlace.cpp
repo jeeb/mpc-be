@@ -1866,8 +1866,9 @@ mainRowLoop:
 
 	void InterpPlane_Bob(void *dst, ptrdiff_t dstpitch, const void *src, ptrdiff_t srcpitch, uint32 w, uint32 h, bool interpField2) {
 		void (*blend_func)(void *dst, ptrdiff_t dstPitch, const void *src1, const void *src2, ptrdiff_t srcPitch, uint32 w16, uint32 h);
+		uint32 y0 = interpField2 ? 1 : 2;
 #if defined(VD_CPU_X86)
-		if (SSE2_enabled)
+		if (SSE2_enabled && (srcpitch*(y0 - 1) & 0xF) == 0) // hmm
 			blend_func = Average_SSE2;
 		else if (ISSE_enabled)
 			blend_func = Average_ISSE;
@@ -1876,12 +1877,13 @@ mainRowLoop:
 		else
 			blend_func = Average_scalar;
 #else
-		blend_func = Average_SSE2;
+		if ((srcpitch*(y0 - 1) & 0xF) == 0) // hmm
+			blend_func = Average_SSE2;
+		else
+			blend_func = Average_scalar;
 #endif
 
 		w = (w + 3) >> 2;
-
-		uint32 y0 = interpField2 ? 1 : 2;
 
 		if (!interpField2)
 			memcpy(dst, src, w * 4);
@@ -1890,7 +1892,7 @@ mainRowLoop:
 			ASSERT(((UINT_PTR)dst & 0xF) == 0);
 			ASSERT((dstpitch & 0xF) == 0);
 			ASSERT(((UINT_PTR)src & 0xF) == 0);
-			ASSERT((srcpitch*(y0 - 1) & 0xF) == 0);
+//			ASSERT((srcpitch*(y0 - 1) & 0xF) == 0);
 			blend_func((char *)dst + dstpitch*y0,
 				dstpitch*2,
 				(const char *)src + srcpitch*(y0 - 1),
