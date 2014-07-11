@@ -1672,7 +1672,7 @@ xloop:
 			memcpy(dst, src, w16 << 4);
 
 		int y0 = interpField2 ? 1 : 2;
-		if (SSE2_enabled) {
+		if (SSE2_enabled && (srcpitch*(y0 - 1) & 0xF) == 0) { // hmm
 			for(uint32 y = y0; y < h - 1; y += 2) {
 				const __m128i *srcat = (const __m128i *)((const char *)src + srcpitch * (y-1));
 				const __m128i *srcab = (const __m128i *)((const char *)src + srcpitch * (y+1));
