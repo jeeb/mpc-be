@@ -135,6 +135,9 @@ class __declspec(uuid("A1EB391C-6089-4A87-9988-BE50872317D4"))
 
 	void AddLine(CString str);
 
+	typedef CAtlMap<CLSID, CString> CachedFilters;
+	CachedFilters m_CachedExternalFilters;
+	static CachedFilters m_CachedRegistryFilters;
 public:
 	CPinInfoWnd();
 

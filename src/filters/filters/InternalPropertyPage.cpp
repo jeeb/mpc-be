@@ -342,8 +342,18 @@ STDMETHODIMP CInternalPropertyPage::TranslateAccelerator(LPMSG lpMsg)
 // CPinInfoWnd
 //
 
+CAtlMap<CLSID, CString> CPinInfoWnd::m_CachedRegistryFilters;
+
 CPinInfoWnd::CPinInfoWnd()
 {
+	AppSettings& s = AfxGetAppSettings();
+	POSITION pos = s.m_filters.GetHeadPosition();
+	while (pos) {
+		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
+		if (::PathFileExists(f->path)) {
+			m_CachedExternalFilters[f->clsid] = f->path;
+		}
+	}
 }
 
 bool CPinInfoWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
@@ -390,26 +400,26 @@ static LRESULT CALLBACK ControlProc(HWND control, UINT message, WPARAM wParam, L
 
 bool CPinInfoWnd::OnActivate()
 {
-	DWORD dwStyle = WS_VISIBLE|WS_CHILD|WS_TABSTOP;
+	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 
 	CPoint p(10, 10);
 
-	m_pin_static.Create(_T("Pin:"), dwStyle, CRect(p + CPoint(0, 3), CSize(30, m_fontheight)), this);
-	m_pin_combo.Create(dwStyle|CBS_DROPDOWNLIST, CRect(p + CPoint(30, 0), CSize(450, 200)), this, IDC_PP_COMBO1);
+	m_pin_static.Create(L"Pin:", dwStyle, CRect(p + CPoint(0, 3), CSize(30, m_fontheight)), this);
+	m_pin_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(30, 0), CSize(450, 200)), this, IDC_PP_COMBO1);
 	BeginEnumPins(m_pBF, pEP, pPin) {
 		CPinInfo pi;
 		if (FAILED(pPin->QueryPinInfo(&pi))) {
 			continue;
 		}
 		CString str = CString(pi.achName);
-		if (!str.Find(_T("Apple"))) {
+		if (!str.Find(L"Apple")) {
 			str.Delete(0,1);
 		}
-		CString dir = _T("[?] ");
+		CString dir = L"[?] ";
 		if (pi.dir == PINDIR_INPUT) {
-			dir = _T("[IN] ");
+			dir = L"[IN] ";
 		} else if (pi.dir == PINDIR_OUTPUT) {
-			dir = _T("[OUT] ");
+			dir = L"[OUT] ";
 		}
 		m_pin_combo.SetItemDataPtr(m_pin_combo.AddString(dir + str), pPin);
 	}
@@ -418,7 +428,13 @@ bool CPinInfoWnd::OnActivate()
 
 	p.y += m_fontheight + 20;
 
-	m_info_edit.CreateEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), dwStyle|WS_BORDER|WS_VSCROLL|WS_HSCROLL|ES_MULTILINE|ES_AUTOHSCROLL|ES_READONLY, CRect(p, CSize(480, m_fontheight*20)), this, IDC_PP_EDIT1);
+	m_info_edit.CreateEx(WS_EX_CLIENTEDGE,
+						 L"EDIT",
+						 L"",
+						 dwStyle | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY,
+						 CRect(p, CSize(480, m_fontheight*20)),
+						 this,
+						 IDC_PP_EDIT1);
 	m_info_edit.SetLimitText(60000);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -428,7 +444,7 @@ bool CPinInfoWnd::OnActivate()
 	m_info_edit.SetFont(&m_monospacefont);
 
 	// subclass the edit control
-	OldControlProc = (WNDPROC) SetWindowLongPtr(m_info_edit.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);
+	OldControlProc = (WNDPROC)SetWindowLongPtr(m_info_edit.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
 
 	OnCbnSelchangeCombo1();
 
@@ -465,7 +481,7 @@ END_MESSAGE_MAP()
 
 void CPinInfoWnd::AddLine(CString str)
 {
-	str.Replace(_T("\n"), _T("\r\n"));
+	str.Replace(L"\n", L"\r\n");
 	int len = m_info_edit.GetWindowTextLength();
 	m_info_edit.SetSel(len, len, TRUE);
 	m_info_edit.ReplaceSel(str);
@@ -473,7 +489,7 @@ void CPinInfoWnd::AddLine(CString str)
 
 void CPinInfoWnd::OnCbnSelchangeCombo1()
 {
-	m_info_edit.SetWindowText(_T(""));
+	m_info_edit.SetWindowText(L"");
 
 	int i = m_pin_combo.GetCurSel();
 	if (i < 0) {
@@ -495,53 +511,52 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 
 		if (SUCCEEDED (PinInfo.pFilter->QueryFilterInfo(&FilterInfo)) && FilterInfo.pGraph) {
 			CString strName;
-			CLSID FilterClsid;
 
-			CRegKey key;
+			CLSID FilterClsid;
 			PinInfo.pFilter->GetClassID(&FilterClsid);
-			if (ERROR_SUCCESS == key.Open (HKEY_CLASSES_ROOT, _T("CLSID\\{083863F1-70DE-11D0-BD40-00A0C911CE86}\\Instance\\") + CStringFromGUID(FilterClsid), KEY_READ)) {
-				ULONG len;
-				TCHAR buff[128];
-				len = _countof(buff);
-				key.QueryStringValue(_T("FriendlyName"), buff, &len);
-				strName = CString (buff);
+			CString clsid = CStringFromGUID(FilterClsid);
+
+			TCHAR buff[MAX_PATH] = { 0 };
+			ULONG len = _countof(buff);
+			CRegKey key;
+			if (ERROR_SUCCESS == key.Open (HKEY_CLASSES_ROOT, L"CLSID\\{083863F1-70DE-11D0-BD40-00A0C911CE86}\\Instance\\" + clsid, KEY_READ)
+					&& ERROR_SUCCESS == key.QueryStringValue(L"FriendlyName", buff, &len)) {
+				strName = CString(buff);
+				key.Close();
 			} else {
 				strName = FilterInfo.achName;
 			}
-			str.Format(_T("Filter : %s - CLSID : %s\n"), strName, CStringFromGUID(FilterClsid));
+			str.Format(L"Filter : %s - CLSID : %s\n", strName, CStringFromGUID(FilterClsid));
 			AddLine(str);
 			FilterInfo.pGraph->Release();
 
 			{
-				CRegKey key;
-				CString clsid = CStringFromGUID(FilterClsid);
+				CString module;
 
-				TCHAR buff[256];
-				ULONG len = sizeof(buff);
-				memset(buff, 0, len);
-
-				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + clsid + _T("\\InprocServer32"), KEY_READ)
-						&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)
-						&& ::PathFileExists(buff)) {
-					str.Format(_T("Module : %s\n"), buff);
-					AddLine(str);
-					key.Close();
+				CachedFilters::CPair* pRegPair = m_CachedRegistryFilters.Lookup(FilterClsid);
+				if (pRegPair && ::PathFileExists(pRegPair->m_value)) {
+					module = pRegPair->m_value;
 				} else {
-					// Search filter in an external filter list ...
-					AppSettings& s = AfxGetAppSettings();
-					POSITION pos = s.m_filters.GetHeadPosition();
-					while (pos) {
-						CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
-						if (f->clsid == FilterClsid && ::PathFileExists(f->path)) {
-							str.Format(_T("Module : %s\n"), f->path);
-							AddLine(str);
-							break;
-						}
+					len = _countof(buff);
+					memset(buff, 0, len);
+					if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
+							&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)
+							&& ::PathFileExists(buff)) {
+						module = CString(buff);
+						m_CachedRegistryFilters[FilterClsid] = module;
+						key.Close();
+					} else if (CachedFilters::CPair* pExtPair = m_CachedExternalFilters.Lookup(FilterClsid)) {
+						module = pExtPair->m_value;
 					}
+				}
+
+				if (!module.IsEmpty()) {
+					str.Format(L"Module : %s\n", module);
+					AddLine(str);
 				}
 			}
 
-			AddLine(_T("\n"));
+			AddLine(L"\n");
 		}
 		PinInfo.pFilter->Release();
 	}
@@ -550,14 +565,14 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 
 	CComPtr<IPin> pPinTo;
 	if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
-		str.Format(_T("- Connected to:\n\nCLSID: %s\nFilter: %s\nPin: %s\n\n"),
+		str.Format(L"- Connected to:\n\nCLSID: %s\nFilter: %s\nPin: %s\n\n",
 				   CString(CStringFromGUID(GetCLSID(pPinTo))),
 				   CString(GetFilterName(GetFilterFromPin(pPinTo))),
 				   CString(GetPinName(pPinTo)));
 
 		AddLine(str);
 
-		AddLine(_T("- Connection media type:\n\n"));
+		AddLine(L"- Connection media type:\n\n");
 
 		if (SUCCEEDED(pPin->ConnectionMediaType(&cmt))) {
 			CAtlList<CString> sl;
@@ -570,7 +585,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			AddLine(tmp);
 		}
 	} else {
-		str = _T("- Not connected\n\n");
+		str = L"- Not connected\n\n";
 	}
 
 	int iMT = 0;
@@ -578,11 +593,11 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 	BeginEnumMediaTypes(pPin, pEMT, pmt) {
 		CMediaTypeEx mt(*pmt);
 
-		str.Format(_T("- Enumerated media type %d:\n\n"), iMT++);
+		str.Format(L"- Enumerated media type %d:\n\n", iMT++);
 		AddLine(str);
 
 		if (cmt.majortype != GUID_NULL && mt == cmt) {
-			AddLine(_T("Set as the current media type\n\n"));
+			AddLine(L"Set as the current media type\n\n");
 		} else {
 			CAtlList<CString> sl;
 			mt.Dump(sl);
@@ -594,7 +609,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			AddLine(tmp);
 		}
 	}
-	EndEnumMediaTypes(pmt)
+	EndEnumMediaTypes(pmt);
 
 	m_info_edit.SetSel(0, 0);
 	m_info_edit.UnlockWindowUpdate();
