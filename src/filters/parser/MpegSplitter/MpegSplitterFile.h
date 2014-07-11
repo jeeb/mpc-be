@@ -216,7 +216,7 @@ public:
 			for (size_t i = 0; i < _countof(streams); i++) {
 				if (streams[i].pid) {
 					for (int type = stream_type::video; type < stream_type::unknown; type++) {
-						if (s[stream_type::video]->FindStream(streams[i].pid)) {
+						if (s[type]->FindStream(streams[i].pid)) {
 							cnt++;
 							break;
 						}
