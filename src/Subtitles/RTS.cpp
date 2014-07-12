@@ -21,8 +21,7 @@
 
 #include "stdafx.h"
 #include <math.h>
-#include <time.h>
-#include <emmintrin.h>
+#include <intrin.h>
 #include "RTS.h"
 
 static HDC g_hDC;
@@ -179,9 +178,9 @@ void CWord::Paint(CPoint p, CPoint org)
 
 void CWord::Transform(CPoint org)
 {
-	if (fSSE2) {	// SSE code
+	if (m_bUseSSE2) { // SSE code
 		Transform_SSE2(org);
-	} else {	// C-code
+	} else { // C-code
 		Transform_C(org);
 	}
 }
