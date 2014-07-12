@@ -520,6 +520,10 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     }
     Fill(Stream_Video, 0, Video_Format_Settings_GOP, GOP_Detect(PictureTypes));
 
+    Fill(Stream_General, 0, General_Encoded_Library, Encoded_Library);
+    Fill(Stream_General, 0, General_Encoded_Library_Name, Encoded_Library_Name);
+    Fill(Stream_General, 0, General_Encoded_Library_Version, Encoded_Library_Version);
+    Fill(Stream_General, 0, General_Encoded_Library_Settings, Encoded_Library_Settings);
     Fill(Stream_Video, 0, Video_Encoded_Library, Encoded_Library);
     Fill(Stream_Video, 0, Video_Encoded_Library_Name, Encoded_Library_Name);
     Fill(Stream_Video, 0, Video_Encoded_Library_Version, Encoded_Library_Version);
@@ -3322,7 +3326,7 @@ bool File_Avc::seq_parameter_set_data(std::vector<seq_parameter_set_struct*> &Da
             case 2 :
                         MaxNumber=(*Data_Item)->MaxFrameNum*2;
                         break;
-            default:    
+            default:
                         MaxNumber = 0;
         }
 
@@ -3461,7 +3465,7 @@ void File_Avc::hrd_parameters(seq_parameter_set_struct::vui_parameters_struct::x
         Trusted_IsNot("cpb_cnt_minus1 too high");
         cpb_cnt_minus1=0;
     }
-    vector<seq_parameter_set_struct::vui_parameters_struct::xxl::xxl_data>  SchedSel; 
+    vector<seq_parameter_set_struct::vui_parameters_struct::xxl::xxl_data>  SchedSel;
     SchedSel.reserve(cpb_cnt_minus1+1);
     for (int8u SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; ++SchedSelIdx)
     {
