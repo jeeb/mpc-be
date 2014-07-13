@@ -24,6 +24,7 @@
 #include <intrin.h>
 #include "RTS.h"
 
+// WARNING: this isn't very thread safe, use only one RTS a time. We should use TLS in future.
 static HDC g_hDC;
 static int g_hDC_refcnt = 0;
 
@@ -32,12 +33,14 @@ static long revcolor(long c)
 	return ((c&0xff0000)>>16) + (c&0xff00) + ((c&0xff)<<16);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 // CMyFont
 
 CMyFont::CMyFont(STSStyle& style)
 {
 	LOGFONT lf;
-	memset(&lf, 0, sizeof(lf));
+	ZeroMemory(&lf, sizeof(lf));
 	lf <<= style;
 	lf.lfHeight = (LONG)(style.fontSize+0.5);
 	lf.lfOutPrecision = OUT_TT_PRECIS;
@@ -206,7 +209,7 @@ bool CWord::CreateOpaqueBox()
 			   (m_width + w + 4) / 8, (m_ascent + m_descent + h + 4) / 8,
 			   -(w + 4) / 8, (m_ascent + m_descent + h + 4) / 8);
 
-	m_pOpaqueBox = DNew CPolygon(style, str, 0, 0, 0, 1.0, 1.0, 0, m_outlineCache, m_overlayCache);
+	m_pOpaqueBox = DEBUG_NEW CPolygon(style, str, 0, 0, 0, 1.0, 1.0, 0, m_outlineCache, m_overlayCache);
 
 	return !!m_pOpaqueBox;
 }
@@ -470,7 +473,7 @@ CText::CText(STSStyle& style, CStringW str, int ktype, int kstart, int kend, dou
 
 CWord* CText::Copy()
 {
-	return DNew CText(*this);
+	return DEBUG_NEW CText(*this);
 }
 
 bool CText::Append(CWord* w)
@@ -549,7 +552,7 @@ CPolygon::~CPolygon()
 
 CWord* CPolygon::Copy()
 {
-	return (DNew CPolygon(*this));
+	return (DEBUG_NEW CPolygon(*this));
 }
 
 bool CPolygon::Append(CWord* w)
@@ -585,7 +588,7 @@ bool CPolygon::GetPOINT(CStringW& str, POINT& point) const
 
 bool CPolygon::ParseStr()
 {
-	if (m_pathTypesOrg.GetCount() > 0) {
+	if (!m_pathTypesOrg.IsEmpty()) {
 		return true;
 	}
 
@@ -668,7 +671,7 @@ bool CPolygon::ParseStr()
 					m_pathPointsOrg.SetCount(lastSplineStart);
 					lastSplineStart = SIZE_T_ERROR;
 				}
-				// no break here
+			// no break
 			case 'p':
 				if (m_pathPointsOrg.GetCount() < 3) {
 					break;
@@ -842,7 +845,7 @@ CClipper::~CClipper()
 
 CWord* CClipper::Copy()
 {
-	return DNew CClipper(m_str, m_size, m_scalex, m_scaley, m_inverse, m_cpOffset, m_outlineCache, m_overlayCache);
+	return DEBUG_NEW CClipper(m_str, m_size, m_scalex, m_scaley, m_inverse, m_cpOffset, m_outlineCache, m_overlayCache);
 }
 
 bool CClipper::Append(CWord* w)
@@ -894,7 +897,7 @@ void CLine::Compact()
 	l.AddTailList(this);
 	RemoveAll();
 
-	CWord* last = NULL;
+	CWord* last = nullptr;
 
 	pos = l.GetHeadPosition();
 	while (pos) {
@@ -975,7 +978,7 @@ CRect CLine::PaintOutline(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CP
 		CWord* w = GetNext(pos);
 
 		if (w->m_fLineBreak) {
-			return bbox;
+			return bbox;    // should not happen since this class is just a line of text without any breaks
 		}
 
 		if (w->m_style.outlineWidthX+w->m_style.outlineWidthY > 0 && !(w->m_ktype == 2 && time < w->m_kstart)) {
@@ -1099,7 +1102,7 @@ CSubtitle::CSubtitle(COutlineCache& outlineCache, COverlayCache& overlayCache)
 	, m_bottomborder(0)
 	, m_overlayCache(overlayCache)
 {
-	memset(m_effects, 0, sizeof(Effect*) * EF_NUMBEROFEFFECTS);
+	ZeroMemory(m_effects, sizeof(Effect*)*EF_NUMBEROFEFFECTS);
 	m_bIsAnimated = false;
 }
 
@@ -1193,8 +1196,8 @@ int CSubtitle::GetWrapWidth(POSITION pos, int maxwidth)
 
 CLine* CSubtitle::GetNextLine(POSITION& pos, int maxwidth)
 {
-	if (pos == NULL) {
-		return NULL;
+	if (pos == nullptr) {
+		return nullptr;
 	}
 
 	CLine* ret;
@@ -1353,7 +1356,7 @@ void CSubtitle::CreateClippers(CSize size)
 		if (k < h) {
 			BYTE* am = &m_pClipper->m_pAlphaMask[k*w];
 
-			memset(m_pClipper->m_pAlphaMask, 0, am - m_pClipper->m_pAlphaMask);
+			ZeroMemory(m_pClipper->m_pAlphaMask, am - m_pClipper->m_pAlphaMask);
 
 			for (ptrdiff_t j = k; j < l; j++, a += da) {
 				for (ptrdiff_t i = 0; i < w; i++, am++) {
@@ -1384,7 +1387,7 @@ void CSubtitle::CreateClippers(CSize size)
 				}
 			}
 
-			memset(am, 0, (h - j) * w);
+			ZeroMemory(am, (h - j)*w);
 		}
 	}
 }
@@ -1397,7 +1400,7 @@ void CSubtitle::MakeLines(CSize size, const CRect& marginRect)
 
 	m_topborder = m_bottomborder = 0;
 
-	CLine* l = NULL;
+	CLine* l = nullptr;
 
 	POSITION pos = m_words.GetHeadPosition();
 	while (pos) {
@@ -1538,7 +1541,7 @@ CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock, STSStyle* styleOve
 	m_size = CSize(0, 0);
 
 	if (g_hDC_refcnt == 0) {
-		g_hDC = CreateCompatibleDC(NULL);
+		g_hDC = CreateCompatibleDC(nullptr);
 		SetBkMode(g_hDC, TRANSPARENT);
 		SetTextColor(g_hDC, 0xffffff);
 		SetMapMode(g_hDC, MM_TEXT);
@@ -1763,7 +1766,7 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 		}
 
 		if (i < j) {
-			if (CWord* w = DNew CText(style, str.Mid(i, j-i), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
+			if (CWord* w = DEBUG_NEW CText(style, str.Mid(i, j - i), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
 										   m_textDimsCache, m_outlineCache, m_overlayCache)) {
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
@@ -1771,13 +1774,13 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 		}
 
 		if (c == L'\n') {
-			if (CWord* w = DNew CText(style, CStringW(), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
+			if (CWord* w = DEBUG_NEW CText(style, CStringW(), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
 										   m_textDimsCache, m_outlineCache, m_overlayCache)) {
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
 			}
 		} else if (c == L' ' || c == L'\x00A0') {
-			if (CWord* w = DNew CText(style, CStringW(c), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
+			if (CWord* w = DEBUG_NEW CText(style, CStringW(c), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
 										   m_textDimsCache, m_outlineCache, m_overlayCache)) {
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
@@ -1796,7 +1799,7 @@ void CRenderedTextSubtitle::ParsePolygon(CSubtitle* sub, CStringW str, STSStyle&
 		return;
 	}
 
-	if (CWord* w = DNew CPolygon(style, str, m_ktype, m_kstart, m_kend,
+	if (CWord* w = DEBUG_NEW CPolygon(style, str, m_ktype, m_kstart, m_kend,
 									  sub->m_scalex / (1 << (m_nPolygon - 1)), sub->m_scaley / (1 << (m_nPolygon - 1)),
 									  m_polygonBaselineOffset, m_outlineCache, m_overlayCache)) {
 		sub->m_words.AddTail(w);
@@ -2169,6 +2172,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 					double dTop		= sub->m_scaley * tag.paramsInt[1];
 					double dRight	= sub->m_scalex * tag.paramsInt[2];
 					double dBottom	= sub->m_scaley * tag.paramsInt[3];
+
 					if (sub->m_relativeTo == 1) {
 						double dOffsetX = m_vidrect.left / 8.0;
 						double dOffsetY = m_vidrect.top / 8.0;
@@ -2403,7 +2407,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 			break;
 			case SSA_r:
 				if (tag.params[0].IsEmpty() || !GetStyle(tag.params[0], style)) {
-				    style = org;
+					style = org;
 				}
 				break;
 			case SSA_shad:
@@ -2440,7 +2444,9 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 						m_animEnd = tag.paramsInt[1];
 						m_animAccel = tag.paramsReal[0];
 					}
+
 					CreateSubFromSSATag(sub, tag.subTagsList, style, org, true);
+
 					sub->m_fAnimated = true;
 				}
 				break;
@@ -2542,22 +2548,22 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 					style.fontName = params[j];
 				} else if (attribs[j] == L"size") {
 					if (params[j][0] == '+') {
-						style.fontSize += wcstol(params[j], NULL, 10);
+						style.fontSize += wcstol(params[j], nullptr, 10);
 					} else if (params[j][0] == '-') {
-						style.fontSize -= wcstol(params[j], NULL, 10);
+						style.fontSize -= wcstol(params[j], nullptr, 10);
 					} else {
-						style.fontSize = wcstol(params[j], NULL, 10);
+						style.fontSize = wcstol(params[j], nullptr, 10);
 					}
 				} else if (attribs[j] == L"color") {
 					nColor = 0;
 				} else if (attribs[j] == L"outline-color") {
 					nColor = 2;
 				} else if (attribs[j] == L"outline-level") {
-					style.outlineWidthX = style.outlineWidthY = wcstol(params[j], NULL, 10);
+					style.outlineWidthX = style.outlineWidthY = wcstol(params[j], nullptr, 10);
 				} else if (attribs[j] == L"shadow-color") {
 					nColor = 3;
 				} else if (attribs[j] == L"shadow-level") {
-					style.shadowDepthX = style.shadowDepthY = wcstol(params[j], NULL, 10);
+					style.shadowDepthX = style.shadowDepthY = wcstol(params[j], nullptr, 10);
 				}
 
 				if (nColor >= 0 && nColor < 4) {
@@ -2565,7 +2571,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 					DWORD val;
 					if (g_colors.Lookup(key, val)) {
 						style.colors[nColor] = val;
-					} else if ((style.colors[nColor] = _tcstol(key, NULL, 16)) == 0) {
+					} else if ((style.colors[nColor] = _tcstol(key, nullptr, 16)) == 0) {
 						style.colors[nColor] = 0x00ffffff;	// default is white
 					}
 					style.colors[nColor] = ((style.colors[nColor]>>16)&0xff)|((style.colors[nColor]&0xff)<<16)|(style.colors[nColor]&0x00ff00);
@@ -2579,7 +2585,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 	} else if (tag == L"k" && attribs.GetCount() == 1 && attribs[0] == L"t") {
 		m_ktype = 1;
 		m_kstart = m_kend;
-		m_kend += wcstol(params[0], NULL, 10);
+		m_kend += wcstol(params[0], nullptr, 10);
 	} else {
 		return false;
 	}
@@ -2611,15 +2617,16 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	if (m_subtitleCache.Lookup(entry, sub)) {
 		if (sub->m_fAnimated) {
 			delete sub;
-			sub = NULL;
+			sub = nullptr;
 		} else {
 			return sub;
 		}
 	}
 
-	sub = DNew CSubtitle(m_outlineCache, m_overlayCache);
-	if (!sub) {
-		return NULL;
+	try {
+		sub = DEBUG_NEW CSubtitle(m_outlineCache, m_overlayCache);
+	} catch (std::bad_alloc) {
+		return nullptr;
 	}
 
 	CStringW str = GetStrW(entry, true);
@@ -2714,9 +2721,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 			i++;
 		}
 
-		STSStyle tmp;
-
-		tmp = stss;
+		STSStyle tmp = stss;
 
 		tmp.fontSize		*= sub->m_scaley * 64.0;
 		tmp.fontSpacing		*= sub->m_scalex * 64.0;
@@ -2780,10 +2785,12 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	return sub;
 }
 
+//
+
 STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
-	*ppv = NULL;
+	*ppv = nullptr;
 
 	return
 		QI(IPersist)
@@ -2797,7 +2804,7 @@ STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, voi
 STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	int iSegment = -1;
-	SearchSubs((int)(rt/10000), fps, &iSegment, NULL);
+	SearchSubs((int)(rt / 10000), fps, &iSegment, nullptr);
 
 	if (iSegment < 0) {
 		iSegment = 0;
@@ -2816,7 +2823,7 @@ STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetNext(POSITION pos)
 		stss = GetSegment(iSegment);
 	}
 
-	return (stss ? (POSITION)(iSegment + 1) : NULL);
+	return (stss ? (POSITION)(iSegment + 1) : nullptr);
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CRenderedTextSubtitle::GetStart(POSITION pos, double fps)
@@ -2933,7 +2940,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
 		CPoint org2;
 
-		BYTE* pAlphaMask = s->m_pClipper ? s->m_pClipper->m_pAlphaMask : NULL;
+		BYTE* pAlphaMask = s->m_pClipper ? s->m_pClipper->m_pAlphaMask : nullptr;
 
 		for (int k = 0; k < EF_NUMBEROFEFFECTS; k++) {
 			if (!s->m_effects[k]) {
