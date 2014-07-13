@@ -725,7 +725,7 @@ void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 						fNeedsUpdate = true;
 
 						if (!m_sts.m_styles.Lookup(str)) {
-							m_sts.AddStyle(str, DEBUG_NEW STSStyle());
+							m_sts.AddStyle(str, DNew STSStyle());
 						}
 
 						m_sts[pItem->iItem].style = str;
@@ -1050,7 +1050,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							STSStyle* val;
 							m_sts.m_styles.GetNextAssoc(pos, key, val);
 
-							CAutoPtr<CPPageSubStyle> page(DEBUG_NEW CPPageSubStyle());
+							CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
 							page->InitSubStyle(key, val);
 							pages.Add(page);
 							styles.Add(val);

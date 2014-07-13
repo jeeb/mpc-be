@@ -2261,7 +2261,7 @@ CString ISO6392ToLanguage(LPCSTR code)
 bool IsISO639Language(LPCSTR code)
 {
 	size_t nLen = strlen(code) + 1;
-	LPSTR tmp = DEBUG_NEW CHAR[nLen];
+	LPSTR tmp = DNew CHAR[nLen];
 	strncpy_s(tmp, nLen, code, nLen);
 	_strlwr_s(tmp, nLen);
 	tmp[0] = (CHAR)toupper(tmp[0]);

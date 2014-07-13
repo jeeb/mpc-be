@@ -209,7 +209,7 @@ bool CWord::CreateOpaqueBox()
 			   (m_width + w + 4) / 8, (m_ascent + m_descent + h + 4) / 8,
 			   -(w + 4) / 8, (m_ascent + m_descent + h + 4) / 8);
 
-	m_pOpaqueBox = DEBUG_NEW CPolygon(style, str, 0, 0, 0, 1.0, 1.0, 0, m_outlineCache, m_overlayCache);
+	m_pOpaqueBox = DNew CPolygon(style, str, 0, 0, 0, 1.0, 1.0, 0, m_outlineCache, m_overlayCache);
 
 	return !!m_pOpaqueBox;
 }
@@ -473,7 +473,7 @@ CText::CText(STSStyle& style, CStringW str, int ktype, int kstart, int kend, dou
 
 CWord* CText::Copy()
 {
-	return DEBUG_NEW CText(*this);
+	return DNew CText(*this);
 }
 
 bool CText::Append(CWord* w)
@@ -552,7 +552,7 @@ CPolygon::~CPolygon()
 
 CWord* CPolygon::Copy()
 {
-	return (DEBUG_NEW CPolygon(*this));
+	return (DNew CPolygon(*this));
 }
 
 bool CPolygon::Append(CWord* w)
@@ -782,7 +782,7 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
 	const size_t alphaMaskSize = size_t(m_size.cx) * m_size.cy;
 
 	try {
-		m_pAlphaMask = DEBUG_NEW BYTE[alphaMaskSize];
+		m_pAlphaMask = DNew BYTE[alphaMaskSize];
 	} catch (std::bad_alloc) {
 		return;
 	}
@@ -845,7 +845,7 @@ CClipper::~CClipper()
 
 CWord* CClipper::Copy()
 {
-	return DEBUG_NEW CClipper(m_str, m_size, m_scalex, m_scaley, m_inverse, m_cpOffset, m_outlineCache, m_overlayCache);
+	return DNew CClipper(m_str, m_size, m_scalex, m_scaley, m_inverse, m_cpOffset, m_outlineCache, m_overlayCache);
 }
 
 bool CClipper::Append(CWord* w)
@@ -1202,7 +1202,7 @@ CLine* CSubtitle::GetNextLine(POSITION& pos, int maxwidth)
 
 	CLine* ret;
 	try {
-		ret = DEBUG_NEW CLine();
+		ret = DNew CLine();
 	} catch (std::bad_alloc) {
 		return nullptr;
 	}
@@ -1297,7 +1297,7 @@ void CSubtitle::CreateClippers(CSize size)
 			CStringW str;
 			str.Format(L"m %d %d l %d %d %d %d %d %d", 0, 0, w, 0, w, h, 0, h);
 			try {
-				m_pClipper = DEBUG_NEW CClipper(str, size, 1, 1, false, CPoint(0, 0), m_outlineCache, m_overlayCache);
+				m_pClipper = DNew CClipper(str, size, 1, 1, false, CPoint(0, 0), m_outlineCache, m_overlayCache);
 			} catch (std::bad_alloc) {
 				return;
 			}
@@ -1335,7 +1335,7 @@ void CSubtitle::CreateClippers(CSize size)
 			CStringW str;
 			str.Format(L"m %d %d l %d %d %d %d %d %d", 0, 0, w, 0, w, h, 0, h);
 			try {
-				m_pClipper = DEBUG_NEW CClipper(str, size, 1, 1, false, CPoint(0, 0), m_outlineCache, m_overlayCache);
+				m_pClipper = DNew CClipper(str, size, 1, 1, false, CPoint(0, 0), m_outlineCache, m_overlayCache);
 			} catch (std::bad_alloc) {
 				return;
 			}
@@ -1707,7 +1707,7 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 
 		Effect* e;
 		try {
-			e = DEBUG_NEW Effect;
+			e = DNew Effect;
 		} catch (std::bad_alloc) {
 			return;
 		}
@@ -1734,7 +1734,7 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 
 		Effect* e;
 		try {
-			e = DEBUG_NEW Effect;
+			e = DNew Effect;
 		} catch (std::bad_alloc) {
 			return;
 		}
@@ -1766,7 +1766,7 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 		}
 
 		if (i < j) {
-			if (CWord* w = DEBUG_NEW CText(style, str.Mid(i, j - i), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
+			if (CWord* w = DNew CText(style, str.Mid(i, j - i), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
 										   m_textDimsCache, m_outlineCache, m_overlayCache)) {
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
@@ -1774,13 +1774,13 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 		}
 
 		if (c == L'\n') {
-			if (CWord* w = DEBUG_NEW CText(style, CStringW(), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
+			if (CWord* w = DNew CText(style, CStringW(), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
 										   m_textDimsCache, m_outlineCache, m_overlayCache)) {
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
 			}
 		} else if (c == L' ' || c == L'\x00A0') {
-			if (CWord* w = DEBUG_NEW CText(style, CStringW(c), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
+			if (CWord* w = DNew CText(style, CStringW(c), m_ktype, m_kstart, m_kend, sub->m_scalex, sub->m_scaley,
 										   m_textDimsCache, m_outlineCache, m_overlayCache)) {
 				sub->m_words.AddTail(w);
 				m_kstart = m_kend;
@@ -1799,7 +1799,7 @@ void CRenderedTextSubtitle::ParsePolygon(CSubtitle* sub, CStringW str, STSStyle&
 		return;
 	}
 
-	if (CWord* w = DEBUG_NEW CPolygon(style, str, m_ktype, m_kstart, m_kend,
+	if (CWord* w = DNew CPolygon(style, str, m_ktype, m_kstart, m_kend,
 									  sub->m_scalex / (1 << (m_nPolygon - 1)), sub->m_scaley / (1 << (m_nPolygon - 1)),
 									  m_polygonBaselineOffset, m_outlineCache, m_overlayCache)) {
 		sub->m_words.AddTail(w);
@@ -1814,7 +1814,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 	}
 
 	int nTags = 0, nUnrecognizedTags = 0;
-	tagsList.reset(DEBUG_NEW CAtlList<SSATag>());
+	tagsList.reset(DNew CAtlList<SSATag>());
 
 	for (int i = 0, j; (j = str.Find(L'\\', i)) >= 0; i = j) {
 		int jOld;
@@ -2153,7 +2153,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				size_t nParamsInt = tag.paramsInt.GetCount();
 
 				if (nParams == 1 && nParamsInt == 0 && !sub->m_pClipper) {
-					sub->m_pClipper = DEBUG_NEW CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3), sub->m_scalex, sub->m_scaley,
+					sub->m_pClipper = DNew CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3), sub->m_scalex, sub->m_scaley,
 														 invert, (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
 														 m_outlineCache, m_overlayCache);
 				} else if (nParams == 1 && nParamsInt == 1 && !sub->m_pClipper) {
@@ -2161,7 +2161,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 					if (scale < 1) {
 						scale = 1;
 					}
-					sub->m_pClipper = DEBUG_NEW CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3),
+					sub->m_pClipper = DNew CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3),
 														 sub->m_scalex / (1 << (scale - 1)), sub->m_scaley / (1 << (scale - 1)), invert,
 														 (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
 														 m_outlineCache, m_overlayCache);
@@ -2204,7 +2204,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				sub->m_bIsAnimated = true;
 
 				if (tag.paramsInt.GetCount() == 7 && !sub->m_effects[EF_FADE]) { // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])
-					if (Effect* e = DEBUG_NEW Effect) {
+					if (Effect* e = DNew Effect) {
 						for (size_t k = 0; k < 3; k++) {
 							e->param[k] = tag.paramsInt[k];
 						}
@@ -2215,7 +2215,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 						sub->m_effects[EF_FADE] = e;
 					}
 				} else if (tag.paramsInt.GetCount() == 2 && !sub->m_effects[EF_FADE]) { // {\fad(t1=t[1], t2=t[2])
-					if (Effect* e = DEBUG_NEW Effect) {
+					if (Effect* e = DNew Effect) {
 						e->param[0] = e->param[2] = 0xff;
 						e->param[1] = 0x00;
 						for (size_t k = 1; k < 3; k++) {
@@ -2347,7 +2347,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				sub->m_bIsAnimated = true;
 
 				if (tag.paramsReal.GetCount() == 4 && !sub->m_effects[EF_MOVE]) {
-					if (Effect* e = DEBUG_NEW Effect) {
+					if (Effect* e = DNew Effect) {
 						e->param[0] = std::lround(sub->m_scalex * tag.paramsReal[0] * 8.0);
 						e->param[1] = std::lround(sub->m_scaley * tag.paramsReal[1] * 8.0);
 						e->param[2] = std::lround(sub->m_scalex * tag.paramsReal[2] * 8.0);
@@ -2366,7 +2366,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				break;
 			case SSA_org: // {\org(x=param[0], y=param[1])}
 				if (tag.paramsReal.GetCount() == 2 && !sub->m_effects[EF_ORG]) {
-					if (Effect* e = DEBUG_NEW Effect) {
+					if (Effect* e = DNew Effect) {
 						e->param[0] = std::lround(sub->m_scalex * tag.paramsReal[0] * 8.0);
 						e->param[1] = std::lround(sub->m_scaley * tag.paramsReal[1] * 8.0);
 
@@ -2384,7 +2384,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				break;
 			case SSA_pos:
 				if (tag.paramsReal.GetCount() == 2 && !sub->m_effects[EF_MOVE]) {
-					if (Effect* e = DEBUG_NEW Effect) {
+					if (Effect* e = DNew Effect) {
 						e->param[0] = e->param[2] = std::lround(sub->m_scalex * tag.paramsReal[0] * 8.0);
 						e->param[1] = e->param[3] = std::lround(sub->m_scaley * tag.paramsReal[1] * 8.0);
 						e->t[0] = e->t[1] = 0;
@@ -2624,7 +2624,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	}
 
 	try {
-		sub = DEBUG_NEW CSubtitle(m_outlineCache, m_overlayCache);
+		sub = DNew CSubtitle(m_outlineCache, m_overlayCache);
 	} catch (std::bad_alloc) {
 		return nullptr;
 	}
