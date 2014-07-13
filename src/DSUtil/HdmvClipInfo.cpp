@@ -496,7 +496,6 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 {
 	BYTE	Buff[4];
 	CPath	Path(strPlaylistFile);
-	bool	bDuplicate = false;
 
 	// Get BDMV folder
 	Path.RemoveFileSpec();
@@ -561,7 +560,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 		CloseFile(S_OK);
 		SAFE_DELETE_ARRAY(rtOffset);
 
-		return bDuplicate ? S_FALSE : S_OK;
+		return S_OK;
 	}
 
 	return AmHresultFromWin32(GetLastError());
