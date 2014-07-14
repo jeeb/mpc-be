@@ -83,7 +83,7 @@ struct COverlayData {
 
 	COverlayData::COverlayData()
 		: mOffsetX(0), mOffsetY(0), mOverlayWidth(0), mOverlayHeight(0), mOverlayPitch(0)
-		, mpOverlayBufferBody(nullptr), mpOverlayBufferBorder(nullptr) {}
+		, mpOverlayBufferBody(NULL), mpOverlayBufferBorder(NULL) {}
 
 	COverlayData::COverlayData(const COverlayData& overlayData)
 		: mOffsetX(overlayData.mOffsetX)
@@ -102,7 +102,7 @@ struct COverlayData {
 			memcpy(mpOverlayBufferBody, overlayData.mpOverlayBufferBody, mOverlayPitch * mOverlayHeight);
 			memcpy(mpOverlayBufferBorder, overlayData.mpOverlayBufferBorder, mOverlayPitch * mOverlayHeight);
 		} else {
-			mpOverlayBufferBody = mpOverlayBufferBorder = nullptr;
+			mpOverlayBufferBody = mpOverlayBufferBorder = NULL;
 		}
 	}
 
@@ -129,7 +129,7 @@ struct COverlayData {
 			memcpy(mpOverlayBufferBody, overlayData.mpOverlayBufferBody, mOverlayPitch * mOverlayHeight);
 			memcpy(mpOverlayBufferBorder, overlayData.mpOverlayBufferBorder, mOverlayPitch * mOverlayHeight);
 		} else {
-			mpOverlayBufferBody = mpOverlayBufferBorder = nullptr;
+			mpOverlayBufferBody = mpOverlayBufferBorder = NULL;
 		}
 
 		return *this;
@@ -138,11 +138,11 @@ struct COverlayData {
 	void DeleteOverlay() {
 		if (mpOverlayBufferBody) {
 			_aligned_free(mpOverlayBufferBody);
-			mpOverlayBufferBody = nullptr;
+			mpOverlayBufferBody = NULL;
 		}
 		if (mpOverlayBufferBorder) {
 			_aligned_free(mpOverlayBufferBorder);
-			mpOverlayBufferBorder = nullptr;
+			mpOverlayBufferBorder = NULL;
 		}
 	}
 };

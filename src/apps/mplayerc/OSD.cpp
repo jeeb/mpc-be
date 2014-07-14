@@ -399,7 +399,7 @@ void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 		if (m_pChapterBag && m_pChapterBag->ChapGetCount() > 1 && llMax != llMin) {
 			REFERENCE_TIME rt;
 			for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); ++i) {
-				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, nullptr))) {
+				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, NULL))) {
 					__int64 pos = m_rectBar.Width() * rt / (llMax - llMin);
 					if (pos < 0) {
 						continue;

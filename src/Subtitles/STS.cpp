@@ -1194,7 +1194,7 @@ static void GetStrW(LPCWSTR& pszBuff, int& nLength, WCHAR sep, LPCWSTR& pszMatch
 	}
 
 	LPCWSTR pEnd = CStringW::StrTraits::StringFindChar(pszBuff, sep);
-	if (pEnd == nullptr) {
+	if (pEnd == NULL) {
 		if (nLength < 1) {
 			throw 1;
 		}
@@ -2417,7 +2417,7 @@ bool CSimpleTextSubtitle::GetStyle(CString styleName, STSStyle& stss)
 {
 	CString def = _T("Default");
 
-	STSStyle* style = nullptr;
+	STSStyle* style = NULL;
 	m_styles.Lookup(styleName, style);
 	if (!style) {
 		return false;
@@ -2425,7 +2425,7 @@ bool CSimpleTextSubtitle::GetStyle(CString styleName, STSStyle& stss)
 
 	stss = *style;
 
-	STSStyle* defstyle = nullptr;
+	STSStyle* defstyle = NULL;
 	m_styles.Lookup(def, defstyle);
 	if (defstyle && stss.relativeTo == 2) {
 		stss.relativeTo = defstyle->relativeTo;

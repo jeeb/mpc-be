@@ -24,7 +24,7 @@
 #include <d3d9types.h>
 
 CompositionObject::CompositionObject()
-	: m_pRLEData(nullptr)
+	: m_pRLEData(NULL)
 	, m_nRLEDataSize(0)
 	, m_nRLEPos(0)
 	, m_nColorNumber(0)

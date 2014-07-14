@@ -614,7 +614,7 @@ bool CAviSplitterFilter::DemuxLoop()
 	fDiscontinuity.SetCount(m_pFile->m_avih.dwStreams);
 	memset(fDiscontinuity.GetData(), 0, m_pFile->m_avih.dwStreams * sizeof(BOOL));
 
-	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		DWORD curTrack = DWORD_MAX;
 
 		REFERENCE_TIME minTime = INT64_MAX;

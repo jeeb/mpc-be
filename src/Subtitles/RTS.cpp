@@ -77,7 +77,7 @@ CWord::CWord(STSStyle& style, CStringW str, int ktype, int kstart, int kend, dou
 	, m_p(INT_MAX, INT_MAX)
 	, m_fLineBreak(false)
 	, m_fWhiteSpaceChar(false)
-	, m_pOpaqueBox(nullptr)
+	, m_pOpaqueBox(NULL)
 	, m_scalex(scalex)
 	, m_scaley(scaley)
 	, m_outlineCache(outlineCache)
@@ -571,8 +571,8 @@ bool CPolygon::Append(CWord* w)
 bool CPolygon::GetPOINT(CStringW& str, POINT& point) const
 {
 	LPCWSTR s = str;
-	LPWSTR xEnd = nullptr;
-	LPWSTR yEnd = nullptr;
+	LPWSTR xEnd = NULL;
+	LPWSTR yEnd = NULL;
 
 	point.x = std::lround(wcstod(s, &xEnd) * m_scalex) * 64;
 	if (xEnd <= s) {
@@ -773,7 +773,7 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
 	, m_size(size)
 	, m_inverse(inverse)
 	, m_cpOffset(cpOffset)
-	, m_pAlphaMask(nullptr)
+	, m_pAlphaMask(NULL)
 {
 	if (m_size.cx <= 0 || m_size.cy <= 0) {
 		return;
@@ -897,7 +897,7 @@ void CLine::Compact()
 	l.AddTailList(this);
 	RemoveAll();
 
-	CWord* last = nullptr;
+	CWord* last = NULL;
 
 	pos = l.GetHeadPosition();
 	while (pos) {
@@ -1090,7 +1090,7 @@ CRect CLine::PaintBody(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CPoin
 
 CSubtitle::CSubtitle(COutlineCache& outlineCache, COverlayCache& overlayCache)
 	: m_outlineCache(outlineCache)
-	, m_pClipper(nullptr)
+	, m_pClipper(NULL)
 	, m_clipInverse(false)
 	, m_scalex(1.0)
 	, m_scaley(1.0)
@@ -1196,15 +1196,15 @@ int CSubtitle::GetWrapWidth(POSITION pos, int maxwidth)
 
 CLine* CSubtitle::GetNextLine(POSITION& pos, int maxwidth)
 {
-	if (pos == nullptr) {
-		return nullptr;
+	if (pos == NULL) {
+		return NULL;
 	}
 
 	CLine* ret;
 	try {
 		ret = DNew CLine();
 	} catch (std::bad_alloc) {
-		return nullptr;
+		return NULL;
 	}
 
 	ret->m_width = ret->m_ascent = ret->m_descent = ret->m_borderX = ret->m_borderY = 0;
@@ -1400,7 +1400,7 @@ void CSubtitle::MakeLines(CSize size, const CRect& marginRect)
 
 	m_topborder = m_bottomborder = 0;
 
-	CLine* l = nullptr;
+	CLine* l = NULL;
 
 	POSITION pos = m_words.GetHeadPosition();
 	while (pos) {
@@ -1541,7 +1541,7 @@ CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock, STSStyle* styleOve
 	m_size = CSize(0, 0);
 
 	if (g_hDC_refcnt == 0) {
-		g_hDC = CreateCompatibleDC(nullptr);
+		g_hDC = CreateCompatibleDC(NULL);
 		SetBkMode(g_hDC, TRANSPARENT);
 		SetTextColor(g_hDC, 0xffffff);
 		SetMapMode(g_hDC, MM_TEXT);
@@ -1888,12 +1888,12 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			case SSA_3a:
 			case SSA_4a:
 				if (cmd.GetLength() > 2) {
-					tag.paramsInt.Add(wcstol(cmd.Mid(2).Trim(L"&H"), nullptr, 16));
+					tag.paramsInt.Add(wcstol(cmd.Mid(2).Trim(L"&H"), NULL, 16));
 				}
 				break;
 			case SSA_alpha:
 				if (cmd.GetLength() > 5) {
-					tag.paramsInt.Add(wcstol(cmd.Mid(5).Trim(L"&H"), nullptr, 16));
+					tag.paramsInt.Add(wcstol(cmd.Mid(5).Trim(L"&H"), NULL, 16));
 				}
 				break;
 			case SSA_an:
@@ -1903,7 +1903,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			case SSA_kf:
 			case SSA_ko:
 				if (cmd.GetLength() > 2) {
-					tag.paramsInt.Add(wcstol(cmd.Mid(2), nullptr, 10));
+					tag.paramsInt.Add(wcstol(cmd.Mid(2), NULL, 10));
 				}
 				break;
 			case SSA_fn:
@@ -1911,7 +1911,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 				break;
 			case SSA_fr:
 				if (cmd.GetLength() > 2) {
-					tag.paramsReal.Add(wcstod(cmd.Mid(2), nullptr));
+					tag.paramsReal.Add(wcstod(cmd.Mid(2), NULL));
 				}
 				break;
 			case SSA_fs:
@@ -1920,7 +1920,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 					if (cmd[s] == L'+' || cmd[s] == L'-') {
 						tag.params.Add(cmd.Mid(s, 1));
 					}
-					tag.paramsInt.Add(wcstol(cmd.Mid(s), nullptr, 10));
+					tag.paramsInt.Add(wcstol(cmd.Mid(s), NULL, 10));
 				}
 				break;
 			case SSA_a:
@@ -1933,7 +1933,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			case SSA_s:
 			case SSA_u:
 				if (cmd.GetLength() > 1) {
-					tag.paramsInt.Add(wcstol(cmd.Mid(1), nullptr, 10));
+					tag.paramsInt.Add(wcstol(cmd.Mid(1), NULL, 10));
 				}
 				break;
 			case SSA_r:
@@ -1945,18 +1945,18 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			case SSA_fscy:
 			case SSA_shad:
 				if (cmd.GetLength() > 4) {
-					tag.paramsReal.Add(wcstod(cmd.Mid(4), nullptr));
+					tag.paramsReal.Add(wcstod(cmd.Mid(4), NULL));
 				}
 				break;
 			case SSA_clip:
 			case SSA_iclip: {
 				size_t nParams = tag.params.GetCount();
 				if (nParams == 2) {
-					tag.paramsInt.Add(wcstol(tag.params[0], nullptr, 10));
+					tag.paramsInt.Add(wcstol(tag.params[0], NULL, 10));
 					tag.params.RemoveAt(0);
 				} else if (nParams == 4) {
 					for (size_t i = 0; i < nParams; i++) {
-						tag.paramsInt.Add(wcstol(tag.params[i], nullptr, 10));
+						tag.paramsInt.Add(wcstol(tag.params[i], NULL, 10));
 					}
 					tag.params.RemoveAll();
 				}
@@ -1966,7 +1966,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 				size_t nParams = tag.params.GetCount();
 				if (nParams == 7 || nParams == 2) {
 					for (size_t i = 0; i < nParams; i++) {
-						tag.paramsInt.Add(wcstol(tag.params[i], nullptr, 10));
+						tag.paramsInt.Add(wcstol(tag.params[i], NULL, 10));
 					}
 					tag.params.RemoveAll();
 				}
@@ -1976,10 +1976,10 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 				size_t nParams = tag.params.GetCount();
 				if (nParams == 4 || nParams == 6) {
 					for (size_t i = 0; i < 4; i++) {
-						tag.paramsReal.Add(wcstod(tag.params[i], nullptr));
+						tag.paramsReal.Add(wcstod(tag.params[i], NULL));
 					}
 					for (size_t i = 4; i < nParams; i++) {
-						tag.paramsInt.Add(wcstol(tag.params[i], nullptr, 10));
+						tag.paramsInt.Add(wcstol(tag.params[i], NULL, 10));
 					}
 					tag.params.RemoveAll();
 				}
@@ -1990,7 +1990,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 				size_t nParams = tag.params.GetCount();
 				if (nParams == 2) {
 					for (size_t i = 0; i < nParams; i++) {
-						tag.paramsReal.Add(wcstod(tag.params[i], nullptr));
+						tag.paramsReal.Add(wcstod(tag.params[i], NULL));
 					}
 					tag.params.RemoveAll();
 				}
@@ -1998,7 +1998,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			break;
 			case SSA_c:
 				if (cmd.GetLength() > 1) {
-					tag.paramsInt.Add(wcstol(cmd.Mid(1).Trim(L"&H"), nullptr, 16));
+					tag.paramsInt.Add(wcstol(cmd.Mid(1).Trim(L"&H"), NULL, 16));
 				}
 				break;
 			case SSA_frx:
@@ -2009,26 +2009,26 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			case SSA_fsc:
 			case SSA_fsp:
 				if (cmd.GetLength() > 3) {
-					tag.paramsReal.Add(wcstod(cmd.Mid(3), nullptr));
+					tag.paramsReal.Add(wcstod(cmd.Mid(3), NULL));
 				}
 				break;
 			case SSA_pbo:
 				if (cmd.GetLength() > 3) {
-					tag.paramsInt.Add(wcstol(cmd.Mid(3), nullptr, 10));
+					tag.paramsInt.Add(wcstol(cmd.Mid(3), NULL, 10));
 				}
 				break;
 			case SSA_t: {
 				size_t nParams = tag.params.GetCount();
 				if (nParams >= 1 && nParams <= 4) {
 					if (nParams == 2) {
-						tag.paramsReal.Add(wcstod(tag.params[0], nullptr));
+						tag.paramsReal.Add(wcstod(tag.params[0], NULL));
 					} else if (nParams == 3) {
-						tag.paramsReal.Add(wcstod(tag.params[0], nullptr));
-						tag.paramsReal.Add(wcstod(tag.params[1], nullptr));
+						tag.paramsReal.Add(wcstod(tag.params[0], NULL));
+						tag.paramsReal.Add(wcstod(tag.params[1], NULL));
 					} else if (nParams == 4) {
-						tag.paramsInt.Add(wcstol(tag.params[0], nullptr, 10));
-						tag.paramsInt.Add(wcstol(tag.params[1], nullptr, 10));
-						tag.paramsReal.Add(wcstod(tag.params[2], nullptr));
+						tag.paramsInt.Add(wcstol(tag.params[0], NULL, 10));
+						tag.paramsInt.Add(wcstol(tag.params[1], NULL, 10));
+						tag.paramsReal.Add(wcstod(tag.params[2], NULL));
 					}
 
 					ParseSSATag(tag.subTagsList, tag.params[nParams - 1]);
@@ -2041,7 +2041,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			case SSA_ybord:
 			case SSA_yshad:
 				if (cmd.GetLength() > 5) {
-					tag.paramsReal.Add(wcstod(cmd.Mid(5), nullptr));
+					tag.paramsReal.Add(wcstod(cmd.Mid(5), NULL));
 				}
 				break;
 		}
@@ -2548,22 +2548,22 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 					style.fontName = params[j];
 				} else if (attribs[j] == L"size") {
 					if (params[j][0] == '+') {
-						style.fontSize += wcstol(params[j], nullptr, 10);
+						style.fontSize += wcstol(params[j], NULL, 10);
 					} else if (params[j][0] == '-') {
-						style.fontSize -= wcstol(params[j], nullptr, 10);
+						style.fontSize -= wcstol(params[j], NULL, 10);
 					} else {
-						style.fontSize = wcstol(params[j], nullptr, 10);
+						style.fontSize = wcstol(params[j], NULL, 10);
 					}
 				} else if (attribs[j] == L"color") {
 					nColor = 0;
 				} else if (attribs[j] == L"outline-color") {
 					nColor = 2;
 				} else if (attribs[j] == L"outline-level") {
-					style.outlineWidthX = style.outlineWidthY = wcstol(params[j], nullptr, 10);
+					style.outlineWidthX = style.outlineWidthY = wcstol(params[j], NULL, 10);
 				} else if (attribs[j] == L"shadow-color") {
 					nColor = 3;
 				} else if (attribs[j] == L"shadow-level") {
-					style.shadowDepthX = style.shadowDepthY = wcstol(params[j], nullptr, 10);
+					style.shadowDepthX = style.shadowDepthY = wcstol(params[j], NULL, 10);
 				}
 
 				if (nColor >= 0 && nColor < 4) {
@@ -2571,7 +2571,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 					DWORD val;
 					if (g_colors.Lookup(key, val)) {
 						style.colors[nColor] = val;
-					} else if ((style.colors[nColor] = _tcstol(key, nullptr, 16)) == 0) {
+					} else if ((style.colors[nColor] = _tcstol(key, NULL, 16)) == 0) {
 						style.colors[nColor] = 0x00ffffff;	// default is white
 					}
 					style.colors[nColor] = ((style.colors[nColor]>>16)&0xff)|((style.colors[nColor]&0xff)<<16)|(style.colors[nColor]&0x00ff00);
@@ -2585,7 +2585,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 	} else if (tag == L"k" && attribs.GetCount() == 1 && attribs[0] == L"t") {
 		m_ktype = 1;
 		m_kstart = m_kend;
-		m_kend += wcstol(params[0], nullptr, 10);
+		m_kend += wcstol(params[0], NULL, 10);
 	} else {
 		return false;
 	}
@@ -2617,7 +2617,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	if (m_subtitleCache.Lookup(entry, sub)) {
 		if (sub->m_fAnimated) {
 			delete sub;
-			sub = nullptr;
+			sub = NULL;
 		} else {
 			return sub;
 		}
@@ -2626,7 +2626,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	try {
 		sub = DNew CSubtitle(m_outlineCache, m_overlayCache);
 	} catch (std::bad_alloc) {
-		return nullptr;
+		return NULL;
 	}
 
 	CStringW str = GetStrW(entry, true);
@@ -2790,7 +2790,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
-	*ppv = nullptr;
+	*ppv = NULL;
 
 	return
 		QI(IPersist)
@@ -2804,7 +2804,7 @@ STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, voi
 STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	int iSegment = -1;
-	SearchSubs((int)(rt / 10000), fps, &iSegment, nullptr);
+	SearchSubs((int)(rt / 10000), fps, &iSegment, NULL);
 
 	if (iSegment < 0) {
 		iSegment = 0;
@@ -2823,7 +2823,7 @@ STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetNext(POSITION pos)
 		stss = GetSegment(iSegment);
 	}
 
-	return (stss ? (POSITION)(iSegment + 1) : nullptr);
+	return (stss ? (POSITION)(iSegment + 1) : NULL);
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CRenderedTextSubtitle::GetStart(POSITION pos, double fps)
@@ -2940,7 +2940,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
 		CPoint org2;
 
-		BYTE* pAlphaMask = s->m_pClipper ? s->m_pClipper->m_pAlphaMask : nullptr;
+		BYTE* pAlphaMask = s->m_pClipper ? s->m_pClipper->m_pAlphaMask : NULL;
 
 		for (int k = 0; k < EF_NUMBEROFEFFECTS; k++) {
 			if (!s->m_effects[k]) {
