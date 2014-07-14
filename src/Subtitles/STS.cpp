@@ -1225,7 +1225,6 @@ static int GetInt(LPCWSTR& pszBuff, int& nLength, WCHAR sep = L',')
 	int nMatchLength;
 	GetStrW(pszBuff, nLength, sep, pszMatch, nMatchLength);
 
-	int base;
 	LPWSTR strEnd;
 	int ret;
 
@@ -1234,11 +1233,9 @@ static int GetInt(LPCWSTR& pszBuff, int& nLength, WCHAR sep = L',')
 				|| (pszMatch[0] == L'0' && towlower(pszMatch[1]) == L'x'))) {
 		pszMatch += 2;
 		nMatchLength -= 2;
-		base = 16;
-		ret = (int)wcstoul(pszMatch, &strEnd, base);
+		ret = (int)wcstoul(pszMatch, &strEnd, 16);
 	} else {
-		base = 10;
-		ret = wcstol(pszMatch, &strEnd, base);
+		ret = wcstol(pszMatch, &strEnd, 10);
 	}
 
 	if (pszMatch == strEnd) { // Ensure something was parsed
