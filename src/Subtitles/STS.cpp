@@ -1237,7 +1237,7 @@ static int GetInt(LPCWSTR& pszBuff, int& nLength, WCHAR sep = L',')
 	}
 
 	LPWSTR strEnd;
-	int ret = wcstol(pszMatch, &strEnd, base);
+	int ret = wcstoll(pszMatch, &strEnd, base);
 	if (pszMatch == strEnd) { // Ensure something was parsed
 		throw 1;
 	}
