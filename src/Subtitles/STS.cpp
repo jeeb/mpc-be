@@ -1226,18 +1226,21 @@ static int GetInt(LPCWSTR& pszBuff, int& nLength, WCHAR sep = L',')
 	GetStrW(pszBuff, nLength, sep, pszMatch, nMatchLength);
 
 	int base;
+	LPWSTR strEnd;
+	int ret;
+
 	if (nMatchLength > 2
 			&& ((pszMatch[0] == L'&' && towlower(pszMatch[1]) == L'h')
 				|| (pszMatch[0] == L'0' && towlower(pszMatch[1]) == L'x'))) {
 		pszMatch += 2;
 		nMatchLength -= 2;
 		base = 16;
+		ret = (int)wcstoul(pszMatch, &strEnd, base);
 	} else {
 		base = 10;
+		ret = wcstol(pszMatch, &strEnd, base);
 	}
 
-	LPWSTR strEnd;
-	int ret = wcstoll(pszMatch, &strEnd, base);
 	if (pszMatch == strEnd) { // Ensure something was parsed
 		throw 1;
 	}
