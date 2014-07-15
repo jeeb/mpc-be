@@ -49,6 +49,7 @@ DiskImage::~DiskImage()
 
 void DiskImage::Init()
 {
+	// Windows 8 Virtual Disks functions
 	if (IsWinEightOrLater()) {
 		m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll");
 
@@ -66,6 +67,25 @@ void DiskImage::Init()
 			m_hVirtualDiskModule = NULL;
 		}
 	}
+
+#if ENABLE_DTLITE_SUPPORT
+	// DAEMON Tools Lite
+	SHELLEXECUTEINFO execinfo;
+	memset(&execinfo, 0, sizeof(execinfo));
+	execinfo.lpFile			= L"DTLite.exe";
+	execinfo.lpParameters	= L"-get_count";
+	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
+	execinfo.nShow			= SW_HIDE;
+	execinfo.cbSize			= sizeof(execinfo);
+	DWORD ec = 0;
+	if (ShellExecuteEx(&execinfo)) {
+		DWORD gg = WaitForSingleObject(execinfo.hProcess, INFINITE);
+		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec != (DWORD)-1 && ec != 0) {
+			m_DriveType = DTLITE;
+			return;
+		}
+	}
+#endif
 }
 
 bool DiskImage::DriveAvailable()
@@ -76,9 +96,13 @@ bool DiskImage::DriveAvailable()
 const LPCTSTR DiskImage::GetExts()
 {
 	if (m_DriveType == WIN8) {
-		return _T(".iso");
+		return _T("*.iso");
+#if ENABLE_DTLITE_SUPPORT
+	} if (m_DriveType == DTLITE) {
+		return _T("*.iso;*.nrg");
+#endif
 	}
-	
+
 	return NULL;
 }
 
@@ -88,6 +112,10 @@ TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 
 	if (m_DriveType == WIN8) {
 		return MountWin8(pathName);
+#if ENABLE_DTLITE_SUPPORT
+	} if (m_DriveType == DTLITE) {
+		return MountDTLite (pathName);
+#endif
 	}
 
 	return 0;
@@ -225,3 +253,60 @@ TCHAR DiskImage::MountWin8(LPCTSTR pathName)
 
 	return 0;
 }
+
+#if ENABLE_DTLITE_SUPPORT
+TCHAR DiskImage::MountDTLite(LPCTSTR pathName)
+{
+	enum {none, dt, scsi};
+	int drivetype = none;
+
+	SHELLEXECUTEINFO execinfo;
+	memset(&execinfo, 0, sizeof(execinfo));
+	execinfo.lpFile			= L"DTLite.exe";
+	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
+	execinfo.nShow			= SW_HIDE;
+	execinfo.cbSize			= sizeof(execinfo);
+
+	DWORD ec = (DWORD)-1;
+	execinfo.lpParameters = L"-get_letter dt, 0";
+	if (!ShellExecuteEx(&execinfo)) {
+		return 0;
+	}
+	WaitForSingleObject(execinfo.hProcess, INFINITE);
+	if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec < 26) {
+		drivetype = dt;
+	} else {
+		ec = (DWORD)-1;
+		execinfo.lpParameters = L"-get_letter scsi, 0";
+		if (!ShellExecuteEx(&execinfo)) {
+			return 0;
+		}
+		WaitForSingleObject(execinfo.hProcess, INFINITE);
+		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec < 26) {
+			drivetype = scsi;
+		}
+	}
+
+	CString parameters;
+	if (drivetype == dt) {
+		parameters.Format(L"-mount dt, 0, \"%s\"", pathName);
+	} else if (drivetype == scsi) {
+		parameters.Format(L"-mount scsi, 0, \"%s\"", pathName);
+	} else {
+		return 0;
+	}
+	TCHAR letter = 'A' + ec;
+
+	ec = (DWORD)-1;
+	execinfo.lpParameters = parameters;
+	if (!ShellExecuteEx(&execinfo)) {
+		return 0;
+	}
+	WaitForSingleObject(execinfo.hProcess, INFINITE);
+	if (!GetExitCodeProcess(execinfo.hProcess, &ec) && ec != 0) {
+		return 0;
+	}
+
+	return letter;
+}
+#endif

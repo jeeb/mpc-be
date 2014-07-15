@@ -959,9 +959,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// Windows 8 - if app is not pinned on the taskbar, it's not receive "TaskbarButtonCreated" message. Bug ???
 	if (IsWinEightOrLater()) {
 		CreateThumbnailToolbar();
-
-		m_DiskImage.Init();
 	}
+
+	m_DiskImage.Init();
 
 	m_hStopNotifyRenderThreadEvent		= CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_hRefreshNotifyRenderThreadEvent	= CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -5278,7 +5278,7 @@ void CMainFrame::OnUpdateFileOpen(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_iMediaLoadState != MLS_LOADING);
 
-	if (pCmdUI->m_nID == ID_FILE_OPENISO && pCmdUI->m_pMenu != NULL && !IsWinEightOrLater()) {
+	if (pCmdUI->m_nID == ID_FILE_OPENISO && pCmdUI->m_pMenu != NULL && !m_DiskImage.DriveAvailable()) {
 		pCmdUI->m_pMenu->DeleteMenu(pCmdUI->m_nID, MF_BYCOMMAND);
 	}
 }
@@ -5562,7 +5562,7 @@ void CMainFrame::OnFileOpenIso()
 		DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT;
 
 		CString szFilter;
-		szFilter.Format(_T("Iso Files (*%ws)|*%ws||"), m_DiskImage.GetExts(), m_DiskImage.GetExts());
+		szFilter.Format(_T("Iso Files (%ws)|%ws||"), m_DiskImage.GetExts(), m_DiskImage.GetExts());
 		CFileDialog fd(TRUE, NULL, NULL, dwFlags, szFilter);
 		if (fd.DoModal() != IDOK) {
 			return;
