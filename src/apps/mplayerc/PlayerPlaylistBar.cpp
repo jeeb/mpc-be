@@ -337,13 +337,11 @@ void CPlaylistItem::AutoLoadFiles()
 
 				HANDLE hFind;
 				CAtlArray<CString> searchPattern;
-				searchPattern.Add(paths[i] + name + _T(".*"));
-				searchPattern.Add(paths[i] + name + _T(".*.*"));
+				searchPattern.Add(paths[i] + name + _T("*.*"));
 				if (BDLabel.GetLength() > 0) {
-					searchPattern.Add(paths[i] + BDLabel + _T(".*"));
-					searchPattern.Add(paths[i] + BDLabel + _T(".*.*"));
+					searchPattern.Add(paths[i] + BDLabel + _T("*.*"));
 				}
-				for (size_t j = 0; j < searchPattern.GetCount() - 1; j++) {
+				for (size_t j = 0; j < searchPattern.GetCount(); j++) {
 					hFind = FindFirstFile(searchPattern[j], &fd);
 
 					if (hFind != INVALID_HANDLE_VALUE) {
@@ -360,7 +358,10 @@ void CPlaylistItem::AutoLoadFiles()
 							ext2 = ext2.Mid(n + 1).MakeLower();
 							CString fullpath = paths[i] + fd.cFileName;
 
-							if (ext != ext2 && mf.FindAudioExt(ext2) && !FindFileInList(m_fns, fullpath) && s.IsUsingRtspEngine(fullpath, DirectShow)) {
+							if (ext != ext2
+									&& mf.FindAudioExt(ext2)
+									&& !FindFileInList(m_fns, fullpath)
+									&& s.IsUsingRtspEngine(fullpath, DirectShow)) {
 								m_fns.AddTail(fullpath);
 							}
 						} while (FindNextFile(hFind, &fd));
@@ -387,13 +388,11 @@ void CPlaylistItem::AutoLoadFiles()
 
 			HANDLE hFind;
 			CAtlArray<CString> searchPattern;
-			searchPattern.Add(paths[i] + name + _T(".*"));
-			searchPattern.Add(paths[i] + name + _T(".*.*"));
+			searchPattern.Add(paths[i] + name + _T("*.*"));
 			if (BDLabel.GetLength() > 0) {
-				searchPattern.Add(paths[i] + BDLabel + _T(".*"));
-				searchPattern.Add(paths[i] + BDLabel + _T(".*.*"));
+				searchPattern.Add(paths[i] + BDLabel + _T("*.*"));
 			}
-			for (size_t j = 0; j < searchPattern.GetCount() - 1; j++) {
+			for (size_t j = 0; j < searchPattern.GetCount(); j++) {
 				hFind = FindFirstFile(searchPattern[j], &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					do {
@@ -409,7 +408,9 @@ void CPlaylistItem::AutoLoadFiles()
 						ext2 = ext2.Mid(n + 1).MakeLower();
 						CString fullpath = paths[i] + fd.cFileName;
 
-						if (ext != ext2 && isSubExt(ext2) && !FindFileInList(m_subs, fullpath)) {
+						if (ext != ext2
+								&& isSubExt(ext2)
+								&& !FindFileInList(m_subs, fullpath)) {
 							m_subs.AddTail(fullpath);
 						}
 					} while (FindNextFile(hFind, &fd));
