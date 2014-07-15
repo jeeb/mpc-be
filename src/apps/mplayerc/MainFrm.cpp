@@ -3258,6 +3258,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 							break;
 						case DVD_ERROR_InvalidDiscRegion:
 							err = ResStr(IDS_MAINFRM_19);
+							err.AppendFormat(_T(" (%u \x2260 %u)"), LOWORD(evParam2), HIWORD(evParam2));
 							break;
 						case DVD_ERROR_LowParentalLevel:
 							err = ResStr(IDS_MAINFRM_20);
@@ -3267,9 +3268,11 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 							break;
 						case DVD_ERROR_IncompatibleSystemAndDecoderRegions:
 							err = ResStr(IDS_MAINFRM_22);
+							err.AppendFormat(_T(" (%u \x2260 %u)"), LOWORD(evParam2), HIWORD(evParam2));
 							break;
 						case DVD_ERROR_IncompatibleDiscAndDecoderRegions:
 							err = ResStr(IDS_MAINFRM_23);
+							err.AppendFormat(_T(" (%u \x2260 %u)"), LOWORD(evParam2), HIWORD(evParam2));
 							break;
 					}
 
