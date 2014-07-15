@@ -70,19 +70,34 @@ void DiskImage::Init()
 
 #if ENABLE_DTLITE_SUPPORT
 	// DAEMON Tools Lite
-	SHELLEXECUTEINFO execinfo;
-	memset(&execinfo, 0, sizeof(execinfo));
-	execinfo.lpFile			= L"DTLite.exe";
-	execinfo.lpParameters	= L"-get_count";
-	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
-	execinfo.nShow			= SW_HIDE;
-	execinfo.cbSize			= sizeof(execinfo);
-	DWORD ec = 0;
-	if (ShellExecuteEx(&execinfo)) {
-		DWORD gg = WaitForSingleObject(execinfo.hProcess, INFINITE);
-		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec != (DWORD)-1 && ec != 0) {
-			m_DriveType = DTLITE;
-			return;
+	m_dtlitepath.Empty();
+
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\DTLite.exe"), KEY_READ)) {
+		ULONG nChars = 0;
+		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_dtlitepath.GetBuffer(nChars), &nChars)) {
+				m_dtlitepath.ReleaseBuffer(nChars);
+			}
+		}
+		key.Close();
+	}
+
+	if (::PathFileExists(m_dtlitepath)) {
+		SHELLEXECUTEINFO execinfo;
+		memset(&execinfo, 0, sizeof(execinfo));
+		execinfo.lpFile = m_dtlitepath;
+		execinfo.lpParameters = L"-get_count";
+		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		execinfo.nShow = SW_HIDE;
+		execinfo.cbSize = sizeof(execinfo);
+		DWORD ec = 0;
+		if (ShellExecuteEx(&execinfo)) {
+			DWORD gg = WaitForSingleObject(execinfo.hProcess, INFINITE);
+			if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec != (DWORD)-1 && ec != 0) {
+				m_DriveType = DTLITE;
+				return;
+			}
 		}
 	}
 #endif
@@ -262,7 +277,7 @@ TCHAR DiskImage::MountDTLite(LPCTSTR pathName)
 
 	SHELLEXECUTEINFO execinfo;
 	memset(&execinfo, 0, sizeof(execinfo));
-	execinfo.lpFile			= L"DTLite.exe";
+	execinfo.lpFile			= m_dtlitepath;
 	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
 	execinfo.nShow			= SW_HIDE;
 	execinfo.cbSize			= sizeof(execinfo);

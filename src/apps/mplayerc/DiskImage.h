@@ -53,6 +53,10 @@ private:
 				__out_bcount(DiskPathSizeInBytes) PWSTR  DiskPath);
 	HANDLE		m_VHDHandle;
 
+#if ENABLE_DTLITE_SUPPORT
+	CString m_dtlitepath;
+#endif
+
 public:
 	DiskImage();
 	~DiskImage();
