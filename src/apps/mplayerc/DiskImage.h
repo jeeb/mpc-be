@@ -22,7 +22,7 @@
 
 #include <VirtDisk.h>
 
-#define ENABLE_DTLITE_SUPPORT 1
+#define ENABLE_DTLITE_SUPPORT 0
 
 class DiskImage
 {
