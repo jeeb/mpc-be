@@ -175,6 +175,7 @@
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="CShockwaveFlash.cpp" />
+    <ClCompile Include="DiskImage.cpp" />
     <ClCompile Include="OSD.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="CShockwaveFlash.h" />
+    <ClInclude Include="DiskImage.h" />
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerVimeo.h" />

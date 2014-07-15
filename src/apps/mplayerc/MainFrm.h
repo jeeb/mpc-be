@@ -70,7 +70,7 @@
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>
 #include <afxmt.h>
-#include <VirtDisk.h>
+#include "DiskImage.h"
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -1234,26 +1234,6 @@ public:
 	CString		GetCurFileName();
 
 protected:
-	HMODULE		m_hVirtualDiskModule;
-	HRESULT		(__stdcall * m_OpenVirtualDiskFunc)(
-				__in     PVIRTUAL_STORAGE_TYPE         VirtualStorageType,
-				__in     PCWSTR                        Path,
-				__in     VIRTUAL_DISK_ACCESS_MASK      VirtualDiskAccessMask,
-				__in     OPEN_VIRTUAL_DISK_FLAG        Flags,
-				__in_opt POPEN_VIRTUAL_DISK_PARAMETERS Parameters,
-				__out    PHANDLE                       Handle);
-	HRESULT		(__stdcall * m_AttachVirtualDiskFunc)(
-				__in     HANDLE                          VirtualDiskHandle,
-				__in_opt PSECURITY_DESCRIPTOR            SecurityDescriptor,
-				__in     ATTACH_VIRTUAL_DISK_FLAG        Flags,
-				__in     ULONG                           ProviderSpecificFlags,
-				__in_opt PATTACH_VIRTUAL_DISK_PARAMETERS Parameters,
-				__in_opt LPOVERLAPPED                    Overlapped);
-	HRESULT		(__stdcall * m_GetVirtualDiskPhysicalPathFunc)(
-				__in                              HANDLE VirtualDiskHandle,
-				__inout                           PULONG DiskPathSizeInBytes,
-				__out_bcount(DiskPathSizeInBytes) PWSTR  DiskPath);
-
-	HANDLE		m_VHDHandle;
+	DiskImage	m_DiskImage;
 	BOOL		OpenIso(CString pathName);
 };
