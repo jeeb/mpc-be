@@ -5569,9 +5569,7 @@ void CMainFrame::OnFileOpenIso()
 		}
 
 		CString pathName = fd.GetPathName();
-		if (GetFileExt(pathName).MakeLower() == L".iso") {
-			OpenIso(pathName);
-		}
+		OpenIso(pathName);
 	}
 }
 

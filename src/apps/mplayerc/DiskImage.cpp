@@ -112,11 +112,12 @@ const LPCTSTR DiskImage::GetExts()
 {
 	if (m_DriveType == WIN8) {
 		return _T("*.iso");
-#if ENABLE_DTLITE_SUPPORT
-	} if (m_DriveType == DTLITE) {
-		return _T("*.iso;*.nrg");
-#endif
 	}
+#if ENABLE_DTLITE_SUPPORT
+	if (m_DriveType == DTLITE) {
+		return _T("*.iso;*.nrg");
+	}
+#endif
 
 	return NULL;
 }
@@ -125,13 +126,16 @@ TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 {
 	UnmountDiskImage();
 
-	if (m_DriveType == WIN8) {
+	CString ext = GetFileExt(pathName).MakeLower();
+
+	if (m_DriveType == WIN8 && ext == L".iso") {
 		return MountWin8(pathName);
-#if ENABLE_DTLITE_SUPPORT
-	} if (m_DriveType == DTLITE) {
-		return MountDTLite (pathName);
-#endif
 	}
+#if ENABLE_DTLITE_SUPPORT
+	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg")) {
+		return MountDTLite (pathName);
+	}
+#endif
 
 	return 0;
 }
