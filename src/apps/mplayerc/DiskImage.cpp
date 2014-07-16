@@ -158,7 +158,6 @@ void DiskImage::UnmountDiskImage()
 		execinfo.nShow = SW_HIDE;
 		execinfo.cbSize = sizeof(execinfo);
 
-		DWORD ec = (DWORD)-1;
 		CString parameters;
 		if (m_dtdrive == dt_dt) {
 			parameters.Format(L"-unmount dt, 0");
@@ -168,10 +167,8 @@ void DiskImage::UnmountDiskImage()
 		execinfo.lpParameters = parameters;
 
 		if (ShellExecuteEx(&execinfo)) {
-			WaitForSingleObject(execinfo.hProcess, INFINITE);
-			if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
-				m_dtdrive = dt_none;
-			}
+			// do not wait for execution result
+			m_dtdrive = dt_none;
 		}
 	}
 #endif

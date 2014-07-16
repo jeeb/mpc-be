@@ -20408,11 +20408,11 @@ GUID CMainFrame::GetTimeFormat()
 
 BOOL CMainFrame::OpenIso(CString pathName)
 {
+	SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+
 	TCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
 
 	if (diskletter) {
-		SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-
 		if (OpenBD(CString(diskletter) + L":\\")) {
 			return TRUE;
 		}
