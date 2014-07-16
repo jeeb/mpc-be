@@ -33,7 +33,9 @@ DiskImage::DiskImage()
 	, m_AttachVirtualDiskFunc(NULL)
 	, m_GetVirtualDiskPhysicalPathFunc(NULL)
 	, m_VHDHandle(INVALID_HANDLE_VALUE)
-
+#if ENABLE_DTLITE_SUPPORT
+	, m_dtdrive(dt_none)
+#endif
 {
 }
 
@@ -70,23 +72,23 @@ void DiskImage::Init()
 
 #if ENABLE_DTLITE_SUPPORT
 	// DAEMON Tools Lite
-	m_dtlitepath.Empty();
+	m_dtlite_path.Empty();
 
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\DTLite.exe"), KEY_READ)) {
 		ULONG nChars = 0;
 		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
-			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_dtlitepath.GetBuffer(nChars), &nChars)) {
-				m_dtlitepath.ReleaseBuffer(nChars);
+			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_dtlite_path.GetBuffer(nChars), &nChars)) {
+				m_dtlite_path.ReleaseBuffer(nChars);
 			}
 		}
 		key.Close();
 	}
 
-	if (::PathFileExists(m_dtlitepath)) {
+	if (::PathFileExists(m_dtlite_path)) {
 		SHELLEXECUTEINFO execinfo;
 		memset(&execinfo, 0, sizeof(execinfo));
-		execinfo.lpFile = m_dtlitepath;
+		execinfo.lpFile = m_dtlite_path;
 		execinfo.lpParameters = L"-get_count";
 		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
 		execinfo.nShow = SW_HIDE;
@@ -125,26 +127,54 @@ const LPCTSTR DiskImage::GetExts()
 TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 {
 	UnmountDiskImage();
+	m_DriveLetter = 0;
 
 	CString ext = GetFileExt(pathName).MakeLower();
 
 	if (m_DriveType == WIN8 && ext == L".iso") {
-		return MountWin8(pathName);
+		m_DriveLetter = MountWin8(pathName);
 	}
 #if ENABLE_DTLITE_SUPPORT
 	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg")) {
-		return MountDTLite (pathName);
+		m_DriveLetter = MountDTLite(pathName);
 	}
 #endif
 
-	return 0;
+	return m_DriveLetter;
 }
 
 void DiskImage::UnmountDiskImage()
 {
-	if (m_VHDHandle != INVALID_HANDLE_VALUE) {
+	if (m_DriveType == WIN8 && m_VHDHandle != INVALID_HANDLE_VALUE) {
 		CloseHandle(m_VHDHandle);
 	}
+
+#if ENABLE_DTLITE_SUPPORT
+	if (m_DriveType == DTLITE && m_dtdrive > dt_none) {
+		SHELLEXECUTEINFO execinfo;
+		memset(&execinfo, 0, sizeof(execinfo));
+		execinfo.lpFile = m_dtlite_path;
+		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		execinfo.nShow = SW_HIDE;
+		execinfo.cbSize = sizeof(execinfo);
+
+		DWORD ec = (DWORD)-1;
+		CString parameters;
+		if (m_dtdrive == dt_dt) {
+			parameters.Format(L"-unmount dt, 0");
+		} else if (m_dtdrive == dt_scsi) {
+			parameters.Format(L"-unmount scsi, 0");
+		}
+		execinfo.lpParameters = parameters;
+
+		if (ShellExecuteEx(&execinfo)) {
+			WaitForSingleObject(execinfo.hProcess, INFINITE);
+			if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
+				m_dtdrive = dt_none;
+			}
+		}
+	}
+#endif
 }
 
 TCHAR DiskImage::MountWin8(LPCTSTR pathName)
@@ -276,12 +306,11 @@ TCHAR DiskImage::MountWin8(LPCTSTR pathName)
 #if ENABLE_DTLITE_SUPPORT
 TCHAR DiskImage::MountDTLite(LPCTSTR pathName)
 {
-	enum {none, dt, scsi};
-	int drivetype = none;
+	m_dtdrive = dt_none;
 
 	SHELLEXECUTEINFO execinfo;
 	memset(&execinfo, 0, sizeof(execinfo));
-	execinfo.lpFile			= m_dtlitepath;
+	execinfo.lpFile			= m_dtlite_path;
 	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
 	execinfo.nShow			= SW_HIDE;
 	execinfo.cbSize			= sizeof(execinfo);
@@ -293,7 +322,7 @@ TCHAR DiskImage::MountDTLite(LPCTSTR pathName)
 	}
 	WaitForSingleObject(execinfo.hProcess, INFINITE);
 	if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec < 26) {
-		drivetype = dt;
+		m_dtdrive = dt_dt;
 	} else {
 		ec = (DWORD)-1;
 		execinfo.lpParameters = L"-get_letter scsi, 0";
@@ -302,14 +331,14 @@ TCHAR DiskImage::MountDTLite(LPCTSTR pathName)
 		}
 		WaitForSingleObject(execinfo.hProcess, INFINITE);
 		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec < 26) {
-			drivetype = scsi;
+			m_dtdrive = dt_scsi;
 		}
 	}
 
 	CString parameters;
-	if (drivetype == dt) {
+	if (m_dtdrive == dt_dt) {
 		parameters.Format(L"-mount dt, 0, \"%s\"", pathName);
-	} else if (drivetype == scsi) {
+	} else if (m_dtdrive == dt_scsi) {
 		parameters.Format(L"-mount scsi, 0, \"%s\"", pathName);
 	} else {
 		return 0;

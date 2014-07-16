@@ -54,7 +54,9 @@ private:
 	HANDLE		m_VHDHandle;
 
 #if ENABLE_DTLITE_SUPPORT
-	CString m_dtlitepath;
+	enum dtdrive {dt_none, dt_dt, dt_scsi};
+	dtdrive		m_dtdrive;
+	CString		m_dtlite_path;
 #endif
 
 public:
