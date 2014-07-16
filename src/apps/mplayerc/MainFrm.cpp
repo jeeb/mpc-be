@@ -2883,6 +2883,7 @@ bool CMainFrame::GraphEventComplete()
 // our WM_GRAPHNOTIFY handler
 //
 
+bool g_bExternalPaused = false;
 LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -2909,6 +2910,9 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 		hr = m_pME->FreeEventParams(evCode, evParam1, evParam2);
 
 		switch (evCode) {
+			case EC_PAUSED:
+				g_bExternalPaused = true;
+				break;
 			case EC_COMPLETE:
 				if (!GraphEventComplete()) {
 					return hr;
@@ -3153,6 +3157,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case EC_DVD_CURRENT_HMSF_TIME:
+				g_bExternalPaused = false;
 				if (m_pDVDC) {
 					// Save current position in the chapter
 					DVD_POSITION* DvdPos = s.CurrentDVDPosition();

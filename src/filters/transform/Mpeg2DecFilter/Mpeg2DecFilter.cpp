@@ -1653,7 +1653,9 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 	}
 
 	if (fRefresh) {
-		//((CMpeg2DecFilter*)m_pFilter)->Deliver(true);
+		if (!g_bExternalPaused) {
+			((CMpeg2DecFilter*)m_pFilter)->Deliver(true);
+		}
 	}
 
 	return S_FALSE;
@@ -1737,7 +1739,9 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 	}
 
 	if (fRefresh) {
-		(static_cast<CMpeg2DecFilter*>(m_pFilter))->Deliver(true);
+		if (!g_bExternalPaused) {
+			(static_cast<CMpeg2DecFilter*>(m_pFilter))->Deliver(true);
+		}
 	}
 
 	return S_OK;

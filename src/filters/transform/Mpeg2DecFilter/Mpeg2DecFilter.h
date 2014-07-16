@@ -34,6 +34,8 @@
 #define Mpeg2DecFilterName L"MPC MPEG Video Decoder"
 #endif
 
+extern bool g_bExternalPaused;
+
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;
 class CMpeg2Dec;
