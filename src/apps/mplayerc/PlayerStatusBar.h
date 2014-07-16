@@ -51,7 +51,7 @@ public:
 	void SetStatusBitmap(UINT id);
 	void SetStatusMessage(CString str);
 	void SetStatusTimer(CString str);
-	void SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID* pTimeFormat = &TIME_FORMAT_MEDIA_TIME);
+	void SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID& timeFormat = TIME_FORMAT_MEDIA_TIME);
 
 	CString GetStatusTimer();
 	CString GetStatusMessage();

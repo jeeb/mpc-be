@@ -1233,6 +1233,7 @@ public:
 
 	CString		GetCurFileName();
 
+	GUID		GetTimeFormat();
 protected:
 	DiskImage	m_DiskImage;
 	BOOL		OpenIso(CString pathName);

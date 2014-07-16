@@ -36,24 +36,24 @@ class CPlayerSeekBar : public CDialogBar
 private:
 	enum tooltip_state_t { TOOLTIP_HIDDEN, TOOLTIP_TRIGGERED, TOOLTIP_VISIBLE };
 
-	__int64 m_start, m_stop, m_pos, m_posreal, m_pos2, m_posreal2;
+	REFERENCE_TIME m_start, m_stop, m_pos, m_posreal, m_pos2, m_posreal2;
 	CPoint pt2;
 	CRgn m_CustomRgn;
 	bool m_fEnabled;
 	CToolTipCtrl m_tooltip;
 	TOOLINFO m_ti;
 	tooltip_state_t m_tooltipState;
-	__int64 m_tooltipPos, m_tooltipLastPos;
+	REFERENCE_TIME m_tooltipPos, m_tooltipLastPos;
 	UINT_PTR m_tooltipTimer;
 
 	CMPCPngImage m_BackGroundbm;
 
 	void MoveThumb(CPoint point);
-	__int64 CalculatePosition(CPoint point);
-	void SetPosInternal(__int64 pos);
+	REFERENCE_TIME CalculatePosition(CPoint point);
+	void SetPosInternal(REFERENCE_TIME pos);
 
 	void MoveThumb2(CPoint point);
-	void SetPosInternal2(__int64 pos);
+	void SetPosInternal2(REFERENCE_TIME pos);
 
 	CCritSec m_CBLock;
 	CComPtr<IDSMChapterBag> m_pChapterBag;
@@ -71,16 +71,18 @@ public:
 
 	void Enable(bool fEnable);
 
-	void GetRange(__int64& start, __int64& stop);
-	void SetRange(__int64 start, __int64 stop);
-	__int64 GetPos(), GetPosReal();
-	void SetPos(__int64 pos);
+	void GetRange(REFERENCE_TIME& start, REFERENCE_TIME& stop);
+	void SetRange(REFERENCE_TIME start, REFERENCE_TIME stop);
+	REFERENCE_TIME GetPos(), GetPosReal();
+	void SetPos(REFERENCE_TIME pos);
 
 	void HideToolTip();
 	void UpdateToolTipPosition(CPoint& point);
 	void UpdateToolTipText();
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
+
+	BOOL HasDuration() { return m_stop && m_start < m_stop; };
 
 	// Overrides
 	// ClassWizard generated virtual function overrides

@@ -27,11 +27,16 @@
 
 IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
 
-CPlayerSeekBar::CPlayerSeekBar() :
-	m_start(0), m_stop(100), m_pos(0), m_posreal(0),
-	m_fEnabled(false),
-	m_tooltipState(TOOLTIP_HIDDEN), m_tooltipLastPos(-1), m_tooltipTimer(1),
-	r_Lock(0,0,0,0)
+CPlayerSeekBar::CPlayerSeekBar()
+	: m_start(0)
+	, m_stop(0)
+	, m_pos(0)
+	, m_posreal(0)
+	, m_fEnabled(false)
+	, m_tooltipState(TOOLTIP_HIDDEN)
+	, m_tooltipLastPos(-1)
+	, m_tooltipTimer(1)
+	, r_Lock(0, 0, 0, 0)
 {
 }
 
@@ -88,37 +93,38 @@ void CPlayerSeekBar::Enable(bool fEnable)
 	Invalidate();
 }
 
-void CPlayerSeekBar::GetRange(__int64& start, __int64& stop)
+void CPlayerSeekBar::GetRange(REFERENCE_TIME& start, REFERENCE_TIME& stop)
 {
 	start = m_start;
 	stop = m_stop;
 }
 
-void CPlayerSeekBar::SetRange(__int64 start, __int64 stop)
+void CPlayerSeekBar::SetRange(REFERENCE_TIME start, REFERENCE_TIME stop)
 {
-	if (start > stop) {
-		start ^= stop, stop ^= start, start ^= stop;
+	if (start < stop) {
+		m_start	= start;
+		m_stop	= stop;
+	} else {
+		m_start	= 0;
+		m_stop	= 0;
 	}
-
-	m_start = start;
-	m_stop = stop;
 
 	if (m_pos < m_start || m_pos >= m_stop) {
 		SetPos(m_start);
 	}
 }
 
-__int64 CPlayerSeekBar::GetPos()
+REFERENCE_TIME CPlayerSeekBar::GetPos()
 {
-	return(m_pos);
+	return m_pos;
 }
 
-__int64 CPlayerSeekBar::GetPosReal()
+REFERENCE_TIME CPlayerSeekBar::GetPosReal()
 {
-	return(m_posreal);
+	return m_posreal;
 }
 
-void CPlayerSeekBar::SetPos(__int64 pos)
+void CPlayerSeekBar::SetPos(REFERENCE_TIME pos)
 {
 	CWnd* w = GetCapture();
 
@@ -127,9 +133,16 @@ void CPlayerSeekBar::SetPos(__int64 pos)
 	}
 
 	SetPosInternal(pos);
+
+	if (HasDuration() && AfxGetAppSettings().fUseWin7TaskBar) {
+		const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
+		if (p_MainWnd && ((CMainFrame*)p_MainWnd)->m_pTaskbarList) {
+			VERIFY(S_OK == ((CMainFrame*)p_MainWnd)->m_pTaskbarList->SetProgressValue(p_MainWnd->m_hWnd, max(pos, 1ll), m_stop));
+		}
+	}
 }
 
-void CPlayerSeekBar::SetPosInternal(__int64 pos)
+void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 {
 	AppSettings& s = AfxGetAppSettings();
 
@@ -153,7 +166,7 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 	}
 }
 
-void CPlayerSeekBar::SetPosInternal2(__int64 pos)
+void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 {
 	AppSettings& s = AfxGetAppSettings();
 
@@ -196,11 +209,11 @@ CRect CPlayerSeekBar::GetThumbRect()
 {
 	CRect r = GetChannelRect();
 
-	int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (m_pos - m_start) / (m_stop - m_start) : 0);
+	int x = r.left + (int)((m_start < m_stop) ? (REFERENCE_TIME)r.Width() * (m_pos - m_start) / (m_stop - m_start) : 0);
 	int y = r.CenterPoint().y;
 
 	if (AfxGetAppSettings().fDisableXPToolbars) {
-		 r.SetRect(x, y-2, x+3, y+3);
+		 r.SetRect(x, y - 2, x + 3, y + 3);
 	} else {
 		r.SetRect(x, y, x, y);
 		r.InflateRect(6, 7, 7, 8);
@@ -221,7 +234,7 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 
 __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 {
-	__int64 pos = -1;
+	REFERENCE_TIME pos = -1;
 	CRect r = GetChannelRect();
 
 	if (r.left >= r.right) {
@@ -231,7 +244,7 @@ __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 	} else if (point.x >= r.right) {
 		pos = m_stop;
 	} else {
-		__int64 w = r.right - r.left;
+		REFERENCE_TIME w = r.right - r.left;
 
 		if (m_start < m_stop) {
 			pos = m_start + ((m_stop - m_start) * (point.x - r.left) + (w / 2)) / w;
@@ -243,7 +256,7 @@ __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 
 void CPlayerSeekBar::MoveThumb(CPoint point)
 {
-	__int64 pos = CalculatePosition(point);
+	REFERENCE_TIME pos = CalculatePosition(point);
 
 	if (pos >= 0) {
 		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
@@ -259,7 +272,7 @@ void CPlayerSeekBar::MoveThumb(CPoint point)
 
 void CPlayerSeekBar::MoveThumb2(CPoint point)
 {
-	__int64 pos = CalculatePosition(point);
+	REFERENCE_TIME pos = CalculatePosition(point);
 
 	if (pos >= 0) {
 		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
@@ -354,7 +367,7 @@ void CPlayerSeekBar::OnPaint()
 		int Progress;
 		if (((CMainFrame*)AfxGetMyApp()->GetMainWnd())->GetBufferingProgress(&Progress)) {
 			r_Lock = r;
-			int r_right = ((__int64)r.Width()/100) * Progress;
+			int r_right = ((REFERENCE_TIME)r.Width()/100) * Progress;
 			ThemeRGB(45, 55, 60, R, G, B);
 				ThemeRGB(65, 70, 75, R2, G2, B2);
 				TRIVERTEX tvb[2] = {
@@ -425,7 +438,7 @@ void CPlayerSeekBar::OnPaint()
 							continue;
 						}
 
-						int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (rt - m_start) / (m_stop - m_start) : 0);
+						int x = r.left + (int)((m_start < m_stop) ? (REFERENCE_TIME)r.Width() * (rt - m_start) / (m_stop - m_start) : 0);
 
 						// можно вместо рисования руками иконку как маркер подтянуть
 						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
@@ -578,7 +591,7 @@ void CPlayerSeekBar::OnSize(UINT nType, int cx, int cy)
 
 void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	__int64 pos = CalculatePosition(point);
+	REFERENCE_TIME pos = CalculatePosition(point);
 	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 
 	if (pFrame->ValidateSeek(pos, m_stop)) {
@@ -682,7 +695,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
-		__int64 pos = CalculatePosition(point);
+		REFERENCE_TIME pos = CalculatePosition(point);
 		if (pFrame->ValidateSeek(pos, m_stop)) {
 			MoveThumb(point);
 		}
@@ -870,19 +883,17 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 
 void CPlayerSeekBar::UpdateToolTipText()
 {
-	DVD_HMSF_TIMECODE tcNow = RT2HMS_r(m_tooltipPos);
-
-	/*
-	if (tcNow.bHours > 0) {
-		m_tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-	} else {
-		m_tooltipText.Format(_T("%02d:%02d"), tcNow.bMinutes, tcNow.bSeconds);
-	}
-	*/
-
-	CString tooltipText;
-	tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
 	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	GUID timeFormat = pFrame->GetTimeFormat();
+	CString tooltipText;
+	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
+		DVD_HMSF_TIMECODE tcNow = RT2HMS_r(m_tooltipPos);
+		tooltipText.Format(_T("%02u:%02u:%02u"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+	} else if (timeFormat == TIME_FORMAT_FRAME) {
+		tooltipText.Format(_T("%I64d"), m_tooltipPos);
+	} else {
+		ASSERT(FALSE);
+	}
 
 	if (!pFrame->CanPreviewUse()) {
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;

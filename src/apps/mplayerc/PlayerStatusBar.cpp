@@ -210,53 +210,50 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 	}
 }
 
-void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID* pTimeFormat)
+void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID& timeFormat/* = TIME_FORMAT_MEDIA_TIME*/)
 {
-	//ASSERT(pTimeFormat);
-	//ASSERT(rtNow <= rtDur);
-
 	CString str;
 	CString posstr, durstr, rstr;
 
-	if (*pTimeFormat == TIME_FORMAT_MEDIA_TIME) {
+	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
 		DVD_HMSF_TIMECODE tcNow, tcDur, tcRt;
 
 		if (fHighPrecision) {
 			tcNow = RT2HMSF(rtNow);
 			tcDur = RT2HMSF(rtDur);
-			tcRt  = RT2HMSF(rtDur-rtNow);
+			tcRt  = RT2HMSF(rtDur - rtNow);
 		} else {
 			tcNow = RT2HMS_r(rtNow);
 			tcDur = RT2HMS_r(rtDur);
-			tcRt  = RT2HMS_r(rtDur-rtNow);
+			tcRt  = RT2HMS_r(rtDur - rtNow);
 		}
 
 #if 0
 		if (tcDur.bHours > 0 || (rtNow >= rtDur && tcNow.bHours > 0)) {
-			posstr.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-			rstr.Format(_T("%02d:%02d:%02d"), tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
+			posstr.Format(_T("%02u:%02u:%02u"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+			rstr.Format(_T("%02u:%02u:%02u"), tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
 		} else {
-			posstr.Format(_T("%02d:%02d"), tcNow.bMinutes, tcNow.bSeconds);
-			rstr.Format(_T("%02d:%02d"), tcRt.bMinutes, tcRt.bSeconds);
+			posstr.Format(_T("%02u:%02u"), tcNow.bMinutes, tcNow.bSeconds);
+			rstr.Format(_T("%02u:%02u"), tcRt.bMinutes, tcRt.bSeconds);
 		}
 
 		if (tcDur.bHours > 0) {
-			durstr.Format(_T("%02d:%02d:%02d"), tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
+			durstr.Format(_T("%02u:%02u:%02u"), tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
 		} else {
-			durstr.Format(_T("%02d:%02d"), tcDur.bMinutes, tcDur.bSeconds);
+			durstr.Format(_T("%02u:%02u"), tcDur.bMinutes, tcDur.bSeconds);
 		}
 #else
-		posstr.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-		rstr.Format(_T("%02d:%02d:%02d"), tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
-		durstr.Format(_T("%02d:%02d:%02d"), tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
+		posstr.Format(_T("%02u:%02u:%02u"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+		rstr.Format(_T("%02u:%02u:%02u"), tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
+		durstr.Format(_T("%02u:%02u:%02u"), tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
 #endif
 
 		if (fHighPrecision) {
-			posstr.AppendFormat(_T(".%03I64d"), (rtNow/10000)%1000);
-			durstr.AppendFormat(_T(".%03I64d"), (rtDur/10000)%1000);
-			rstr.AppendFormat(_T(".%03I64d"), ((rtDur - rtNow)/10000)%1000);
+			posstr.AppendFormat(_T(".%03d"), (rtNow / 10000) % 1000);
+			durstr.AppendFormat(_T(".%03d"), (rtDur / 10000) % 1000);
+			rstr.AppendFormat(_T(".%03d"), ((rtDur - rtNow) / 10000) % 1000);
 		}
-	} else if (*pTimeFormat == TIME_FORMAT_FRAME) {
+	} else if (timeFormat == TIME_FORMAT_FRAME) {
 		posstr.Format(_T("%I64d"), rtNow);
 		durstr.Format(_T("%I64d"), rtDur);
 		rstr.Format(_T("%I64d"), rtDur - rtNow);
