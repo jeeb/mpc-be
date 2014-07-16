@@ -34,9 +34,6 @@
 #include <dxva.h>
 #include <dxva2api.h>
 
-// flag for display only forced subtitles (PGS/VOBSUB)
-bool g_bForcedSubtitle = false;
-
 CString ResStr(UINT nID)
 {
 	CString id;
