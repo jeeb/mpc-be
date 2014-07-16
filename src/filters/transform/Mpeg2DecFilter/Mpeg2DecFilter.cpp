@@ -39,6 +39,47 @@
 #include <moreuuids.h>
 #include <IFilterVersion.h>
 
+class CMpeg2DecControlThread : public CAMThread
+{
+public:
+	CMpeg2DecControlThread(CMpeg2DecFilter *pMpeg2DecFilter)
+		: CAMThread()
+		, m_pMpeg2DecFilter(pMpeg2DecFilter)
+	{
+		Create();
+	}
+
+	~CMpeg2DecControlThread() {
+		CallWorker(CMpeg2DecFilter::CNTRL_EXIT);
+		Close();
+	}
+
+protected:
+	DWORD ThreadProc() {
+		SetThreadName(-1, "CMpeg2DecFilter Control Thread");
+		DWORD cmd;
+		while (TRUE) {
+			cmd = GetRequest();
+			switch(cmd) {
+				case CMpeg2DecFilter::CNTRL_EXIT:
+					Reply(S_OK);
+					return 0;
+				case CMpeg2DecFilter::CNTRL_REDRAW:
+					Reply(S_OK);
+					if (!g_bExternalPaused) {
+						m_pMpeg2DecFilter->Deliver(true);
+					}
+				break;
+			}
+		}
+
+		return 1;
+	}
+
+private:
+	CMpeg2DecFilter *m_pMpeg2DecFilter;
+};
+
 // option names
 #define OPT_REGKEY_MPEGDec  _T("Software\\MPC-BE Filters\\MPEG Video Decoder")
 #define OPT_SECTION_MPEGDec _T("Filters\\MPEG Video Decoder")
@@ -201,14 +242,13 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(NAME("CMpeg2DecFilter"), lpunk, phr, __uuidof(this), 1)
 	, m_fWaitForKeyFrame(true)
 	, m_fInitializedBuffer(true)
+	, m_ControlThread(NULL)
 {
-	delete m_pInput;
-	//	delete m_pOutput;
-
 	if (FAILED(*phr)) {
 		return;
 	}
 
+	delete m_pInput;
 	m_pInput = DNew CMpeg2DecInputPin(this, phr, L"Video");
 	if (!m_pInput) {
 		*phr = E_OUTOFMEMORY;
@@ -216,10 +256,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	if (FAILED(*phr)) {
 		return;
 	}
-
-	//	m_pOutput = DNew CMpeg2DecOutputPin(this, phr, L"Output");
-	//	if(!m_pOutput) *phr = E_OUTOFMEMORY;
-	//	if(FAILED(*phr)) return;
 
 	m_pSubpicInput = DNew CSubpicInputPin(this, phr);
 	if (!m_pSubpicInput) {
@@ -231,6 +267,14 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_pClosedCaptionOutput = DNew CClosedCaptionOutputPin(this, m_pLock, phr);
 	if (!m_pClosedCaptionOutput) {
+		*phr = E_OUTOFMEMORY;
+	}
+	if (FAILED(*phr)) {
+		return;
+	}
+
+	m_ControlThread = DNew CMpeg2DecControlThread(this);
+	if (!m_ControlThread) {
 		*phr = E_OUTOFMEMORY;
 	}
 	if (FAILED(*phr)) {
@@ -308,8 +352,9 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 CMpeg2DecFilter::~CMpeg2DecFilter()
 {
-	delete m_pSubpicInput;
-	delete m_pClosedCaptionOutput;
+	SAFE_DELETE(m_ControlThread);
+	SAFE_DELETE(m_pSubpicInput);
+	SAFE_DELETE(m_pClosedCaptionOutput);
 }
 
 STDMETHODIMP CMpeg2DecFilter::Apply()
@@ -1409,80 +1454,6 @@ STDMETHODIMP CMpeg2DecInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG*
 }
 
 //
-// CMpeg2DecOutputPin
-//
-
-CMpeg2DecOutputPin::CMpeg2DecOutputPin(CBaseVideoFilter* pFilter, HRESULT* phr, LPWSTR pName)
-	: CBaseVideoOutputPin(NAME("CMpeg2DecOutputPin"), pFilter, phr, pName)
-{
-}
-
-HRESULT CMpeg2DecOutputPin::Active()
-{
-	CAutoLock cAutoLock(m_pLock);
-
-	// TODO
-
-	if (m_Connected && !m_pOutputQueue) {
-		HRESULT hr = NOERROR;
-
-		m_pOutputQueue.Attach(DNew COutputQueue(m_Connected, &hr));
-		if (!m_pOutputQueue) {
-			hr = E_OUTOFMEMORY;
-		}
-
-		if (FAILED(hr)) {
-			m_pOutputQueue.Free();
-			return hr;
-		}
-	}
-
-	return __super::Active();
-}
-
-HRESULT CMpeg2DecOutputPin::Inactive()
-{
-	CAutoLock cAutoLock(m_pLock);
-	m_pOutputQueue.Free();
-	return __super::Inactive();
-}
-
-HRESULT CMpeg2DecOutputPin::Deliver(IMediaSample* pMediaSample)
-{
-	if (!m_pOutputQueue) {
-		return NOERROR;
-	}
-	pMediaSample->AddRef();
-	return m_pOutputQueue->Receive(pMediaSample);
-}
-
-#define CallQueue(call) \
-	if(!m_pOutputQueue) return NOERROR; \
-	m_pOutputQueue->##call; \
-	return NOERROR; \
- 
-HRESULT CMpeg2DecOutputPin::DeliverEndOfStream()
-{
-	CallQueue(EOS());
-}
-
-HRESULT CMpeg2DecOutputPin::DeliverBeginFlush()
-{
-	CallQueue(BeginFlush());
-}
-
-HRESULT CMpeg2DecOutputPin::DeliverEndFlush()
-{
-	CallQueue(EndFlush());
-}
-
-HRESULT CMpeg2DecOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
-{
-	CallQueue(NewSegment(tStart, tStop, dRate));
-}
-
-
-//
 // CSubpicInputPin
 //
 
@@ -1653,9 +1624,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 	}
 
 	if (fRefresh) {
-		if (!g_bExternalPaused) {
-			((CMpeg2DecFilter*)m_pFilter)->Deliver(true);
-		}
+		(static_cast<CMpeg2DecFilter*>(m_pFilter))->ControlCmd(CMpeg2DecFilter::CNTRL_REDRAW);
 	}
 
 	return S_FALSE;
@@ -1739,9 +1708,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 	}
 
 	if (fRefresh) {
-		if (!g_bExternalPaused) {
-			(static_cast<CMpeg2DecFilter*>(m_pFilter))->Deliver(true);
-		}
+		(static_cast<CMpeg2DecFilter*>(m_pFilter))->ControlCmd(CMpeg2DecFilter::CNTRL_REDRAW);
 	}
 
 	return S_OK;

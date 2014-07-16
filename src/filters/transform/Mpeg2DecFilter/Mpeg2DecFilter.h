@@ -192,6 +192,19 @@ public:
 
 	STDMETHODIMP EnableReadARFromStream(bool fEnable);
 	STDMETHODIMP_(bool) IsReadARFromStreamEnabled();
+
+private:
+	enum {
+		CNTRL_EXIT,
+		CNTRL_REDRAW
+	};
+	HRESULT ControlCmd(DWORD cmd) {
+		return m_ControlThread->CallWorker(cmd);
+	}
+
+	friend class CMpeg2DecControlThread;
+	friend class CSubpicInputPin;
+	CAMThread *m_ControlThread;
 };
 
 class CMpeg2DecInputPin : public CDeCSSInputPin
@@ -208,23 +221,6 @@ public:
 	STDMETHODIMP Set(REFGUID PropSet, ULONG Id, LPVOID InstanceData, ULONG InstanceLength, LPVOID PropertyData, ULONG DataLength);
 	STDMETHODIMP Get(REFGUID PropSet, ULONG Id, LPVOID InstanceData, ULONG InstanceLength, LPVOID PropertyData, ULONG DataLength, ULONG* pBytesReturned);
 	STDMETHODIMP QuerySupported(REFGUID PropSet, ULONG Id, ULONG* pTypeSupport);
-};
-
-class CMpeg2DecOutputPin : public CBaseVideoOutputPin
-{
-public:
-	CMpeg2DecOutputPin(CBaseVideoFilter* pFilter, HRESULT* phr, LPWSTR pName);
-
-	CAutoPtr<COutputQueue> m_pOutputQueue;
-
-	HRESULT Active();
-	HRESULT Inactive();
-
-	HRESULT Deliver(IMediaSample* pMediaSample);
-	HRESULT DeliverEndOfStream();
-	HRESULT DeliverBeginFlush();
-	HRESULT DeliverEndFlush();
-	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 };
 
 class CSubpicInputPin : public CMpeg2DecInputPin
