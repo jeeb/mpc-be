@@ -37,7 +37,6 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 		unsigned __int64 ts;
 	};
 	CAtlMap<DWORD, trackpos> m_trackpos;
-	CSize m_framesize;
 
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;

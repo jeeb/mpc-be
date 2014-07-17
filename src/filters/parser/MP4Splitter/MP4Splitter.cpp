@@ -203,7 +203,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 	REFERENCE_TIME rtVideoDuration = 0;
 
-	m_framesize.SetSize(640, 480);
+	CSize videoSize(0, 0);
 
 	int nRotation		= 0;
 	int ChapterTrackId	= INT_MIN;
@@ -546,22 +546,28 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					switch (system_desc->GetObjectTypeId()) {
 						case AP4_NERO_VOBSUB:
-							if (di->GetDataSize() >= 16*4) {
-								CSize size(720, 576);
+							if (di->GetDataSize() >= 16 * 4) {
+								CSize size(videoSize);
 								if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
-									size.cx = tkhd->GetWidth()>>16;
-									size.cy = tkhd->GetHeight()>>16;
+									if (tkhd->GetWidth() && tkhd->GetHeight()) {
+										size.cx = tkhd->GetWidth() >> 16;
+										size.cy = tkhd->GetHeight() >> 16;
+									}
+								}
+
+								if (size == CSize(0, 0)) {
+									size = CSize(720, 576);
 								}
 
 								const AP4_Byte* pal = di->GetData();
 								CAtlList<CStringA> sl;
-								for (int i = 0; i < 16*4; i += 4) {
-									BYTE y = (pal[i+1]-16)*255/219;
-									BYTE u = pal[i+2];
-									BYTE v = pal[i+3];
-									BYTE r = (BYTE)min(max(1.0*y + 1.4022*(v-128), 0), 255);
-									BYTE g = (BYTE)min(max(1.0*y - 0.3456*(u-128) - 0.7145*(v-128), 0), 255);
-									BYTE b = (BYTE)min(max(1.0*y + 1.7710*(u-128), 0) , 255);
+								for (int i = 0; i < 16 * 4; i += 4) {
+									BYTE y = (pal[i + 1] - 16) * 255 / 219;
+									BYTE u = pal[i + 2];
+									BYTE v = pal[i + 3];
+									BYTE r = (BYTE)min(max(1.0 * y + 1.4022 * (v - 128), 0), 255);
+									BYTE g = (BYTE)min(max(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0), 255);
+									BYTE b = (BYTE)min(max(1.0 * y + 1.7710 * (u - 128), 0) , 255);
 									CStringA str;
 									str.Format("%02x%02x%02x", r, g, b);
 									sl.AddTail(str);
@@ -1050,11 +1056,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			for (int i = 0, j = mts.GetCount(); i < j; ++i) {
-				BITMAPINFOHEADER bih;
-				if (ExtractBIH(&mts[i], &bih)) {
-					m_framesize.cx = bih.biWidth;
-					m_framesize.cy = abs(bih.biHeight);
+			if (AP4_Track::TYPE_VIDEO == track->GetType() && videoSize == CSize(0, 0)) {
+				for (int i = 0, j = mts.GetCount(); i < j; ++i) {
+					BITMAPINFOHEADER bih;
+					if (ExtractBIH(&mts[i], &bih)) {
+						videoSize.cx = bih.biWidth;
+						videoSize.cy = abs(bih.biHeight);
+						break;
+					}
 				}
 			}
 
