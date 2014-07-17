@@ -23,7 +23,7 @@
 
 #include <atlcoll.h>
 
-typedef struct {
+struct COutline {
 	CAtlArray<CPoint> pa;
 	CAtlArray<int> da;
 	void RemoveAll() {
@@ -34,7 +34,7 @@ typedef struct {
 		pa.Add(p);
 		da.Add(d);
 	}
-} COutline;
+};
 
 class CVobSubImage
 {
@@ -54,30 +54,29 @@ private:
 	bool Alloc(int w, int h);
 	void Free();
 
-	BYTE GetNibble(BYTE* lpData);
+	BYTE GetNibble(const BYTE* lpData);
 	void DrawPixels(CPoint p, int length, int colorid);
 	void TrimSubImage();
 
 public:
 	int iLang, iIdx;
-	bool fForced;
+	bool fForced, bAnimated;
+	int tCurrent;
 	__int64 start, delay;
 	CRect rect;
-	typedef struct {
+	struct SubPal {
 		BYTE pal: 4, tr: 4;
-	} SubPal;
+	};
 	SubPal pal[4];
 	RGBQUAD* lpPixels;
 
 	CVobSubImage();
 	virtual ~CVobSubImage();
 
-	void Invalidate() {
-		iLang = iIdx = -1;
-	}
+	void Invalidate() { iLang = iIdx = -1; }
 
-	void GetPacketInfo(BYTE* lpData, int packetsize, int datasize);
-	bool Decode(BYTE* lpData, int packetsize, int datasize,
+	void GetPacketInfo(const BYTE* lpData, int packetsize, int datasize, int t = INT_MAX);
+	bool Decode(BYTE* lpData, int packetsize, int datasize, int t,
 				bool fCustomPal,
 				int tridx,
 				RGBQUAD* orgpal /*[16]*/, RGBQUAD* cuspal /*[4]*/,
@@ -87,8 +86,8 @@ public:
 
 private:
 	CAutoPtrList<COutline>* GetOutlineList(CPoint& topleft);
-	int GrabSegment(int start, COutline& o, COutline& ret);
-	void SplitOutline(COutline& o, COutline& o1, COutline& o2);
+	int GrabSegment(int start, const COutline& o, COutline& ret);
+	void SplitOutline(const COutline& o, COutline& o1, COutline& o2);
 	void AddSegment(COutline& o, CAtlArray<BYTE>& pathTypes, CAtlArray<CPoint>& pathPoints);
 
 public:
