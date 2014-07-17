@@ -86,21 +86,26 @@ void DiskImage::Init()
 	}
 
 	if (::PathFileExists(m_dtlite_path)) {
-		SHELLEXECUTEINFO execinfo;
-		memset(&execinfo, 0, sizeof(execinfo));
-		execinfo.lpFile = m_dtlite_path;
-		execinfo.lpParameters = L"-get_count";
-		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-		execinfo.nShow = SW_HIDE;
-		execinfo.cbSize = sizeof(execinfo);
-		DWORD ec = 0;
-		if (ShellExecuteEx(&execinfo)) {
-			DWORD gg = WaitForSingleObject(execinfo.hProcess, INFINITE);
-			if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec != (DWORD)-1 && ec != 0) {
-				m_DriveType = DTLITE;
-				return;
-			}
-		}
+		// simple check
+		m_DriveType = DTLITE;
+		return;
+
+		// detailed checking
+		//SHELLEXECUTEINFO execinfo;
+		//memset(&execinfo, 0, sizeof(execinfo));
+		//execinfo.lpFile = m_dtlite_path;
+		//execinfo.lpParameters = L"-get_count";
+		//execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		//execinfo.nShow = SW_HIDE;
+		//execinfo.cbSize = sizeof(execinfo);
+		//DWORD ec = 0;
+		//if (ShellExecuteEx(&execinfo)) {
+		//	DWORD gg = WaitForSingleObject(execinfo.hProcess, INFINITE);
+		//	if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec != (DWORD)-1 && ec != 0) {
+		//		m_DriveType = DTLITE;
+		//		return;
+		//	}
+		//}
 	}
 #endif
 }
