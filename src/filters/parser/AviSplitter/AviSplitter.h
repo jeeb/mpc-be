@@ -29,8 +29,6 @@
 #define AviSplitterName L"MPC AVI Splitter"
 #define AviSourceName   L"MPC AVI Source"
 
-class CAviFile;
-
 class CAviSplitterOutputPin : public CBaseSplitterOutputPin
 {
 public:
@@ -38,6 +36,8 @@ public:
 
 	HRESULT CheckConnect(IPin* pPin);
 };
+
+class CAviFile;
 
 class __declspec(uuid("9736D831-9D6C-4E72-B6E7-560EF9181001"))
 	CAviSplitterFilter

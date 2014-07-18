@@ -146,6 +146,23 @@ STDMETHODIMP CAviSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
+#define Parse(type)													\
+	if (s->cs.GetCount()) {											\
+		__int64 pos = m_pFile->GetPos();							\
+		for (size_t i = 0; i < s->cs.GetCount() - 1; i++) {			\
+			if (s->cs[i].orgsize) {									\
+				m_pFile->Seek(s->cs[i].filepos);					\
+				CMediaType mt2;										\
+				type h;												\
+				if (m_pFile->Read(h, s->cs[i].orgsize, &mt2)) {		\
+					mts.InsertAt(0, mt2);							\
+				}													\
+				break;												\
+			}														\
+		}															\
+		m_pFile->Seek(pos);											\
+	}																\
+
 HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -304,6 +321,21 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('DXSB'):
 				case FCC('DXSA'):
 					label = L"XSub";
+				case FCC('H264'):
+				case FCC('h264'):
+				case FCC('X264'):
+				case FCC('x264'):
+				case FCC('AVC1'):
+				case FCC('avc1'):
+				case FCC('DAVC'):
+				case FCC('SMV2'):
+				case FCC('VSSH'):
+				case FCC('Q264'):
+				case FCC('V264'):
+				case FCC('GAVC'):
+				case FCC('UMSV'):
+				case FCC('UNMC'):
+					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('H264'));
 				default:
 					mt.subtype = FOURCCMap(pbmi->biCompression);
 			}
@@ -324,42 +356,27 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			// building a special media type
 			switch (pbmi->biCompression) {
 				case FCC('HM10'):
-					if (s->cs.GetCount()) {
-						__int64 cur_pos = m_pFile->GetPos();
-						for (size_t i = 0; i < s->cs.GetCount() - 1; i++) {
-							if (s->cs[i].orgsize) {
-								m_pFile->Seek(s->cs[i].filepos);
-								CBaseSplitterFileEx::hevchdr h;
-								CMediaType mt2;
-								if (m_pFile->Read(h, s->cs[i].orgsize, &mt2)) {
-									mts.InsertAt(0, mt2);
-								}
-							
-								break;
-							}
-						}
-
-						m_pFile->Seek(cur_pos);
-					}
+					Parse(CBaseSplitterFileEx::hevchdr)
+					break;
 				case FCC('mpg2'):
 				case FCC('MPG2'):
 				case FCC('MMES'):
-					if (s->cs.GetCount()) {
-						__int64 cur_pos = m_pFile->GetPos();
-
-						m_pFile->Seek(s->cs[0].filepos);
-						CBaseSplitterFileEx::seqhdr h;
-						CMediaType mt2;
-						if (m_pFile->Read(h, s->cs[0].size, &mt2)) {
-							mts.InsertAt(0, mt2);
-						}
-						m_pFile->Seek(cur_pos);
-					}
+					Parse(CBaseSplitterFileEx::seqhdr)
 					break;
 				case FCC('H264'):
 				case FCC('h264'):
+				case FCC('X264'):
+				case FCC('x264'):
 				case FCC('AVC1'):
 				case FCC('avc1'):
+				case FCC('DAVC'):
+				case FCC('SMV2'):
+				case FCC('VSSH'):
+				case FCC('Q264'):
+				case FCC('V264'):
+				case FCC('GAVC'):
+				case FCC('UMSV'):
+				case FCC('UNMC'):
 					if (s->strf.GetCount() > sizeof(BITMAPINFOHEADER)) {
 						size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
 						BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
@@ -368,11 +385,13 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						ReduceDim(aspect);
 
 						pbmi->biCompression = FCC('AVC1');
-
 						CMediaType mt2;
 						if (SUCCEEDED(CreateMPEG2VIfromAVC(&mt2, pbmi, AvgTimePerFrame, aspect, extra, extralen))) {
 							mts.InsertAt(0, mt2);
 						}
+					}
+					if (mts.GetCount() == 1) {
+						Parse(CBaseSplitterFileEx::avchdr)
 					}
 					break;
 			}
