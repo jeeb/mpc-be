@@ -214,5 +214,17 @@
     <ClCompile Include="dsp\yuv_sse2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="enc\picture_csp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\picture_psnr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\picture_rescale.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\picture_tools.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

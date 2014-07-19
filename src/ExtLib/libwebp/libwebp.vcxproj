@@ -182,6 +182,10 @@
     <ClCompile Include="enc\histogram.c" />
     <ClCompile Include="enc\iterator.c" />
     <ClCompile Include="enc\picture.c" />
+    <ClCompile Include="enc\picture_csp.c" />
+    <ClCompile Include="enc\picture_psnr.c" />
+    <ClCompile Include="enc\picture_rescale.c" />
+    <ClCompile Include="enc\picture_tools.c" />
     <ClCompile Include="enc\quant.c" />
     <ClCompile Include="enc\syntax.c" />
     <ClCompile Include="enc\token.c" />
