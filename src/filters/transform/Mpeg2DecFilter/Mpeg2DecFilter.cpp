@@ -66,9 +66,13 @@ protected:
 					return 0;
 				case CMpeg2DecFilter::CNTRL_REDRAW:
 					Reply(S_OK);
+#ifdef REGISTER_FILTER
+					m_pMpeg2DecFilter->Deliver(true);
+#else
 					if (!g_bExternalPaused) {
 						m_pMpeg2DecFilter->Deliver(true);
 					}
+#endif
 				break;
 			}
 		}
