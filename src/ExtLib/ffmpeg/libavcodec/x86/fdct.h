@@ -1,7 +1,4 @@
 /*
- * MMX optimized DSP utils
- * Copyright (c) 2007  Aurelien Jacobs <aurel@gnuage.org>
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -19,18 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_X86_DSPUTIL_X86_H
-#define AVCODEC_X86_DSPUTIL_X86_H
+#ifndef AVCODEC_X86_FDCT_H
+#define AVCODEC_X86_FDCT_H
 
 #include <stdint.h>
 
-#include "libavcodec/avcodec.h"
-#include "libavcodec/dsputil.h"
+void ff_fdct_mmx(int16_t *block);
+void ff_fdct_mmxext(int16_t *block);
+void ff_fdct_sse2(int16_t *block);
 
-void ff_dsputilenc_init_mmx(DSPContext *c, AVCodecContext *avctx);
-void ff_dsputil_init_pix_mmx(DSPContext *c, AVCodecContext *avctx);
-
-
-void ff_mmx_idct(int16_t *block);
-void ff_mmxext_idct(int16_t *block);
-#endif /* AVCODEC_X86_DSPUTIL_X86_H */
+#endif /* AVCODEC_X86_FDCT_H */

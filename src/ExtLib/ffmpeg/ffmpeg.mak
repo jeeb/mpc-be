@@ -151,7 +151,6 @@ SRCS_LC = \
 	libavcodec/dnxhd_parser.c \
 	libavcodec/dnxhddata.c \
 	libavcodec/dnxhddec.c \
-	libavcodec/dsputil.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
 	libavcodec/dv_tablegen.c \
@@ -247,6 +246,7 @@ SRCS_LC = \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \
 	libavcodec/mdct_template.c \
+	libavcodec/me_cmp.c \
 	libavcodec/mdct_fixed.c \
 	libavcodec/mdct_fixed_32.c \
 	libavcodec/mdct_float.c \
@@ -419,7 +419,6 @@ SRCS_LC = \
 	libavcodec/x86/dct_init.c \
 	libavcodec/x86/dirac_dwt.c \
 	libavcodec/x86/diracdsp_mmx.c \
-	libavcodec/x86/dsputil_init.c \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fdctdsp_init.c \
 	libavcodec/x86/fft_init.c \
@@ -439,8 +438,8 @@ SRCS_LC = \
 	libavcodec/x86/idctdsp_mmx.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
 	libavcodec/x86/lossless_videodsp_init.c \
+	libavcodec/x86/me_cmp_init.c \
 	libavcodec/x86/mlpdsp.c \
-	libavcodec/x86/motion_est.c \
 	libavcodec/x86/mpegaudiodsp.c \
 	libavcodec/x86/mpegvideo.c \
 	libavcodec/x86/mpegvideodsp.c \
@@ -555,6 +554,7 @@ SRCS_LR = \
 	libswresample/x86/resample_init.c
 
 SRCS_LS = \
+	libswscale/hscale_fast_bilinear.c \
 	libswscale/input.c \
 	libswscale/options.c \
 	libswscale/output.c \
@@ -564,6 +564,7 @@ SRCS_LS = \
 	libswscale/utils.c \
 	libswscale/yuv2rgb.c \
 	\
+	libswscale/x86/hscale_fast_bilinear_simd.c \
 	libswscale/x86/rgb2rgb.c \
 	libswscale/x86/swscale.c \
 	libswscale/x86/yuv2rgb.c
@@ -605,6 +606,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/imdct36.asm \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
+	libavcodec/x86/me_cmp.asm \
 	libavcodec/x86/mpegvideoencdsp.asm \
 	libavcodec/x86/pixblockdsp.asm \
 	libavcodec/x86/pngdsp.asm \

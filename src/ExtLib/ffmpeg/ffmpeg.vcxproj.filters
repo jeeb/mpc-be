@@ -151,6 +151,9 @@
     <None Include="libavcodec\x86\lossless_videodsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\me_cmp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\mpegvideoencdsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -271,6 +274,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
+    <ClInclude Include="libavcodec\x86\dsputil_x86.h" />
     <ClInclude Include="compat\va_copy.h">
       <Filter>compat</Filter>
     </ClInclude>
@@ -298,7 +302,7 @@
     <ClInclude Include="libavcodec\x86\diracdsp_mmx.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\x86\dsputil_x86.h">
+    <ClInclude Include="libavcodec\x86\fdct.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\fft.h">
@@ -326,6 +330,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\mathops.h">
+      <Filter>libavcodec\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\x86\simple_idct.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\vc1dsp.h">
@@ -509,9 +516,6 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\dnxhddata.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\dsputil.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\dv.h">
@@ -719,6 +723,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\mathops.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\me_cmp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\metasound_data.h">
@@ -1450,9 +1457,6 @@
     <ClCompile Include="libavcodec\x86\diracdsp_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\dsputil_init.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\x86\fdct.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1513,10 +1517,10 @@
     <ClCompile Include="libavcodec\x86\lossless_videodsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\mlpdsp.c">
+    <ClCompile Include="libavcodec\x86\me_cmp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\motion_est.c">
+    <ClCompile Include="libavcodec\x86\mlpdsp.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\mpegaudiodsp.c">
@@ -1811,9 +1815,6 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\dnxhddec.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\dsputil.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\dv.c">
@@ -2156,6 +2157,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mdct_template.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\me_cmp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\metasound.c">
@@ -2905,6 +2909,9 @@
     <ClCompile Include="libswresample\swresample.c">
       <Filter>libswresample</Filter>
     </ClCompile>
+    <ClCompile Include="libswscale\x86\hscale_fast_bilinear_simd.c">
+      <Filter>libswscale\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libswscale\x86\rgb2rgb.c">
       <Filter>libswscale\x86</Filter>
     </ClCompile>
@@ -2924,6 +2931,9 @@
       <Filter>libswscale\x86</Filter>
     </ClCompile>
     <ClCompile Include="libswscale\bayer_template.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\hscale_fast_bilinear.c">
       <Filter>libswscale</Filter>
     </ClCompile>
     <ClCompile Include="libswscale\input.c">

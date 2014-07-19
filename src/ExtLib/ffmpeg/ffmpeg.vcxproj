@@ -55,6 +55,7 @@
     <None Include="libavcodec\x86\imdct36.asm" />
     <None Include="libavcodec\x86\lossless_audiodsp.asm" />
     <None Include="libavcodec\x86\lossless_videodsp.asm" />
+    <None Include="libavcodec\x86\me_cmp.asm" />
     <None Include="libavcodec\x86\mpegvideoencdsp.asm" />
     <None Include="libavcodec\x86\pixblockdsp.asm" />
     <None Include="libavcodec\x86\pngdsp.asm" />
@@ -158,7 +159,6 @@
     <ClInclude Include="libavcodec\dirac_arith.h" />
     <ClInclude Include="libavcodec\dirac_dwt.h" />
     <ClInclude Include="libavcodec\dnxhddata.h" />
-    <ClInclude Include="libavcodec\dsputil.h" />
     <ClInclude Include="libavcodec\dv.h" />
     <ClInclude Include="libavcodec\dvdata.h" />
     <ClInclude Include="libavcodec\dv_profile.h" />
@@ -229,6 +229,7 @@
     <ClInclude Include="libavcodec\lzw.h" />
     <ClInclude Include="libavcodec\mathops.h" />
     <ClInclude Include="libavcodec\metasound_data.h" />
+    <ClInclude Include="libavcodec\me_cmp.h" />
     <ClInclude Include="libavcodec\mips\amrwbdec_mips.h" />
     <ClInclude Include="libavcodec\mips\lsp_mips.h" />
     <ClInclude Include="libavcodec\mjpeg.h" />
@@ -369,6 +370,7 @@
     <ClInclude Include="libavcodec\x86\diracdsp_mmx.h" />
     <ClInclude Include="libavcodec\x86\dirac_dwt.h" />
     <ClInclude Include="libavcodec\x86\dsputil_x86.h" />
+    <ClInclude Include="libavcodec\x86\fdct.h" />
     <ClInclude Include="libavcodec\x86\fft.h" />
     <ClInclude Include="libavcodec\x86\fpel.h" />
     <ClInclude Include="libavcodec\x86\h264_i386.h" />
@@ -378,6 +380,7 @@
     <ClInclude Include="libavcodec\x86\idct_xvid.h" />
     <ClInclude Include="libavcodec\x86\inline_asm.h" />
     <ClInclude Include="libavcodec\x86\mathops.h" />
+    <ClInclude Include="libavcodec\x86\simple_idct.h" />
     <ClInclude Include="libavcodec\x86\vc1dsp.h" />
     <ClInclude Include="libavcodec\x86\vp56_arith.h" />
     <ClInclude Include="libavcodec\xiph.h" />
@@ -555,7 +558,6 @@
     <ClCompile Include="libavcodec\dnxhddata.c" />
     <ClCompile Include="libavcodec\dnxhddec.c" />
     <ClCompile Include="libavcodec\dnxhd_parser.c" />
-    <ClCompile Include="libavcodec\dsputil.c" />
     <ClCompile Include="libavcodec\dv.c" />
     <ClCompile Include="libavcodec\dvdata.c" />
     <ClCompile Include="libavcodec\dvdec.c" />
@@ -672,6 +674,7 @@
     <ClCompile Include="libavcodec\mdct_template.c" />
     <ClCompile Include="libavcodec\metasound.c" />
     <ClCompile Include="libavcodec\metasound_data.c" />
+    <ClCompile Include="libavcodec\me_cmp.c" />
     <ClCompile Include="libavcodec\mjpeg.c" />
     <ClCompile Include="libavcodec\mjpegbdec.c" />
     <ClCompile Include="libavcodec\mjpegdec.c" />
@@ -843,7 +846,6 @@
     <ClCompile Include="libavcodec\x86\dct_init.c" />
     <ClCompile Include="libavcodec\x86\diracdsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\dirac_dwt.c" />
-    <ClCompile Include="libavcodec\x86\dsputil_init.c" />
     <ClCompile Include="libavcodec\x86\fdct.c" />
     <ClCompile Include="libavcodec\x86\fdctdsp_init.c" />
     <ClCompile Include="libavcodec\x86\fft_init.c" />
@@ -864,8 +866,8 @@
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c" />
     <ClCompile Include="libavcodec\x86\lossless_audiodsp_init.c" />
     <ClCompile Include="libavcodec\x86\lossless_videodsp_init.c" />
+    <ClCompile Include="libavcodec\x86\me_cmp_init.c" />
     <ClCompile Include="libavcodec\x86\mlpdsp.c" />
-    <ClCompile Include="libavcodec\x86\motion_est.c" />
     <ClCompile Include="libavcodec\x86\mpegaudiodsp.c" />
     <ClCompile Include="libavcodec\x86\mpegvideo.c" />
     <ClCompile Include="libavcodec\x86\mpegvideodsp.c" />
@@ -978,6 +980,7 @@
     <ClCompile Include="libswresample\x86\rematrix_init.c" />
     <ClCompile Include="libswresample\x86\resample_init.c" />
     <ClCompile Include="libswscale\bayer_template.c" />
+    <ClCompile Include="libswscale\hscale_fast_bilinear.c" />
     <ClCompile Include="libswscale\input.c" />
     <ClCompile Include="libswscale\options.c" />
     <ClCompile Include="libswscale\output.c" />
@@ -986,6 +989,7 @@
     <ClCompile Include="libswscale\swscale.c" />
     <ClCompile Include="libswscale\swscale_unscaled.c" />
     <ClCompile Include="libswscale\utils.c" />
+    <ClCompile Include="libswscale\x86\hscale_fast_bilinear_simd.c" />
     <ClCompile Include="libswscale\x86\rgb2rgb.c" />
     <ClCompile Include="libswscale\x86\rgb2rgb_template.c" />
     <ClCompile Include="libswscale\x86\swscale.c" />

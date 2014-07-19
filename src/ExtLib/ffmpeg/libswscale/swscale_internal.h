@@ -27,6 +27,8 @@
 #include <altivec.h>
 #endif
 
+#include "version.h"
+
 #include "libavutil/avassert.h"
 #include "libavutil/avutil.h"
 #include "libavutil/common.h"
@@ -429,7 +431,7 @@ typedef struct SwsContext {
 #define UV_OFF_BYTE           "11*8+4*4*"AV_STRINGIFY(MAX_FILTER_SIZE)"*3+56"
 #define DITHER16              "11*8+4*4*"AV_STRINGIFY(MAX_FILTER_SIZE)"*3+64"
 #define DITHER32              "11*8+4*4*"AV_STRINGIFY(MAX_FILTER_SIZE)"*3+80"
-#define DITHER32_INT          (11*8+4*4*MAX_FILTER_SIZE*3+80) // value equal to above, used for checking that the struct hasnt been changed by mistake
+#define DITHER32_INT          (11*8+4*4*MAX_FILTER_SIZE*3+80) // value equal to above, used for checking that the struct hasn't been changed by mistake
 
     DECLARE_ALIGNED(8, uint64_t, redDither);
     DECLARE_ALIGNED(8, uint64_t, greenDither);
@@ -856,6 +858,21 @@ void ff_sws_init_output_funcs(SwsContext *c,
                               yuv2anyX_fn *yuv2anyX);
 void ff_sws_init_swscale_ppc(SwsContext *c);
 void ff_sws_init_swscale_x86(SwsContext *c);
+
+void ff_hyscale_fast_c(SwsContext *c, int16_t *dst, int dstWidth,
+                       const uint8_t *src, int srcW, int xInc);
+void ff_hcscale_fast_c(SwsContext *c, int16_t *dst1, int16_t *dst2,
+                       int dstWidth, const uint8_t *src1,
+                       const uint8_t *src2, int srcW, int xInc);
+int ff_init_hscaler_mmxext(int dstW, int xInc, uint8_t *filterCode,
+                           int16_t *filter, int32_t *filterPos,
+                           int numSplits);
+void ff_hyscale_fast_mmxext(SwsContext *c, int16_t *dst,
+                            int dstWidth, const uint8_t *src,
+                            int srcW, int xInc);
+void ff_hcscale_fast_mmxext(SwsContext *c, int16_t *dst1, int16_t *dst2,
+                            int dstWidth, const uint8_t *src1,
+                            const uint8_t *src2, int srcW, int xInc);
 
 static inline void fillPlane16(uint8_t *plane, int stride, int width, int height, int y,
                                int alpha, int bits, const int big_endian)
