@@ -474,7 +474,7 @@ END
 BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 5		"Sprungintervalle (kurz, mittel, weit in ms)"
 9		"Standard"
-10		"Nächste Datei im Ordner bei nur einer Datei in der Wiedergabeliste durch "
+10		"Bei nur einer Datei in der Wiedergabeliste keine Dateien im Ordner durch ""Vorwärts/Rückwärts springen"" öffnen"
 12		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
 14		"LCD-Unterstützung für Logitech-Tastaturen aktivieren (experimentell)"
 15		"Schnellen Suchlauf verwenden (Keyframes)"
@@ -1856,7 +1856,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Möchten Sie die MPC-BE Standardeinstellunge
 STRING IDS_SATURATION_DEC		"Sättigung verringern"
 STRING IDS_SATURATION_INC		"Sättigung erhöhen"
 STRING IDS_SAVE_FILE		"Datei speichern"
-STRING IDS_SCALE_16_9		"Skalierung nach 16:9,%.3f,%.3f,%.3f,%.3f"
+STRING IDS_SCALE_16_9		"Skalieren nach 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Zoom zu Ultra-Breitbild,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Zoom zu Breitbild,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCREENSHOT_ERROR_MADVR		"Die ""Bild speichern"" und ""Miniaturansichten speichern"" Funktionen arbeiten nicht mit dem ""madVR Video Renderer"" zusammen.\nÄndern Sie den Video-Renderer in den Ausgabeeinstellungen im MPC-BE Optionsdialog und öffnen Sie die Datei erneut."
