@@ -2883,7 +2883,6 @@ bool CMainFrame::GraphEventComplete()
 // our WM_GRAPHNOTIFY handler
 //
 
-bool g_bExternalPaused = false;
 LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 {
 	AppSettings& s = AfxGetAppSettings();

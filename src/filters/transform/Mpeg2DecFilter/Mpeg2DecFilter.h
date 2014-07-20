@@ -34,9 +34,7 @@
 #define Mpeg2DecFilterName L"MPC MPEG Video Decoder"
 #endif
 
-#ifndef REGISTER_FILTER
 extern bool g_bExternalPaused;
-#endif
 
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;

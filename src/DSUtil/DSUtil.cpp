@@ -37,6 +37,8 @@
 // flag for display only forced subtitles (PGS/VOBSUB)
 bool g_bForcedSubtitle = false;
 
+bool g_bExternalPaused = false;
+
 CString ResStr(UINT nID)
 {
 	CString id;
