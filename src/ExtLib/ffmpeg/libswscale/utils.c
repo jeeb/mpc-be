@@ -72,8 +72,6 @@ const char *swscale_license(void)
     return LICENSE_PREFIX FFMPEG_LICENSE + sizeof(LICENSE_PREFIX) - 1;
 }
 
-#define RET 0xC3 // near return opcode for x86
-
 typedef struct FormatEntry {
     uint8_t is_supported_in         :1;
     uint8_t is_supported_out        :1;
@@ -840,7 +838,7 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
 
     //The srcBpc check is possibly wrong but we seem to lack a definitive reference to test this
     //and what we have in ticket 2939 looks better with this check
-    if (need_reinit && c->srcBpc == 8)
+    if (need_reinit && (c->srcBpc == 8 || !isYUV(c->srcFormat)))
         ff_sws_init_range_convert(c);
 
     if ((isYUV(c->dstFormat) || isGray(c->dstFormat)) && (isYUV(c->srcFormat) || isGray(c->srcFormat)))

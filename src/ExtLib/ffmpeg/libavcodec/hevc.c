@@ -89,8 +89,8 @@ static int pic_arrays_init(HEVCContext *s, const HEVCSPS *sps)
     int ctb_count        = sps->ctb_width * sps->ctb_height;
     int min_pu_size      = sps->min_pu_width * sps->min_pu_height;
 
-    s->bs_width  = width  >> 3;
-    s->bs_height = height >> 3;
+    s->bs_width  = (width  >> 2) + 1;
+    s->bs_height = (height >> 2) + 1;
 
     s->sao           = av_mallocz_array(ctb_count, sizeof(*s->sao));
     s->deblock       = av_mallocz_array(ctb_count, sizeof(*s->deblock));
@@ -104,7 +104,7 @@ static int pic_arrays_init(HEVCContext *s, const HEVCSPS *sps)
 
     s->cbf_luma = av_malloc_array(sps->min_tb_width, sps->min_tb_height);
     s->tab_ipm  = av_mallocz(min_pu_size);
-    s->is_pcm   = av_malloc(min_pu_size);
+    s->is_pcm   = av_malloc((sps->min_pu_width + 1) * (sps->min_pu_height + 1));
     if (!s->tab_ipm || !s->cbf_luma || !s->is_pcm)
         goto fail;
 
@@ -116,8 +116,8 @@ static int pic_arrays_init(HEVCContext *s, const HEVCSPS *sps)
     if (!s->qp_y_tab || !s->filter_slice_edges || !s->tab_slice_address)
         goto fail;
 
-    s->horizontal_bs = av_mallocz_array(2 * s->bs_width, (s->bs_height + 1));
-    s->vertical_bs   = av_mallocz_array(2 * s->bs_width, (s->bs_height + 1));
+    s->horizontal_bs = av_mallocz_array(s->bs_width, s->bs_height);
+    s->vertical_bs   = av_mallocz_array(s->bs_width, s->bs_height);
     if (!s->horizontal_bs || !s->vertical_bs)
         goto fail;
 
@@ -276,7 +276,7 @@ static int decode_lt_rps(HEVCContext *s, LongTermRPS *rps, GetBitContext *gb)
     return 0;
 }
 
-static int get_buffer_sao(HEVCContext *s, AVFrame *frame)
+static int get_buffer_sao(HEVCContext *s, AVFrame *frame, HEVCSPS *sps)
 {
     int ret, i;
 
@@ -285,7 +285,7 @@ static int get_buffer_sao(HEVCContext *s, AVFrame *frame)
     if ((ret = ff_get_buffer(s->avctx, frame, AV_GET_BUFFER_FLAG_REF)) < 0)
         return ret;
     for (i = 0; frame->data[i]; i++) {
-        int offset = frame->linesize[i] + 1;
+        int offset = frame->linesize[i] + (1 << sps->pixel_shift);
         frame->data[i] += offset;
     }
     frame->width  = s->avctx->width;
@@ -335,7 +335,7 @@ static int set_sps(HEVCContext *s, const HEVCSPS *sps)
 
     if (sps->sao_enabled) {
         av_frame_unref(s->tmp_frame);
-        ret = get_buffer_sao(s, s->tmp_frame);
+        ret = get_buffer_sao(s, s->tmp_frame, sps);
         s->sao_frame = s->tmp_frame;
     }
 
@@ -2584,10 +2584,10 @@ static int hevc_frame_start(HEVCContext *s)
                            ((s->sps->height >> s->sps->log2_min_cb_size) + 1);
     int ret;
 
-    memset(s->horizontal_bs, 0, 2 * s->bs_width * (s->bs_height + 1));
-    memset(s->vertical_bs,   0, 2 * s->bs_width * (s->bs_height + 1));
+    memset(s->horizontal_bs, 0, s->bs_width * s->bs_height);
+    memset(s->vertical_bs,   0, s->bs_width * s->bs_height);
     memset(s->cbf_luma,      0, s->sps->min_tb_width * s->sps->min_tb_height);
-    memset(s->is_pcm,        0, s->sps->min_pu_width * s->sps->min_pu_height);
+    memset(s->is_pcm,        0, (s->sps->min_pu_width + 1) * (s->sps->min_pu_height + 1));
     memset(s->tab_slice_address, -1, pic_size_in_ctb * sizeof(*s->tab_slice_address));
 
     s->is_decoded        = 0;
@@ -3311,7 +3311,8 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     }
 
     if (s->sps != s0->sps)
-        ret = set_sps(s, s0->sps);
+        if ((ret = set_sps(s, s0->sps)) < 0)
+            return ret;
 
     s->seq_decode = s0->seq_decode;
     s->seq_output = s0->seq_output;
