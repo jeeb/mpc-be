@@ -626,13 +626,15 @@ HRESULT CDirectVobSubFilter::CheckInputType(const CMediaType* mtIn)
 	BITMAPINFOHEADER bih;
 	ExtractBIH(mtIn, &bih);
 
+	CComPtr<IBaseFilter> pFilter;
+
 	return mtIn->majortype == MEDIATYPE_Video
 		&& (mtIn->subtype == MEDIASUBTYPE_P016
 		       || mtIn->subtype == MEDIASUBTYPE_P010
 		       || mtIn->subtype == MEDIASUBTYPE_NV12
 		       || mtIn->subtype == MEDIASUBTYPE_YV12
 			   || mtIn->subtype == MEDIASUBTYPE_I420
-			   || mtIn->subtype == MEDIASUBTYPE_IYUV
+			   || (mtIn->subtype == MEDIASUBTYPE_IYUV && FAILED(m_pGraph->FindFilterByName(L"Lentoid HEVC Decoder", &pFilter)))
 			   || mtIn->subtype == MEDIASUBTYPE_YUY2
 			   || mtIn->subtype == MEDIASUBTYPE_ARGB32
 			   || mtIn->subtype == MEDIASUBTYPE_RGB32
