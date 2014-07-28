@@ -118,6 +118,7 @@ SRCS_LC = \
 	libavcodec/atrac.c \
 	libavcodec/atrac3.c \
 	libavcodec/audiodsp.c \
+	libavcodec/avdct.c \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
 	libavcodec/avpicture.c \
@@ -151,6 +152,7 @@ SRCS_LC = \
 	libavcodec/dnxhd_parser.c \
 	libavcodec/dnxhddata.c \
 	libavcodec/dnxhddec.c \
+	libavcodec/dsputil_compat.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
 	libavcodec/dv_tablegen.c \

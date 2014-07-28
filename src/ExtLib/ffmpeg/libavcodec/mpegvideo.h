@@ -62,11 +62,6 @@ enum OutputFormat {
     FMT_MJPEG,
 };
 
-#define MPEG_BUF_SIZE (16 * 1024)
-
-#define QMAT_SHIFT_MMX 16
-#define QMAT_SHIFT 21
-
 #define MAX_FCODE 7
 #define MAX_MV 4096
 
@@ -76,8 +71,6 @@ enum OutputFormat {
 #define MAX_B_FRAMES 16
 
 #define ME_MAP_SIZE 64
-#define ME_MAP_SHIFT 3
-#define ME_MAP_MV_BITS 11
 
 #define MAX_MB_BYTES (30*16*16*3/8 + 120)
 

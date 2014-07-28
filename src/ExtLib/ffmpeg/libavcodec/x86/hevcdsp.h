@@ -95,60 +95,40 @@ void ff_hevc_put_hevc_bi_w##width##_##bitd##_##opt(uint8_t *dst, ptrdiff_t dstst
 ///////////////////////////////////////////////////////////////////////////////
 EPEL_PROTOTYPES(pel_pixels ,  8, sse4);
 EPEL_PROTOTYPES(pel_pixels , 10, sse4);
+EPEL_PROTOTYPES(pel_pixels , 12, sse4);
 ///////////////////////////////////////////////////////////////////////////////
 // EPEL
 ///////////////////////////////////////////////////////////////////////////////
 EPEL_PROTOTYPES(epel_h ,  8, sse4);
 EPEL_PROTOTYPES(epel_h , 10, sse4);
+EPEL_PROTOTYPES(epel_h , 12, sse4);
 
 EPEL_PROTOTYPES(epel_v ,  8, sse4);
 EPEL_PROTOTYPES(epel_v , 10, sse4);
+EPEL_PROTOTYPES(epel_v , 12, sse4);
 
 EPEL_PROTOTYPES(epel_hv ,  8, sse4);
 EPEL_PROTOTYPES(epel_hv , 10, sse4);
+EPEL_PROTOTYPES(epel_hv , 12, sse4);
 
 ///////////////////////////////////////////////////////////////////////////////
 // QPEL
 ///////////////////////////////////////////////////////////////////////////////
 QPEL_PROTOTYPES(qpel_h ,  8, sse4);
 QPEL_PROTOTYPES(qpel_h , 10, sse4);
+QPEL_PROTOTYPES(qpel_h , 12, sse4);
 
 QPEL_PROTOTYPES(qpel_v,  8, sse4);
 QPEL_PROTOTYPES(qpel_v, 10, sse4);
+QPEL_PROTOTYPES(qpel_v, 12, sse4);
 
 QPEL_PROTOTYPES(qpel_hv,  8, sse4);
 QPEL_PROTOTYPES(qpel_hv, 10, sse4);
+QPEL_PROTOTYPES(qpel_hv, 12, sse4);
 
 
 WEIGHTING_PROTOTYPES(8, sse4);
 WEIGHTING_PROTOTYPES(10, sse4);
-
-///////////////////////////////////////////////////////////////////////////////
-// IDCT
-///////////////////////////////////////////////////////////////////////////////
-
-
-idct_dc_proto(4, 8,mmxext);
-idct_dc_proto(8, 8,mmxext);
-idct_dc_proto(16,8,  sse2);
-idct_dc_proto(32,8,  sse2);
-
-idct_dc_proto(32,8,  avx2);
-
-
-idct_dc_proto(4, 10,mmxext);
-idct_dc_proto(8, 10,  sse2);
-idct_dc_proto(16,10,  sse2);
-idct_dc_proto(32,10,  sse2);
-idct_dc_proto(8, 10,   avx);
-idct_dc_proto(16,10,   avx);
-idct_dc_proto(32,10,   avx);
-
-idct_dc_proto(16,10,  avx2);
-idct_dc_proto(32,10,  avx2);
-
-
-
-
+WEIGHTING_PROTOTYPES(12, sse4);
 
 #endif // AVCODEC_X86_HEVCDSP_H

@@ -134,6 +134,7 @@
     <ClInclude Include="libavcodec\audiodsp.h" />
     <ClInclude Include="libavcodec\audio_frame_queue.h" />
     <ClInclude Include="libavcodec\avcodec.h" />
+    <ClInclude Include="libavcodec\avdct.h" />
     <ClInclude Include="libavcodec\avfft.h" />
     <ClInclude Include="libavcodec\bgmc.h" />
     <ClInclude Include="libavcodec\binkdata.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="libavcodec\dirac_arith.h" />
     <ClInclude Include="libavcodec\dirac_dwt.h" />
     <ClInclude Include="libavcodec\dnxhddata.h" />
+    <ClInclude Include="libavcodec\dsputil.h" />
     <ClInclude Include="libavcodec\dv.h" />
     <ClInclude Include="libavcodec\dvdata.h" />
     <ClInclude Include="libavcodec\dv_profile.h" />
@@ -524,6 +526,7 @@
     <ClCompile Include="libavcodec\atrac.c" />
     <ClCompile Include="libavcodec\atrac3.c" />
     <ClCompile Include="libavcodec\audiodsp.c" />
+    <ClCompile Include="libavcodec\avdct.c" />
     <ClCompile Include="libavcodec\avfft.c" />
     <ClCompile Include="libavcodec\avpacket.c" />
     <ClCompile Include="libavcodec\avpicture.c" />
@@ -558,6 +561,7 @@
     <ClCompile Include="libavcodec\dnxhddata.c" />
     <ClCompile Include="libavcodec\dnxhddec.c" />
     <ClCompile Include="libavcodec\dnxhd_parser.c" />
+    <ClCompile Include="libavcodec\dsputil_compat.c" />
     <ClCompile Include="libavcodec\dv.c" />
     <ClCompile Include="libavcodec\dvdata.c" />
     <ClCompile Include="libavcodec\dvdec.c" />

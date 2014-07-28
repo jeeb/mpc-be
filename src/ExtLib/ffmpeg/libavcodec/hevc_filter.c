@@ -76,8 +76,7 @@ static int chroma_tc(HEVCContext *s, int qp_y, int c_idx, int tc_offset)
     return tctable[idxt];
 }
 
-static int get_qPy_pred(HEVCContext *s, int xC, int yC,
-                        int xBase, int yBase, int log2_cb_size)
+static int get_qPy_pred(HEVCContext *s, int xBase, int yBase, int log2_cb_size)
 {
     HEVCLocalContext *lc     = s->HEVClc;
     int ctb_size_mask        = (1 << s->sps->log2_ctb_size) - 1;
@@ -120,10 +119,9 @@ static int get_qPy_pred(HEVCContext *s, int xC, int yC,
     return (qPy_a + qPy_b + 1) >> 1;
 }
 
-void ff_hevc_set_qPy(HEVCContext *s, int xC, int yC,
-                     int xBase, int yBase, int log2_cb_size)
+void ff_hevc_set_qPy(HEVCContext *s, int xBase, int yBase, int log2_cb_size)
 {
-    int qp_y = get_qPy_pred(s, xC, yC, xBase, yBase, log2_cb_size);
+    int qp_y = get_qPy_pred(s, xBase, yBase, log2_cb_size);
 
     if (s->HEVClc->tu.cu_qp_delta != 0) {
         int off = s->sps->qp_bd_offset;
@@ -383,7 +381,8 @@ static void deblocking_filter_CTB(HEVCContext *s, int x0, int y0)
             if (bs0 || bs1) {
                 const int qp = (get_qPy(s, x - 1, y)     + get_qPy(s, x, y)     + 1) >> 1;
 
-                beta    = betatable[av_clip(qp + beta_offset, 0, MAX_QP)];
+                beta = betatable[av_clip(qp + beta_offset, 0, MAX_QP)];
+
                 tc[0]   = bs0 ? TC_CALC(qp, bs0) : 0;
                 tc[1]   = bs1 ? TC_CALC(qp, bs1) : 0;
                 src     = &s->frame->data[LUMA][y * s->frame->linesize[LUMA] + (x << s->sps->pixel_shift)];
@@ -450,7 +449,7 @@ static void deblocking_filter_CTB(HEVCContext *s, int x0, int y0)
                 tc_offset   = x >= x0 ? cur_tc_offset : left_tc_offset;
                 beta_offset = x >= x0 ? cur_beta_offset : left_beta_offset;
 
-                beta    = betatable[av_clip(qp + beta_offset, 0, MAX_QP)];
+                beta = betatable[av_clip(qp + beta_offset, 0, MAX_QP)];
                 tc[0]   = bs0 ? TC_CALC(qp, bs0) : 0;
                 tc[1]   = bs1 ? TC_CALC(qp, bs1) : 0;
                 src     = &s->frame->data[LUMA][y * s->frame->linesize[LUMA] + (x << s->sps->pixel_shift)];
@@ -586,9 +585,9 @@ void ff_hevc_deblocking_boundary_strengths(HEVCContext *s, int x0, int y0,
     if (y0 > 0 && (y0 & 7) == 0) {
         int bd_ctby = y0 & ((1 << s->sps->log2_ctb_size) - 1);
         int bd_slice = s->sh.slice_loop_filter_across_slices_enabled_flag ||
-                       !(lc->slice_or_tiles_up_boundary & 1);
+                       !(lc->boundary_flags & BOUNDARY_UPPER_SLICE);
         int bd_tiles = s->pps->loop_filter_across_tiles_enabled_flag ||
-                       !(lc->slice_or_tiles_up_boundary & 2);
+                       !(lc->boundary_flags & BOUNDARY_UPPER_TILE);
         if (((bd_slice && bd_tiles)  || bd_ctby)) {
             int yp_pu = (y0 - 1) >> log2_min_pu_size;
             int yq_pu =  y0      >> log2_min_pu_size;
@@ -620,9 +619,9 @@ void ff_hevc_deblocking_boundary_strengths(HEVCContext *s, int x0, int y0,
     if (x0 > 0 && (x0 & 7) == 0) {
         int bd_ctbx = x0 & ((1 << s->sps->log2_ctb_size) - 1);
         int bd_slice = s->sh.slice_loop_filter_across_slices_enabled_flag ||
-                       !(lc->slice_or_tiles_left_boundary & 1);
+                       !(lc->boundary_flags & BOUNDARY_LEFT_SLICE);
         int bd_tiles = s->pps->loop_filter_across_tiles_enabled_flag ||
-                       !(lc->slice_or_tiles_left_boundary & 2);
+                       !(lc->boundary_flags & BOUNDARY_LEFT_TILE);
         if (((bd_slice && bd_tiles)  || bd_ctbx)) {
             int xp_pu = (x0 - 1) >> log2_min_pu_size;
             int xq_pu =  x0      >> log2_min_pu_size;
