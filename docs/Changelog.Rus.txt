@@ -28,7 +28,7 @@
 	* libwebp 0.4.0 git-d2cc61b7;
 	* MediaInfo 0.7.69+ svn rev.6373;
 	* Little-CMS 2.7 beta git-1948a466;
-	* ZenLib 0.4.29+ svn rev.481;
+	* ZenLib 0.4.29+ svn rev.483;
 	 ... и многое другое.
 
 
