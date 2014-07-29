@@ -372,9 +372,6 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 				while (pos) {
 					CFGFilter* pFGF = m_override.GetNext(pos);
 					if (pFGF->GetCLSID() == clsid_value) {
-						pFGF->SetMerit(MERIT64_PRIORITY);
-						fl.Insert(pFGF, 0, false, false);
-
 						const CAtlList<GUID>& types = pFGF->GetTypes();
 						if (types.GetCount()) {
 							bool bIsSplitter = false;
@@ -385,15 +382,23 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 								if (major == MEDIATYPE_Stream) {
 									bIsSplitter = true;
+
+									CAtlList<GUID> typesNew;
+									typesNew.AddTail(major);
+									typesNew.AddTail(sub);
+									pFGF->SetTypes(typesNew);
+
 									break;
 								}
 							}
 							if (bIsSplitter) {
-								CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_PRIORITY - 1);
-								pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-								fl.Insert(pFGF, 0);
+								CFGFilter* pFGFAsync = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_PRIORITY + 1);
+								fl.Insert(pFGFAsync, 0);
 							}
 						}
+						
+						pFGF->SetMerit(MERIT64_PRIORITY);
+						fl.Insert(pFGF, 0, false, false);
 
 						break;
 					}
