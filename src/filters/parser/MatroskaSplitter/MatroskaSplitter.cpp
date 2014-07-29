@@ -231,7 +231,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (pTE->TrackType == TrackEntry::TypeVideo) {
 				Name.Format(L"Video %d", iVideo++);
 
-				bool interlaced = false;
+				bool bIsInterlaced = false;
 
 				mt.majortype = MEDIATYPE_Video;
 				mt.SetSampleSize(1); // variable frame size?
@@ -339,7 +339,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						CGolombBuffer gb((BYTE*)pTE->CodecPrivate.GetData() + 9, pTE->CodecPrivate.GetCount() - 9);
 						avc_hdr h;
 						ParseAVCHeader(gb, h);
-						interlaced = !!h.interlaced;
+						bIsInterlaced = !!h.interlaced;
 					}
 
 					BITMAPINFOHEADER pbmi;
@@ -564,13 +564,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						bHasVideo = true;
 					}
 				}
-				REFERENCE_TIME AvgTimePerFrame = 0;
 
+				REFERENCE_TIME AvgTimePerFrame = 0;
 				if (pTE->v.FramePerSec > 0) {
 					AvgTimePerFrame = (REFERENCE_TIME)(10000000i64 / pTE->v.FramePerSec);
 				} else if (pTE->DefaultDuration > 0) {
 					AvgTimePerFrame = (REFERENCE_TIME)pTE->DefaultDuration / 100;
-				} 
+				}
 
 				if (AvgTimePerFrame < 166666) { // incorrect fps - calculate avarage value
 					DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : calculate AvgTimePerFrame"));
@@ -733,15 +733,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							double fps = 10000000.0 / AvgTimePerFrame;
 							fps = Video_FrameRate_Rounding(fps);
 							AvgTimePerFrame = 10000000.0 / fps;
-							if (interlaced) {
-								;//AvgTimePerFrame *= 2; // TODO - it is necessary or not ???
-							}
 						}
 					}
 				}
 
 				if (AvgTimePerFrame < 166666) {
 					AvgTimePerFrame = 417082; // set 23.976 as default
+				} else if (bIsInterlaced) {
+					AvgTimePerFrame *= 2;
 				}
 
 				for (size_t i = 0; i < mts.GetCount(); i++) {
