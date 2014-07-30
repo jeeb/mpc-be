@@ -63,6 +63,6 @@ public:
 		return m_startpos;
 	}
 
-	bool Sync(int limit = 0x2000);
-	bool Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit = 0x2000);
+	bool Sync(int limit = 8096);
+	bool Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit = 8096);
 };

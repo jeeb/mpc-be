@@ -229,14 +229,14 @@ HRESULT CMpaSplitterFile::Init()
 	return S_OK;
 }
 
-bool CMpaSplitterFile::Sync(int limit)
+bool CMpaSplitterFile::Sync(int limit/* = 8096*/)
 {
 	int FrameSize;
 	REFERENCE_TIME rtDuration;
 	return Sync(FrameSize, rtDuration, limit);
 }
 
-bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit)
+bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit/* = 8096*/)
 {
 	__int64 endpos = min(GetLength(), GetPos() + limit);
 

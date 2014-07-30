@@ -360,7 +360,7 @@ HRESULT CBaseSplitterFile::HasMoreData(__int64 len, DWORD ms)
 	return S_OK;
 }
 
-HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds, __int64 AvailBytes)
+HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds/* = 1500*/, __int64 AvailBytes/* = 1*/, HANDLE hBreak/* = NULL*/)
 {
 	if (m_fRandomAccess) {
 		return HasMoreData(AvailBytes, dwMilliseconds);
@@ -370,7 +370,7 @@ HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds, __int64 AvailByte
 		AvailBytes = min(AvailBytes, GetLength() - GetAvailable());
 	}
 
-	for (int i = 0; i < int(dwMilliseconds/100); i++) {
+	for (int i = 0; i < int(dwMilliseconds/100) && (!hBreak || WaitForSingleObject(hBreak, 0) != WAIT_OBJECT_0); i++) {
 		if (GetRemaining() >= AvailBytes) {
 			return S_OK;
 		}

@@ -131,7 +131,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	AddOutputPin(0, pPinOut);
 
 	m_rtNewStart = m_rtCurrent = 0;
-	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->GetDuration();
+	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->IsStreaming() ? 0 : m_pFile->GetDuration();
 
 	SetID3TagProperties(this, m_pFile->ID3Tag);
 
@@ -143,7 +143,7 @@ STDMETHODIMP CMpaSplitterFilter::GetDuration(LONGLONG* pDuration)
 	CheckPointer(pDuration, E_POINTER);
 	CheckPointer(m_pFile, VFW_E_NOT_CONNECTED);
 
-	*pDuration = m_pFile->GetDuration();
+	*pDuration = m_pFile->IsStreaming() ? m_rtDuration : m_pFile->GetDuration();
 
 	return S_OK;
 }
@@ -181,9 +181,9 @@ bool CMpaSplitterFilter::DemuxLoop()
 	int FrameSize;
 	REFERENCE_TIME rtDuration;
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (m_pFile->GetPos() < m_pFile->GetLength() - 9 || m_pFile->IsStreaming())) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (m_pFile->GetRemaining() > 9 || m_pFile->IsStreaming())) {
+		m_pFile->WaitAvailable(1500, 8096, GetRequestHandle());
 		if (!m_pFile->Sync(FrameSize, rtDuration)) {
-			Sleep(1);
 			continue;
 		}
 
