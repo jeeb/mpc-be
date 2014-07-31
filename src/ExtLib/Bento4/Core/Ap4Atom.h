@@ -309,6 +309,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_AVC1 = AP4_ATOM_TYPE('a','v','c','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_AVCC = AP4_ATOM_TYPE('a','v','c','C');
 // HEVC
 const AP4_Atom::Type AP4_ATOM_TYPE_HVC1 = AP4_ATOM_TYPE('h','v','c','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_HEV1 = AP4_ATOM_TYPE('h','e','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HVCC = AP4_ATOM_TYPE('h','v','c','C');
 // image
 const AP4_Atom::Type AP4_ATOM_TYPE_JPEG = AP4_ATOM_TYPE('j','p','e','g');

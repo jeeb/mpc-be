@@ -263,6 +263,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 			break;
 
 		case AP4_ATOM_TYPE_HVC1:
+		case AP4_ATOM_TYPE_HEV1:
 			atom = new AP4_Hvc1SampleEntry(size, stream, *this);
 			break;
 
