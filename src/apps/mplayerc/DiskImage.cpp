@@ -23,6 +23,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include <WinIoCtl.h>
+#include "MainFrm.h"
 #include "DiskImage.h"
 
 DiskImage::DiskImage()
@@ -129,18 +130,27 @@ const LPCTSTR DiskImage::GetExts()
 	return NULL;
 }
 
+#define SendClose												\
+	if (p_MainWnd) {											\
+		p_MainWnd->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);	\
+	}															\
+
+
 TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 {
 	UnmountDiskImage();
 	m_DriveLetter = 0;
 
 	CString ext = GetFileExt(pathName).MakeLower();
+	const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
 
 	if (m_DriveType == WIN8 && ext == L".iso") {
+		SendClose;
 		m_DriveLetter = MountWin8(pathName);
 	}
 #if ENABLE_DTLITE_SUPPORT
 	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg")) {
+		SendClose;
 		m_DriveLetter = MountDTLite(pathName);
 	}
 #endif
@@ -152,6 +162,7 @@ void DiskImage::UnmountDiskImage()
 {
 	if (m_DriveType == WIN8 && m_VHDHandle != INVALID_HANDLE_VALUE) {
 		CloseHandle(m_VHDHandle);
+		m_VHDHandle = INVALID_HANDLE_VALUE;
 	}
 
 #if ENABLE_DTLITE_SUPPORT
@@ -300,6 +311,7 @@ TCHAR DiskImage::MountWin8(LPCTSTR pathName)
 
 	if (m_VHDHandle != INVALID_HANDLE_VALUE) {
 		CloseHandle(m_VHDHandle);
+		m_VHDHandle = INVALID_HANDLE_VALUE;
 	}
 
 	return 0;
