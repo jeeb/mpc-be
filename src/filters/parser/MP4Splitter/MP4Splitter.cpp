@@ -1235,6 +1235,33 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
+	if (m_pOutputs.GetCount()) {
+		AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
+
+		POSITION pos = m_trackpos.GetStartPosition();
+		while (pos) {
+			CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
+			AP4_Track* track = movie->GetTrack(pPair->m_key);
+
+			if (track->GetType() != AP4_Track::TYPE_VIDEO) {
+				continue;
+			}
+
+			if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
+				for (AP4_Cardinal i = 0; i < stss->m_Entries.ItemCount(); ++i) {
+					AP4_UI32 index = stss->m_Entries[i] - 1;
+
+					AP4_Sample sample;
+					if (AP4_SUCCEEDED(track->GetSample(index, sample))) {
+						REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+						SyncPoint sp = { rt, __int64(index) };
+						m_sps.Add(sp);
+					}
+				}
+			}
+		}
+	}
+
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
@@ -1467,30 +1494,9 @@ bool CMP4SplitterFilter::DemuxLoop()
 STDMETHODIMP CMP4SplitterFilter::GetKeyFrameCount(UINT& nKFs)
 {
 	CheckPointer(m_pFile, E_UNEXPECTED);
-
-	if (!m_pFile) {
-		return E_UNEXPECTED;
-	}
-
-	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
-
-	POSITION pos = m_trackpos.GetStartPosition();
-	while (pos) {
-		CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
-
-		AP4_Track* track = movie->GetTrack(pPair->m_key);
-
-		if (track->GetType() != AP4_Track::TYPE_VIDEO) {
-			continue;
-		}
-
-		if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-			nKFs = stss->m_Entries.ItemCount();
-			return S_OK;
-		}
-	}
-
-	return E_FAIL;
+	
+	nKFs = m_sps.GetCount();
+	return S_OK;
 }
 
 STDMETHODIMP CMP4SplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs)
@@ -1503,40 +1509,11 @@ STDMETHODIMP CMP4SplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 		return E_INVALIDARG;
 	}
 
-	if (!m_pFile) {
-		return E_UNEXPECTED;
+	for (nKFs = 0; nKFs < m_sps.GetCount(); nKFs++) {
+		pKFs[nKFs] = m_sps[nKFs].rt;
 	}
 
-	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
-
-	POSITION pos = m_trackpos.GetStartPosition();
-	while (pos) {
-		CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
-
-		AP4_Track* track = movie->GetTrack(pPair->m_key);
-
-		if (track->GetType() != AP4_Track::TYPE_VIDEO) {
-			continue;
-		}
-
-		if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-			UINT nKFsTmp = 0;
-			AP4_UI32 mts = track->GetMediaTimeScale();
-
-			for (AP4_Cardinal i = 0; i < stss->m_Entries.ItemCount() && nKFsTmp < nKFs; ++i) {
-				AP4_Sample sample;
-				if (AP4_SUCCEEDED(track->GetSample(stss->m_Entries[i]-1, sample))) {
-					pKFs[nKFsTmp++] = REFERENCE_TIME((10000000ui64 * sample.GetCts() + mts/2) / mts);
-					//pKFs[nKFsTmp++] = REFERENCE_TIME(10000000.0 * sample.GetCts() / track->GetMediaTimeScale() + 0.5);
-				}
-			}
-			nKFs = nKFsTmp;
-
-			return S_OK;
-		}
-	}
-
-	return E_FAIL;
+	return S_OK;
 }
 
 //
