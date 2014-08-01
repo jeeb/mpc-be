@@ -70,6 +70,7 @@
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>
 #include <afxmt.h>
+#include "ColorControl.h"
 #include "DiskImage.h"
 
 #define USE_MEDIAINFO_STATIC
@@ -1234,6 +1235,8 @@ public:
 	CString		GetCurFileName();
 
 	GUID		GetTimeFormat();
+
+	CColorControl	m_ColorCintrol;
 protected:
 	DiskImage	m_DiskImage;
 	BOOL		OpenIso(CString pathName);

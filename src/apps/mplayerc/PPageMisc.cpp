@@ -124,26 +124,27 @@ BOOL CPPageMisc::OnApply()
 
 void CPPageMisc::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
+	CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
 	UpdateData();
 
 	if (*pScrollBar == m_SliBrightness) {
 		m_iBrightness = m_SliBrightness.GetPos();
-		((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_Brightness, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+		pMainFrame->SetColorControl(ProcAmp_Brightness, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 		m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
 	}
 	else if (*pScrollBar == m_SliContrast) {
 		m_iContrast = m_SliContrast.GetPos();
-		((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_Contrast, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+		pMainFrame->SetColorControl(ProcAmp_Contrast, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 		m_iContrast ? m_sContrast.Format(_T("%+d"), m_iContrast) : m_sContrast = _T("0");
 	}
 	else if (*pScrollBar == m_SliHue) {
 		m_iHue = m_SliHue.GetPos();
-		((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_Hue, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+		pMainFrame->SetColorControl(ProcAmp_Hue, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 		m_iHue ? m_sHue.Format(_T("%+d"), m_iHue) : m_sHue = _T("0");
 	}
 	else if (*pScrollBar == m_SliSaturation) {
 		m_iSaturation = m_SliSaturation.GetPos();
-		((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_Saturation, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+		pMainFrame->SetColorControl(ProcAmp_Saturation, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 		m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
 	}
 
@@ -156,10 +157,12 @@ void CPPageMisc::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CPPageMisc::OnBnClickedReset()
 {
-	m_iBrightness	= AfxGetMyApp()->GetColorControl(ProcAmp_Brightness)->DefaultValue;
-	m_iContrast		= AfxGetMyApp()->GetColorControl(ProcAmp_Contrast)->DefaultValue;
-	m_iHue			= AfxGetMyApp()->GetColorControl(ProcAmp_Hue)->DefaultValue;
-	m_iSaturation	= AfxGetMyApp()->GetColorControl(ProcAmp_Saturation)->DefaultValue;
+	CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
+
+	m_iBrightness	= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Brightness)->DefaultValue;
+	m_iContrast		= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Contrast)->DefaultValue;
+	m_iHue			= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Hue)->DefaultValue;
+	m_iSaturation	= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Saturation)->DefaultValue;
 
 	m_SliBrightness.SetPos	(m_iBrightness);
 	m_SliContrast.SetPos	(m_iContrast);

@@ -30,9 +30,6 @@
 #include <atlsync.h>
 #include "FakeFilterMapper2.h"
 #include "AppSettings.h"
-#include <d3d9.h>
-#include <vmr9.h>
-#include <dxva2api.h> //#include <evr9.h>
 #include "../../../Include/Version.h"
 #include "WinDebugMonitor.h"
 
@@ -54,35 +51,6 @@ extern bool LoadType(CString fn, CString& type);
 extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 extern CStringA GetContentType(CString fn, CAtlList<CString>* redir = NULL);
 extern WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
-
-typedef enum {
-	ProcAmp_Brightness = 0x1,
-	ProcAmp_Contrast   = 0x2,
-	ProcAmp_Hue        = 0x4,
-	ProcAmp_Saturation = 0x8,
-	ProcAmp_All = ProcAmp_Brightness | ProcAmp_Contrast | ProcAmp_Hue | ProcAmp_Saturation,
-} ControlType;
-
-typedef struct {
-	DWORD dwProperty;
-	int   MinValue;
-	int   MaxValue;
-	int   DefaultValue;
-	int   StepSize;
-} COLORPROPERTY_RANGE;
-
-__inline DXVA2_Fixed32 IntToFixed(__in const int _int_, __in const SHORT divisor = 1)
-{
-	DXVA2_Fixed32 _fixed_;
-	_fixed_.Value = _int_ / divisor;
-	_fixed_.Fraction = (_int_ % divisor * 0x10000 + divisor/2) / divisor;
-	return _fixed_;
-}
-
-__inline int FixedToInt(__in const DXVA2_Fixed32 _fixed_, __in const SHORT factor = 1)
-{
-	return (int)_fixed_.Value * factor + ((int)_fixed_.Fraction * factor + 0x8000) / 0x10000;
-}
 
 extern void GetCurDispMode(dispmode& dm, CString& DisplayName);
 extern bool GetDispMode(int i, dispmode& dm, CString& DisplayName);
@@ -107,10 +75,6 @@ class CMPlayerCApp : public CWinApp
 	void PreProcessCommandLine();
 	BOOL SendCommandLine(HWND hWnd);
 	UINT GetVKFromAppCommand(UINT nAppCommand);
-
-	COLORPROPERTY_RANGE		m_ColorControl[4];
-	VMR9ProcAmpControlRange	m_VMR9ColorControl[4];
-	DXVA2_ValueRange		m_EVRColorControl[4];
 
 	static UINT	GetRemoteControlCodeMicrosoft(UINT nInputcode, HRAWINPUT hRawInput);
 	static UINT	GetRemoteControlCodeSRM7500(UINT nInputcode, HRAWINPUT hRawInput);
@@ -139,11 +103,6 @@ public:
 	typedef UINT (*PTR_GetRemoteControlCode)(UINT nInputcode, HRAWINPUT hRawInput);
 
 	PTR_GetRemoteControlCode	GetRemoteControlCode;
-	COLORPROPERTY_RANGE*		GetColorControl(ControlType nFlag);
-	void						ResetColorControlRange();
-	void						UpdateColorControlRange(bool isEVR);
-	VMR9ProcAmpControlRange*	GetVMR9ColorControl(ControlType nFlag);
-	DXVA2_ValueRange*			GetEVRColorControl(ControlType nFlag);
 
 	static const LanguageResource languageResources[];
 	static const size_t languageResourcesCount;
