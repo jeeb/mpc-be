@@ -20405,22 +20405,28 @@ GUID CMainFrame::GetTimeFormat()
 
 BOOL CMainFrame::OpenIso(CString pathName)
 {
-	TCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
-	if (diskletter) {
+	if (m_DiskImage.CheckExtension(pathName)) {
+		SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
-		if (OpenBD(CString(diskletter) + L":\\")) {
-			return TRUE;
-		}
+		TCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
+		if (diskletter) {
+			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
-		if (::PathFileExists(CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO")) {
-			CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
-			p->path = CString(diskletter) + L":\\";
-			OpenMedia(p);
-			return TRUE;
+			if (OpenBD(CString(diskletter) + L":\\")) {
+				return TRUE;
+			}
+
+			if (::PathFileExists(CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO")) {
+				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
+				p->path = CString(diskletter) + L":\\";
+				OpenMedia(p);
+				return TRUE;
+			}
+
+			m_DiskImage.UnmountDiskImage();
 		}
 	}
 
-	m_DiskImage.UnmountDiskImage();
 	return FALSE;
 }
 

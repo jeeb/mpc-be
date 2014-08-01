@@ -66,6 +66,7 @@ public:
 	void Init();
 	bool DriveAvailable();
 	const LPCTSTR GetExts();
+	bool CheckExtension(LPCTSTR pathName);
 
 	TCHAR MountDiskImage(LPCTSTR pathName);
 	void UnmountDiskImage();

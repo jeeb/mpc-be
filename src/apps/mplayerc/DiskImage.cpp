@@ -129,31 +129,35 @@ const LPCTSTR DiskImage::GetExts()
 	return NULL;
 }
 
-#define SendClose												\
-	if (p_MainWnd) {											\
-		p_MainWnd->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);	\
-	}															\
+bool DiskImage::CheckExtension(LPCTSTR pathName)
+{
+	CString ext = GetFileExt(pathName).MakeLower();
 
+	if (m_DriveType == WIN8 && ext == L".iso") {
+		return true;
+	}
+#if ENABLE_DTLITE_SUPPORT
+	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg")) {
+		return true;
+	}
+#endif
+
+	return false;
+}
 
 TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 {
 	UnmountDiskImage();
 	m_DriveLetter = 0;
 
-	CString ext = GetFileExt(pathName).MakeLower();
-	const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
-
-	if (m_DriveType == WIN8 && ext == L".iso") {
-		SendClose;
+	if (m_DriveType == WIN8) {
 		m_DriveLetter = MountWin8(pathName);
 	}
 #if ENABLE_DTLITE_SUPPORT
-	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg")) {
-		SendClose;
+	if (m_DriveType == DTLITE) {
 		m_DriveLetter = MountDTLite(pathName);
 	}
 #endif
-
 	return m_DriveLetter;
 }
 
