@@ -135,7 +135,6 @@ TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 	m_DriveLetter = 0;
 
 	CString ext = GetFileExt(pathName).MakeLower();
-	const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
 
 	if (m_DriveType == WIN8 && ext == L".iso") {
 		m_DriveLetter = MountWin8(pathName);
