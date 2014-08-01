@@ -9858,58 +9858,58 @@ void CMainFrame::OnPlayColor(UINT nID)
 {
 	if (m_pVMRMC9 || m_pMFVP) {
 		AppSettings& s = AfxGetAppSettings();
-		//ColorRanges* crs = AfxGetMyApp()->ColorControls;
 		int& brightness = s.iBrightness;
 		int& contrast   = s.iContrast;
 		int& hue        = s.iHue;
 		int& saturation = s.iSaturation;
 		CString tmp, str;
+
 		switch (nID) {
 
-			case ID_COLOR_BRIGHTNESS_INC:
-				brightness += 2;
-			case ID_COLOR_BRIGHTNESS_DEC:
-				brightness -=1;
-				SetColorControl(ProcAmp_Brightness, brightness, contrast, hue, saturation);
-				brightness ? tmp.Format(_T("%+d"), brightness) : tmp = _T("0");
-				str.Format(IDS_OSD_BRIGHTNESS, tmp);
-				break;
+		case ID_COLOR_BRIGHTNESS_INC:
+			brightness += 2;
+		case ID_COLOR_BRIGHTNESS_DEC:
+			brightness -= 1;
+			SetColorControl(ProcAmp_Brightness, brightness, contrast, hue, saturation);
+			brightness ? tmp.Format(_T("%+d"), brightness) : tmp = _T("0");
+			str.Format(IDS_OSD_BRIGHTNESS, tmp);
+			break;
 
-			case ID_COLOR_CONTRAST_INC:
-				contrast += 2;
-			case ID_COLOR_CONTRAST_DEC:
-				contrast -= 1;
-				SetColorControl(ProcAmp_Contrast, brightness, contrast, hue, saturation);
-				contrast ? tmp.Format(_T("%+d"), contrast) : tmp = _T("0");
-				str.Format(IDS_OSD_CONTRAST, tmp);
-				break;
+		case ID_COLOR_CONTRAST_INC:
+			contrast += 2;
+		case ID_COLOR_CONTRAST_DEC:
+			contrast -= 1;
+			SetColorControl(ProcAmp_Contrast, brightness, contrast, hue, saturation);
+			contrast ? tmp.Format(_T("%+d"), contrast) : tmp = _T("0");
+			str.Format(IDS_OSD_CONTRAST, tmp);
+			break;
 
-			case ID_COLOR_HUE_INC:
-				hue += 2;
-			case ID_COLOR_HUE_DEC:
-				hue -= 1;
-				SetColorControl(ProcAmp_Hue, brightness, contrast, hue, saturation);
-				hue ? tmp.Format(_T("%+d"), hue) : tmp = _T("0");
-				str.Format(IDS_OSD_HUE, tmp);
-				break;
+		case ID_COLOR_HUE_INC:
+			hue += 2;
+		case ID_COLOR_HUE_DEC:
+			hue -= 1;
+			SetColorControl(ProcAmp_Hue, brightness, contrast, hue, saturation);
+			hue ? tmp.Format(_T("%+d"), hue) : tmp = _T("0");
+			str.Format(IDS_OSD_HUE, tmp);
+			break;
 
-			case ID_COLOR_SATURATION_INC:
-				saturation += 2;
-			case ID_COLOR_SATURATION_DEC:
-				saturation -= 1;
-				SetColorControl(ProcAmp_Saturation, brightness, contrast, hue, saturation);
-				saturation ? tmp.Format(_T("%+d"), saturation) : tmp = _T("0");
-				str.Format(IDS_OSD_SATURATION, tmp);
-				break;
+		case ID_COLOR_SATURATION_INC:
+			saturation += 2;
+		case ID_COLOR_SATURATION_DEC:
+			saturation -= 1;
+			SetColorControl(ProcAmp_Saturation, brightness, contrast, hue, saturation);
+			saturation ? tmp.Format(_T("%+d"), saturation) : tmp = _T("0");
+			str.Format(IDS_OSD_SATURATION, tmp);
+			break;
 
-			case ID_COLOR_RESET:
-				brightness = m_ColorCintrol.GetColorControl(ProcAmp_Brightness)->DefaultValue;
-				contrast   = m_ColorCintrol.GetColorControl(ProcAmp_Contrast)->DefaultValue;
-				hue        = m_ColorCintrol.GetColorControl(ProcAmp_Hue)->DefaultValue;
-				saturation = m_ColorCintrol.GetColorControl(ProcAmp_Saturation)->DefaultValue;
-				SetColorControl(ProcAmp_All, brightness, contrast, hue, saturation);
-				str = ResStr(IDS_OSD_RESET_COLOR);
-				break;
+		case ID_COLOR_RESET:
+			brightness = m_ColorCintrol.GetColorControl(ProcAmp_Brightness)->DefaultValue;
+			contrast = m_ColorCintrol.GetColorControl(ProcAmp_Contrast)->DefaultValue;
+			hue = m_ColorCintrol.GetColorControl(ProcAmp_Hue)->DefaultValue;
+			saturation = m_ColorCintrol.GetColorControl(ProcAmp_Saturation)->DefaultValue;
+			SetColorControl(ProcAmp_All, brightness, contrast, hue, saturation);
+			str = ResStr(IDS_OSD_RESET_COLOR);
+			break;
 		}
 		m_OSD.DisplayMessage(OSD_TOPLEFT, str);
 	} else {
