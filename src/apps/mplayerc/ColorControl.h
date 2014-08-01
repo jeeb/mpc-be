@@ -25,19 +25,19 @@
 #include <dxva2api.h> //#include <evr9.h>
 
 typedef enum {
-	ProcAmp_Brightness = 0x1,
-	ProcAmp_Contrast   = 0x2,
-	ProcAmp_Hue        = 0x4,
-	ProcAmp_Saturation = 0x8,
+	ProcAmp_Brightness	= 0x1,
+	ProcAmp_Contrast	= 0x2,
+	ProcAmp_Hue			= 0x4,
+	ProcAmp_Saturation	= 0x8,
 	ProcAmp_All = ProcAmp_Brightness | ProcAmp_Contrast | ProcAmp_Hue | ProcAmp_Saturation,
 } ControlType;
 
 typedef struct {
-	DWORD dwProperty;
-	int   MinValue;
-	int   MaxValue;
-	int   DefaultValue;
-	int   StepSize;
+	DWORD	dwProperty;
+	int		MinValue;
+	int		MaxValue;
+	int		DefaultValue;
+	int		StepSize;
 } COLORPROPERTY_RANGE;
 
 __inline DXVA2_Fixed32 IntToFixed(__in const int _int_, __in const SHORT divisor = 1)

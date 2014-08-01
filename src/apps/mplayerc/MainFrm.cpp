@@ -18472,16 +18472,16 @@ void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, in
 		ClrControl.dwSize     = sizeof(ClrControl);
 		ClrControl.dwFlags    = flags;
 		ClrControl.Brightness = (float)brightness;
-		ClrControl.Contrast   = (float)(contrast+100)/100;
+		ClrControl.Contrast   = (float)(contrast + 100) / 100;
 		ClrControl.Hue        = (float)hue;
-		ClrControl.Saturation = (float)(saturation+100)/100;
+		ClrControl.Saturation = (float)(saturation + 100) / 100;
 
 		m_pVMRMC9->SetProcAmpControl(0, &ClrControl);
 	} else if (m_pMFVP) {
 		ClrValues.Brightness = IntToFixed(brightness);
-		ClrValues.Contrast   = IntToFixed(contrast+100, 100);
+		ClrValues.Contrast   = IntToFixed(contrast + 100, 100);
 		ClrValues.Hue        = IntToFixed(hue);
-		ClrValues.Saturation = IntToFixed(saturation+100, 100);
+		ClrValues.Saturation = IntToFixed(saturation + 100, 100);
 
 		m_pMFVP->SetProcAmpValues(flags, &ClrValues);
 	}
