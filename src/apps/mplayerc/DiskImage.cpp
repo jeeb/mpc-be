@@ -23,7 +23,6 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include <WinIoCtl.h>
-#include "MainFrm.h"
 #include "DiskImage.h"
 
 DiskImage::DiskImage()
@@ -130,12 +129,6 @@ const LPCTSTR DiskImage::GetExts()
 	return NULL;
 }
 
-#define SendClose												\
-	if (p_MainWnd) {											\
-		p_MainWnd->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);	\
-	}															\
-
-
 TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 {
 	UnmountDiskImage();
@@ -145,12 +138,10 @@ TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 	const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
 
 	if (m_DriveType == WIN8 && ext == L".iso") {
-		SendClose;
 		m_DriveLetter = MountWin8(pathName);
 	}
 #if ENABLE_DTLITE_SUPPORT
 	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg")) {
-		SendClose;
 		m_DriveLetter = MountDTLite(pathName);
 	}
 #endif
