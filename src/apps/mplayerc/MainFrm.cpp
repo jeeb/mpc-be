@@ -2312,10 +2312,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			break;
 		case TIMER_STREAMPOSPOLLER2:
 			if (m_iMediaLoadState == MLS_LOADED) {
-				__int64 start, stop, pos;
-				m_wndSeekBar.GetRange(start, stop);
-				pos = m_wndSeekBar.GetPosReal();
-
 				if (AfxGetAppSettings().nCS < CS_STATUSBAR) {
 					AfxGetAppSettings().bStatusBarIsVisible = false;
 				} else {
@@ -2336,7 +2332,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 					m_wndStatusBar.SetStatusTimer(str);
 				} else {
-					m_wndStatusBar.SetStatusTimer(pos, stop, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
 					CString str_temp;
 					bool bmadvr = (AfxGetAppSettings().iDSVideoRendererType == VIDRNDT_DS_MADVR);
 
