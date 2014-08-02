@@ -411,6 +411,7 @@ SRCS_LC = \
 	libavcodec/wmv2dec.c \
 	libavcodec/wmv2dsp.c \
 	libavcodec/xiph.c \
+	libavcodec/xvididct.c \
 	\
 	libavcodec/x86/ac3dsp_init.c \
 	libavcodec/x86/audiodsp_init.c \
@@ -464,7 +465,8 @@ SRCS_LC = \
 	libavcodec/x86/vp3dsp_init.c \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
-	libavcodec/x86/vp9dsp_init.c
+	libavcodec/x86/vp9dsp_init.c \
+	libavcodec/x86/xvididct_init.c
 
 SRCS_LF = \
 	libavfilter/af_atempo.c \

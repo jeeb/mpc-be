@@ -31,6 +31,7 @@
 #include "mpeg4video.h"
 #include "h263.h"
 #include "thread.h"
+#include "xvididct.h"
 
 /* The defines below define the number of bits that are read at once for
  * reading vlc values. Changing these may improve speed and data cache needs
@@ -1723,7 +1724,7 @@ static int decode_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
         s->avctx->sample_aspect_ratio = ff_h263_pixel_aspect[s->aspect_ratio_info];
     }
 
-    if ((s->vol_control_parameters = get_bits1(gb))) { /* vol control parameter */
+    if ((ctx->vol_control_parameters = get_bits1(gb))) { /* vol control parameter */
         int chroma_format = get_bits(gb, 2);
         if (chroma_format != CHROMA_420)
             av_log(s->avctx, AV_LOG_ERROR, "illegal chroma format\n");
@@ -2124,7 +2125,7 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
 
     if (ctx->xvid_build == -1 && ctx->divx_version == -1 && ctx->lavc_build == -1)
         if (s->codec_tag == AV_RL32("DIVX") && s->vo_type == 0 &&
-            s->vol_control_parameters == 0)
+            ctx->vol_control_parameters == 0)
             ctx->divx_version = 400;  // divx 4
 
     if (ctx->xvid_build >= 0 && ctx->divx_version >= 0) {
@@ -2209,7 +2210,8 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
                ctx->divx_version, ctx->divx_build, s->divx_packed ? "p" : "");
 
 #if HAVE_MMX
-    if (s->codec_id == AV_CODEC_ID_MPEG4 && ctx->xvid_build >= 0 &&
+    if (CONFIG_MPEG4_DECODER && ctx->xvid_build >= 0 &&
+        s->codec_id == AV_CODEC_ID_MPEG4 &&
         avctx->idct_algo == FF_IDCT_AUTO &&
         (av_get_cpu_flags() & AV_CPU_FLAG_MMX)) {
         avctx->idct_algo = FF_IDCT_XVIDMMX;
@@ -2217,6 +2219,7 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
         return 1;
     }
 #endif
+
     return 0;
 }
 
@@ -2228,7 +2231,7 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 
     s->pict_type = get_bits(gb, 2) + AV_PICTURE_TYPE_I;        /* pict type: I = 0 , P = 1 */
     if (s->pict_type == AV_PICTURE_TYPE_B && s->low_delay &&
-        s->vol_control_parameters == 0 && !(s->flags & CODEC_FLAG_LOW_DELAY)) {
+        ctx->vol_control_parameters == 0 && !(s->flags & CODEC_FLAG_LOW_DELAY)) {
         av_log(s->avctx, AV_LOG_ERROR, "low_delay flag incorrectly, clearing it\n");
         s->low_delay = 0;
     }
@@ -2446,7 +2449,7 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
                    s->data_partitioning, ctx->resync_marker,
                    ctx->num_sprite_warping_points, s->sprite_warping_accuracy,
                    1 - s->no_rounding, s->vo_type,
-                   s->vol_control_parameters ? " VOLC" : " ", ctx->intra_dc_threshold,
+                   ctx->vol_control_parameters ? " VOLC" : " ", ctx->intra_dc_threshold,
                    ctx->cplx_estimation_trash_i, ctx->cplx_estimation_trash_p,
                    ctx->cplx_estimation_trash_b,
                    s->time,
@@ -2470,7 +2473,7 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
     /* detect buggy encoders which don't set the low_delay flag
      * (divx4/xvid/opendivx). Note we cannot detect divx5 without b-frames
      * easily (although it's buggy too) */
-    if (s->vo_type == 0 && s->vol_control_parameters == 0 &&
+    if (s->vo_type == 0 && ctx->vol_control_parameters == 0 &&
         ctx->divx_version == -1 && s->picture_number == 0) {
         av_log(s->avctx, AV_LOG_WARNING,
                "looks like this file was encoded with (divx4/(old)xvid/opendivx) -> forcing low_delay flag\n");

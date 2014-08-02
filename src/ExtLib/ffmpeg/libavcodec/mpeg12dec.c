@@ -2096,6 +2096,14 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
                 } else
                     goto eos;
             }
+            if (s->mb_y >= ((s->height + 15) >> 4) &&
+                s->progressive_frame &&
+                !s->progressive_sequence &&
+                get_bits_left(&s->gb) <= 8 &&
+                get_bits_left(&s->gb) >= 0 &&
+                s->mb_skip_run == -1 &&
+                show_bits(&s->gb, 8) == 0)
+                goto eos;
 
             ff_init_block_index(s);
         }
@@ -2161,8 +2169,10 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
         }
     }
 eos: // end of slice
-    if (get_bits_left(&s->gb) < 0)
+    if (get_bits_left(&s->gb) < 0) {
+        av_log(s, AV_LOG_ERROR, "overread %d\n", -get_bits_left(&s->gb));
         return AVERROR_INVALIDDATA;
+    }
     *buf += (get_bits_count(&s->gb) - 1) / 8;
     av_dlog(s, "y %d %d %d %d\n", s->resync_mb_x, s->resync_mb_y, s->mb_x, s->mb_y);
     return 0;
