@@ -27,7 +27,7 @@
 	* libpng 1.7.0 b35 git-f3b1eb68;
 	* libwebp 0.4.0 git-d2cc61b7;
 	* MediaInfo 0.7.69+ svn rev.6375;
-	* Little-CMS 2.7 beta git-1948a466;
+	* Little-CMS 2.7 beta git-a41d62ee;
 	* ZenLib 0.4.29+ svn rev.483;
 	 ... и многое другое.
 
