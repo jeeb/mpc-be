@@ -133,11 +133,15 @@ bool DiskImage::CheckExtension(LPCTSTR pathName)
 {
 	CString ext = GetFileExt(pathName).MakeLower();
 
+	if (CString(pathName).Right(7).MakeLower() == L".iso.wv") {
+		ext = L".iso.wv";
+	}
+
 	if (m_DriveType == WIN8 && ext == L".iso") {
 		return true;
 	}
 #if ENABLE_DTLITE_SUPPORT
-	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg")) {
+	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".iso.wv" || ext == L".nrg")) {
 		return true;
 	}
 #endif

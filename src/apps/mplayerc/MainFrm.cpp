@@ -20417,6 +20417,20 @@ BOOL CMainFrame::OpenIso(CString pathName)
 				return TRUE;
 			}
 
+			if (pathName.Right(7).MakeLower() == L".iso.wv") {
+				WIN32_FIND_DATA fd;
+				HANDLE hFind = FindFirstFile(CString(diskletter) + L":\\*.wv", &fd);
+				if (hFind != INVALID_HANDLE_VALUE) {
+					CAtlList<CString> sl;
+					sl.AddTail(CString(diskletter) + L":\\" + fd.cFileName);
+					FindClose(hFind);
+
+					m_wndPlaylistBar.Open(sl, false);
+					OpenCurPlaylistItem();
+					return TRUE;
+				}
+			}
+
 			m_DiskImage.UnmountDiskImage();
 		}
 	}
