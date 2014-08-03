@@ -489,6 +489,7 @@ HRESULT CDirectVobSubFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* p
 
 HRESULT CDirectVobSubFilter::CompleteConnect(PIN_DIRECTION dir, IPin* pReceivePin)
 {
+	bool reconnected = false;
 	if (dir == PINDIR_INPUT) {
 		CComPtr<IBaseFilter> pFilter;
 
@@ -506,7 +507,6 @@ HRESULT CDirectVobSubFilter::CompleteConnect(PIN_DIRECTION dir, IPin* pReceivePi
 		CMediaType desiredMt;
 
 		bool can_reconnect	= false;
-		bool reconnected	= false;
 		bool can_transform	= SUCCEEDED(DoCheckTransform(mtIn, mtOut, true));
 		if (mtIn->subtype != mtOut->subtype) {
 
@@ -556,19 +556,19 @@ HRESULT CDirectVobSubFilter::CompleteConnect(PIN_DIRECTION dir, IPin* pReceivePi
 			}
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}		
-		
-		if (!reconnected && m_pOutput->IsConnected()) {
-			if (!m_hSystrayThread) {
-				m_tbid.graph = m_pGraph;
-				m_tbid.dvs = static_cast<IDirectVobSub*>(this);
+	}
 
-				DWORD tid;
-				m_hSystrayThread = CreateThread(0, 0, SystrayThreadProc, &m_tbid, 0, &tid);
-			}
+	if (!reconnected && m_pOutput->IsConnected()) {
+		if (!m_hSystrayThread) {
+			m_tbid.graph = m_pGraph;
+			m_tbid.dvs = static_cast<IDirectVobSub*>(this);
 
-			// HACK: triggers CBaseVideoFilter::SetMediaType to adjust m_w/m_h/.. and InitSubPicQueue() to realloc buffers
-			m_pInput->SetMediaType(&m_pInput->CurrentMediaType());
+			DWORD tid;
+			m_hSystrayThread = CreateThread(0, 0, SystrayThreadProc, &m_tbid, 0, &tid);
 		}
+
+		// HACK: triggers CBaseVideoFilter::SetMediaType to adjust m_w/m_h/.. and InitSubPicQueue() to realloc buffers
+		m_pInput->SetMediaType(&m_pInput->CurrentMediaType());
 	}
 
 	return __super::CompleteConnect(dir, pReceivePin);
