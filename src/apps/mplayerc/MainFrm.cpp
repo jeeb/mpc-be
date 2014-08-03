@@ -5354,7 +5354,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			}
 			s.nCLSwitches &= ~CLSW_NOFOCUS;
 			return true;
-		} else if (!fMulti && CPath(s.slFiles.GetHead() + _T("\\VIDEO_TS")).IsDirectory()) {
+		} else if (!fMulti && ::PathIsDirectory(s.slFiles.GetHead() + _T("\\VIDEO_TS"))) {
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			fSetForegroundWindow = true;
 
@@ -19524,7 +19524,7 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 
 	CString ext = GetFileExt(Path).MakeLower();
 
-	if ((CPath(Path).IsDirectory() && Path.Find(_T("\\BDMV"))) || CPath(Path + _T("\\BDMV")).IsDirectory() || ext == _T(".bdmv")) {
+	if ((::PathIsDirectory(Path) && Path.Find(_T("\\BDMV"))) || ::PathIsDirectory(Path + _T("\\BDMV")) || ext == _T(".bdmv")) {
 		if (ext == _T(".bdmv")) {
 			Path.Replace(_T("\\BDMV\\"), _T("\\"));
 			Path = GetFolderOnly(Path);
