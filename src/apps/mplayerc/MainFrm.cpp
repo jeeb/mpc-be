@@ -20405,7 +20405,6 @@ BOOL CMainFrame::OpenIso(CString pathName)
 
 		TCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
 		if (diskletter) {
-			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
 			if (OpenBD(CString(diskletter) + L":\\")) {
 				return TRUE;
