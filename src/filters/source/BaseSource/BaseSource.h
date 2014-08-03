@@ -22,6 +22,7 @@
 #pragma once
 
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/MediaDescription.h"
 
 template<class TStream>
 class CBaseSource
@@ -73,19 +74,13 @@ public:
 	}
 
 	STDMETHODIMP GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt) {
-		size_t		nCount;
-		if (!ppszFileName) {
-			return E_POINTER;
-		}
+		CheckPointer(ppszFileName, E_POINTER);
 
-		nCount = m_fn.GetLength()+1;
-		*ppszFileName = (LPOLESTR)CoTaskMemAlloc(nCount*sizeof(WCHAR));
-		if (!(*ppszFileName)) {
-			return E_OUTOFMEMORY;
-		}
+		size_t nCount = m_fn.GetLength() + 1;
+		*ppszFileName = (LPOLESTR)CoTaskMemAlloc(nCount * sizeof(WCHAR));
+		CheckPointer(*ppszFileName, E_OUTOFMEMORY);
 
 		wcscpy_s(*ppszFileName, nCount, m_fn);
-
 		return S_OK;
 	}
 
@@ -132,4 +127,6 @@ public:
 	virtual HRESULT FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, long& len /*in+out*/) = 0;
 
 	STDMETHODIMP Notify(IBaseFilter* pSender, Quality q);
+
+	HRESULT SetName(LPCWSTR pName);
 };

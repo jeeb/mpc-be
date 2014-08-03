@@ -233,4 +233,6 @@ public:
 	HRESULT OnThreadDestroy();
 	HRESULT Inactive();
 	HRESULT Pause();
+
+	HRESULT SetName(LPCWSTR pName);
 };

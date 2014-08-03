@@ -88,9 +88,11 @@ HRESULT CBaseSplitterOutputPin::SetName(LPCWSTR pName)
 	if (m_pName) {
 		delete [] m_pName;
 	}
-	m_pName = DNew WCHAR[wcslen(pName)+1];
+
+	size_t len = wcslen(pName) + 1;
+	m_pName = DNew WCHAR[len];
 	CheckPointer(m_pName, E_OUTOFMEMORY);
-	wcscpy_s(m_pName, wcslen(pName) + 1, pName);
+	wcscpy_s(m_pName, len, pName);
 	return S_OK;
 }
 

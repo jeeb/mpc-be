@@ -280,6 +280,11 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		hr = S_OK;
+
+		CMediaType mt;
+		if (SUCCEEDED(GetMediaType(0, &mt))) {
+			SetName(GetMediaTypeDesc(&mt, L"Output"));
+		}
 	} while (false);
 
 	if (phr) {

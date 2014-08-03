@@ -238,17 +238,13 @@ STDMETHODIMP CShoutcastSource::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* 
 
 STDMETHODIMP CShoutcastSource::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 {
-	if (!ppszFileName) {
-		return E_POINTER;
-	}
+	CheckPointer(ppszFileName, E_POINTER);
 
-	*ppszFileName = (LPOLESTR)CoTaskMemAlloc((m_fn.GetLength()+1)*sizeof(WCHAR));
-	if (!(*ppszFileName)) {
-		return E_OUTOFMEMORY;
-	}
+	size_t nCount = m_fn.GetLength() + 1;
+	*ppszFileName = (LPOLESTR)CoTaskMemAlloc(nCount * sizeof(WCHAR));
+	CheckPointer(*ppszFileName, E_OUTOFMEMORY);
 
-	wcscpy_s(*ppszFileName, m_fn.GetLength() + 1, m_fn);
-
+	wcscpy_s(*ppszFileName, nCount, m_fn);
 	return S_OK;
 }
 
@@ -371,6 +367,11 @@ redirect:
 		}
 		*phr = E_FAIL;
 		return;
+	}
+
+	CMediaType mt;
+	if (SUCCEEDED(GetMediaType(0, &mt))) {
+		SetName(GetMediaTypeDesc(&mt, L"Output"));
 	}
 
 	m_hSocket = m_socket.Detach();
@@ -723,6 +724,20 @@ HRESULT CShoutcastStream::Inactive()
 {
 	fExitThread = true;
 	return __super::Inactive();
+}
+
+HRESULT CShoutcastStream::SetName(LPCWSTR pName)
+{
+	CheckPointer(pName, E_POINTER);
+	if (m_pName) {
+		delete [] m_pName;
+	}
+
+	size_t len = wcslen(pName) + 1;
+	m_pName = DNew WCHAR[len];
+	CheckPointer(m_pName, E_OUTOFMEMORY);
+	wcscpy_s(m_pName, len, pName);
+	return S_OK;
 }
 
 //

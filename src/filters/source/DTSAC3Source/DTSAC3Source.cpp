@@ -373,6 +373,11 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		m_rtStop = m_rtDuration;
 
 		hr = S_OK;
+
+		CMediaType mt;
+		if (SUCCEEDED(GetMediaType(0, &mt))) {
+			SetName(GetMediaTypeDesc(&mt, L"Output"));
+		}
 	} while (false);
 
 	if (phr) {

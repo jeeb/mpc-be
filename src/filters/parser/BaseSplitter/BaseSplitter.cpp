@@ -557,11 +557,12 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 STDMETHODIMP CBaseSplitterFilter::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 {
 	CheckPointer(ppszFileName, E_POINTER);
-	*ppszFileName = (LPOLESTR)CoTaskMemAlloc((m_fn.GetLength()+1)*sizeof(WCHAR));
-	if (!(*ppszFileName)) {
-		return E_OUTOFMEMORY;
-	}
-	wcscpy_s(*ppszFileName, m_fn.GetLength() + 1, m_fn);
+
+	size_t nCount = m_fn.GetLength() + 1;
+	*ppszFileName = (LPOLESTR)CoTaskMemAlloc(nCount * sizeof(WCHAR));
+	CheckPointer(*ppszFileName, E_OUTOFMEMORY);
+
+	wcscpy_s(*ppszFileName, nCount, m_fn);
 	return S_OK;
 }
 
