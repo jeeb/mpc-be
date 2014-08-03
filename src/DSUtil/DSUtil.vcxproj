@@ -125,6 +125,7 @@
     <ClCompile Include="HdmvClipInfo.cpp" />
     <ClCompile Include="ID3Tag.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="MediaDescription.cpp" />
     <ClCompile Include="MediaTypeEx.cpp" />
     <ClCompile Include="MPCSocket.cpp" />
     <ClCompile Include="NullRenderers.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="HdmvClipInfo.h" />
     <ClInclude Include="ID3Tag.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="MediaDescription.h" />
     <ClInclude Include="MediaTypeEx.h" />
     <ClInclude Include="MPCSocket.h" />
     <ClInclude Include="Mpeg2Def.h" />

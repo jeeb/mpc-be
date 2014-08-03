@@ -92,6 +92,9 @@
     <ClCompile Include="ID3Tag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MediaDescription.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
@@ -185,6 +188,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ID3Tag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaDescription.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

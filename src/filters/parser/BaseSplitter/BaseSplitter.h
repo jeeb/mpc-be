@@ -33,6 +33,7 @@
 #include "AsyncReader.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 #include "../../../DSUtil/FontInstaller.h"
+#include "../../../DSUtil/MediaDescription.h"
 #include "../apps/mplayerc/SettingsDefines.h"
 #include <vector>
 
