@@ -663,6 +663,7 @@ public:
 	afx_msg LRESULT OnTaskBarRestart(WPARAM, LPARAM);
 	afx_msg LRESULT OnNotifyIcon(WPARAM, LPARAM);
 	afx_msg LRESULT OnTaskBarThumbnailsCreate(WPARAM, LPARAM);
+	afx_msg LRESULT OnQueryCancelAutoPlay(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnDwmSendIconicThumbnail(WPARAM, LPARAM);
 	afx_msg LRESULT OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);

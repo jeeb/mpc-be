@@ -92,9 +92,10 @@
 
 #define BLU_RAY			L"Blu-ray"
 
-static UINT s_uTaskbarRestart	= RegisterWindowMessage(_T("TaskbarCreated"));
-static UINT s_uTBBC				= RegisterWindowMessage(_T("TaskbarButtonCreated"));
-static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
+static UINT s_uTaskbarRestart		= RegisterWindowMessage(_T("TaskbarCreated"));
+static UINT s_uTBBC					= RegisterWindowMessage(_T("TaskbarButtonCreated"));
+static UINT WM_NOTIFYICON			= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
+static UINT s_uQueryCancelAutoPlay	= RegisterWindowMessage(_T("QueryCancelAutoPlay"));
 
 class __declspec(uuid("5933BB4F-EC4D-454E-8E11-B74DDA92E6F9")) ChaptersSouce : public CSource, public IDSMChapterBagImpl
 {
@@ -209,6 +210,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_REGISTERED_MESSAGE(s_uTaskbarRestart, OnTaskBarRestart)
 	ON_REGISTERED_MESSAGE(s_uTBBC, OnTaskBarThumbnailsCreate)
 	ON_REGISTERED_MESSAGE(WM_NOTIFYICON, OnNotifyIcon)
+	ON_REGISTERED_MESSAGE(s_uQueryCancelAutoPlay, OnQueryCancelAutoPlay)
 
 	ON_MESSAGE(WM_DWMSENDICONICTHUMBNAIL, OnDwmSendIconicThumbnail)
 	ON_MESSAGE(WM_DWMSENDICONICLIVEPREVIEWBITMAP, OnDwmSendIconicLivePreviewBitmap)
@@ -1263,6 +1265,15 @@ LRESULT CMainFrame::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 LRESULT CMainFrame::OnTaskBarThumbnailsCreate(WPARAM, LPARAM)
 {
 	return CreateThumbnailToolbar();
+}
+
+LRESULT CMainFrame::OnQueryCancelAutoPlay(WPARAM wParam, LPARAM lParam)
+{
+	if (wParam == m_DiskImage.GetDriveLetter() - 'A') {
+		return 0;
+	} else {
+		return -1;
+	}
 }
 
 void CMainFrame::ShowTrayIcon(bool fShow)

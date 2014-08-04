@@ -22,7 +22,7 @@
 
 #include <VirtDisk.h>
 
-#define ENABLE_DTLITE_SUPPORT 0
+#define ENABLE_DTLITE_SUPPORT 1
 
 class DiskImage
 {
@@ -70,6 +70,8 @@ public:
 
 	TCHAR MountDiskImage(LPCTSTR pathName);
 	void UnmountDiskImage();
+
+	TCHAR GetDriveLetter() { return m_DriveLetter; };
 
 private:
 	TCHAR MountWin8(LPCTSTR pathName);

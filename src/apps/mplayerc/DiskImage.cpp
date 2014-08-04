@@ -195,6 +195,8 @@ void DiskImage::UnmountDiskImage()
 		}
 	}
 #endif
+
+	m_DriveLetter = 0;
 }
 
 TCHAR DiskImage::MountWin8(LPCTSTR pathName)
