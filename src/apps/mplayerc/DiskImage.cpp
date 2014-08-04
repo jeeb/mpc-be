@@ -154,14 +154,17 @@ TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 	UnmountDiskImage();
 	m_DriveLetter = 0;
 
-	if (m_DriveType == WIN8) {
-		m_DriveLetter = MountWin8(pathName);
-	}
+	if (::PathFileExists(pathName)) {
+		if (m_DriveType == WIN8) {
+			m_DriveLetter = MountWin8(pathName);
+		}
 #if ENABLE_DTLITE_SUPPORT
-	if (m_DriveType == DTLITE) {
-		m_DriveLetter = MountDTLite(pathName);
-	}
+		if (m_DriveType == DTLITE) {
+			m_DriveLetter = MountDTLite(pathName);
+		}
 #endif
+	}
+
 	return m_DriveLetter;
 }
 
@@ -201,7 +204,7 @@ void DiskImage::UnmountDiskImage()
 
 TCHAR DiskImage::MountWin8(LPCTSTR pathName)
 {
-	if (m_hVirtualDiskModule && ::PathFileExists(pathName)) {
+	if (m_hVirtualDiskModule) {
 		CString ISOVolumeName;
 
 		VIRTUAL_STORAGE_TYPE vst;
