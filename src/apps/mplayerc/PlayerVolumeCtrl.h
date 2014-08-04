@@ -30,19 +30,19 @@ class CVolumeCtrl : public CSliderCtrl
 	DECLARE_DYNAMIC(CVolumeCtrl)
 
 private:
-	bool m_fSelfDrawn;
-	CBitmap m_bmUnderCtrl;
+	bool	m_fSelfDrawn;
+	CBitmap	m_bmUnderCtrl;
 
 	CMPCPngImage m_BackGroundbm;
 	CMPCPngImage m_Volumebm;
 
-	__int64 iDisableXPToolbars;
-	__int64 iThemeBrightness;
-	__int64 iThemeRed;
-	__int64 iThemeGreen;
-	__int64 iThemeBlue;
+	int		m_iUseDarkTheme;
+	int		m_iThemeBrightness;
+	int		m_iThemeRed;
+	int		m_iThemeGreen;
+	int		m_iThemeBlue;
 
-	bool m_fSetRedraw;
+	bool	m_fSetRedraw;
 
 public:
 	CVolumeCtrl(bool fSelfDrawn = true);

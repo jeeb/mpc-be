@@ -54,12 +54,12 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(s.nVolumeStep);
 	SetLineSize(0);
 
-	iDisableXPToolbars = s.bUseDarkTheme + 1;
+	m_iUseDarkTheme = s.bUseDarkTheme + 1;
 
-	iThemeBrightness = s.nThemeBrightness;
-	iThemeRed = s.nThemeRed;
-	iThemeGreen = s.nThemeGreen;
-	iThemeBlue = s.nThemeBlue;
+	m_iThemeBrightness = s.nThemeBrightness;
+	m_iThemeRed = s.nThemeRed;
+	m_iThemeGreen = s.nThemeGreen;
+	m_iThemeBlue = s.nThemeBlue;
 
 	return TRUE;
 }
@@ -115,11 +115,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
 				if (s.bUseDarkTheme && (m_bmUnderCtrl.GetSafeHandle() == NULL
-								|| iDisableXPToolbars == 1
-								|| iThemeBrightness != s.nThemeBrightness
-								|| iThemeRed != s.nThemeRed
-								|| iThemeGreen != s.nThemeGreen
-								|| iThemeBlue != s.nThemeBlue)) {
+								|| m_iUseDarkTheme == 1
+								|| m_iThemeBrightness != s.nThemeBrightness
+								|| m_iThemeRed != s.nThemeRed
+								|| m_iThemeGreen != s.nThemeGreen
+								|| m_iThemeBlue != s.nThemeBlue)) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
 					CRect r;
@@ -153,8 +153,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					m_bmUnderCtrl.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
-					if (iDisableXPToolbars == 1) {
-						iDisableXPToolbars++;
+					if (m_iUseDarkTheme == 1) {
+						m_iUseDarkTheme++;
 					}
 
 					memdc.BitBlt(r.left, r.top, r.Width(), r.Height(), &dc, r.left, r.top, SRCCOPY);
@@ -183,14 +183,14 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
-					if (iDisableXPToolbars == 0) {
-						iDisableXPToolbars++;
+					if (m_iUseDarkTheme == 0) {
+						m_iUseDarkTheme++;
 					}
 
-					iThemeBrightness = s.nThemeBrightness;
-					iThemeRed = s.nThemeRed;
-					iThemeGreen = s.nThemeGreen;
-					iThemeBlue = s.nThemeBlue;
+					m_iThemeBrightness = s.nThemeBrightness;
+					m_iThemeRed = s.nThemeRed;
+					m_iThemeGreen = s.nThemeGreen;
+					m_iThemeBlue = s.nThemeBlue;
 
 					int pa = 255 * 256;
 					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
@@ -302,7 +302,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					lr = CDRF_SKIPDEFAULT;
 				}
 				if (!s.bUseDarkTheme) {
-					iDisableXPToolbars = 0;
+					m_iUseDarkTheme = 0;
 				}
 				break;
 			default:

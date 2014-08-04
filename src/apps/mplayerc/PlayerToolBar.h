@@ -37,14 +37,15 @@ private:
 
 	CMPCPngImage m_BackGroundbm;
 
-	__int64		iDisableXPToolbars;
-	int			iMute;
+	int			m_iUseDarkTheme;
+	int			m_iMute;
 
-	CImageList	*m_pButtonsImages;
+	CImageList*	m_pButtonsImages;
 	HICON		m_hDXVAIcon;
 
-	int iDXVAIconHeight;
-	int iDXVAIconWidth;
+	int			m_iDXVAIconWidth;
+	int			m_iDXVAIconHeight;
+
 
 public:
 	CPlayerToolBar();

@@ -58,8 +58,8 @@ CPlayerToolBar::CPlayerToolBar()
 		delete bmp;
 	}
 
-	iDXVAIconHeight	= bm.bmHeight;
-	iDXVAIconWidth	= bm.bmWidth;
+	m_iDXVAIconWidth	= bm.bmWidth;
+	m_iDXVAIconHeight	= bm.bmHeight;
 
 	DeleteObject(hBmp);
 }
@@ -82,7 +82,7 @@ void CPlayerToolBar::SwitchTheme()
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	m_nButtonHeight = 16;
 
-	if (iDisableXPToolbars != (__int64)s.bUseDarkTheme) {
+	if (m_iUseDarkTheme != (__int64)s.bUseDarkTheme) {
 		VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
 
 		ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
@@ -109,7 +109,7 @@ void CPlayerToolBar::SwitchTheme()
 			SetButtonStyle(i, styles[i] | TBBS_DISABLED);
 		}
 
-		iDisableXPToolbars = s.bUseDarkTheme;
+		m_iUseDarkTheme = s.bUseDarkTheme;
 	}
 
 	if (s.bUseDarkTheme) {
@@ -260,8 +260,8 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
 
-	iDisableXPToolbars = 2;
-	iMute = 0;
+	m_iUseDarkTheme = 2;
+	m_iMute = 0;
 
 	SwitchTheme();
 
@@ -376,14 +376,14 @@ int CPlayerToolBar::GetVolume()
 {
 	int volume = m_volctrl.GetPos(), type = 0;
 
-	if (volume < 1 && !iMute) {
+	if (volume < 1 && !m_iMute) {
 		if (!IsMuted()) {
 			type++;
 		}
-		iMute = 1;
-	} else if (IsMuted() && volume > 0 && iMute) {
+		m_iMute = 1;
+	} else if (IsMuted() && volume > 0 && m_iMute) {
 		type++;
-		iMute = 0;
+		m_iMute = 0;
 	}
 
 	/*
@@ -563,7 +563,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			GetItemRect(12, &r12);
 
 			if (bGPU && m_hDXVAIcon) {
-				if (r10.right < r12.left - iDXVAIconWidth) DrawIconEx(dc.m_hDC, r12.left - 8 - iDXVAIconWidth, r.CenterPoint().y - (iDXVAIconHeight/2+1), m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
+				if (r10.right < r12.left - m_iDXVAIconWidth) DrawIconEx(dc.m_hDC, r12.left - 8 - m_iDXVAIconWidth, r.CenterPoint().y - (m_iDXVAIconHeight/2+1), m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.SelectObject(&penSaved);
@@ -646,7 +646,7 @@ void CPlayerToolBar::OnInitialUpdate()
 
 	m_volctrl.MoveWindow(vr2);
 
-	if (iDisableXPToolbars != (__int64)AfxGetAppSettings().bUseDarkTheme) {
+	if (m_iUseDarkTheme != (__int64)AfxGetAppSettings().bUseDarkTheme) {
 		SwitchTheme();
 	}
 
