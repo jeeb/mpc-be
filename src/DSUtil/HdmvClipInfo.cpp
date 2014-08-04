@@ -571,9 +571,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists)
 {
 	HRESULT hr = E_FAIL;
-
 	CString strPath(strFolder);
-	CString strFilter;
 
 	MainPlaylist.RemoveAll();
 	MPLSPlaylists.RemoveAll();
@@ -582,19 +580,13 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile
 	CPlaylist			PlaylistArray[1024];
 	int					idx = 0;
 	WIN32_FIND_DATA		fd = {0};
-
-	strPath.Replace(_T("\\PLAYLIST\\"), _T("\\"));
-	strPath.Replace(_T("\\STREAM\\"), _T("\\"));
-	strPath += _T("\\BDMV\\");
-	strFilter.Format (_T("%sPLAYLIST\\*.mpls"), strPath);
-
-	HANDLE hFind = FindFirstFile(strFilter, &fd);
+	HANDLE hFind = FindFirstFile(strPath + L"\\PLAYLIST\\*.mpls", &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		REFERENCE_TIME	rtMax = 0;
 		REFERENCE_TIME	rtCurrent;
 		CString			strCurrentPlaylist;
 		do {
-			strCurrentPlaylist.Format(_T("%sPLAYLIST\\%s"), strPath, fd.cFileName);
+			strCurrentPlaylist = strPath + L"\\PLAYLIST\\" + fd.cFileName;
 			Playlist.RemoveAll();
 
 			// Main movie shouldn't have duplicate M2TS filename ...

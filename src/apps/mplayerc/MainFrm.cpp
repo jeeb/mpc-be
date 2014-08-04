@@ -19513,42 +19513,37 @@ void CMainFrame::EnableShaders2(bool enable)
 	}
 }
 
-BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
+BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
 {
-	CHdmvClipInfo	ClipInfo;
-	CString			strPlaylistFile;
-	CHdmvClipInfo::CPlaylist MainPlaylist;
-
 	m_BDLabel.Empty();
-	m_LastOpenBDPath = Path;
+	m_LastOpenBDPath = path;
 
-	CString ext = GetFileExt(Path).MakeLower();
+	path.TrimRight('\\');
+	if (path.Right(11).MakeLower() == L"\\index.bdmv") {
+		path.Truncate(path.GetLength() - 11);
+	} else if (::PathIsDirectory(path + L"\\BDMV")) {
+		path += L"\\BDMV";
+	}
 
-	if ((::PathIsDirectory(Path) && Path.Find(_T("\\BDMV"))) || ::PathIsDirectory(Path + _T("\\BDMV")) || ext == _T(".bdmv")) {
-		if (ext == _T(".bdmv")) {
-			Path.Replace(_T("\\BDMV\\"), _T("\\"));
-			Path = GetFolderOnly(Path);
-		} else if (Path.Find(_T("\\BDMV"))) {
-			Path.Replace(_T("\\BDMV"), _T("\\"));
-		}
-		Path.TrimRight('\\');
+	if (::PathIsDirectory(path + L"\\PLAYLIST") && ::PathIsDirectory(path + L"\\STREAM")) {
+		CHdmvClipInfo	ClipInfo;
+		CString			strPlaylistFile;
+		CHdmvClipInfo::CPlaylist MainPlaylist;
 
-		if (m_iMediaLoadState != MLS_CLOSED) {
-			CloseMedia();
-		}
-
-		if (SUCCEEDED (ClipInfo.FindMainMovie(Path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
-			CString infFile = Path + L"\\disc.inf";
-			if (::PathFileExists(infFile)) {
-				CTextFile cf;
-				if (cf.Open(infFile)) {
-					CString line;
-					while (cf.ReadString(line)) {
-						CAtlList<CString> sl;
-						Explode(line, sl, '=');
-						if (sl.GetCount() == 2 && CString(sl.GetHead().Trim()).MakeLower() == L"label") {
-							m_BDLabel = sl.GetTail();
-							break;
+		if (SUCCEEDED (ClipInfo.FindMainMovie(path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
+			if (path.Right(5).MakeUpper() == L"\\BDMV") {
+				CString infFile = path.Left(path.GetLength() - 5) + L"\\disc.inf";
+				if (::PathFileExists(infFile)) {
+					CTextFile cf;
+					if (cf.Open(infFile)) {
+						CString line;
+						while (cf.ReadString(line)) {
+							CAtlList<CString> sl;
+							Explode(line, sl, '=');
+							if (sl.GetCount() == 2 && CString(sl.GetHead().Trim()).MakeLower() == L"label") {
+								m_BDLabel = sl.GetTail();
+								break;
+							}
 						}
 					}
 				}
@@ -19557,7 +19552,7 @@ BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 			{
 				CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
 				pMRU->ReadList();
-				pMRU->Add(Path);
+				pMRU->Add(path);
 				pMRU->WriteList();
 			}
 
