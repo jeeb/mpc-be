@@ -5602,6 +5602,7 @@ void CMainFrame::OnFileReOpen()
 	if (!m_LastOpenBDPath.IsEmpty() && OpenBD(m_LastOpenBDPath)) {
 		return;
 	}
+
 	OpenCurPlaylistItem();
 }
 
@@ -10777,53 +10778,54 @@ void CMainFrame::OnFavoritesAdd()
 
 		s.AddFav(FAV_FILE, str);
 	} else if (GetPlaybackMode() == PM_DVD) {
-		WCHAR path[_MAX_PATH];
+		WCHAR path[MAX_PATH] = { 0 };
 		ULONG len = 0;
-		m_pDVDI->GetDVDDirectory(path, _MAX_PATH, &len);
-		CString fn = path;
-		fn.TrimRight(_T("/\\"));
+		if (SUCCEEDED(m_pDVDI->GetDVDDirectory(path, _countof(path), &len))) {
+			CString fn = path;
+			fn.TrimRight(_T("/\\"));
 
-		DVD_PLAYBACK_LOCATION2 Location;
-		m_pDVDI->GetCurrentLocation(&Location);
-		CString desc;
-		desc.Format(_T("%s - T%02d C%02d - %02d:%02d:%02d"), fn, Location.TitleNum, Location.ChapterNum,
-					Location.TimeCode.bHours, Location.TimeCode.bMinutes, Location.TimeCode.bSeconds);
+			DVD_PLAYBACK_LOCATION2 Location;
+			m_pDVDI->GetCurrentLocation(&Location);
+			CString desc;
+			desc.Format(_T("%s - T%02d C%02d - %02d:%02d:%02d"), fn, Location.TitleNum, Location.ChapterNum,
+				Location.TimeCode.bHours, Location.TimeCode.bMinutes, Location.TimeCode.bSeconds);
 
-		CAtlList<CString> fnList;
-		fnList.AddTail(fn);
+			CAtlList<CString> fnList;
+			fnList.AddTail(fn);
 
-		CFavoriteAddDlg dlg(fnList, desc);
-		if (dlg.DoModal() != IDOK) {
-			return;
-		}
-
-		// Name
-		CString str = dlg.m_name;
-		str.Remove(';');
-
-		// RememberPos
-		CString pos(_T("0"));
-		if (dlg.m_bRememberPos) {
-			CDVDStateStream stream;
-			stream.AddRef();
-
-			CComPtr<IDvdState> pStateData;
-			CComQIPtr<IPersistStream> pPersistStream;
-			if (SUCCEEDED(m_pDVDI->GetState(&pStateData))
-					&& (pPersistStream = pStateData)
-					&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
-				pos = BinToCString(stream.m_data.GetData(), stream.m_data.GetCount());
+			CFavoriteAddDlg dlg(fnList, desc);
+			if (dlg.DoModal() != IDOK) {
+				return;
 			}
+
+			// Name
+			CString str = dlg.m_name;
+			str.Remove(';');
+
+			// RememberPos
+			CString pos(_T("0"));
+			if (dlg.m_bRememberPos) {
+				CDVDStateStream stream;
+				stream.AddRef();
+
+				CComPtr<IDvdState> pStateData;
+				CComQIPtr<IPersistStream> pPersistStream;
+				if (SUCCEEDED(m_pDVDI->GetState(&pStateData))
+						&& (pPersistStream = pStateData)
+						&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
+					pos = BinToCString(stream.m_data.GetData(), stream.m_data.GetCount());
+				}
+			}
+
+			str += ';';
+			str += pos;
+
+			// Paths
+			str += ';';
+			str += fn;
+
+			s.AddFav(FAV_DVD, str);
 		}
-
-		str += ';';
-		str += pos;
-
-		// Paths
-		str += ';';
-		str += fn;
-
-		s.AddFav(FAV_DVD, str);
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
 		// TODO
 	}
@@ -10904,47 +10906,48 @@ void CMainFrame::OnFavoritesQuickAddFavorite()
 
 		osdMsg = ResStr(IDS_FILE_FAV_ADDED);
 	} else if (GetPlaybackMode() == PM_DVD) {
-		WCHAR path[_MAX_PATH];
+		WCHAR path[MAX_PATH] = { 0 };
 		ULONG len = 0;
-		m_pDVDI->GetDVDDirectory(path, _MAX_PATH, &len);
-		CString fn = path;
-		fn.TrimRight(_T("/\\"));
+		if (SUCCEEDED(m_pDVDI->GetDVDDirectory(path, _countof(path), &len))) {
+			CString fn = path;
+			fn.TrimRight(_T("/\\"));
 
-		DVD_PLAYBACK_LOCATION2 Location;
-		m_pDVDI->GetCurrentLocation(&Location);
-		CString desc;
-		desc.Format(_T("%s - T%02d C%02d - %02d:%02d:%02d"), fn, Location.TitleNum, Location.ChapterNum,
-					Location.TimeCode.bHours, Location.TimeCode.bMinutes, Location.TimeCode.bSeconds);
+			DVD_PLAYBACK_LOCATION2 Location;
+			m_pDVDI->GetCurrentLocation(&Location);
+			CString desc;
+			desc.Format(_T("%s - T%02d C%02d - %02d:%02d:%02d"), fn, Location.TitleNum, Location.ChapterNum,
+				Location.TimeCode.bHours, Location.TimeCode.bMinutes, Location.TimeCode.bSeconds);
 
-		// Name
-		CString str = s.bFavRememberPos ? desc : fn;
-		str.Remove(';');
+			// Name
+			CString str = s.bFavRememberPos ? desc : fn;
+			str.Remove(';');
 
-		// RememberPos
-		CString pos(_T("0"));
-		if (s.bFavRememberPos) {
-			CDVDStateStream stream;
-			stream.AddRef();
+			// RememberPos
+			CString pos(_T("0"));
+			if (s.bFavRememberPos) {
+				CDVDStateStream stream;
+				stream.AddRef();
 
-			CComPtr<IDvdState> pStateData;
-			CComQIPtr<IPersistStream> pPersistStream;
-			if (SUCCEEDED(m_pDVDI->GetState(&pStateData))
-					&& (pPersistStream = pStateData)
-					&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
-				pos = BinToCString(stream.m_data.GetData(), stream.m_data.GetCount());
+				CComPtr<IDvdState> pStateData;
+				CComQIPtr<IPersistStream> pPersistStream;
+				if (SUCCEEDED(m_pDVDI->GetState(&pStateData))
+						&& (pPersistStream = pStateData)
+						&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
+					pos = BinToCString(stream.m_data.GetData(), stream.m_data.GetCount());
+				}
 			}
+
+			str += ';';
+			str += pos;
+
+			// Paths
+			str += ';';
+			str += fn;
+
+			s.AddFav(FAV_DVD, str);
+
+			osdMsg = ResStr(IDS_DVD_FAV_ADDED);
 		}
-
-		str += ';';
-		str += pos;
-
-		// Paths
-		str += ';';
-		str += fn;
-
-		s.AddFav(FAV_DVD, str);
-
-		osdMsg = ResStr(IDS_DVD_FAV_ADDED);
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
 		// TODO
 	}
@@ -11110,7 +11113,7 @@ void CMainFrame::OnRecentFile(UINT nID)
 		return;
 	}
 
-	if (OpenBD(str)) {
+	if (OpenBD(str) || OpenIso(str)) {
 		return;
 	}
 
@@ -13021,7 +13024,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (s.fKeepHistory && m_LastOpenBDPath.IsEmpty()) {
+		if (s.fKeepHistory && pOFD->bAddRecent) {
 			CRecentFileList* pMRU = fFirst ? &s.MRU : &s.MRUDub;
 			pMRU->ReadList();
 			pMRU->Add(fn);
@@ -13353,17 +13356,13 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 		return ResStr(IDS_AG_FAILED);
 	}
 
-	WCHAR buff[_MAX_PATH];
+	WCHAR buff[MAX_PATH] = { 0 };
 	ULONG len = 0;
 	if (SUCCEEDED(hr = m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
-		pODD->title = CString(CStringW(buff));
+		pODD->title = CString(buff);
 		pODD->title.TrimRight('\\');
+		AddRecent(pODD->title);
 	}
-
-	CRecentFileList* pMRU = &s.MRU;
-	pMRU->ReadList();
-	pMRU->Add(pODD->title);
-	pMRU->WriteList();
 
 	// TODO: resetdvd
 	m_pDVDC->SetOption(DVD_ResetOnStop, FALSE);
@@ -18084,7 +18083,7 @@ void CMainFrame::SendStatusMessage(CString msg, int nTimeOut)
 	m_Lcd.SetStatusMessage(msg, nTimeOut);
 }
 
-BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart)
+BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, BOOL bAddRecent/* = TRUE*/)
 {
 	if (m_wndPlaylistBar.GetCount() == 0) {
 		return FALSE;
@@ -18100,6 +18099,7 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart)
 
 	CAutoPtr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
 	if (p) {
+		p->bAddRecent = bAddRecent;
 		OpenMedia(p);
 	}
 
@@ -19523,7 +19523,7 @@ void CMainFrame::EnableShaders2(bool enable)
 	}
 }
 
-BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
+BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/, BOOL bAddRecent/* = TRUE*/)
 {
 	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
@@ -19560,11 +19560,12 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
 				}
 			}
 
-			{
+			if (AfxGetAppSettings().fKeepHistory && bAddRecent) {
 				CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
 				pMRU->ReadList();
 				pMRU->Add(path);
 				pMRU->WriteList();
+				SHAddToRecentDocs(SHARD_PATH, path);
 			}
 
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
@@ -19574,7 +19575,7 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
 			CAtlList<CString> sl;
 			sl.AddTail(strPlaylistFile);
 			m_wndPlaylistBar.Open(sl, false);
-			if (OpenCurPlaylistItem(rtStart)) {
+			if (OpenCurPlaylistItem(rtStart, FALSE)) {
 				return TRUE;
 			}
 		}
@@ -20346,7 +20347,7 @@ void CMainFrame::MakeBDLabel(CString path, CString& label, CString* pBDlabel)
 
 void CMainFrame::MakeDVDLabel(CString& label, CString* pDVDlabel)
 {
-	WCHAR buff[MAX_PATH];
+	WCHAR buff[MAX_PATH] = { 0 };
 	ULONG len = 0;
 	if (m_pDVDI && SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
 		CString DVDPath(buff);
@@ -20416,14 +20417,18 @@ BOOL CMainFrame::OpenIso(CString pathName)
 		TCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
 		if (diskletter) {
 
-			if (OpenBD(CString(diskletter) + L":\\")) {
+			if (OpenBD(CString(diskletter) + L":\\", INVALID_TIME, FALSE)) {
+				AddRecent(pathName);
 				return TRUE;
 			}
 
 			if (::PathFileExists(CString(diskletter) + L":\\VIDEO_TS\\VIDEO_TS.IFO")) {
 				CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 				p->path = CString(diskletter) + L":\\";
+				p->bAddRecent = FALSE;
 				OpenMedia(p);
+
+				AddRecent(pathName);
 				return TRUE;
 			}
 
@@ -20436,7 +20441,9 @@ BOOL CMainFrame::OpenIso(CString pathName)
 					FindClose(hFind);
 
 					m_wndPlaylistBar.Open(sl, false);
-					OpenCurPlaylistItem();
+					OpenCurPlaylistItem(INVALID_TIME, FALSE);
+
+					AddRecent(pathName);
 					return TRUE;
 				}
 			}
@@ -20446,6 +20453,17 @@ BOOL CMainFrame::OpenIso(CString pathName)
 	}
 
 	return FALSE;
+}
+
+void CMainFrame::AddRecent(CString pathName)
+{
+	if (AfxGetAppSettings().fKeepHistory) {
+		CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
+		pMRU->ReadList();
+		pMRU->Add(pathName);
+		pMRU->WriteList();
+		SHAddToRecentDocs(SHARD_PATH, pathName);
+	}
 }
 
 void CMainFrame::CheckMenuRadioItem(UINT first, UINT last, UINT check)

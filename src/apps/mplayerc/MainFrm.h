@@ -92,6 +92,8 @@ public:
 	virtual ~OpenMediaData() {} // one virtual funct is needed to enable rtti
 	CString title;
 	CAtlList<CString> subs;
+
+	BOOL bAddRecent = TRUE;
 };
 
 class OpenFileData : public OpenMediaData
@@ -105,7 +107,7 @@ public:
 class OpenDVDData : public OpenMediaData
 {
 public:
-	//	OpenDVDData() {}
+	// OpenDVDData() {}
 	CString path;
 	CComPtr<IDvdState> pDvdState;
 };
@@ -537,7 +539,7 @@ protected:
 	DWORD	m_dwLastRun;
 
 public:
-	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME);
+	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void PlayFavoriteFile(CString fav);
 	void PlayFavoriteDVD(CString fav);
@@ -1183,7 +1185,7 @@ public:
 
 	CHdmvClipInfo::CPlaylist m_MPLSPlaylist;
 	BOOL m_bIsBDPlay;
-	BOOL OpenBD(CString Path, REFERENCE_TIME rtStart = INVALID_TIME);
+	BOOL OpenBD(CString Path, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 
 	IBaseFilter*	GetVSFilter();
 	bool			b_UseVSFilter;
@@ -1241,4 +1243,6 @@ public:
 protected:
 	DiskImage	m_DiskImage;
 	BOOL		OpenIso(CString pathName);
+
+	void		AddRecent(CString pathName);
 };
