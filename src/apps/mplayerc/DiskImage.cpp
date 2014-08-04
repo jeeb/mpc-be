@@ -137,7 +137,7 @@ bool DiskImage::CheckExtension(LPCTSTR pathName)
 		ext = L".iso.wv";
 	}
 
-	if (m_DriveType == WIN8 && ext == L".iso") {
+	if (m_DriveType == WIN8 && (ext == L".iso" || ext == L".iso.wv")) {
 		return true;
 	}
 #if ENABLE_DTLITE_SUPPORT
@@ -201,9 +201,7 @@ void DiskImage::UnmountDiskImage()
 
 TCHAR DiskImage::MountWin8(LPCTSTR pathName)
 {
-	if (m_hVirtualDiskModule
-			&& GetFileExt(pathName).MakeLower() == L".iso"
-			&& ::PathFileExists(pathName)) {
+	if (m_hVirtualDiskModule && ::PathFileExists(pathName)) {
 		CString ISOVolumeName;
 
 		VIRTUAL_STORAGE_TYPE vst;
