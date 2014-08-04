@@ -5350,24 +5350,13 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 		m_wndPlaylistBar.Open(sl, true);
 		OpenCurPlaylistItem();
 	} else if (!s.slFiles.IsEmpty()) {
-		CAtlList<CString> sl;
-		sl.AddTailList(&s.slFiles);
-
-		ParseDirs(sl);
-
-		bool fMulti = sl.GetCount() > 1;
-
-		if (!fMulti) {
-			sl.AddTailList(&s.slDubs);
-		}
-
-		if (!fMulti && (OpenBD(s.slFiles.GetHead()) || OpenIso(s.slFiles.GetHead()))) {
+		if (s.slFiles.GetCount() == 1 && (OpenBD(s.slFiles.GetHead()) || OpenIso(s.slFiles.GetHead()))) {
 			if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
 				SetForegroundWindow();
 			}
 			s.nCLSwitches &= ~CLSW_NOFOCUS;
 			return true;
-		} else if (!fMulti && ::PathIsDirectory(s.slFiles.GetHead() + _T("\\VIDEO_TS"))) {
+		} else if (s.slFiles.GetCount() == 1 && ::PathIsDirectory(s.slFiles.GetHead() + _T("\\VIDEO_TS"))) {
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			fSetForegroundWindow = true;
 
@@ -5378,6 +5367,16 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			}
 			OpenMedia(p);
 		} else {
+			CAtlList<CString> sl;
+			sl.AddTailList(&s.slFiles);
+
+			ParseDirs(sl);
+			bool fMulti = sl.GetCount() > 1;
+
+			if (!fMulti) {
+				sl.AddTailList(&s.slDubs);
+			}
+
 			if (m_dwLastRun && ((GetTickCount() - m_dwLastRun) < 500)) {
 				s.nCLSwitches |= CLSW_ADD;
 			}
@@ -5694,9 +5693,9 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 		return;
 	}
 
-	if (sl.GetCount() == 1) {
+	{
 		CString path = sl.GetHead();
-		if (OpenBD(path) || OpenIso(path)) {
+		if (OpenBD(path) || (sl.GetCount() == 1 && OpenIso(path))) {
 			return;
 		}
 	}
@@ -10474,13 +10473,11 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			while (pos) {
 				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
 				if (idx == id) {
-					if (m_iMediaLoadState != MLS_CLOSED) {
-						CloseMedia();
-					}
-
+					SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					m_bIsBDPlay = TRUE;
+
 					CAtlList<CString> sl;
-					sl.AddTail(CString(Item->m_strFileName));
+					sl.AddTail(Item->m_strFileName);
 					m_wndPlaylistBar.Open(sl, false);
 					OpenCurPlaylistItem();
 					return;
@@ -19529,7 +19526,7 @@ void CMainFrame::EnableShaders2(bool enable)
 BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
 {
 	m_BDLabel.Empty();
-	m_LastOpenBDPath = path;
+	m_LastOpenBDPath.Empty();
 
 	path.TrimRight('\\');
 	if (path.Right(11).MakeLower() == L"\\index.bdmv") {
@@ -19545,7 +19542,8 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
 
 		if (SUCCEEDED (ClipInfo.FindMainMovie(path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
 			if (path.Right(5).MakeUpper() == L"\\BDMV") {
-				CString infFile = path.Left(path.GetLength() - 5) + L"\\disc.inf";
+				path.Truncate(path.GetLength() - 5);
+				CString infFile = path + L"\\disc.inf";
 				if (::PathFileExists(infFile)) {
 					CTextFile cf;
 					if (cf.Open(infFile)) {
@@ -19569,7 +19567,10 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
 				pMRU->WriteList();
 			}
 
+			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			m_bIsBDPlay = TRUE;
+			m_LastOpenBDPath = path;
+
 			CAtlList<CString> sl;
 			sl.AddTail(strPlaylistFile);
 			m_wndPlaylistBar.Open(sl, false);
@@ -19580,6 +19581,7 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart)
 	}
 
 	m_bIsBDPlay = FALSE;
+	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
 	return FALSE;
 }
