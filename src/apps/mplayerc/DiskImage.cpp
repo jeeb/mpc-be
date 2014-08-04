@@ -122,7 +122,7 @@ const LPCTSTR DiskImage::GetExts()
 	}
 #if ENABLE_DTLITE_SUPPORT
 	if (m_DriveType == DTLITE) {
-		return _T("*.iso;*.nrg");
+		return _T("*.iso;*.nrg;*.mdf;*.isz;*.ccd");
 	}
 #endif
 
@@ -141,7 +141,7 @@ bool DiskImage::CheckExtension(LPCTSTR pathName)
 		return true;
 	}
 #if ENABLE_DTLITE_SUPPORT
-	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".iso.wv" || ext == L".nrg")) {
+	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg" || ext == L".mdf" || ext == L".isz" || ext == L".ccd" || ext == L".iso.wv")) {
 		return true;
 	}
 #endif
