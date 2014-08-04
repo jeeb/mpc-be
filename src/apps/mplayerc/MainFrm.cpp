@@ -1270,9 +1270,11 @@ LRESULT CMainFrame::OnTaskBarThumbnailsCreate(WPARAM, LPARAM)
 LRESULT CMainFrame::OnQueryCancelAutoPlay(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == m_DiskImage.GetDriveLetter() - 'A') {
-		return 0;
+		DbgLog((LOG_TRACE, 3, L"CMainFrame: block autopay for %C:\\", (PCHAR)wParam + 'A'));
+		return TRUE;
 	} else {
-		return -1;
+		DbgLog((LOG_TRACE, 3, L"CMainFrame: allow autopay for %C:\\", (PCHAR)wParam + 'A'));
+		return FALSE;
 	}
 }
 
