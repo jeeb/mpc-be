@@ -1057,11 +1057,14 @@ HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 	CStreamSwitcherInputPin* pIn = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetInputPin();
 	CMediaType mt;
 	if (SUCCEEDED(hr) && pIn && pIn->IsConnected()
-			&& SUCCEEDED(pIn->GetConnected()->ConnectionMediaType(&mt)) && m_mt != mt) {
-		if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
-			hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
-		} else {
-			hr = VFW_E_TYPE_NOT_ACCEPTED;
+			&& SUCCEEDED(pIn->GetConnected()->ConnectionMediaType(&mt))) {
+		CorrectWaveFormatEx(&mt);
+		if (m_mt != mt) {
+			if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
+				hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
+			} else {
+				hr = VFW_E_TYPE_NOT_ACCEPTED;
+			}
 		}
 	}
 
