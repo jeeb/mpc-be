@@ -237,18 +237,13 @@ __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 	REFERENCE_TIME pos = -1;
 	CRect r = GetChannelRect();
 
-	if (r.left >= r.right) {
-		pos = -1;
-	} else if (point.x < r.left) {
+	if (point.x < r.left) {
 		pos = m_start;
 	} else if (point.x >= r.right) {
 		pos = m_stop;
-	} else {
-		REFERENCE_TIME w = r.right - r.left;
-
-		if (m_start < m_stop) {
-			pos = m_start + ((m_stop - m_start) * (point.x - r.left) + (w / 2)) / w;
-		}
+	} else if (m_start < m_stop) {
+		LONG w = r.right - r.left;
+		pos = m_start + ((m_stop - m_start) * (point.x - r.left) + (w / 2)) / w;
 	}
 
 	return pos;
