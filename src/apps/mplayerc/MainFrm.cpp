@@ -5385,7 +5385,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
 				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
 
-				if (s.nCLSwitches&(CLSW_OPEN|CLSW_PLAY)) {
+				if (s.nCLSwitches&(CLSW_OPEN | CLSW_PLAY)) {
 					m_wndPlaylistBar.SetLast();
 					OpenCurPlaylistItem();
 				}
@@ -5416,6 +5416,8 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 	}
 
 	s.nCLSwitches &= ~CLSW_NOFOCUS;
+
+	UpdateThumbarButton();
 
 	return TRUE;
 }
@@ -11768,6 +11770,8 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		SetWindowPlacement(&wp);
 		ShowWindow(SW_MAXIMIZE);
 	}
+
+	UpdateThumbarButton();
 }
 
 void CMainFrame::AutoChangeMonitorMode()
@@ -19353,7 +19357,7 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 	}
 
 	RECT vid_rect, result_rect;
-	m_wndView.GetClientRect( &vid_rect );
+	m_wndView.GetClientRect(&vid_rect);
 
 	// NOTE: For remove menu from thumbnail clip preview, only if it's present
 	result_rect.left	= 2;
