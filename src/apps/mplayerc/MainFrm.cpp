@@ -5516,7 +5516,7 @@ void CMainFrame::OnFileOpenIso()
 		DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT;
 
 		CString szFilter;
-		szFilter.Format(_T("Iso Files (%ws)|%ws||"), m_DiskImage.GetExts(), m_DiskImage.GetExts());
+		szFilter.Format(_T("Image Files (%s)|%s||"), m_DiskImage.GetExts(), m_DiskImage.GetExts());
 		CFileDialog fd(TRUE, NULL, NULL, dwFlags, szFilter);
 		if (fd.DoModal() != IDOK) {
 			return;
@@ -19566,12 +19566,8 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 				}
 			}
 
-			if (AfxGetAppSettings().fKeepHistory && bAddRecent) {
-				CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
-				pMRU->ReadList();
-				pMRU->Add(path);
-				pMRU->WriteList();
-				SHAddToRecentDocs(SHARD_PATH, path);
+			if (bAddRecent) {
+				AddRecent(path);
 			}
 
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
