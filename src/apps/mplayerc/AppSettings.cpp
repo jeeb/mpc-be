@@ -738,7 +738,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, fGlobalMedia);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEXPTOOLBARS, fDisableXPToolbars);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEXPTOOLBARS, bUseDarkTheme);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeBrightness"), nThemeBrightness);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeRed"), nThemeRed);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), nThemeGreen);
@@ -1306,7 +1306,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fUIce = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_UICE, 0);
 	fGlobalMedia = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, 1);
 
-	fDisableXPToolbars = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEXPTOOLBARS, 1);
+	bUseDarkTheme = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEXPTOOLBARS, 1);
 	nThemeBrightness = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBrightness"), 15);
 	nThemeRed = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeRed"), 256);
 	nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), 256);

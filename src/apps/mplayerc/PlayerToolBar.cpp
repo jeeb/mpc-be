@@ -82,7 +82,7 @@ void CPlayerToolBar::SwitchTheme()
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	m_nButtonHeight = 16;
 
-	if (iDisableXPToolbars != (__int64)s.fDisableXPToolbars) {
+	if (iDisableXPToolbars != (__int64)s.bUseDarkTheme) {
 		VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
 
 		ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
@@ -109,10 +109,10 @@ void CPlayerToolBar::SwitchTheme()
 			SetButtonStyle(i, styles[i] | TBBS_DISABLED);
 		}
 
-		iDisableXPToolbars = s.fDisableXPToolbars;
+		iDisableXPToolbars = s.bUseDarkTheme;
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 
@@ -156,7 +156,7 @@ void CPlayerToolBar::SwitchTheme()
 
 	HBITMAP hBmp = NULL;
 	bool fp = CMPCPngImage::FileExists(CString(L"toolbar"));
-	if (s.fDisableXPToolbars && !fp) {
+	if (s.bUseDarkTheme && !fp) {
 		/*
 		int col = s.clrFaceABGR;
 		int r, g, b, R, G, B;
@@ -174,7 +174,7 @@ void CPlayerToolBar::SwitchTheme()
 		::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 
 		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
-			if (s.fDisableXPToolbars) {
+			if (s.bUseDarkTheme) {
 				hBmp = CMPCPngImage::LoadExternalImage(L"", IDB_PLAYERTOOLBAR_PNG, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 				::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 			} else {
@@ -210,7 +210,7 @@ void CPlayerToolBar::SwitchTheme()
 		DeleteObject(hBmp);
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		if (!fDisableImgListRemap) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);// 0 Remap Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);// 1 Remap Disabled
@@ -451,7 +451,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	int sep[] = {2, 7, 10, 11};
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
@@ -637,7 +637,7 @@ void CPlayerToolBar::OnInitialUpdate()
 	GetClientRect(&r);
 	br = GetBorders();
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (AfxGetAppSettings().bUseDarkTheme) {
 		int nBMedian = r.bottom - 3 - 0.5 * m_nButtonHeight;
 		vr2.SetRect(r.right + br.right - 60, nBMedian - 14, r.right + br.right + 6, nBMedian + 10);
 	} else {
@@ -646,7 +646,7 @@ void CPlayerToolBar::OnInitialUpdate()
 
 	m_volctrl.MoveWindow(vr2);
 
-	if (iDisableXPToolbars != (__int64)AfxGetAppSettings().fDisableXPToolbars) {
+	if (iDisableXPToolbars != (__int64)AfxGetAppSettings().bUseDarkTheme) {
 		SwitchTheme();
 	}
 
@@ -702,7 +702,7 @@ void CPlayerToolBar::OnNcPaint()
 
 	pDC->ExcludeClipRect(&cr);
 
-	if (!AfxGetAppSettings().fDisableXPToolbars) {
+	if (!AfxGetAppSettings().bUseDarkTheme) {
 		pDC->FillSolidRect(wr, GetSysColor(COLOR_BTNFACE));
 	}
 

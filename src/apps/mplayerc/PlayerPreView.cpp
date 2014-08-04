@@ -136,7 +136,7 @@ void CPreView::OnPaint()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(95, 100, 105, r1, g1, b1);
 		ThemeRGB(25, 30, 35, r2, g2, b2);
 	} else {
@@ -149,7 +149,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(0,i,rcBar.Width(),1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(145, 140, 145, r1, g1, b1);
 		ThemeRGB(115, 120, 125, r2, g2, b2);
 	} else {
@@ -162,7 +162,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(i,0,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(15, 20, 25, r1, g1, b1);
 		ThemeRGB(55, 60, 65, r2, g2, b2);
 	} else {
@@ -175,7 +175,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(i,hc,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(35, 40, 45, r1, g1, b1);
 		ThemeRGB(55, 60, 65, r2, g2, b2);
 	} else {
@@ -188,7 +188,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(i,rcBar.bottom-wb-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(0, 5, 10, r1, g1, b1);
 		ThemeRGB(10, 15, 20, r2, g2, b2);
 	} else {
@@ -201,7 +201,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(i,rcBar.bottom-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(145, 150, 155, r1, g1, b1);
 		ThemeRGB(45, 50, 55, r2, g2, b2);
 	} else {
@@ -214,7 +214,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(0,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(55, 60, 65, r1, g1, b1);
 		ThemeRGB(15, 20, 25, r2, g2, b2);
 	} else {
@@ -227,7 +227,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(wb,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(105, 110, 115, r1, g1, b1);
 		ThemeRGB(55, 60, 65, r2, g2, b2);
 	} else {
@@ -240,7 +240,7 @@ void CPreView::OnPaint()
 		mdc.FillSolidRect(rcBar.right-wb-1,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(65, 70, 75, r1, g1, b1);
 		ThemeRGB(5, 10, 15, r2, g2, b2);
 	} else {
@@ -256,7 +256,7 @@ void CPreView::OnPaint()
 	// text (time)
 	CFont font;
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(255, 255, 255, r1, g1, b1);
 	} else {
 		r1 = GetRValue(0);

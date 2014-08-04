@@ -146,7 +146,7 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		if (m_pos == pos || m_stop <= pos) {
 			return;
 		}
@@ -160,7 +160,7 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 	CRect after = GetThumbRect();
 
 	if (before != after) {
-		if (!s.fDisableXPToolbars) {
+		if (!s.bUseDarkTheme) {
 			InvalidateRect (before | after);
 		}
 	}
@@ -170,7 +170,7 @@ void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		if (m_pos2 == pos || m_stop <= pos) {
 			return;
 		}
@@ -184,7 +184,7 @@ void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 	CRect after = GetThumbRect();
 
 	if (before != after) {
-		if (!s.fDisableXPToolbars) {
+		if (!s.bUseDarkTheme) {
 			InvalidateRect (before | after);
 		}
 	}
@@ -195,7 +195,7 @@ CRect CPlayerSeekBar::GetChannelRect()
 	CRect r;
 	GetClientRect(&r);
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (AfxGetAppSettings().bUseDarkTheme) {
 		//r.DeflateRect(1,1,1,1);
 	} else {
 		r.DeflateRect(8, 9, 9, 0);
@@ -212,7 +212,7 @@ CRect CPlayerSeekBar::GetThumbRect()
 	int x = r.left + (int)((m_start < m_stop) ? (REFERENCE_TIME)r.Width() * (m_pos - m_start) / (m_stop - m_start) : 0);
 	int y = r.CenterPoint().y;
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (AfxGetAppSettings().bUseDarkTheme) {
 		 r.SetRect(x, y - 2, x + 3, y + 3);
 	} else {
 		r.SetRect(x, y, x, y);
@@ -314,7 +314,7 @@ void CPlayerSeekBar::OnPaint()
 
 	bool fEnabled = m_fEnabled && m_start < m_stop;
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		CRect rt;
 		CString str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->GetStrForTitle();
 		CDC memdc;
@@ -596,7 +596,7 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (pFrame->ValidateSeek(pos, m_stop)) {
 
-		if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
+		if (AfxGetAppSettings().bUseDarkTheme && m_fEnabled) {
 			SetCapture();
 			MoveThumb(point);
 		} else {
@@ -624,7 +624,7 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 	if (((CMainFrame*)GetParentFrame())->ValidateSeek(pos, m_stop)) {
 
-		if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
+		if (AfxGetAppSettings().bUseDarkTheme && m_fEnabled) {
 			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		}
 	}
@@ -700,7 +700,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 			MoveThumb(point);
 		}
 
-		if (!s.fDisableXPToolbars) {
+		if (!s.bUseDarkTheme) {
 			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
 		}
 	}
@@ -906,7 +906,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 		CAutoLock lock(&m_CBLock);
 
 		strChap.Empty();
-		if (AfxGetAppSettings().fDisableXPToolbars
+		if (AfxGetAppSettings().bUseDarkTheme
 			&& AfxGetAppSettings().fChapterMarker
 			/*&& AfxGetAppSettings().fFileNameOnSeekBar*/
 			&& m_pChapterBag && m_pChapterBag->ChapGetCount()) {

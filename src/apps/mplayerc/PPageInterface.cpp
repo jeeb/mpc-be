@@ -30,7 +30,7 @@
 IMPLEMENT_DYNAMIC(CPPageInterface, CPPageBase)
 CPPageInterface::CPPageInterface()
 	: CPPageBase(CPPageInterface::IDD, CPPageInterface::IDD)
-	, m_fDisableXPToolbars(FALSE)
+	, m_bUseDarkTheme(FALSE)
 	, m_nThemeBrightness(0)
 	, m_nThemeRed(255)
 	, m_nThemeGreen(255)
@@ -61,8 +61,8 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Check(pDX, IDC_CHECK3, m_fDisableXPToolbars);
-	DDX_Control(pDX, IDC_CHECK3, m_fDisableXPToolbarsCtrl);
+	DDX_Check(pDX, IDC_CHECK3, m_bUseDarkTheme);
+	DDX_Control(pDX, IDC_CHECK3, m_UseDarkThemeCtrl);
 	DDX_Slider(pDX, IDC_SLIDER1, m_nThemeBrightness);
 	DDX_Slider(pDX, IDC_SLIDER2, m_nThemeRed);
 	DDX_Slider(pDX, IDC_SLIDER3, m_nThemeGreen);
@@ -107,7 +107,7 @@ BOOL CPPageInterface::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_fDisableXPToolbars	= s.fDisableXPToolbars;
+	m_bUseDarkTheme	= s.bUseDarkTheme;
 	m_nThemeBrightness		= m_nThemeBrightness_Old	= s.nThemeBrightness;
 	m_nThemeRed				= m_nThemeRed_Old			= s.nThemeRed;
 	m_nThemeGreen			= m_nThemeGreen_Old			= s.nThemeGreen;
@@ -211,9 +211,9 @@ BOOL CPPageInterface::OnApply()
 	ApplyOSDTransparent();
 
 	HWND WndToolBar			= ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
-	BOOL fDisableXPToolbars	= s.fDisableXPToolbars;
-	s.fDisableXPToolbars	= !!m_fDisableXPToolbars;
-	if (::IsWindow(WndToolBar) && (s.fDisableXPToolbars != !!fDisableXPToolbars)) {
+	BOOL bUseDarkTheme	= s.bUseDarkTheme;
+	s.bUseDarkTheme	= !!m_bUseDarkTheme;
+	if (::IsWindow(WndToolBar) && (s.bUseDarkTheme != !!bUseDarkTheme)) {
 		::PostMessage(WndToolBar,								WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 		::PostMessage(((CMainFrame*)AfxGetMainWnd())->m_hWnd,	WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 	}
@@ -345,11 +345,11 @@ END_MESSAGE_MAP()
 
 void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 {
-	GetDlgItem(IDC_BUTTON_CLRFACE)->EnableWindow(m_fDisableXPToolbars);
-	GetDlgItem(IDC_BUTTON_CLROUTLINE)->EnableWindow(m_fDisableXPToolbars);
-	GetDlgItem(IDC_BUTTON_CLRDEFAULT)->EnableWindow(m_fDisableXPToolbars);
-	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(m_fDisableXPToolbars);
-	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(m_fDisableXPToolbars);
+	GetDlgItem(IDC_BUTTON_CLRFACE)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_BUTTON_CLROUTLINE)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_BUTTON_CLRDEFAULT)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(m_bUseDarkTheme);
 }
 
 void CPPageInterface::OnCheckShadow()

@@ -645,7 +645,7 @@ public:
 	STSStyle		subdefstyle;
 
 	// Interface
-	bool			fDisableXPToolbars;
+	bool			bUseDarkTheme;
 	int				nThemeBrightness;
 	int				nThemeRed;
 	int				nThemeGreen;

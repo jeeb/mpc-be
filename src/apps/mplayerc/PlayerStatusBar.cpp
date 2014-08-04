@@ -83,7 +83,7 @@ void CPlayerStatusBar::Relayout()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	if (!s.fDisableXPToolbars) {
+	if (!s.bUseDarkTheme) {
 		m_type.ShowWindow(/*SW_SHOW*/SW_HIDE);
 		m_status.ShowWindow(SW_SHOW);
 		m_time.ShowWindow(SW_SHOW);
@@ -294,7 +294,7 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 	AppSettings& s = AfxGetAppSettings();
 	CRect r;
 
-	if (!s.fDisableXPToolbars) {
+	if (!s.bUseDarkTheme) {
 		for (CWnd* pChild = GetWindow(GW_CHILD); pChild; pChild = pChild->GetNextWindow()) {
 			if (!pChild->IsWindowVisible()) {
 				continue;
@@ -337,7 +337,7 @@ void CPlayerStatusBar::OnPaint()
 	AppSettings& s = AfxGetAppSettings();
 	CRect r;
 
-	if (!s.fDisableXPToolbars) {
+	if (!s.bUseDarkTheme) {
 		if (m_bm.m_hObject) {
 			BITMAP bm;
 			m_bm.GetBitmap(&bm);
@@ -495,7 +495,7 @@ HBRUSH CPlayerStatusBar::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = CDialogBar::OnCtlColor(pDC, pWnd, nCtlColor);
 
-	if (!AfxGetAppSettings().fDisableXPToolbars) {
+	if (!AfxGetAppSettings().bUseDarkTheme) {
 		if (*pWnd == m_type) {
 			hbr = GetStockBrush(BLACK_BRUSH);
 		}

@@ -54,7 +54,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(s.nVolumeStep);
 	SetLineSize(0);
 
-	iDisableXPToolbars = s.fDisableXPToolbars + 1;
+	iDisableXPToolbars = s.bUseDarkTheme + 1;
 
 	iThemeBrightness = s.nThemeBrightness;
 	iThemeRed = s.nThemeRed;
@@ -114,7 +114,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 	if (m_fSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
-				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL
+				if (s.bUseDarkTheme && (m_bmUnderCtrl.GetSafeHandle() == NULL
 								|| iDisableXPToolbars == 1
 								|| iThemeBrightness != s.nThemeBrightness
 								|| iThemeRed != s.nThemeRed
@@ -172,7 +172,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 			case CDDS_ITEMPREPAINT:
 			case CDDS_POSTPAINT:
-				if (s.fDisableXPToolbars && m_bmUnderCtrl.GetSafeHandle() != NULL) {
+				if (s.bUseDarkTheme && m_bmUnderCtrl.GetSafeHandle() != NULL) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
 					CRect r;
@@ -258,7 +258,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					lr = CDRF_SKIPDEFAULT;
 					m_fSetRedraw = false;
-				} else if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL) {
+				} else if (!s.bUseDarkTheme && pNMCD->dwItemSpec == TBCD_CHANNEL) {
 					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
 						m_bmUnderCtrl.DeleteObject();
 					}
@@ -282,7 +282,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					dc.Detach();
 					lr = CDRF_SKIPDEFAULT;
-				} else if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_THUMB) {
+				} else if (!s.bUseDarkTheme && pNMCD->dwItemSpec == TBCD_THUMB) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
 					pNMCD->rc.bottom--;
@@ -301,7 +301,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Detach();
 					lr = CDRF_SKIPDEFAULT;
 				}
-				if (!s.fDisableXPToolbars) {
+				if (!s.bUseDarkTheme) {
 					iDisableXPToolbars = 0;
 				}
 				break;

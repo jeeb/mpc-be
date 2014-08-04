@@ -306,7 +306,7 @@ HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, in
 		if (fp) {
 			return TypeLoadImage(IMG_TYPE::BMP, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		} else {
-			if (resid && ((int)AfxGetAppSettings().fDisableXPToolbars == !!type || type == IMG_TYPE::UNDEF)) {
+			if (resid && ((int)AfxGetAppSettings().bUseDarkTheme == !!type || type == IMG_TYPE::UNDEF)) {
 				return TypeLoadImage(IMG_TYPE::PNG, &pData, &width, &height, &bpp, NULL, resid, br, rc, gc, bc);
 			}
 		}

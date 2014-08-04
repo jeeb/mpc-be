@@ -35,7 +35,7 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		int size = IsWinVistaOrLater() ? 13 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Tahoma") : _T("Microsoft Sans Serif");
 		m_font.CreateFont(int(size * s.scalefont), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
@@ -82,7 +82,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(165, 170, 175, R, G, B);
 		dc.SetTextColor(RGB(R,G,B));
 		ThemeRGB(5, 10, 15, R, G, B);
@@ -102,7 +102,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 	}
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		dc.SelectObject(&old);
 		ThemeRGB(5, 10, 15, R, G, B);
 		dc.FillSolidRect(&r, RGB(R, G, B));
@@ -123,7 +123,7 @@ BOOL CStatusLabel::OnEraseBkgnd(CDC* pDC)
 	GetClientRect(&r);
 	int R, G, B;
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (AfxGetAppSettings().bUseDarkTheme) {
 		ThemeRGB(5, 10, 15, R, G, B);
 		pDC->FillSolidRect(&r, RGB(R,G,B));
 		pDC->FillSolidRect(&r, 0);

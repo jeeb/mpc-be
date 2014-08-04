@@ -190,7 +190,7 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 
 	int R, G, B;
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (AfxGetAppSettings().bUseDarkTheme) {
 		CPen penBlend(PS_SOLID,0,RGB(0,0,0));
 		CPen *penSaved = pDC->SelectObject(&penBlend);
 		pDC->MoveTo(r.left,r.top);

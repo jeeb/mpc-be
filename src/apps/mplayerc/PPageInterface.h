@@ -36,8 +36,8 @@ public:
 	virtual ~CPPageInterface();
 
 	enum { IDD = IDD_PPAGEINTERFACE };
-	BOOL m_fDisableXPToolbars;
-	CButton m_fDisableXPToolbarsCtrl;
+	BOOL m_bUseDarkTheme;
+	CButton m_UseDarkThemeCtrl;
 	int m_nThemeBrightness;
 	int m_nThemeRed;
 	int m_nThemeGreen;

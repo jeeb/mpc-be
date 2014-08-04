@@ -4119,7 +4119,7 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 			(fs == State_Paused || m_fFrameSteppingActive) ? ResStr(IDS_CONTROLS_PAUSED) :
 			fs == State_Running ? ResStr(IDS_CONTROLS_PLAYING) :
 			_T("");
-		bool bDXVAonStatusBar = !(AfxGetAppSettings().fDisableXPToolbars && m_wndToolBar.IsVisible());
+		bool bDXVAonStatusBar = !(AfxGetAppSettings().bUseDarkTheme && m_wndToolBar.IsVisible());
 		if ((!m_fAudioOnly) && bDXVAonStatusBar && (UI_Text == ResStr(IDS_CONTROLS_PAUSED) || UI_Text == ResStr(IDS_CONTROLS_PLAYING))) {
 			if (GetDXVAStatus()) {
 				UI_Text.AppendFormat(_T(" [%ws]"), GetDXVAVersion());

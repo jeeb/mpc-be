@@ -1896,13 +1896,13 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			ResizeListColumn();
 		}
 
-		if (s.fDisableXPToolbars) {
+		if (s.bUseDarkTheme) {
 			ThemeRGB(30, 35, 40, R, G, B);
 		}
 
 		CRect r;
 		GetClientRect(&r);
-		FillRect(pLVCD->nmcd.hdc, &r, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : RGB(255, 255, 255)));
+		FillRect(pLVCD->nmcd.hdc, &r, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : RGB(255, 255, 255)));
 
 		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
 
@@ -1911,7 +1911,7 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		pLVCD->nmcd.uItemState &= ~CDIS_SELECTED;
 		pLVCD->nmcd.uItemState &= ~CDIS_FOCUS;
 
-		if (!s.fDisableXPToolbars) {
+		if (!s.bUseDarkTheme) {
 			pLVCD->clrTextBk = m_list.GetItemState(pLVCD->nmcd.dwItemSpec, LVIS_SELECTED) ? 0xf1dacc : CLR_DEFAULT;
 		}
 
@@ -1925,7 +1925,7 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			CRect r;
 			m_list.GetItemRect(nItem, &r, LVIR_BOUNDS);
 
-			if (!s.fDisableXPToolbars) {
+			if (!s.bUseDarkTheme) {
 				FrameRect(pLVCD->nmcd.hdc, &r, CBrush(0xc56a31));
 			}
 		}
@@ -1953,21 +1953,21 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
-		if (s.fDisableXPToolbars) {
+		if (s.bUseDarkTheme) {
 			ThemeRGB(15, 20, 25, R, G, B);
 		}
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : 0x00f1dacc));
-		FrameRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : 0xc56a31));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : 0x00f1dacc));
+		FrameRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : 0xc56a31));
 	} else {
-		if (s.fDisableXPToolbars) {
+		if (s.bUseDarkTheme) {
 			ThemeRGB(30, 35, 40, R, G, B);
 		}
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : RGB(255, 255, 255)));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : RGB(255, 255, 255)));
 	}
 
 	COLORREF textcolor = fSelected ? 0xff : 0;
 
-	if (s.fDisableXPToolbars) {
+	if (s.bUseDarkTheme) {
 		ThemeRGB(135, 140, 145, R, G, B);
 		textcolor = fSelected ? s.clrFaceABGR : RGB(R, G, B);
 	}
