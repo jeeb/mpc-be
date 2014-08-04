@@ -146,11 +146,7 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.bUseDarkTheme) {
-		if (m_pos == pos || m_stop <= pos) {
-			return;
-		}
-	} else if (m_pos == pos) {
+	if (m_pos == pos) {
 		return;
 	}
 
@@ -159,10 +155,8 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 	m_posreal = pos;
 	CRect after = GetThumbRect();
 
-	if (before != after) {
-		if (!s.bUseDarkTheme) {
-			InvalidateRect (before | after);
-		}
+	if (before != after && !s.bUseDarkTheme) {
+		InvalidateRect(before | after);
 	}
 }
 
@@ -170,11 +164,7 @@ void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.bUseDarkTheme) {
-		if (m_pos2 == pos || m_stop <= pos) {
-			return;
-		}
-	} else if (m_pos2 == pos) {
+	if (m_pos2 == pos) {
 		return;
 	}
 
@@ -183,10 +173,8 @@ void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 	m_posreal2 = pos;
 	CRect after = GetThumbRect();
 
-	if (before != after) {
-		if (!s.bUseDarkTheme) {
-			InvalidateRect (before | after);
-		}
+	if (before != after && !s.bUseDarkTheme) {
+		InvalidateRect(before | after);
 	}
 }
 
@@ -202,7 +190,7 @@ CRect CPlayerSeekBar::GetChannelRect()
 		r.bottom = r.top + 5;
 	}
 
-	return(r);
+	return r;
 }
 
 CRect CPlayerSeekBar::GetThumbRect()
@@ -219,7 +207,7 @@ CRect CPlayerSeekBar::GetThumbRect()
 		r.InflateRect(6, 7, 7, 8);
 	}
 
-	return(r);
+	return r;
 }
 
 CRect CPlayerSeekBar::GetInnerThumbRect()
@@ -229,7 +217,7 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 	bool fEnabled = m_fEnabled && m_start < m_stop;
 	r.DeflateRect(3, fEnabled ? 5 : 4, 3, fEnabled ? 5 : 4);
 
-	return(r);
+	return r;
 }
 
 __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
@@ -309,9 +297,14 @@ void CPlayerSeekBar::OnPaint()
 
 	bool fEnabled = m_fEnabled && m_start < m_stop;
 
+	const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
+	if (!p_MainWnd) {
+		return;
+	}
+
 	if (s.bUseDarkTheme) {
 		CRect rt;
-		CString str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->GetStrForTitle();
+		CString str = ((CMainFrame*)p_MainWnd)->GetStrForTitle();
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r,rf,rc;
@@ -330,8 +323,8 @@ void CPlayerSeekBar::OnPaint()
 			ThemeRGB(0, 5, 10, R, G, B);
 			ThemeRGB(15, 20, 25, R2, G2, B2);
 			TRIVERTEX tv[2] = {
-				{r.left, r.top, R*256, G*256, B*256, pa},
-				{r.right, r.bottom, R2*256, G2*256, B2*256, pa},
+				{r.left, r.top, R * 256, G * 256, B * 256, pa},
+				{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, pa},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -342,7 +335,7 @@ void CPlayerSeekBar::OnPaint()
 		CPen penPlayedOutline(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);
 
 		rc = GetChannelRect();
-		int nposx = GetThumbRect().right-2;
+		int nposx = GetThumbRect().right - 2;
 		int nposy = r.top;
 
 		ThemeRGB(30, 35, 40, R, G, B);
@@ -354,20 +347,20 @@ void CPlayerSeekBar::OnPaint()
 		ThemeRGB(80, 85, 90, R, G, B);
 		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed2);
-		memdc.MoveTo(rc.left -1, rc.bottom-1);
-		memdc.LineTo(rc.right+2, rc.bottom-1);
+		memdc.MoveTo(rc.left - 1, rc.bottom - 1);
+		memdc.LineTo(rc.right + 2, rc.bottom - 1);
 
 		// buffer
-		r_Lock.SetRect(-1,-1,-1,-1);
+		r_Lock.SetRect(-1, -1, -1, -1);
 		int Progress;
-		if (((CMainFrame*)AfxGetMyApp()->GetMainWnd())->GetBufferingProgress(&Progress)) {
+		if (((CMainFrame*)p_MainWnd)->GetBufferingProgress(&Progress)) {
 			r_Lock = r;
-			int r_right = ((REFERENCE_TIME)r.Width()/100) * Progress;
+			int r_right = ((REFERENCE_TIME)r.Width() / 100) * Progress;
 			ThemeRGB(45, 55, 60, R, G, B);
 				ThemeRGB(65, 70, 75, R2, G2, B2);
 				TRIVERTEX tvb[2] = {
-					{r.left, r.top, R*256, G*256, B*256, pa},
-					{r_right, r.bottom-3, R2*256, G2*256, B2*256, pa},
+					{r.left, r.top, R * 256, G * 256, B * 256, pa},
+					{r_right, r.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
 				};
 				memdc.GradientFill(tvb, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				r_Lock.left = r_right;
@@ -388,8 +381,8 @@ void CPlayerSeekBar::OnPaint()
 				ThemeRGB(0, 5, 10, R, G, B);
 				ThemeRGB(105, 110, 115, R2, G2, B2);
 				TRIVERTEX tv[2] = {
-					{rc.left, rc.top, R*256, G*256, B*256, pa},
-					{nposx, rc.bottom-3, R2*256, G2*256, B2*256, pa},
+					{rc.left, rc.top, R * 256, G * 256, B * 256, pa},
+					{nposx, rc.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
 				};
 				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
@@ -402,8 +395,8 @@ void CPlayerSeekBar::OnPaint()
 				ThemeRGB(0, 5, 10, R, G, B);
 				ThemeRGB(205, 210, 215, R2, G2, B2);
 				TRIVERTEX tv2[2] = {
-					{rc2.left, rc2.top, R*256, G*256, B*256, pa},
-					{rc2.right, rc.bottom-3, R2*256, G2*256, B2*256, pa},
+					{rc2.left, rc2.top, R * 256, G * 256, B * 256, pa},
+					{rc2.right, rc.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
 				};
 				memdc.GradientFill(tv2, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
@@ -418,7 +411,6 @@ void CPlayerSeekBar::OnPaint()
 			if (s.fChapterMarker) {
 				CAutoLock lock(&m_CBLock);
 
-				CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 				if (m_pChapterBag && m_pChapterBag->ChapGetCount()) {
 					CRect rc2 = rc;
 					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
@@ -476,16 +468,16 @@ void CPlayerSeekBar::OnPaint()
 				rt.left  += 6;
 				rt.top   -= 2;
 				rt.right -= xt;
-				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
+				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 				// highlights string
 				ThemeRGB(205, 210, 215, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
 				if (nposx > rt.right - 15) {
-					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
+					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 				} else {
 					rt.right = nposx;
-					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
+					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 				}
 			}
 
@@ -497,7 +489,7 @@ void CPlayerSeekBar::OnPaint()
 				rt.right -= 6;
 				ThemeRGB(200, 205, 210, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
-				memdc.DrawText(strT, strT.GetLength(), &rt, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
+				memdc.DrawText(strT, strT.GetLength(), &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
 			}
 		}
 
@@ -544,7 +536,7 @@ void CPlayerSeekBar::OnPaint()
 				dc.SetPixel(r.CenterPoint().x, r.bottom, 0);
 			}
 
-			dc.SetPixel(r.CenterPoint().x+5, r.top-4, bkg);
+			dc.SetPixel(r.CenterPoint().x + 5, r.top - 4, bkg);
 
 			{
 				CRgn rgn1, rgn2;
@@ -587,9 +579,9 @@ void CPlayerSeekBar::OnSize(UINT nType, int cx, int cy)
 void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	REFERENCE_TIME pos = CalculatePosition(point);
-	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
 
-	if (pFrame->ValidateSeek(pos, m_stop)) {
+	if (pFrame && pFrame->ValidateSeek(pos, m_stop)) {
 
 		if (AfxGetAppSettings().bUseDarkTheme && m_fEnabled) {
 			SetCapture();
@@ -598,9 +590,11 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 			if (m_fEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 				SetCapture();
 				MoveThumb(point);
-				GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+				if (pFrame) {
+					pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+				}
 			} else {
-				if (!pFrame->m_fFullScreen) {
+				if (pFrame && !pFrame->m_fFullScreen) {
 					MapWindowPoints(pFrame, &point, 1);
 					pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 				}
@@ -616,11 +610,11 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 	ReleaseCapture();
 
 	__int64 pos = CalculatePosition(point);
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
 
-	if (((CMainFrame*)GetParentFrame())->ValidateSeek(pos, m_stop)) {
-
+	if (pFrame && pFrame->ValidateSeek(pos, m_stop)) {
 		if (AfxGetAppSettings().bUseDarkTheme && m_fEnabled) {
-			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+			pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		}
 	}
 
@@ -645,7 +639,7 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 
-	if (CMainFrame* pFrame = (CMainFrame*)GetParentFrame()) {
+	if (CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd()) {
 		pFrame->PostMessage(WM_COMMAND, ID_PLAY_GOTO);
 	}
 
@@ -656,7 +650,7 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 void CPlayerSeekBar::UpdateTooltip(CPoint point)
 {
 	m_tooltipPos = CalculatePosition(point);
-	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
 	if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 		if (m_tooltipState == TOOLTIP_HIDDEN && m_tooltipPos != m_tooltipLastPos) {
 
@@ -687,7 +681,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	AppSettings& s = AfxGetAppSettings();
 
 	CWnd* w = GetCapture();
-	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
 
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
 		REFERENCE_TIME pos = CalculatePosition(point);
@@ -696,7 +690,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 		}
 
 		if (!s.bUseDarkTheme) {
-			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
+			pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
 		}
 	}
 
@@ -721,7 +715,10 @@ LRESULT CPlayerSeekBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_MOUSELEAVE) {
 		HideToolTip();
-		((CMainFrame*)GetParentFrame())->PreviewWindowHide();
+		CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
+		if (pFrame) {
+			pFrame->PreviewWindowHide();
+		}
 		strChap.Empty();
 		Invalidate();
 	}
@@ -770,7 +767,6 @@ BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 BOOL CPlayerSeekBar::OnPlayStop(UINT nID)
 {
 	SetPos(0);
-
 	Invalidate();
 
 	return FALSE;
@@ -778,7 +774,7 @@ BOOL CPlayerSeekBar::OnPlayStop(UINT nID)
 
 void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 {
-	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
 
 	if (nIDEvent == m_tooltipTimer) {
 		switch (m_tooltipState) {
@@ -825,9 +821,9 @@ void CPlayerSeekBar::HideToolTip()
 
 void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 {
-	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
 
-	if (pFrame->CanPreviewUse()) {
+	if (pFrame && pFrame->CanPreviewUse()) {
 		CRect Rect;
 		pFrame->m_wndPreView.GetWindowRect(Rect);
 		int r_width  = Rect.Width();
@@ -878,14 +874,15 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 
 void CPlayerSeekBar::UpdateToolTipText()
 {
-	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
+
 	GUID timeFormat = pFrame->GetTimeFormat();
 	CString tooltipText;
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
 		DVD_HMSF_TIMECODE tcNow = RT2HMS_r(m_tooltipPos);
-		tooltipText.Format(_T("%02u:%02u:%02u"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+		tooltipText.Format(L"%02u:%02u:%02u", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
 	} else if (timeFormat == TIME_FORMAT_FRAME) {
-		tooltipText.Format(_T("%I64d"), m_tooltipPos);
+		tooltipText.Format(L"%I64d", m_tooltipPos);
 	} else {
 		ASSERT(FALSE);
 	}
@@ -902,16 +899,15 @@ void CPlayerSeekBar::UpdateToolTipText()
 
 		strChap.Empty();
 		if (AfxGetAppSettings().bUseDarkTheme
-			&& AfxGetAppSettings().fChapterMarker
-			/*&& AfxGetAppSettings().fFileNameOnSeekBar*/
-			&& m_pChapterBag && m_pChapterBag->ChapGetCount()) {
+				&& AfxGetAppSettings().fChapterMarker
+				&& m_pChapterBag && m_pChapterBag->ChapGetCount()) {
 
 			CComBSTR chapterName;
 			REFERENCE_TIME rt = m_tooltipPos;
 			m_pChapterBag->ChapLookup(&rt, &chapterName);
 
 			if (chapterName.Length() > 0) {
-				strChap.Format(_T("%s%s"), ResStr(IDS_AG_CHAPTER2), chapterName);
+				strChap.Format(L"%s%s", ResStr(IDS_AG_CHAPTER2), chapterName);
 				Invalidate();
 			}
 		}
@@ -920,9 +916,9 @@ void CPlayerSeekBar::UpdateToolTipText()
 
 void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
 {
-	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+	CMainFrame* pFrame = (CMainFrame*)AfxGetAppSettings().GetMainWnd();
 
-	if (pFrame->m_wndPreView) {
+	if (pFrame && pFrame->m_wndPreView) {
 		pFrame->PreviewWindowHide();
 		AfxGetAppSettings().fSmartSeek = !AfxGetAppSettings().fSmartSeek;
 		OnMouseMove(nFlags,point);
