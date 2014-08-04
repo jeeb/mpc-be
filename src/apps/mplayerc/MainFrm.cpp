@@ -13365,7 +13365,9 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	if (SUCCEEDED(hr = m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
 		pODD->title = CString(buff);
 		pODD->title.TrimRight('\\');
-		AddRecent(pODD->title);
+		if (pODD->bAddRecent) {
+			AddRecent(pODD->title);
+		}
 	}
 
 	// TODO: resetdvd
