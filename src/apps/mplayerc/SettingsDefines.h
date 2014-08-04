@@ -106,7 +106,7 @@
 #define IDS_RS_SPCSIZE						_T("SPCSize")
 #define IDS_RS_SPMAXTEXRES					_T("SPMaxTexRes")
 #define IDS_RS_INTREALMEDIA					_T("IntRealMedia")
-#define IDS_RS_DISABLEXPTOOLBARS			_T("DisableXPToolbars")
+#define IDS_RS_USEDARKTHEME					_T("UseDarkTheme")
 
 #define IDS_RS_TBREFRESH					_T("Toolbar Refresh")
 #define IDS_RS_CLRFACEABGR					_T("Toolbar clrFace(ABGR)")
