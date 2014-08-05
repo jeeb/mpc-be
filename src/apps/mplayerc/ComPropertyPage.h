@@ -51,7 +51,7 @@ public:
 // CComPropertySheet
 
 interface IComPropertyPageDirty {
-	virtual void OnSetDirty(bool fDirty) = 0;
+	virtual void OnSetDirty(bool fDirty) PURE;
 };
 
 class CComPropertySheet : public CPropertySheet, public IComPropertyPageDirty

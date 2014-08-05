@@ -29,7 +29,7 @@ class CVideoDecDXVAAllocator;
 interface __declspec(uuid("AE7EC2A2-1913-4a80-8DD6-DF1497ABA494"))
 IMPCDXVA2Sample :
 public IUnknown {
-	STDMETHOD_(int, GetDXSurfaceId()) = 0;
+	STDMETHOD_(int, GetDXSurfaceId()) PURE;
 };
 
 class CDXVA2Sample : public CMediaSample, public IMFGetService, public IMPCDXVA2Sample

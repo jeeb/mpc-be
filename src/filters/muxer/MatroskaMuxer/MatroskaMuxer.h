@@ -90,7 +90,7 @@ public:
 interface __declspec(uuid("38E2D43D-915D-493C-B373-888DB16EE3DC"))
 IMatroskaMuxer :
 public IUnknown {
-	STDMETHOD (CorrectTimeOffset) (bool fNegative, bool fPositive) = 0;
+	STDMETHOD (CorrectTimeOffset) (bool fNegative, bool fPositive) PURE;
 	// TODO: chapters
 };
 

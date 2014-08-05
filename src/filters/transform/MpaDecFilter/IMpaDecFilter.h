@@ -43,17 +43,17 @@ public IUnknown {
 #endif
 		etcount};
 
-	STDMETHOD(SetSampleFormat(MPCSampleFormat sf, bool enable)) = 0;
-	STDMETHOD_(bool, GetSampleFormat(MPCSampleFormat sf)) = 0;
-	STDMETHOD_(MPCSampleFormat, SelectSampleFormat(MPCSampleFormat sf)) = 0;
-	STDMETHOD(SetMixer(bool fMixer)) = 0;
-	STDMETHOD_(bool, GetMixer()) = 0;
-	STDMETHOD(SetMixerLayout(int sc)) = 0;
-	STDMETHOD_(int, GetMixerLayout()) = 0;
-	STDMETHOD(SetDynamicRangeControl(bool fDRC)) = 0;
-	STDMETHOD_(bool, GetDynamicRangeControl()) = 0;
-	STDMETHOD(SetSPDIF(enctype et, bool fSPDIF)) = 0;
-	STDMETHOD_(bool, GetSPDIF(enctype et)) = 0;
+	STDMETHOD(SetSampleFormat(MPCSampleFormat sf, bool enable)) PURE;
+	STDMETHOD_(bool, GetSampleFormat(MPCSampleFormat sf)) PURE;
+	STDMETHOD_(MPCSampleFormat, SelectSampleFormat(MPCSampleFormat sf)) PURE;
+	STDMETHOD(SetMixer(bool fMixer)) PURE;
+	STDMETHOD_(bool, GetMixer()) PURE;
+	STDMETHOD(SetMixerLayout(int sc)) PURE;
+	STDMETHOD_(int, GetMixerLayout()) PURE;
+	STDMETHOD(SetDynamicRangeControl(bool fDRC)) PURE;
+	STDMETHOD_(bool, GetDynamicRangeControl()) PURE;
+	STDMETHOD(SetSPDIF(enctype et, bool fSPDIF)) PURE;
+	STDMETHOD_(bool, GetSPDIF(enctype et)) PURE;
 
-	STDMETHOD(SaveSettings()) = 0;
+	STDMETHOD(SaveSettings()) PURE;
 };

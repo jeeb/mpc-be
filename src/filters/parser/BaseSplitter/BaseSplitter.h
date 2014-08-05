@@ -77,7 +77,7 @@ protected:
 	HRESULT AddOutputPin(DWORD TrackNum, CAutoPtr<CBaseSplitterOutputPin> pPin);
 	HRESULT RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, std::vector<CMediaType> mts, BOOL bNeedReconnect = FALSE);
 	virtual HRESULT DeleteOutputs();
-	virtual HRESULT CreateOutputs(IAsyncReader* pAsyncReader) = 0; // override this ...
+	virtual HRESULT CreateOutputs(IAsyncReader* pAsyncReader) PURE; // override this ...
 	virtual LPCTSTR GetPartFilename(IAsyncReader* pAsyncReader);
 
 	LONGLONG m_nOpenProgress;
@@ -108,9 +108,9 @@ protected:
 	DWORD ThreadProc();
 
 	// ... and also override all these too
-	virtual bool DemuxInit() = 0;
-	virtual void DemuxSeek(REFERENCE_TIME rt) = 0;
-	virtual bool DemuxLoop() = 0;
+	virtual bool DemuxInit() PURE;
+	virtual void DemuxSeek(REFERENCE_TIME rt) PURE;
+	virtual bool DemuxLoop() PURE;
 	virtual bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items) { return false; };
 	virtual bool BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items) { return false; };
 

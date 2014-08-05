@@ -150,8 +150,8 @@ public:
 		return AddFormat(pmt, *(T*)pcaps);
 	}
 
-	virtual CString MakeFormatName(AM_MEDIA_TYPE* pmt) = 0;
-	virtual CString MakeDimensionName(CFormatElem<T>* pfe) = 0;
+	virtual CString MakeFormatName(AM_MEDIA_TYPE* pmt) PURE;
+	virtual CString MakeDimensionName(CFormatElem<T>* pfe) PURE;
 };
 
 typedef CFormatElem<VIDEO_STREAM_CONFIG_CAPS> CVidFormatElem;

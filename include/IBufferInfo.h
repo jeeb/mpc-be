@@ -24,7 +24,7 @@
 interface __declspec(uuid("46070104-1318-4A82-8822-E99AB7CD15C1"))
 IBufferInfo :
 public IUnknown {
-	STDMETHOD_(int, GetCount()) = 0;
-	STDMETHOD(GetStatus(int i, int& samples, int& size)) = 0;
-	STDMETHOD_(DWORD, GetPriority()) = 0;
+	STDMETHOD_(int, GetCount()) PURE;
+	STDMETHOD(GetStatus(int i, int& samples, int& size)) PURE;
+	STDMETHOD_(DWORD, GetPriority()) PURE;
 };

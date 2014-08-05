@@ -111,8 +111,8 @@ namespace DSObjects
 		}
 		virtual void SetWindowRect(CRect r) {}
 		virtual void SetDestRect(CRect r) {}
-		virtual bool CreateSite(IRMASite** pSite) = 0;
-		virtual void DestroySite(IRMASite* pSite) = 0;
+		virtual bool CreateSite(IRMASite** pSite) PURE;
+		virtual void DestroySite(IRMASite* pSite) PURE;
 
 		// IRMAErrorSink
 		STDMETHODIMP ErrorOccurred(const UINT8 unSeverity, const UINT32 ulRMACode, const UINT32 ulUserCode, const char* pUserString, const char* pMoreInfoURL);

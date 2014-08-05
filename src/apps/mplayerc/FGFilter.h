@@ -70,7 +70,7 @@ public:
 
 	CAtlList<CString> m_protocols, m_extensions, m_chkbytes; // TODO: subtype?
 
-	virtual HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) = 0;
+	virtual HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) PURE;
 
 	virtual CString GetType() {
 		return _T("CFGFilter");

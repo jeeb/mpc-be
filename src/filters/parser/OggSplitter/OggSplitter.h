@@ -59,8 +59,8 @@ public:
 	CStringW GetComment(CStringW key);
 
 	HRESULT UnpackPage(OggPage& page);
-	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len) = 0;
-	virtual REFERENCE_TIME GetRefTime(__int64 granule_position) = 0;
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len) PURE;
+	virtual REFERENCE_TIME GetRefTime(__int64 granule_position) PURE;
 	CAutoPtr<Packet> GetPacket();
 
 	HRESULT DeliverEndFlush();

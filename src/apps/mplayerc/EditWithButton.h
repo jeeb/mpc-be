@@ -52,8 +52,8 @@ protected:
 	int GetButtonThemeState() const;
 
 	virtual void DrawButton(CRect rectButton);
-	virtual void DrawButtonContent(CDC& dc, CRect rectButton, HTHEME hButtonTheme) = 0;
-	virtual int CalculateButtonWidth() = 0;
+	virtual void DrawButtonContent(CDC& dc, CRect rectButton, HTHEME hButtonTheme) PURE;
+	virtual int CalculateButtonWidth() PURE;
 
 private:
 	int m_TopBorder;

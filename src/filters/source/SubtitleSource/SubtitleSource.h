@@ -48,7 +48,7 @@ public:
 	// IAMFilterMiscFlags
 	STDMETHODIMP_(ULONG) GetMiscFlags();
 
-	virtual HRESULT GetMediaType(CMediaType* pmt) = 0;
+	virtual HRESULT GetMediaType(CMediaType* pmt) PURE;
 
 	// CBaseFilter
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);

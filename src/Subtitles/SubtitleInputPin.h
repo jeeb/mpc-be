@@ -35,9 +35,9 @@ class CSubtitleInputPin : public CBaseInputPin
 	CComPtr<ISubStream> m_pSubStream;
 
 protected:
-	virtual void AddSubStream(ISubStream* pSubStream) = 0;
-	virtual void RemoveSubStream(ISubStream* pSubStream) = 0;
-	virtual void InvalidateSubtitle(REFERENCE_TIME rtStart, ISubStream* pSubStream) = 0;
+	virtual void AddSubStream(ISubStream* pSubStream) PURE;
+	virtual void RemoveSubStream(ISubStream* pSubStream) PURE;
+	virtual void InvalidateSubtitle(REFERENCE_TIME rtStart, ISubStream* pSubStream) PURE;
 	bool		 IsHdmvSub(const CMediaType* pmt);
 
 public:

@@ -293,7 +293,7 @@ protected:
 	virtual void OnClose(int nErrorCode);
 	virtual void OnReceive(int nErrorCode);
 
-	virtual void OnCommand(CStringA str) = 0;
+	virtual void OnCommand(CStringA str) PURE;
 
 	void ExecuteCommand(CStringA cmd, int repcnt);
 

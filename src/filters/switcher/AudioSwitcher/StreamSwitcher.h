@@ -119,7 +119,7 @@ public:
 interface __declspec(uuid("DA395FA3-4A3E-4D85-805E-0BEFF53D4BCD"))
 IStreamSwitcherInputPin :
 public IUnknown {
-	STDMETHOD_(bool, IsActive)() = 0;
+	STDMETHOD_(bool, IsActive)() PURE;
 };
 
 class CStreamSwitcherInputPin : public CBaseInputPin, public IPinConnection, public IStreamSwitcherInputPin
@@ -277,7 +277,7 @@ public:
 	}
 
 	// override these
-	virtual HRESULT CheckMediaType(const CMediaType* pmt) = 0;
+	virtual HRESULT CheckMediaType(const CMediaType* pmt) PURE;
 	virtual HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
 	virtual CMediaType CreateNewOutputMediaType(CMediaType mt, long& cbBuffer);
 	virtual void OnNewOutputMediaType(const CMediaType& mtIn, const CMediaType& mtOut) {}

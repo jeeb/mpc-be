@@ -52,16 +52,16 @@ public IUnknown {
 #define CHAPTER_ROOT_ID		0
 
 	//	\param aChapterID is 0 for the top level one
-	STDMETHOD_(UINT, GetChapterCount) (UINT aChapterID) = 0;
+	STDMETHOD_(UINT, GetChapterCount) (UINT aChapterID) PURE;
 
 	//	\param aIndex start from 1 to GetChapterCount( aParentChapterId )
-	STDMETHOD_(UINT, GetChapterId) (UINT aParentChapterId, UINT aIndex) = 0;
+	STDMETHOD_(UINT, GetChapterId) (UINT aParentChapterId, UINT aIndex) PURE;
 
-	STDMETHOD_(UINT, GetChapterCurrentId) () = 0;
+	STDMETHOD_(UINT, GetChapterCurrentId) () PURE;
 
-	STDMETHOD_(BOOL, GetChapterInfo) (UINT aChapterID, struct ChapterElement* pStructureToFill) = 0;
+	STDMETHOD_(BOOL, GetChapterInfo) (UINT aChapterID, struct ChapterElement* pStructureToFill) PURE;
 
 	//	\param PreferredLanguage Language code as in ISO-639-2 (3 chars)
 	//	\param CountryCode		 Country code as in internet domains
-	STDMETHOD_(BSTR, GetChapterStringInfo) (UINT aChapterID, CHAR PreferredLanguage[3], CHAR CountryCode[2]) = 0;
+	STDMETHOD_(BSTR, GetChapterStringInfo) (UINT aChapterID, CHAR PreferredLanguage[3], CHAR CountryCode[2]) PURE;
 };

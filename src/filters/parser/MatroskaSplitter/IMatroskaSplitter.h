@@ -23,8 +23,8 @@
 interface __declspec(uuid("1D7FBEA1-D294-4350-B49B-078EACA282C3"))
 IMatroskaSplitterFilter :
 public IUnknown {
-	STDMETHOD(Apply()) = 0;
+	STDMETHOD(Apply()) PURE;
 
-	STDMETHOD(SetLoadEmbeddedFonts(BOOL nValue)) = 0;
-	STDMETHOD_(BOOL, GetLoadEmbeddedFonts()) = 0;
+	STDMETHOD(SetLoadEmbeddedFonts(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetLoadEmbeddedFonts()) PURE;
 };

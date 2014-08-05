@@ -24,6 +24,6 @@
 interface __declspec(uuid("EB2CD9E6-BA08-4acb-AA0F-3D8D0DD521CA"))
 IBitRateInfo :
 public IUnknown {
-	STDMETHOD_(DWORD, GetCurrentBitRate) () = 0;
-	STDMETHOD_(DWORD, GetAverageBitRate) () = 0;
+	STDMETHOD_(DWORD, GetCurrentBitRate) () PURE;
+	STDMETHOD_(DWORD, GetAverageBitRate) () PURE;
 };

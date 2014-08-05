@@ -23,11 +23,11 @@
 interface __declspec(uuid("282A5DA8-F62D-49D9-9E54-757B0E5529AA"))
 IAviSplitterFilter :
 public IUnknown {
-	STDMETHOD(Apply()) = 0;
+	STDMETHOD(Apply()) PURE;
 
-	STDMETHOD(SetBadInterleavedSuport(BOOL nValue)) = 0;
-	STDMETHOD_(BOOL, GetBadInterleavedSuport()) = 0;
+	STDMETHOD(SetBadInterleavedSuport(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetBadInterleavedSuport()) PURE;
 
-	STDMETHOD(SetReindex(BOOL nValue)) = 0;
-	STDMETHOD_(BOOL, GetReindex()) = 0;
+	STDMETHOD(SetReindex(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetReindex()) PURE;
 };

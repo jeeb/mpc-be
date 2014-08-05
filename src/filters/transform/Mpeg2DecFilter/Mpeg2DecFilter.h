@@ -246,8 +246,8 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 			m_rtStart = m_rtStop = 0;
 		}
 		virtual ~spu() {}
-		virtual bool Parse() = 0;
-		virtual void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) = 0;
+		virtual bool Parse() PURE;
+		virtual void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) PURE;
 	};
 
 	class dvdspu : public spu

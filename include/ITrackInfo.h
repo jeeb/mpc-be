@@ -67,17 +67,17 @@ struct TrackExtendedInfoAudio {
 interface __declspec(uuid("03E98D51-DDE7-43aa-B70C-42EF84A3A23D"))
 ITrackInfo :
 public IUnknown {
-	STDMETHOD_(UINT, GetTrackCount) () = 0;
+	STDMETHOD_(UINT, GetTrackCount) () PURE;
 
 	// \param aTrackIdx the track index (from 0 to GetTrackCount()-1)
-	STDMETHOD_(BOOL, GetTrackInfo) (UINT aTrackIdx, struct TrackElement* pStructureToFill) = 0;
+	STDMETHOD_(BOOL, GetTrackInfo) (UINT aTrackIdx, struct TrackElement* pStructureToFill) PURE;
 
 	// Get an extended information struct relative to the track type
-	STDMETHOD_(BOOL, GetTrackExtendedInfo) (UINT aTrackIdx, void* pStructureToFill) = 0;
+	STDMETHOD_(BOOL, GetTrackExtendedInfo) (UINT aTrackIdx, void* pStructureToFill) PURE;
 
-	STDMETHOD_(BSTR, GetTrackCodecID) (UINT aTrackIdx) = 0;
-	STDMETHOD_(BSTR, GetTrackName) (UINT aTrackIdx) = 0;
-	STDMETHOD_(BSTR, GetTrackCodecName) (UINT aTrackIdx) = 0;
-	STDMETHOD_(BSTR, GetTrackCodecInfoURL) (UINT aTrackIdx) = 0;
-	STDMETHOD_(BSTR, GetTrackCodecDownloadURL) (UINT aTrackIdx) = 0;
+	STDMETHOD_(BSTR, GetTrackCodecID) (UINT aTrackIdx) PURE;
+	STDMETHOD_(BSTR, GetTrackName) (UINT aTrackIdx) PURE;
+	STDMETHOD_(BSTR, GetTrackCodecName) (UINT aTrackIdx) PURE;
+	STDMETHOD_(BSTR, GetTrackCodecInfoURL) (UINT aTrackIdx) PURE;
+	STDMETHOD_(BSTR, GetTrackCodecDownloadURL) (UINT aTrackIdx) PURE;
 };

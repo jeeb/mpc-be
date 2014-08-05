@@ -30,7 +30,7 @@
 interface __declspec(uuid("03481710-D73E-4674-839F-03EDE2D60ED8"))
 ISpecifyPropertyPages2 :
 public ISpecifyPropertyPages {
-	STDMETHOD (CreatePage) (const GUID& guid, IPropertyPage** ppPage) = 0;
+	STDMETHOD (CreatePage) (const GUID& guid, IPropertyPage** ppPage) PURE;
 };
 
 class CInternalPropertyPageWnd : public CWnd
@@ -80,9 +80,9 @@ class CInternalPropertyPage
 	CInternalPropertyPageWnd* m_pWnd;
 
 protected:
-	virtual CInternalPropertyPageWnd* GetWindow() = 0;
-	virtual LPCTSTR GetWindowTitle() = 0;
-	virtual CSize GetWindowSize() = 0;
+	virtual CInternalPropertyPageWnd* GetWindow() PURE;
+	virtual LPCTSTR GetWindowTitle() PURE;
+	virtual CSize GetWindowSize() PURE;
 
 public:
 	CInternalPropertyPage(LPUNKNOWN lpunk, HRESULT* phr);

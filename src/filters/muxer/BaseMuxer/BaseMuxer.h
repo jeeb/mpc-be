@@ -27,12 +27,12 @@
 interface __declspec(uuid("30AB78C7-5259-4594-AEFE-9C0FC2F08A5E"))
 IBitStream :
 public IUnknown {
-	STDMETHOD_(UINT64, GetPos) () = 0;
-	STDMETHOD_(UINT64, Seek) (UINT64 pos) = 0; // it's a _stream_, please don't seek if you don't have to
-	STDMETHOD(ByteWrite) (const void* pData, int len) = 0;
-	STDMETHOD(BitWrite) (UINT64 data, int len) = 0;
-	STDMETHOD(BitFlush) () = 0;
-	STDMETHOD(StrWrite) (LPCSTR pData, BOOL bFixNewLine) = 0;
+	STDMETHOD_(UINT64, GetPos) () PURE;
+	STDMETHOD_(UINT64, Seek) (UINT64 pos) PURE; // it's a _stream_, please don't seek if you don't have to
+	STDMETHOD(ByteWrite) (const void* pData, int len) PURE;
+	STDMETHOD(BitWrite) (UINT64 data, int len) PURE;
+	STDMETHOD(BitFlush) () PURE;
+	STDMETHOD(StrWrite) (LPCSTR pData, BOOL bFixNewLine) PURE;
 };
 
 class CBitStream : public CUnknown, public IBitStream
@@ -62,8 +62,8 @@ public:
 interface __declspec(uuid("EE6F2741-7DB4-4AAD-A3CB-545208EE4C0A"))
 IBaseMuxerRelatedPin :
 public IUnknown {
-	STDMETHOD(SetRelatedPin) (CBasePin* pPin) = 0;
-	STDMETHOD_(CBasePin*, GetRelatedPin) () = 0;
+	STDMETHOD(SetRelatedPin) (CBasePin* pPin) PURE;
+	STDMETHOD_(CBasePin*, GetRelatedPin) () PURE;
 };
 
 class CBaseMuxerRelatedPin : public IBaseMuxerRelatedPin
@@ -234,7 +234,7 @@ protected:
 		return m_pOutput;
 	}
 
-	virtual void MuxInit() = 0;
+	virtual void MuxInit() PURE;
 
 	// only called when the output pin is connected
 	virtual void MuxHeader(IBitStream* pBS) {}

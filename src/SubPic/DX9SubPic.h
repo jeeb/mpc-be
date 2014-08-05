@@ -30,8 +30,8 @@
 class CVirtualLock
 {
 public:
-	virtual void Lock() = 0;
-	virtual void Unlock() = 0;
+	virtual void Lock() PURE;
+	virtual void Unlock() PURE;
 };
 
 typedef void (FLock)(void *_pLock);

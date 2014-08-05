@@ -124,7 +124,7 @@ public:
 
 	HRESULT FillBuffer(IMediaSample* pSample);
 
-	virtual HRESULT FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, long& len /*in+out*/) = 0;
+	virtual HRESULT FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, long& len /*in+out*/) PURE;
 
 	STDMETHODIMP Notify(IBaseFilter* pSender, Quality q);
 

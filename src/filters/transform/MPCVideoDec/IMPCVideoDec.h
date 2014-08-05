@@ -105,39 +105,39 @@ interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {
 
-	STDMETHOD(SetThreadNumber(int nValue)) = 0;
-	STDMETHOD_(int, GetThreadNumber()) = 0;
-	STDMETHOD(SetDiscardMode(int nValue)) = 0;
-	STDMETHOD_(int, GetDiscardMode()) = 0;
-	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue)) = 0;
-	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing()) = 0;
-	STDMETHOD(SetARMode(int nValue)) = 0;
-	STDMETHOD_(int, GetARMode()) = 0;
+	STDMETHOD(SetThreadNumber(int nValue)) PURE;
+	STDMETHOD_(int, GetThreadNumber()) PURE;
+	STDMETHOD(SetDiscardMode(int nValue)) PURE;
+	STDMETHOD_(int, GetDiscardMode()) PURE;
+	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue)) PURE;
+	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing()) PURE;
+	STDMETHOD(SetARMode(int nValue)) PURE;
+	STDMETHOD_(int, GetARMode()) PURE;
 
-	STDMETHOD(SetDXVACheckCompatibility(int nValue)) = 0;
-	STDMETHOD_(int, GetDXVACheckCompatibility()) = 0;
-	STDMETHOD(SetDXVA_SD(int nValue)) = 0;
-	STDMETHOD_(int, GetDXVA_SD()) = 0;
+	STDMETHOD(SetDXVACheckCompatibility(int nValue)) PURE;
+	STDMETHOD_(int, GetDXVACheckCompatibility()) PURE;
+	STDMETHOD(SetDXVA_SD(int nValue)) PURE;
+	STDMETHOD_(int, GetDXVA_SD()) PURE;
 
-	STDMETHOD(SetSwRefresh(int nValue)) = 0;
-	STDMETHOD(SetSwPixelFormat(MPCPixelFormat pf, bool enable)) = 0;
-	STDMETHOD_(bool, GetSwPixelFormat(MPCPixelFormat pf)) = 0;
-	STDMETHOD(SetSwPreset(int nValue)) = 0;
-	STDMETHOD_(int, GetSwPreset()) = 0;
-	STDMETHOD(SetSwStandard(int nValue)) = 0;
-	STDMETHOD_(int, GetSwStandard()) = 0;
-	STDMETHOD(SetSwRGBLevels(int nValue)) = 0;
-	STDMETHOD_(int, GetSwRGBLevels()) = 0;
+	STDMETHOD(SetSwRefresh(int nValue)) PURE;
+	STDMETHOD(SetSwPixelFormat(MPCPixelFormat pf, bool enable)) PURE;
+	STDMETHOD_(bool, GetSwPixelFormat(MPCPixelFormat pf)) PURE;
+	STDMETHOD(SetSwPreset(int nValue)) PURE;
+	STDMETHOD_(int, GetSwPreset()) PURE;
+	STDMETHOD(SetSwStandard(int nValue)) PURE;
+	STDMETHOD_(int, GetSwStandard()) PURE;
+	STDMETHOD(SetSwRGBLevels(int nValue)) PURE;
+	STDMETHOD_(int, GetSwRGBLevels()) PURE;
 
-	STDMETHOD(SetActiveCodecs(ULONGLONG nValue)) = 0;
-	STDMETHOD_(ULONGLONG, GetActiveCodecs()) = 0;
+	STDMETHOD(SetActiveCodecs(ULONGLONG nValue)) PURE;
+	STDMETHOD_(ULONGLONG, GetActiveCodecs()) PURE;
 
-	STDMETHOD(SaveSettings()) = 0;
+	STDMETHOD(SaveSettings()) PURE;
 
-	STDMETHOD_(CString, GetInformation(MPCInfo index)) = 0;
+	STDMETHOD_(CString, GetInformation(MPCInfo index)) PURE;
 
-	STDMETHOD_(GUID*, GetDXVADecoderGuid()) = 0;
-	STDMETHOD_(int, GetColorSpaceConversion()) = 0;
-	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) = 0;
-	STDMETHOD_(int, GetFrameType()) = 0;
+	STDMETHOD_(GUID*, GetDXVADecoderGuid()) PURE;
+	STDMETHOD_(int, GetColorSpaceConversion()) PURE;
+	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) PURE;
+	STDMETHOD_(int, GetFrameType()) PURE;
 };

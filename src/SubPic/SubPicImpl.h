@@ -78,10 +78,10 @@ public:
 	STDMETHODIMP_(void) SetStart(REFERENCE_TIME rtStart);
 	STDMETHODIMP_(void) SetStop(REFERENCE_TIME rtStop);
 
-	STDMETHODIMP GetDesc(SubPicDesc& spd) = 0;
+	STDMETHODIMP GetDesc(SubPicDesc& spd) PURE;
 	STDMETHODIMP CopyTo(ISubPic* pSubPic);
 
-	STDMETHODIMP ClearDirtyRect(DWORD color) = 0;
+	STDMETHODIMP ClearDirtyRect(DWORD color) PURE;
 	STDMETHODIMP GetDirtyRect(RECT* pDirtyRect);
 	STDMETHODIMP SetDirtyRect(RECT* pDirtyRect);
 
@@ -89,10 +89,10 @@ public:
 	STDMETHODIMP SetSize(SIZE size, RECT vidrect);
 	STDMETHODIMP GetSize(SIZE* pSize);
 
-	STDMETHODIMP Lock(SubPicDesc& spd) = 0;
-	STDMETHODIMP Unlock(RECT* pDirtyRect) = 0;
+	STDMETHODIMP Lock(SubPicDesc& spd) PURE;
+	STDMETHODIMP Unlock(RECT* pDirtyRect) PURE;
 
-	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) = 0;
+	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) PURE;
 
 	STDMETHODIMP SetVirtualTextureSize (const SIZE pSize, const POINT pTopLeft);
 	STDMETHODIMP GetSourceAndDest(SIZE* pSize, RECT* pRcSource, RECT* pRcDest);
@@ -114,7 +114,7 @@ private:
 	CRect m_curvidrect;
 	bool m_fDynamicWriteOnly;
 
-	virtual bool Alloc(bool fStatic, ISubPic** ppSubPic) = 0;
+	virtual bool Alloc(bool fStatic, ISubPic** ppSubPic) PURE;
 
 protected:
 	bool m_fPow2Textures;

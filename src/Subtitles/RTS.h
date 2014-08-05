@@ -69,7 +69,7 @@ protected:
 	double m_scalex, m_scaley;
 	CStringW m_str;
 
-	virtual bool CreatePath() = 0;
+	virtual bool CreatePath() PURE;
 
 public:
 	bool m_fWhiteSpaceChar, m_fLineBreak;
@@ -87,7 +87,7 @@ public:
 		  COutlineCache& outlineCache, COverlayCache& overlayCache);
 	virtual ~CWord();
 
-	virtual CWord* Copy() = 0;
+	virtual CWord* Copy() PURE;
 	virtual bool Append(CWord* w);
 
 	void Paint(const CPoint& p, const CPoint& org);
