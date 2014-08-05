@@ -23,6 +23,9 @@
 #include "MainFrm.h"
 #include "PPagePlayer.h"
 
+#define MIN_RECENT_FILES 10
+#define MAX_RECENT_FILES 50
+
 
 // CPPagePlayer dialog
 
@@ -46,6 +49,7 @@ CPPagePlayer::CPPagePlayer()
 	, m_fLimitWindowProportions(TRUE)
 	, m_fRememberDVDPos(FALSE)
 	, m_fRememberFilePos(FALSE)
+	, m_nRecentFiles(20)
 {
 }
 
@@ -75,7 +79,8 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DVD_POS, m_fRememberDVDPos);
 	DDX_Check(pDX, IDC_FILE_POS, m_fRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2, m_bRememberPlaylistItems);
-	DDX_Control(pDX, IDC_COMBO1, m_nFileHistoryCtrl);
+	DDX_Text(pDX, IDC_EDIT1, m_nRecentFiles);
+	DDX_Control(pDX, IDC_SPIN1, m_RecentFilesCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
@@ -113,29 +118,16 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_fRememberFilePos = s.fRememberFilePos;
 	m_fLimitWindowProportions = s.fLimitWindowProportions;
 	m_bRememberPlaylistItems = s.bRememberPlaylistItems;
-
-	int idx = 0;
-	BOOL bSelect = FALSE;
-	for (int count = 5; count <= 50; count += 5) {
-		CString str;
-		str.Format(L"%d", count);
-		m_nFileHistoryCtrl.AddString(str);
-
-		if (count == s.iRecentFilesNumber) {
-			m_nFileHistoryCtrl.SetCurSel(idx);
-			bSelect = TRUE;
-		}
-		idx++;
-	}
-	if (!bSelect) {
-		m_nFileHistoryCtrl.SetCurSel(3);
-	}
+	
+	m_nRecentFiles = s.iRecentFilesNumber;
+	m_RecentFilesCtrl.SetRange(MIN_RECENT_FILES, MAX_RECENT_FILES);
+	m_RecentFilesCtrl.SetPos(m_nRecentFiles);
 
 	UpdateData(FALSE);
 
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
-	GetDlgItem(IDC_COMBO1)->EnableWindow(s.fKeepHistory);
+	m_RecentFilesCtrl.EnableWindow(s.fKeepHistory);
 
 	return TRUE;
 }
@@ -201,7 +193,8 @@ BOOL CPPagePlayer::OnApply()
 		s.ClearFilePositions();
 	}
 
-	s.iRecentFilesNumber = (m_nFileHistoryCtrl.GetCurSel() + 1) * 5;
+	m_nRecentFiles = min(max(MIN_RECENT_FILES, m_nRecentFiles), MAX_RECENT_FILES); // CSpinButtonCtrl.SetRange() does not affect the manual input
+	s.iRecentFilesNumber = m_nRecentFiles;
 	s.MRU.SetSize(s.iRecentFilesNumber);
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
 
@@ -216,7 +209,7 @@ BOOL CPPagePlayer::OnApply()
 
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
-	GetDlgItem(IDC_COMBO1)->EnableWindow(s.fKeepHistory);
+	m_RecentFilesCtrl.EnableWindow(s.fKeepHistory);
 
 	return __super::OnApply();
 }

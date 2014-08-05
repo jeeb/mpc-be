@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Prefer external audio files over embedded audio track"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 5		"Options d'ouverture"
 6		"Force a single process"
 8		"Use same process for every file"
@@ -392,6 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 31		"Historique"
 32		"Se souvenir du recadrage (Pan && Scan)"
 33		"Remember last playlist"
+34		"Number of recent files:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32

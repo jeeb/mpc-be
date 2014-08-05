@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Prefer external audio files over embedded audio track"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
 8		"파일을 열때마다 같은 플레이어창 사용"
@@ -392,6 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 31		"히스토리"
 32		"지난 Pan-n-Scan 줌 기억"
 33		"지난 재생목록 기억"
+34		"Number of recent files:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32

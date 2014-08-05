@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Prefer external audio files over embedded audio track"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 5		"Επιλογές ανοίγματος"
 6		"Force a single process"
 8		"Χρήση του ίδιου αναπαραγωγού για κάθε αρχείο πολυμέσων"
@@ -392,6 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 31		"Ιστορικό"
 32		"Απομνημ. τελευτ. ζούμ πανορ/κής && σάρωσης"
 33		"Απομνημ. τελευταίας λίστας αναπαραγωγής"
+34		"Number of recent files:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32

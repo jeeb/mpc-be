@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Віддавати перевагу зовнішнім аудіофайлам перед вбудованими доріжками"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 5		"При відкритті файлів"
 6		"Примусовий одновіконний режим"
 8		"Використовувати один процес для усіх файлів"
@@ -392,6 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 31		"Історія"
 32		"Запам'ятов. останнє значення Pan-n-Scan"
 33		"Запам'ятов. останній список відтворення"
+34		"Number of recent files:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32

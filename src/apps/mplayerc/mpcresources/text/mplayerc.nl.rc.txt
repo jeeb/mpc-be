@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Prefereer externe audiobestanden boven ingesloten audiospoor"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 5		"Opties voor openen"
 6		"Forceer een enkel proces"
 8		"Gebruik hetzelfde proces voor elk bestand"
@@ -392,6 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 31		"Geschiedenis"
 32		"Laatste Pan&&Scan-zoom onthouden"
 33		"Laatste afspeellijst onthouden"
+34		"Number of recent files:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32

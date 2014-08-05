@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Preferisci tracce audio esterne rispetto a quelle incorporate"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 5		"Opzioni di apertura"
 6		"Forza un unico processo"
 8		"Apri solo un'unica schermata per ogni file aperto."
@@ -392,6 +392,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 31		"Cronologia"
 32		"Ricorda l'ultimo zoom Pan&&Scan"
 33		"Ricorda l'ultima playlist"
+34		"Number of recent files:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
