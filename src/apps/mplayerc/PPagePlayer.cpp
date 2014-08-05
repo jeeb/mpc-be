@@ -88,6 +88,7 @@ BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_DVD_POS, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_FILE_POS, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_COMBO1, OnUpdatePos)
+	ON_EN_KILLFOCUS(IDC_EDIT1, OnKillFocusEdit1)
 END_MESSAGE_MAP()
 
 // CPPagePlayer message handlers
@@ -195,7 +196,6 @@ BOOL CPPagePlayer::OnApply()
 		s.ClearFilePositions();
 	}
 
-	m_nRecentFiles = min(max(MIN_RECENT_FILES, m_nRecentFiles), MAX_RECENT_FILES); // CSpinButtonCtrl.SetRange() does not affect the manual input
 	s.iRecentFilesNumber = m_nRecentFiles;
 	s.MRU.SetSize(s.iRecentFilesNumber);
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
@@ -228,4 +228,11 @@ void CPPagePlayer::OnUpdatePos(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(!!m_fKeepHistory);
+}
+
+void CPPagePlayer::OnKillFocusEdit1()
+{
+	m_nRecentFiles = min(max(MIN_RECENT_FILES, m_nRecentFiles), MAX_RECENT_FILES); // CSpinButtonCtrl.SetRange() does not affect the manual input
+
+	UpdateData(FALSE);
 }
