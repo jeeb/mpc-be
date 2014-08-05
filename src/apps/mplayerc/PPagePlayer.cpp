@@ -75,12 +75,14 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DVD_POS, m_fRememberDVDPos);
 	DDX_Check(pDX, IDC_FILE_POS, m_fRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2, m_bRememberPlaylistItems);
+	DDX_Control(pDX, IDC_COMBO1, m_nFileHistoryCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK13, OnUpdateCheck13)
 	ON_UPDATE_COMMAND_UI(IDC_DVD_POS, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_FILE_POS, OnUpdatePos)
+	ON_UPDATE_COMMAND_UI(IDC_COMBO1, OnUpdatePos)
 END_MESSAGE_MAP()
 
 // CPPagePlayer message handlers
@@ -88,6 +90,8 @@ END_MESSAGE_MAP()
 BOOL CPPagePlayer::OnInitDialog()
 {
 	__super::OnInitDialog();
+
+	SetHandCursor(m_hWnd, IDC_COMBO1);
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -110,10 +114,28 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_fLimitWindowProportions = s.fLimitWindowProportions;
 	m_bRememberPlaylistItems = s.bRememberPlaylistItems;
 
+	int idx = 0;
+	BOOL bSelect = FALSE;
+	for (int count = 5; count <= 50; count += 5) {
+		CString str;
+		str.Format(L"%d", count);
+		m_nFileHistoryCtrl.AddString(str);
+
+		if (count == s.iRecentFilesNumber) {
+			m_nFileHistoryCtrl.SetCurSel(idx);
+			bSelect = TRUE;
+		}
+		idx++;
+	}
+	if (!bSelect) {
+		m_nFileHistoryCtrl.SetCurSel(3);
+	}
+
 	UpdateData(FALSE);
 
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
+	GetDlgItem(IDC_COMBO1)->EnableWindow(s.fKeepHistory);
 
 	return TRUE;
 }
@@ -149,8 +171,8 @@ BOOL CPPagePlayer::OnApply()
 		}
 	}
 	s.fLimitWindowProportions = !!m_fLimitWindowProportions;
-	s.fRememberDVDPos = m_fRememberDVDPos ? true : false;
-	s.fRememberFilePos = m_fRememberFilePos ? true : false;
+	s.fRememberDVDPos = !!m_fRememberDVDPos;
+	s.fRememberFilePos = !!m_fRememberFilePos;
 	s.bRememberPlaylistItems = !!m_bRememberPlaylistItems;
 
 	if (!m_fKeepHistory) {
@@ -171,10 +193,17 @@ BOOL CPPagePlayer::OnApply()
 		if (SUCCEEDED(hr)) {
 			hr = pDests->RemoveAllDestinations();
 		}
-
-		s.ClearFilePositions();
+	}
+	if (!m_fKeepHistory || !m_fRememberDVDPos) {
 		s.ClearDVDPositions();
 	}
+	if (!m_fKeepHistory || !m_fRememberFilePos) {
+		s.ClearFilePositions();
+	}
+
+	s.iRecentFilesNumber = (m_nFileHistoryCtrl.GetCurSel() + 1) * 5;
+	s.MRU.SetSize(s.iRecentFilesNumber);
+	s.MRUDub.SetSize(s.iRecentFilesNumber);
 
 	// Check if the settings location needs to be changed
 	if (AfxGetMyApp()->IsIniValid() != !!m_fUseIni) {
@@ -187,6 +216,7 @@ BOOL CPPagePlayer::OnApply()
 
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
+	GetDlgItem(IDC_COMBO1)->EnableWindow(s.fKeepHistory);
 
 	return __super::OnApply();
 }

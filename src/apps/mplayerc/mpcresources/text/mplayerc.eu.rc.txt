@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Hobetsi kanpoko audio agiriak barneratutako audio bideen gainetik"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Ireki aukerak"
 6		"Behartu prozesu bakarra"
 8		"Erabili prozesu berdina agiri guztientzat"

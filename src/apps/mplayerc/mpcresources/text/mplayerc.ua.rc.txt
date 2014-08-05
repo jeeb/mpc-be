@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Віддавати перевагу зовнішнім аудіофайлам перед вбудованими доріжками"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"При відкритті файлів"
 6		"Примусовий одновіконний режим"
 8		"Використовувати один процес для усіх файлів"

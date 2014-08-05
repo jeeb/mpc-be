@@ -28,8 +28,10 @@
 
 CAppSettings::CAppSettings()
 	: fInitialized(false)
-	, MRU(0, _T("Recent File List"), _T("File%d"), 20)
-	, MRUDub(0, _T("Recent Dub List"), _T("Dub%d"), 20)
+	, fKeepHistory(true)
+	, iRecentFilesNumber(20)
+	, MRU(0, _T("Recent File List"), _T("File%d"), iRecentFilesNumber)
+	, MRUDub(0, _T("Recent Dub List"), _T("Dub%d"), iRecentFilesNumber)
 	, hAccel(NULL)
 	, nCmdlnWebServerPort(-1)
 	, fShowDebugInfo(false)
@@ -396,7 +398,7 @@ DVD_POSITION* CAppSettings::CurrentDVDPosition()
 bool CAppSettings::NewDvd(ULONGLONG llDVDGuid)
 {
 	// Look for the DVD position
-	for (int i = 0; i < MAX_DVD_POSITION; i++) {
+	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
 		if (DvdPosition[i].llDVDGuid == llDVDGuid) {
 			nCurrentDvdPosition = i;
 			return false;
@@ -404,7 +406,7 @@ bool CAppSettings::NewDvd(ULONGLONG llDVDGuid)
 	}
 
 	// If DVD is unknown, we put it first
-	for (int i = MAX_DVD_POSITION - 1; i > 0; i--) {
+	for (int i = min(iRecentFilesNumber, MAX_DVD_POSITION) - 1; i > 0; i--) {
 		memcpy(&DvdPosition[i], &DvdPosition[i-1], sizeof(DVD_POSITION));
 	}
 	DvdPosition[0].llDVDGuid	= llDVDGuid;
@@ -424,7 +426,7 @@ FILE_POSITION* CAppSettings::CurrentFilePosition()
 bool CAppSettings::NewFile(LPCTSTR strFileName)
 {
 	// Look for the file position
-	for (int i = 0; i < MAX_FILE_POSITION; i++) {
+	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		if (FilePosition[i].strFile == strFileName) {
 			nCurrentFilePosition = i;
 			return false;
@@ -432,7 +434,7 @@ bool CAppSettings::NewFile(LPCTSTR strFileName)
 	}
 
 	// If it is unknown, we put it first
-	for (int i = MAX_FILE_POSITION - 1; i > 0; i--) {
+	for (int i = min(iRecentFilesNumber, MAX_FILE_POSITION) - 1; i > 0; i--) {
 		FilePosition[i].strFile		= FilePosition[i-1].strFile;
 		FilePosition[i].llPosition	= FilePosition[i-1].llPosition;
 	}
@@ -520,6 +522,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, sizeAspectRatio.cx);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, sizeAspectRatio.cy);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, fKeepHistory);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, iDSVideoRendererType);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RMVIDEORENDERERTYPE, iRMVideoRendererType);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_QTVIDEORENDERERTYPE, iQTVideoRendererType);
@@ -677,25 +680,28 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVDPOS, (int)fRememberDVDPos);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, (int)fRememberFilePos);
 	if (fKeepHistory) {
-		for (int i = 0; i < MAX_DVD_POSITION; i++) {
-			CString strDVDPos;
-			CString strValue;
+		if (fRememberDVDPos) {
+			for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
+				CString strDVDPos;
+				CString strValue;
 
-			strDVDPos.Format(_T("DVD Position %d"), i);
-			strValue = SerializeHex((BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
-			pApp->WriteProfileString(IDS_R_SETTINGS, strDVDPos, strValue);
+				strDVDPos.Format(_T("DVD Position %d"), i);
+				strValue = SerializeHex((BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
+				pApp->WriteProfileString(IDS_R_SETTINGS, strDVDPos, strValue);
+			}
 		}
 
-		// playback positions for last played files
-		for (int i = 0; i < MAX_FILE_POSITION; i++) {
-			CString strFilePos;
-			CString strValue;
+		if (fRememberFilePos) {
+			for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
+				CString strFilePos;
+				CString strValue;
 
-			strFilePos.Format(_T("File Name %d"), i);
-			pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, FilePosition[i].strFile);
-			strFilePos.Format(_T("File Position %d"), i);
-			strValue.Format(_T("%I64d"), FilePosition[i].llPosition);
-			pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
+				strFilePos.Format(_T("File Name %d"), i);
+				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, FilePosition[i].strFile);
+				strFilePos.Format(_T("File Position %d"), i);
+				strValue.Format(_T("%I64d"), FilePosition[i].llPosition);
+				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
+			}
 		}
 	}
 
@@ -1065,6 +1071,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	sizeAspectRatio.cx = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, 0);
 	sizeAspectRatio.cy = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, 0);
 	fKeepHistory = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, 1);
+	iRecentFilesNumber = max(0, (int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, 20));
+	MRU.SetSize(iRecentFilesNumber);
+	MRUDub.SetSize(iRecentFilesNumber);
+
 	if (pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, &ptr, &len)) {
 		if (len == sizeof(CRect)) {
 			memcpy(&rcLastWindowPos, ptr, sizeof(CRect));
@@ -1456,7 +1466,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fRememberDVDPos		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVDPOS, 0);
 	nCurrentDvdPosition = -1;
 	memset(DvdPosition, 0, sizeof(DvdPosition));
-	for (int i = 0; i < MAX_DVD_POSITION; i++) {
+	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
 		CString		strDVDPos;
 		CString		strValue;
 
@@ -1470,7 +1480,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	// playback positions for last played files
 	fRememberFilePos		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, 0);
 	nCurrentFilePosition	= -1;
-	for (int i = 0; i < MAX_FILE_POSITION; i++) {
+	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		CString		strFilePos;
 		CString		strValue;
 
@@ -1802,7 +1812,7 @@ void CAppSettings::ClearFilePositions()
 {
 	CWinApp* pApp = AfxGetApp();
 	CString strFilePos;
-	for (int i = 0; i < MAX_FILE_POSITION; i++) {
+	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		FilePosition[i].strFile.Empty();
 		FilePosition[i].llPosition = 0;
 
@@ -1829,9 +1839,10 @@ void CAppSettings::ClearDVDPositions()
 {
 	CWinApp* pApp = AfxGetApp();
 	CString strDVDPos;
-	for (int i = 0; i < MAX_DVD_POSITION; i++) {
+	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
 		DvdPosition[i].llDVDGuid = 0;
 		DvdPosition[i].lTitle = 0;
+		memset(&DvdPosition[i].Timecode, 0, sizeof(DVD_HMSF_TIMECODE));
 
 		strDVDPos.Format(_T("DVD Position %d"), i);
 		pApp->WriteProfileString(IDS_R_SETTINGS, strDVDPos, L"");
@@ -2195,4 +2206,20 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 	}
 	// place this one at the beginning
 	m_arrNames[0] = pathName;
+}
+
+void CAppSettings::CRecentFileAndURLList::SetSize(int nSize)
+{
+	ENSURE_ARG(nSize >= 0);
+
+	if (m_nSize != nSize) {
+		CString* arrNames = new CString[nSize];
+		int nSizeToCopy = min(m_nSize, nSize);
+		for (int i = 0; i < nSizeToCopy; i++) {
+			arrNames[i] = m_arrNames[i];
+		}
+		delete [] m_arrNames;
+		m_arrNames = arrNames;
+		m_nSize = nSize;
+	}
 }

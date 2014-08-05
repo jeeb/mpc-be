@@ -366,7 +366,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 42		"Preferisci tracce audio esterne rispetto a quelle incorporate"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 35
 5		"Opzioni di apertura"
 6		"Forza un unico processo"
 8		"Apri solo un'unica schermata per ogni file aperto."

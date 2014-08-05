@@ -150,14 +150,14 @@ enum favtype {
 	FAV_DEVICE
 };
 
-#define MAX_DVD_POSITION 20
+#define MAX_DVD_POSITION 50
 struct DVD_POSITION {
 	ULONGLONG			llDVDGuid;
 	ULONG				lTitle;
 	DVD_HMSF_TIMECODE	Timecode;
 };
 
-#define MAX_FILE_POSITION 20
+#define MAX_FILE_POSITION 50
 struct FILE_POSITION {
 	CString				strFile;
 	LONGLONG			llPosition;
@@ -434,6 +434,8 @@ class CAppSettings
 							  int nMaxDispLen = AFX_ABBREV_FILENAME_LEN);
 
 		virtual void Add(LPCTSTR lpszPathName); // we have to override CRecentFileList::Add because the original version can't handle URLs
+
+		void SetSize(int nSize);
 	};
 
 public:
@@ -483,6 +485,7 @@ public:
 	int				iTitleBarTextStyle;
 	bool			fTitleBarTextTitle;
 	bool			fKeepHistory;
+	int				iRecentFilesNumber;
 	CRecentFileAndURLList MRU;
 	CRecentFileAndURLList MRUDub;
 	bool			fRememberDVDPos;

@@ -53,6 +53,8 @@ public:
 	BOOL m_fRememberFilePos;
 	BOOL m_bRememberPlaylistItems;
 
+	CComboBox m_nFileHistoryCtrl;
+
 	enum { IDD = IDD_PPAGEPLAYER };
 
 protected:
