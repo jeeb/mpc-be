@@ -2357,7 +2357,7 @@ BEGIN
     IDD_PPAGEINTERFACE      "Interface"
     IDD_PPAGEAUDIOSWITCHER  "Internal Filters::Audio Switcher"
     IDD_PPAGEFILTERSPERFORMANCE "Internal Filters::Performance"
-    IDD_PPAGEFILTERSPRIORITY "Internal Filters::Priority"
+    IDD_PPAGEFILTERSPRIORITY "External Filters::Priority"
     IDD_PPAGEEXTERNALFILTERS "External Filters"
 END
 

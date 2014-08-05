@@ -79,20 +79,20 @@ private:
 	CPPagePlayback m_playback;
 	CPPageDVD m_dvd;
 	CPPageOutput m_output;
-	CPPageYoutube m_youtube;
 	CPPageFullscreen m_fullscreen;
 	CPPageSync m_sync;
 	CPPageCapture m_tuner;
+	CPPageYoutube m_youtube;
 	CPPageInternalFilters m_internalfilters;
 	CPPageAudioSwitcher m_audioswitcher;
 	CPPageFiltersPerformance m_filtersperformance;
-	CPPageFiltersPriority m_filterspriority;
 	CPPageExternalFilters m_externalfilters;
+	CPPageFiltersPriority m_filterspriority;
 	CPPageSubtitles m_subtitles;
-	CPPageSubStyle m_substyle;
 	CPPageSubRend m_subMisc;
-	CPPageTweaks m_tweaks;
+	CPPageSubStyle m_substyle;
 	CPPageInterface m_interface;
+	CPPageTweaks m_tweaks;
 	CPPageMisc m_misc;
 
 	CTreeCtrl* CreatePageTreeObject();
