@@ -122,6 +122,8 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_nRecentFiles = s.iRecentFilesNumber;
 	m_RecentFilesCtrl.SetRange(MIN_RECENT_FILES, MAX_RECENT_FILES);
 	m_RecentFilesCtrl.SetPos(m_nRecentFiles);
+	UDACCEL acc = {0, 5};
+	m_RecentFilesCtrl.SetAccel(1, &acc);
 
 	UpdateData(FALSE);
 
