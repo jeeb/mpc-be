@@ -33,7 +33,7 @@
 #include "../../../DSUtil/ID3Tag.h"
 #include <libflac/src/libflac/include/protected/stream_decoder.h>
 
-#define _DECODER_   (FLAC__StreamDecoder*)m_pDecoder
+#define FLAC_DECODER (FLAC__StreamDecoder*)m_pDecoder
 
 #ifdef REGISTER_FILTER
 
@@ -158,8 +158,8 @@ STDMETHODIMP CFLACSource::QueryFilterInfo(FILTER_INFO* pInfo)
 
 CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 	: CBaseStream(NAME("CFLACStream"), pParent, phr)
-	, m_bIsEOF (false)
-	, m_pDecoder (NULL)
+	, m_bIsEOF(false)
+	, m_pDecoder(NULL)
 {
 	CAutoLock		cAutoLock(&m_cSharedState);
 	CString			fn(wfn);
@@ -169,8 +169,8 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 	file_info.got_vorbis_comments = false;
 
 	do {
-		if (!m_file.Open(fn, CFile::modeRead|CFile::shareDenyNone, &ex)) {
-			hr	= AmHresultFromWin32 (ex.m_lOsError);
+		if (!m_file.Open(fn, CFile::modeRead | CFile::shareDenyNone, &ex)) {
+			hr = AmHresultFromWin32 (ex.m_lOsError);
 			break;
 		}
 
@@ -179,11 +179,11 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 		}
 
-		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_VORBIS_COMMENT);
-		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_PICTURE);
-		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_CUESHEET);
+		FLAC__stream_decoder_set_metadata_respond(FLAC_DECODER, FLAC__METADATA_TYPE_VORBIS_COMMENT);
+		FLAC__stream_decoder_set_metadata_respond(FLAC_DECODER, FLAC__METADATA_TYPE_PICTURE);
+		FLAC__stream_decoder_set_metadata_respond(FLAC_DECODER, FLAC__METADATA_TYPE_CUESHEET);
 
-		if (FLAC__STREAM_DECODER_INIT_STATUS_OK != FLAC__stream_decoder_init_stream (_DECODER_,
+		if (FLAC__STREAM_DECODER_INIT_STATUS_OK != FLAC__stream_decoder_init_stream (FLAC_DECODER,
 				StreamDecoderRead,
 				StreamDecoderSeek,
 				StreamDecoderTell,
@@ -196,12 +196,12 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 		}
 
-		if (!FLAC__stream_decoder_process_until_end_of_metadata (_DECODER_) ||
-				!FLAC__stream_decoder_seek_absolute (_DECODER_, 0)) {
+		if (!FLAC__stream_decoder_process_until_end_of_metadata(FLAC_DECODER) ||
+				!FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0)) {
 			break;
 		}
 
-		FLAC__stream_decoder_get_decode_position(_DECODER_, &m_llOffset);
+		FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &m_llOffset);
 
 		CID3Tag* pID3Tag = NULL;
 
@@ -295,7 +295,7 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 CFLACStream::~CFLACStream()
 {
 	if (m_pDecoder) {
-		FLAC__stream_decoder_delete (_DECODER_);
+		FLAC__stream_decoder_delete(FLAC_DECODER);
 		m_pDecoder = NULL;
 	}
 }
@@ -329,39 +329,36 @@ HRESULT CFLACStream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, l
 	FLAC__uint64	llNextPos;
 
 	if (m_bDiscontinuity) {
-		FLAC__stream_decoder_seek_absolute (_DECODER_, FLAC__uint64((1.0 * m_rtPosition * m_i64TotalNumSamples) / m_rtDuration));
+		FLAC__stream_decoder_seek_absolute(FLAC_DECODER, FLAC__uint64((1.0 * m_rtPosition * m_i64TotalNumSamples) / m_rtDuration));
 		// need calculate in double, because uint64 can give overflow
 	}
 
-	FLAC__stream_decoder_get_decode_position(_DECODER_, &llCurPos);
+	FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &llCurPos);
 
-	FLAC__stream_decoder_skip_single_frame (_DECODER_);
-	if (m_bIsEOF) {
-		return S_FALSE;
-	}
+	FLAC__stream_decoder_skip_single_frame(FLAC_DECODER);
 
-	FLAC__stream_decoder_get_decode_position(_DECODER_, &llNextPos);
+	FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &llNextPos);
 
-	FLAC__uint64	llCurFile = m_file.GetPosition();
+	FLAC__uint64 llCurFile = m_file.GetPosition();
 	len = (long)(llNextPos - llCurPos);
-	ASSERT (len > 0);
+	ASSERT(len > 0);
 	if (len <= 0) {
 		return S_FALSE;
 	}
 
-	m_file.Seek (llCurPos, CFile::begin);
+	m_file.Seek(llCurPos, CFile::begin);
 	try {
-		m_file.Read (pOut, len);
+		m_file.Read(pOut, len);
 	} catch (CFileException* e) {
 		// TODO - Handle exception
 		e->Delete();
 		len = 0;
 	}
-	m_file.Seek (llCurFile, CFile::begin);
+	m_file.Seek(llCurFile, CFile::begin);
 
 	if (len) {
-		if ((_DECODER_)->protected_->blocksize > 0 && (_DECODER_)->protected_->sample_rate > 0) {
-			m_AvgTimePerFrame = (_DECODER_)->protected_->blocksize * UNITS / (_DECODER_)->protected_->sample_rate;
+		if ((FLAC_DECODER)->protected_->blocksize > 0 && (FLAC_DECODER)->protected_->sample_rate > 0) {
+			m_AvgTimePerFrame = (FLAC_DECODER)->protected_->blocksize * UNITS / (FLAC_DECODER)->protected_->sample_rate;
 		} else {
 			m_AvgTimePerFrame = m_rtDuration * len / (m_llFileSize - m_llOffset);
 		}
@@ -447,7 +444,7 @@ static int CalculateFLACFrameSize(UINT max_blocksize, UINT channels, UINT bits_p
 
 void CFLACStream::UpdateFromMetadata (void* pBuffer)
 {
-	const FLAC__StreamMetadata* pMetadata = (const FLAC__StreamMetadata*) pBuffer;
+	const FLAC__StreamMetadata* pMetadata = (const FLAC__StreamMetadata*)pBuffer;
 
 	if (pMetadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
 		const FLAC__StreamMetadata_StreamInfo *si = &pMetadata->data.stream_info;
@@ -561,28 +558,28 @@ FLAC__StreamDecoderReadStatus StreamDecoderRead(const FLAC__StreamDecoder *decod
 	pThis->m_bIsEOF	= (nRead != *bytes);
 	*bytes			= nRead;
 
-	return (*bytes == 0) ?  FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+	return (*bytes == 0) ? FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
 
 FLAC__StreamDecoderSeekStatus StreamDecoderSeek(const FLAC__StreamDecoder *decoder, FLAC__uint64 absolute_byte_offset, void *client_data)
 {
-	CFLACStream*	pThis = static_cast<CFLACStream*> (client_data);
+	CFLACStream*	pThis = static_cast<CFLACStream*>(client_data);
 
 	pThis->m_bIsEOF	= false;
-	pThis->GetFile()->Seek (absolute_byte_offset, CFile::begin);
+	pThis->GetFile()->Seek(absolute_byte_offset, CFile::begin);
 	return FLAC__STREAM_DECODER_SEEK_STATUS_OK;
 }
 
 FLAC__StreamDecoderTellStatus StreamDecoderTell(const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data)
 {
-	CFLACStream*	pThis = static_cast<CFLACStream*> (client_data);
+	CFLACStream*	pThis = static_cast<CFLACStream*>(client_data);
 	*absolute_byte_offset = pThis->GetFile()->GetPosition();
 	return FLAC__STREAM_DECODER_TELL_STATUS_OK;
 }
 
 FLAC__StreamDecoderLengthStatus StreamDecoderLength(const FLAC__StreamDecoder *decoder, FLAC__uint64 *stream_length, void *client_data)
 {
-	CFLACStream*	pThis = static_cast<CFLACStream*> (client_data);
+	CFLACStream*	pThis = static_cast<CFLACStream*>(client_data);
 	CFile*			pFile = pThis->GetFile();
 
 	if (pFile == NULL) {
@@ -595,14 +592,14 @@ FLAC__StreamDecoderLengthStatus StreamDecoderLength(const FLAC__StreamDecoder *d
 
 FLAC__bool StreamDecoderEof(const FLAC__StreamDecoder *decoder, void *client_data)
 {
-	CFLACStream*	pThis = static_cast<CFLACStream*> (client_data);
+	CFLACStream*	pThis = static_cast<CFLACStream*>(client_data);
 
 	return pThis->m_bIsEOF;
 }
 
 FLAC__StreamDecoderWriteStatus StreamDecoderWrite(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
 {
-	CFLACStream*	pThis = static_cast<CFLACStream*> (client_data);
+	CFLACStream* pThis = static_cast<CFLACStream*>(client_data);
 	UNREFERENCED_PARAMETER(pThis);
 
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
@@ -615,9 +612,9 @@ void StreamDecoderError(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderE
 
 void StreamDecoderMetadata(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
 {
-	CFLACStream*	pThis = static_cast<CFLACStream*> (client_data);
+	CFLACStream*	pThis = static_cast<CFLACStream*>(client_data);
 
 	if (pThis) {
-		pThis->UpdateFromMetadata ((void*)metadata);
+		pThis->UpdateFromMetadata((void*)metadata);
 	}
 }
