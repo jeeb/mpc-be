@@ -1393,7 +1393,7 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 			int j = 0;
 			while (pos) {
 				CMpegSplitterFile::program* p = &m_pFile->m_programs.GetNextValue(pos);
-				if (!p->streamCount(&m_pFile->m_streams)) {
+				if (!p->streamCount(m_pFile->m_streams)) {
 					continue;
 				}
 				if (j == lIndex) {
@@ -1520,7 +1520,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 			int j = 0;
 			while (pos) {
 				CMpegSplitterFile::program* p = &m_pFile->m_programs.GetNextValue(pos);
-				if (!p->streamCount(&m_pFile->m_streams)) {
+				if (!p->streamCount(m_pFile->m_streams)) {
 					continue;
 				}
 			

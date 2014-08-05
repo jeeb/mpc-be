@@ -211,12 +211,12 @@ public:
 			memset(this, 0, sizeof(*this));
 		}
 
-		size_t streamCount(CStreamsList* s) {
+		size_t streamCount(CStreamsList s) {
 			size_t cnt = 0;
 			for (size_t i = 0; i < _countof(streams); i++) {
 				if (streams[i].pid) {
 					for (int type = stream_type::video; type < stream_type::unknown; type++) {
-						if (s[type]->FindStream(streams[i].pid)) {
+						if (s[type].FindStream(streams[i].pid)) {
 							cnt++;
 							break;
 						}
@@ -240,7 +240,7 @@ public:
 			POSITION pos = GetStartPosition();
 			while (pos) {
 				program* p = &GetNextValue(pos);
-				if (p->streamCount(s)) {
+				if (p->streamCount(*s)) {
 					cnt++;
 				}
 			}
