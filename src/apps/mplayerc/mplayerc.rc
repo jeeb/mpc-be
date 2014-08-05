@@ -221,7 +221,7 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,17,105,18
     CONTROL         "New process for every file",IDC_RADIO3,
                     "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,35,105,18
-    GROUPBOX        "Title bar",IDC_STATIC,5,80,115,68
+    GROUPBOX        "Title bar",IDC_STATIC,5,80,115,68,WS_GROUP
     CONTROL         "Display full path",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,92,105,8
     CONTROL         "File name only",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,104,105,8
     CONTROL         "Don't prefix anything",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,116,105,8
