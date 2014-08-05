@@ -313,6 +313,7 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 	}
 
 	int got_frame = 0;
+	BOOL bFlush = (p == NULL);
 
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
@@ -343,6 +344,8 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 				return S_FALSE;
 			}
 		}
+	} else if (bFlush) {
+		return S_FALSE;
 	} else {
 		avpkt.data = p;
 		avpkt.size = buffsize;

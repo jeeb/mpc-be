@@ -492,8 +492,7 @@ HRESULT CMpaDecFilter::EndOfStream()
 
 	enum AVCodecID nCodecId = m_FFAudioDec.GetCodecId();
 	if (nCodecId != AV_CODEC_ID_NONE) {
-		ProcessFFmpeg(nCodecId); // process the remaining data in the buffer.
-		// LOOKATTHIS // necessary or not?
+		ProcessFFmpeg(nCodecId, TRUE); // process the remaining data in the ffmpeg's parser.
 	}
 
 	return __super::EndOfStream();
@@ -811,7 +810,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels, remap->dwChannelMask);
 }
 
-HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
+HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALSE*/)
 {
 	HRESULT hr;
 	BYTE* const base = m_buff.GetData();
@@ -820,8 +819,6 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 
 	enum AVCodecID ffCodecId = m_FFAudioDec.GetCodecId();
 
-//	if (ffCodecId != nCodecId 
-//			&& (ffCodecId != AV_CODEC_ID_MP1 && ffCodecId != AV_CODEC_ID_MP2)) {
 	if (ffCodecId == AV_CODEC_ID_NONE) {
 		m_FFAudioDec.Init(nCodecId, m_pInput);
 		m_FFAudioDec.SetDRC(GetDynamicRangeControl());
@@ -830,7 +827,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 	// RealAudio
 	CPaddedArray buffRA(FF_INPUT_BUFFER_PADDING_SIZE);
 	bool isRA = false;
-	if (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR) {
+	if (bEOF && (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR)) {
 		HRESULT hrRA = m_FFAudioDec.RealPrepare(p, int(end - p), buffRA);
 		if (hrRA == S_OK) {
 			p = buffRA.GetData();
@@ -843,27 +840,42 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 		}
 	}
 
-	while (p < end) {
-		int size = 0;
-		CAtlArray<BYTE> output;
-		SampleFormat samplefmt = SAMPLE_FMT_NONE;
+	if (bEOF) {
+		for (;;) {
+			int size = 0;
+			CAtlArray<BYTE> output;
+			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
-		hr = m_FFAudioDec.Decode(nCodecId, p, int(end - p), size, output, samplefmt);
-		if (FAILED(hr)) {
-			m_buff.RemoveAll();
-			m_bResync = true;
-			return S_OK;
-		} else if (hr == S_FALSE) {
-			m_bResync = true;
-			p += size;
-			continue;
-		} else if (output.GetCount() > 0) { // && SUCCEEDED(hr)
-			hr = Deliver(output.GetData(), (int)output.GetCount(), samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
-		} else if (size == 0) { // && pBuffOut.GetCount() == 0
-			break;
+			hr = m_FFAudioDec.Decode(nCodecId, NULL, 0, size, output, samplefmt);
+			if (hr == S_OK && output.GetCount() > 0) {
+				hr = Deliver(output.GetData(), (int)output.GetCount(), samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
+			} else {
+				return S_OK;	
+			}
 		}
+	} else {
+		while (p < end) {
+			int size = 0;
+			CAtlArray<BYTE> output;
+			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
-		p += size;
+			hr = m_FFAudioDec.Decode(nCodecId, p, int(end - p), size, output, samplefmt);
+			if (FAILED(hr)) {
+				m_buff.RemoveAll();
+				m_bResync = true;
+				return S_OK;
+			} else if (hr == S_FALSE) {
+				m_bResync = true;
+				p += size;
+				continue;
+			} else if (output.GetCount() > 0) { // && SUCCEEDED(hr)
+				hr = Deliver(output.GetData(), (int)output.GetCount(), samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
+			} else if (size == 0) { // && pBuffOut.GetCount() == 0
+				break;
+			}
+
+			p += size;
+		}
 	}
 
 	if (isRA) { // RealAudio
