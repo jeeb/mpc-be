@@ -34,26 +34,25 @@ public:
 	CPPagePlayer();
 	virtual ~CPPagePlayer();
 
-	int m_iMultipleInst;
-	int m_iTitleBarTextStyle;
+	int  m_iMultipleInst;
+	int  m_iTitleBarTextStyle;
 	BOOL m_bTitleBarTextTitle;
-	BOOL m_iAlwaysOnTop;
+	BOOL m_fKeepHistory;
+	int  m_nRecentFiles;
+	BOOL m_fRememberDVDPos;
+	BOOL m_fRememberFilePos;
 	BOOL m_fRememberWindowPos;
 	BOOL m_fRememberWindowSize;
 	BOOL m_fSavePnSZoom;
-	BOOL m_fSnapToDesktopEdges;
-	BOOL m_fUseIni;
+	BOOL m_bRememberPlaylistItems;
 	BOOL m_fTrayIcon;
-	BOOL m_fKeepHistory;
-	BOOL m_fHideCDROMsSubMenu;
-	BOOL m_priority;
 	BOOL m_fShowOSD;
 	BOOL m_fLimitWindowProportions;
-	BOOL m_fRememberDVDPos;
-	BOOL m_fRememberFilePos;
-	BOOL m_bRememberPlaylistItems;
+	BOOL m_fSnapToDesktopEdges;
+	BOOL m_fUseIni;
+	BOOL m_fHideCDROMsSubMenu;
+	BOOL m_bPriority;
 
-	int m_nRecentFiles;
 	CSpinButtonCtrl m_RecentFilesCtrl;
 
 	enum { IDD = IDD_PPAGEPLAYER };

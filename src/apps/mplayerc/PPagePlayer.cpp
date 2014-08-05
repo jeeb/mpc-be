@@ -33,23 +33,23 @@ IMPLEMENT_DYNAMIC(CPPagePlayer, CPPageBase)
 CPPagePlayer::CPPagePlayer()
 	: CPPageBase(CPPagePlayer::IDD, CPPagePlayer::IDD)
 	, m_iMultipleInst(1)
-	, m_iAlwaysOnTop(FALSE)
-	, m_fTrayIcon(FALSE)
 	, m_iTitleBarTextStyle(0)
-	, m_bTitleBarTextTitle(0)
+	, m_bTitleBarTextTitle(FALSE)
+	, m_fKeepHistory(FALSE)
+	, m_nRecentFiles(20)
+	, m_fRememberDVDPos(FALSE)
+	, m_fRememberFilePos(FALSE)
 	, m_fRememberWindowPos(FALSE)
 	, m_fRememberWindowSize(FALSE)
 	, m_fSavePnSZoom(FALSE)
-	, m_fSnapToDesktopEdges(FALSE)
-	, m_fUseIni(FALSE)
-	, m_fKeepHistory(FALSE)
-	, m_fHideCDROMsSubMenu(FALSE)
-	, m_priority(FALSE)
+	, m_bRememberPlaylistItems(FALSE)
+	, m_fTrayIcon(FALSE)
 	, m_fShowOSD(FALSE)
 	, m_fLimitWindowProportions(TRUE)
-	, m_fRememberDVDPos(FALSE)
-	, m_fRememberFilePos(FALSE)
-	, m_nRecentFiles(20)
+	, m_fSnapToDesktopEdges(FALSE)
+	, m_fUseIni(FALSE)
+	, m_fHideCDROMsSubMenu(FALSE)
+	, m_bPriority(FALSE)
 {
 }
 
@@ -64,7 +64,6 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO1, m_iMultipleInst);
 	DDX_Radio(pDX, IDC_RADIO4, m_iTitleBarTextStyle);
 	DDX_Check(pDX, IDC_CHECK13, m_bTitleBarTextTitle);
-	//DDX_Check(pDX, IDC_CHECK2, m_iAlwaysOnTop);
 	DDX_Check(pDX, IDC_CHECK3, m_fTrayIcon);
 	DDX_Check(pDX, IDC_CHECK6, m_fRememberWindowPos);
 	DDX_Check(pDX, IDC_CHECK7, m_fRememberWindowSize);
@@ -73,7 +72,7 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK8, m_fUseIni);
 	DDX_Check(pDX, IDC_CHECK1, m_fKeepHistory);
 	DDX_Check(pDX, IDC_CHECK10, m_fHideCDROMsSubMenu);
-	DDX_Check(pDX, IDC_CHECK9, m_priority);
+	DDX_Check(pDX, IDC_CHECK9, m_bPriority);
 	DDX_Check(pDX, IDC_SHOW_OSD, m_fShowOSD);
 	DDX_Check(pDX, IDC_CHECK4, m_fLimitWindowProportions);
 	DDX_Check(pDX, IDC_DVD_POS, m_fRememberDVDPos);
@@ -104,7 +103,6 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_iMultipleInst = s.iMultipleInst;
 	m_iTitleBarTextStyle = s.iTitleBarTextStyle;
 	m_bTitleBarTextTitle = s.fTitleBarTextTitle;
-	m_iAlwaysOnTop = s.iOnTop;
 	m_fTrayIcon = s.fTrayIcon;
 	m_fRememberWindowPos = s.fRememberWindowPos;
 	m_fRememberWindowSize = s.fRememberWindowSize;
@@ -113,7 +111,7 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_fUseIni = AfxGetMyApp()->IsIniValid();
 	m_fKeepHistory = s.fKeepHistory;
 	m_fHideCDROMsSubMenu = s.fHideCDROMsSubMenu;
-	m_priority = s.dwPriority != NORMAL_PRIORITY_CLASS;
+	m_bPriority = s.dwPriority != NORMAL_PRIORITY_CLASS;
 	m_fShowOSD = s.fShowOSD;
 	m_fRememberDVDPos = s.fRememberDVDPos;
 	m_fRememberFilePos = s.fRememberFilePos;
@@ -144,7 +142,6 @@ BOOL CPPagePlayer::OnApply()
 	s.iMultipleInst = m_iMultipleInst;
 	s.iTitleBarTextStyle = m_iTitleBarTextStyle;
 	s.fTitleBarTextTitle = !!m_bTitleBarTextTitle;
-	s.iOnTop = m_iAlwaysOnTop;
 	s.fTrayIcon = !!m_fTrayIcon;
 	s.fRememberWindowPos = !!m_fRememberWindowPos;
 	s.fRememberWindowSize = !!m_fRememberWindowSize;
@@ -152,7 +149,7 @@ BOOL CPPagePlayer::OnApply()
 	s.fSnapToDesktopEdges = !!m_fSnapToDesktopEdges;
 	s.fKeepHistory = !!m_fKeepHistory;
 	s.fHideCDROMsSubMenu = !!m_fHideCDROMsSubMenu;
-	s.dwPriority = !m_priority ? NORMAL_PRIORITY_CLASS : ABOVE_NORMAL_PRIORITY_CLASS;
+	s.dwPriority = !m_bPriority ? NORMAL_PRIORITY_CLASS : ABOVE_NORMAL_PRIORITY_CLASS;
 	BOOL bShowOSDChanged = (s.fShowOSD != !!m_fShowOSD);
 	s.fShowOSD = !!m_fShowOSD;
 	if (bShowOSDChanged) {
