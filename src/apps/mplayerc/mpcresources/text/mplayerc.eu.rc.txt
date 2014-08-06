@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Berrezarri Hautatutakoa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Gaitu barneraiketa audio aldaketa iragazkia (beharrezkoa berrabiaraztea)"
 8		"Audio denbora aldaketa (sm):"
 11		"Gaitu norbere bide mapaketa"

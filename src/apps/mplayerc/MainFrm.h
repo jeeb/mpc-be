@@ -979,8 +979,8 @@ public:
 	afx_msg void OnUpdatePlayVolumeBoost(CCmdUI* pCmdUI);
 	afx_msg void OnCustomChannelMapping();
 	afx_msg void OnUpdateCustomChannelMapping(CCmdUI* pCmdUI);
-	afx_msg void OnNormalizeRegainVolume(UINT nID);
-	afx_msg void OnUpdateNormalizeRegainVolume(CCmdUI* pCmdUI);
+	afx_msg void OnNormalizeVolume();
+	afx_msg void OnUpdateNormalizeVolume(CCmdUI* pCmdUI);
 	afx_msg void OnPlayColor(UINT nID);
 	afx_msg void OnAfterplayback(UINT nID);
 	afx_msg void OnUpdateAfterplayback(CCmdUI* pCmdUI);

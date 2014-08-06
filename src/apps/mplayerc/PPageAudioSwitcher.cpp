@@ -32,7 +32,7 @@ CPPageAudioSwitcher::CPPageAudioSwitcher(IFilterGraph* pFG)
 	: CPPageBase(CPPageAudioSwitcher::IDD, CPPageAudioSwitcher::IDD)
 	, m_fEnableAudioSwitcher(FALSE)
 	, m_fAudioNormalize(FALSE)
-	, m_fAudioNormalizeRecover(FALSE)
+	, m_iAudioRecoverStep(20)
 	, m_AudioBoostPos(0)
 	, m_fAudioTimeShift(FALSE)
 	, m_tAudioTimeShift(0)
@@ -53,7 +53,8 @@ void CPPageAudioSwitcher::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Check(pDX, IDC_CHECK2, m_fEnableAudioSwitcher);
 	DDX_Check(pDX, IDC_CHECK5, m_fAudioNormalize);
-	DDX_Check(pDX, IDC_CHECK6, m_fAudioNormalizeRecover);
+	DDX_Slider(pDX, IDC_SLIDER2, m_iAudioRecoverStep);
+	DDX_Control(pDX, IDC_SLIDER2, m_AudioRecoverStepCtrl);
 	DDX_Slider(pDX, IDC_SLIDER1, m_AudioBoostPos);
 	DDX_Control(pDX, IDC_SLIDER1, m_AudioBoostCtrl);
 	DDX_Check(pDX, IDC_CHECK4, m_fAudioTimeShift);
@@ -73,9 +74,9 @@ BEGIN_MESSAGE_MAP(CPPageAudioSwitcher, CPPageBase)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, OnNMClickList1)
 	ON_WM_DRAWITEM()
 	ON_EN_CHANGE(IDC_EDIT1, OnEnChangeEdit1)
+	ON_UPDATE_COMMAND_UI(IDC_SLIDER2, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_SLIDER1, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK5, OnUpdateAudioSwitcher)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK6, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK4, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateAudioSwitcher)
@@ -101,9 +102,10 @@ BOOL CPPageAudioSwitcher::OnInitDialog()
 
 	m_fEnableAudioSwitcher   = s.fEnableAudioSwitcher;
 	m_fAudioNormalize        = s.fAudioNormalize;
-	m_fAudioNormalizeRecover = s.fAudioNormalizeRecover;
-	m_AudioBoostPos          = (int)(s.dAudioBoost_dB*10+0.1);
+	m_AudioRecoverStepCtrl.SetRange(10, 200);
+	m_iAudioRecoverStep      = s.iAudioRecoverStep;
 	m_AudioBoostCtrl.SetRange(0, 100);
+	m_AudioBoostPos          = (int)(s.dAudioBoost_dB*10+0.1);
 	m_fAudioTimeShift        = s.fAudioTimeShift;
 	m_tAudioTimeShift        = s.iAudioTimeShift;
 	m_tAudioTimeShiftSpin.SetRange32(-1000*60*60*24, 1000*60*60*24);
@@ -168,7 +170,7 @@ BOOL CPPageAudioSwitcher::OnApply()
 
 	s.fEnableAudioSwitcher   = !!m_fEnableAudioSwitcher;
 	s.fAudioNormalize        = !!m_fAudioNormalize;
-	s.fAudioNormalizeRecover = !!m_fAudioNormalizeRecover;
+	s.iAudioRecoverStep      = m_iAudioRecoverStep;
 	s.dAudioBoost_dB         = (float)m_AudioBoostPos/10;
 	s.fAudioTimeShift        = !!m_fAudioTimeShift;
 	s.iAudioTimeShift        = m_tAudioTimeShift;
@@ -178,7 +180,7 @@ BOOL CPPageAudioSwitcher::OnApply()
 	if (m_pASF) {
 		m_pASF->SetSpeakerConfig(s.fCustomChannelMapping, s.pSpeakerToChannelMap);
 		m_pASF->SetAudioTimeShift(s.fAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
-		m_pASF->SetNormalizeBoost(s.fAudioNormalize, s.fAudioNormalizeRecover, s.dAudioBoost_dB);
+		m_pASF->SetNormalizeBoost(s.fAudioNormalize, s.iAudioRecoverStep, s.dAudioBoost_dB);
 	}
 
 	s.nSpeakerChannels = m_nChannels;

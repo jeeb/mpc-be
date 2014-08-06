@@ -36,8 +36,8 @@ public IUnknown {
 	STDMETHOD_(int, GetNumberOfInputChannels) () PURE;
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
-	STDMETHOD(GetNormalizeBoost) (bool& fNormalize, bool& fNormalizeRecover, float& boost) PURE;
-	STDMETHOD(SetNormalizeBoost) (bool fNormalize, bool fNormalizeRecover, float boost) PURE;
+	STDMETHOD(GetNormalizeBoost) (bool& fNormalize, int& iRecoverStep, float& boost) PURE;
+	STDMETHOD(SetNormalizeBoost) (bool fNormalize, int iRecoverStep, float boost) PURE;
 };
 
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
@@ -51,7 +51,8 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	bool m_fCustomChannelMapping;
 	DWORD m_pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS];
 	REFERENCE_TIME m_rtAudioTimeShift;
-	bool m_fNormalize, m_fNormalizeRecover;
+	bool m_fNormalize;
+	int  m_iRecoverStep; // percent per second
 	double m_normalizeFactor;
 	float m_boost_mul;
 
@@ -78,8 +79,8 @@ public:
 	STDMETHODIMP_(int) GetNumberOfInputChannels();
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
-	STDMETHODIMP GetNormalizeBoost(bool& fNormalize, bool& fNormalizeRecover, float& boost);
-	STDMETHODIMP SetNormalizeBoost(bool fNormalize, bool fNormalizeRecover, float boost);
+	STDMETHODIMP GetNormalizeBoost(bool& fNormalize, int& iRecoverStep, float& boost);
+	STDMETHODIMP SetNormalizeBoost(bool fNormalize, int iRecoverStep, float boost);
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);

@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"אפס נבחר"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"הפעל את פילטר מחליף זרמי השמע המובנה (דורש הפעלה מחדש)"
 8		"הזזת רצועת השמע (מילישניות):"
 11		"הפעל מיפוי ערוצים מותאם אישים"

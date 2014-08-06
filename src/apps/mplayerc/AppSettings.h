@@ -618,7 +618,7 @@ public:
 	// Audio Switcher
 	bool			fEnableAudioSwitcher;
 	bool			fAudioNormalize;
-	bool			fAudioNormalizeRecover;
+	int				iAudioRecoverStep;
 	float			dAudioBoost_dB;
 	bool			fAudioTimeShift;
 	int				iAudioTimeShift;

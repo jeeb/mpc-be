@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Ետարկել ընտրումը"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Միացնել ներդրված ձայնի անջատիչի ֆիլտրը (պահանջում է վերամեկնարկում)"
 8		"Ձայնի փոխումը(մվ-ում)."
 11		"Միացնել ալիքների ընտրված տեղորոշումը"

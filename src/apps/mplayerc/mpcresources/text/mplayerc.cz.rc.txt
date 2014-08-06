@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Výchozí (označené)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Povolit vestavěný audio switcher (vyžaduje restart)"
 8		"Posunout zvukovou stopu (ms):"
 11		"Povolit vlastní přiřazení zvukových kanálů"

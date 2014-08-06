@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Reiniciar Sel."
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Activar interruptor del filtre d'àudio intern (requereix reiniciar)"
 8		"Desplaçament de l'àudio (ms):"
 11		"Activar mapeig de canals editable"

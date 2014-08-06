@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Скинути обране"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Увімкнути вбудований перемикач аудіодоріжок (необхідний перезап.)"
 8		"Затримка звуку (в мс):"
 11		"Увімкнути розподіл каналів користувача"

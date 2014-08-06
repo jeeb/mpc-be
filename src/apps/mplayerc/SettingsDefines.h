@@ -82,7 +82,7 @@
 #define IDS_RS_COLOR_SATURATION				_T("VideoSaturation")
 #define IDS_RS_SHADERLIST					_T("Shaders List")
 #define IDS_RS_TITLEBARTEXTTITLE			_T("TitleBarTextTitle")
-#define IDS_RS_AUDIONORMALIZERECOVER		_T("AudioNormalizeRecover")
+#define IDS_RS_AUDIORECOVERSTEP				_T("AudioRecoverStep")
 #define IDS_RS_LOOPNUM						_T("LoopNum")
 #define IDS_RS_REWIND						_T("Rewind")
 #define IDS_RS_ZOOM							_T("Zoom")

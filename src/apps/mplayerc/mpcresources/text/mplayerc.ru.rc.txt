@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Сбросить выбранные"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Включить встроенный переключатель аудиодорожек (требуется перезапуск)"
 8		"Смещение звука (в мс):"
 11		"Включить пользовательское распределение каналов"

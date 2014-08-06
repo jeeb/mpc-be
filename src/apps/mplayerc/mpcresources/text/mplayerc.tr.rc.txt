@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Seçimi Sıfırla"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Dahili ses dönüştürücü süzgecini kullan (yeniden başlatma gerektirir)"
 8		"Ses süresi değişimi (ms):"
 11		"Özel kanal adreslemesini kullan"

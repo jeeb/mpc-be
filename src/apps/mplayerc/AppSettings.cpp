@@ -255,7 +255,6 @@ void CAppSettings::CreateCommands()
 	ADDCMD((ID_VOLUME_BOOST_MAX,				  0, FVIRTKEY|FNOINVERT,				IDS_VOLUME_BOOST_MAX));
 	ADDCMD((ID_CUSTOM_CHANNEL_MAPPING,			  0, FVIRTKEY|FNOINVERT,				IDS_CUSTOM_CHANNEL_MAPPING));
 	ADDCMD((ID_NORMALIZE,						  0, FVIRTKEY|FNOINVERT,				IDS_NORMALIZE));
-	ADDCMD((ID_REGAIN_VOLUME,					  0, FVIRTKEY|FNOINVERT,				IDS_REGAIN_VOLUME));
 	ADDCMD((ID_COLOR_BRIGHTNESS_INC,			  0, FVIRTKEY|FNOINVERT,				IDS_BRIGHTNESS_INC));
 	ADDCMD((ID_COLOR_BRIGHTNESS_DEC,			  0, FVIRTKEY|FNOINVERT,				IDS_BRIGHTNESS_DEC));
 	ADDCMD((ID_COLOR_CONTRAST_INC,				  0, FVIRTKEY|FNOINVERT,				IDS_CONTRAST_INC));
@@ -582,7 +581,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CUSTOMCHANNELMAPPING, fCustomChannelMapping);
 	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_SPEAKERTOCHANNELMAPPING, (BYTE*)pSpeakerToChannelMap, sizeof(pSpeakerToChannelMap));
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZE, fAudioNormalize);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZERECOVER, fAudioNormalizeRecover);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, iAudioRecoverStep);
 
 	CString strTemp;
 	strTemp.Format( _T("%.1f"), dAudioBoost_dB);
@@ -1162,7 +1161,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	fAudioNormalize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZE, FALSE);
-	fAudioNormalizeRecover = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZERECOVER, TRUE);
+	iAudioRecoverStep = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, 20);
 	dAudioBoost_dB = (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOBOOST, _T("0")));
 	if (dAudioBoost_dB < 0 || dAudioBoost_dB > 10) {
 		dAudioBoost_dB = 0;

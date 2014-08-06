@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Obnoviť vybrané"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Zapnúť vstavaný filter zvuku (vyžaduje reštart)"
 8		"Čas. posun zvuku (ms):"
 11		"Zapnúť mapovanie kanálov používateľom"

@@ -265,7 +265,6 @@
 #define ID_COLOR_RESET                  992
 #define ID_CUSTOM_CHANNEL_MAPPING       993
 #define ID_NORMALIZE                    994
-#define ID_REGAIN_VOLUME                995
 #define ID_MENU_NAVIGATE_AUDIO          1000
 #define ID_MENU_NAVIGATE_SUBTITLES      1001
 #define ID_MENU_NAVIGATE_JUMPTO         1002

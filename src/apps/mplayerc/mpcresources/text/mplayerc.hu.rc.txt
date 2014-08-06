@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Kijelöltek visszaállítása"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
 5		"Beépített audió-váltó szűrő engedélyezése (újraindítást igényel)"
 8		"Audió időzítés-eltolása:\n(ezredmásodpercben)"
 11		"Egyedi csatornaleképezés engedélyezése"

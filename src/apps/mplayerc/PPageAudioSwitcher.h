@@ -45,7 +45,8 @@ public:
 
 	BOOL m_fEnableAudioSwitcher;
 	BOOL m_fAudioNormalize;
-	BOOL m_fAudioNormalizeRecover;
+	int  m_iAudioRecoverStep;
+	CSliderCtrl m_AudioRecoverStepCtrl;
 	int m_AudioBoostPos;
 	CSliderCtrl m_AudioBoostCtrl;
 	BOOL m_fAudioTimeShift;

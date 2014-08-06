@@ -26,7 +26,7 @@
 #include "../../../DSUtil/AudioTools.h"
 #include <math.h>
 
-#define NORMALIZATION_REGAIN_STEP      0.06 // +6%/s
+#define NORMALIZATION_REGAIN_STEP      20
 #define NORMALIZATION_REGAIN_THRESHOLD 0.75
 
 #ifdef REGISTER_FILTER
@@ -87,7 +87,7 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtNextStart(0)
 	, m_rtNextStop(1)
 	, m_fNormalize(false)
-	, m_fNormalizeRecover(false)
+	, m_iRecoverStep(NORMALIZATION_REGAIN_STEP)
 	, m_normalizeFactor(4.0)
 	, m_boost_mul(1.0f)
 {
@@ -405,9 +405,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			double normFact = 1.0 / sample_max;
 			if (m_normalizeFactor > normFact) {
 				m_normalizeFactor = normFact;
-			} else if (m_fNormalizeRecover
-					   && sample_max * m_normalizeFactor < NORMALIZATION_REGAIN_THRESHOLD) { // we don't regain if we are too close of the maximum
-				m_normalizeFactor += NORMALIZATION_REGAIN_STEP * rtDur / 10000000; // the step is per second so we weight it with the duration
+			} else if (sample_max * m_normalizeFactor < NORMALIZATION_REGAIN_THRESHOLD) { // we don't regain if we are too close of the maximum
+				m_normalizeFactor += (double)m_iRecoverStep * rtDur / (10000000 * 100); // the step is per second so we weight it with the duration
 			}
 
 			if (m_normalizeFactor > 4.0) {
@@ -602,21 +601,21 @@ STDMETHODIMP CAudioSwitcherFilter::SetAudioTimeShift(REFERENCE_TIME rtAudioTimeS
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::GetNormalizeBoost(bool& fNormalize, bool& fNormalizeRecover, float& boost_dB)
+STDMETHODIMP CAudioSwitcherFilter::GetNormalizeBoost(bool& fNormalize, int& iRecoverStep, float& boost_dB)
 {
 	fNormalize = m_fNormalize;
-	fNormalizeRecover = m_fNormalizeRecover;
+	iRecoverStep = m_iRecoverStep;
 	boost_dB = 20*log10(m_boost_mul);
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::SetNormalizeBoost(bool fNormalize, bool fNormalizeRecover, float boost_dB)
+STDMETHODIMP CAudioSwitcherFilter::SetNormalizeBoost(bool fNormalize, int iRecoverStep, float boost_dB)
 {
 	if (m_fNormalize != fNormalize) {
 		m_normalizeFactor = 4.0;
 	}
 	m_fNormalize = fNormalize;
-	m_fNormalizeRecover = fNormalizeRecover;
+	m_iRecoverStep = min(max(10, iRecoverStep), 200);
 	m_boost_mul = pow(10.0f, boost_dB/20);
 	return S_OK;
 }
