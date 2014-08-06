@@ -1161,7 +1161,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	fAudioNormalize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZE, FALSE);
-	iAudioRecoverStep = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, 20);
+	iAudioRecoverStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, 20);
+	iAudioRecoverStep = min(max(10, iAudioRecoverStep), 200);
 	dAudioBoost_dB = (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOBOOST, _T("0")));
 	if (dAudioBoost_dB < 0 || dAudioBoost_dB > 10) {
 		dAudioBoost_dB = 0;

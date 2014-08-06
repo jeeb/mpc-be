@@ -102,10 +102,10 @@ BOOL CPPageAudioSwitcher::OnInitDialog()
 
 	m_fEnableAudioSwitcher   = s.fEnableAudioSwitcher;
 	m_fAudioNormalize        = s.fAudioNormalize;
-	m_AudioRecoverStepCtrl.SetRange(10, 200);
 	m_iAudioRecoverStep      = s.iAudioRecoverStep;
-	m_AudioBoostCtrl.SetRange(0, 100);
+	m_AudioRecoverStepCtrl.SetRange(10, 200, TRUE);
 	m_AudioBoostPos          = (int)(s.dAudioBoost_dB*10+0.1);
+	m_AudioBoostCtrl.SetRange(0, 100, TRUE);
 	m_fAudioTimeShift        = s.fAudioTimeShift;
 	m_tAudioTimeShift        = s.iAudioTimeShift;
 	m_tAudioTimeShiftSpin.SetRange32(-1000*60*60*24, 1000*60*60*24);
