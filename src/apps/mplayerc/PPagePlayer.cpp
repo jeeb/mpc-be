@@ -194,6 +194,7 @@ BOOL CPPagePlayer::OnApply()
 		s.ClearFilePositions();
 	}
 
+	m_nRecentFiles = min(max(MIN_RECENT_FILES, m_nRecentFiles), MAX_RECENT_FILES);
 	s.iRecentFilesNumber = m_nRecentFiles;
 	s.MRU.SetSize(s.iRecentFilesNumber);
 	s.MRUDub.SetSize(s.iRecentFilesNumber);

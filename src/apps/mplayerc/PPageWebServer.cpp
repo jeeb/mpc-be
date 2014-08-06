@@ -24,6 +24,8 @@
 #include "PPageWebServer.h"
 #include "../../DSUtil/SysVersion.h"
 
+#define MIN_PORT_NUMBER 1
+#define MAX_PORT_NUMBER 65535
 
 // CPPageWebServer dialog
 
@@ -130,6 +132,7 @@ BOOL CPPageWebServer::OnApply()
 					|| s.strWebRoot != NewWebRoot || s.strWebServerCGI != m_WebServerCGI;
 
 	s.fEnableWebServer = !!m_fEnableWebServer;
+	m_nWebServerPort = min(max(MIN_PORT_NUMBER, m_nWebServerPort), MAX_PORT_NUMBER);
 	s.nWebServerPort = m_nWebServerPort;
 	s.nWebServerQuality = m_nWebServerQuality;
 	s.fWebServerPrintDebugInfo = !!m_fWebServerPrintDebugInfo;
@@ -242,6 +245,8 @@ BEGIN_MESSAGE_MAP(CPPageWebServer, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateButton2)
+	ON_EN_KILLFOCUS(IDC_EDIT1, OnKillFocusEdit1)
+	ON_EN_CHANGE(IDC_EDIT1, OnKillFocusEdit1)
 END_MESSAGE_MAP()
 
 // CPPageWebServer message handlers
@@ -288,4 +293,11 @@ void CPPageWebServer::OnBnClickedButton2()
 void CPPageWebServer::OnUpdateButton2(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(GetDlgItem(IDC_EDIT2)->GetWindowTextLength() > 0);
+}
+
+void CPPageWebServer::OnKillFocusEdit1()
+{
+	m_nWebServerPort = min(max(MIN_PORT_NUMBER, m_nWebServerPort), MAX_PORT_NUMBER);
+
+	UpdateData(FALSE);
 }
