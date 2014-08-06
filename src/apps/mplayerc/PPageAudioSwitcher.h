@@ -76,6 +76,7 @@ public:
 	afx_msg void OnEnChangeEdit1();
 	afx_msg void OnUpdateAudioSwitcher(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateChannelMapping(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateNormalize(CCmdUI* pCmdUI);
 public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);

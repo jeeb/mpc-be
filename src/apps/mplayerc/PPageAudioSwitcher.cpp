@@ -74,14 +74,14 @@ BEGIN_MESSAGE_MAP(CPPageAudioSwitcher, CPPageBase)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, OnNMClickList1)
 	ON_WM_DRAWITEM()
 	ON_EN_CHANGE(IDC_EDIT1, OnEnChangeEdit1)
-	ON_UPDATE_COMMAND_UI(IDC_SLIDER2, OnUpdateAudioSwitcher)
-	ON_UPDATE_COMMAND_UI(IDC_SLIDER1, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK5, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK4, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_SPIN2, OnUpdateAudioSwitcher)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK1, OnUpdateAudioSwitcher)
+	ON_UPDATE_COMMAND_UI(IDC_SLIDER1, OnUpdateNormalize)
+	ON_UPDATE_COMMAND_UI(IDC_SLIDER2, OnUpdateNormalize)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateChannelMapping)
 	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdateChannelMapping)
 	ON_UPDATE_COMMAND_UI(IDC_LIST1, OnUpdateChannelMapping)
@@ -304,17 +304,19 @@ void CPPageAudioSwitcher::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStru
 
 void CPPageAudioSwitcher::OnUpdateAudioSwitcher(CCmdUI* pCmdUI)
 {
-	//	UpdateData();
-
 	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK2));
 }
 
 void CPPageAudioSwitcher::OnUpdateChannelMapping(CCmdUI* pCmdUI)
 {
-	//	UpdateData();
-
 	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK2)
 				   && IsDlgButtonChecked(IDC_CHECK1));
+}
+
+void CPPageAudioSwitcher::OnUpdateNormalize(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK2)
+				   && IsDlgButtonChecked(IDC_CHECK5));
 }
 
 void CPPageAudioSwitcher::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
