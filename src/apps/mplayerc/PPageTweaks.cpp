@@ -33,9 +33,10 @@ CPPageTweaks::CPPageTweaks()
 	, m_nJumpDistM(0)
 	, m_nJumpDistL(0)
 	, m_fFastSeek(FALSE)
-	, m_fPreventMinimize(FALSE)
 	, m_fDontUseSearchInFolder(FALSE)
+	, m_fPreventMinimize(FALSE)
 	, m_fLCDSupport(FALSE)
+	, m_fMiniDump(FALSE)
 {
 }
 

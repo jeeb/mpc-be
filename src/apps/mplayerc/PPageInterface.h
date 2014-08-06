@@ -37,38 +37,39 @@ public:
 
 	enum { IDD = IDD_PPAGEINTERFACE };
 	BOOL m_bUseDarkTheme;
-	CButton m_UseDarkThemeCtrl;
-	int m_nThemeBrightness;
-	int m_nThemeRed;
-	int m_nThemeGreen;
-	int m_nThemeBlue;
-	int m_nOSDTransparent;
+	int  m_nThemeBrightness;
+	int  m_nThemeRed;
+	int  m_nThemeGreen;
+	int  m_nThemeBlue;
+	BOOL m_fUseTimeTooltip;
 	BOOL m_fFileNameOnSeekBar;
+	BOOL m_fSmartSeek;
+	BOOL m_fChapterMarker;
+	BOOL m_fFlybar;
+	int  m_OSD_Size;
+	BOOL m_fFontShadow;
+	BOOL m_fFontAA;
+	int  m_nOSDTransparent;
+	int  m_OSDBorder;
+	BOOL m_fUseWin7TaskBar;
+	CString m_OSD_Font;
+
+	CButton m_UseDarkThemeCtrl;
 	CSliderCtrl m_ThemeBrightnessCtrl;
 	CSliderCtrl m_ThemeRedCtrl;
 	CSliderCtrl m_ThemeGreenCtrl;
 	CSliderCtrl m_ThemeBlueCtrl;
 	CSliderCtrl m_OSDTransparentCtrl;
-	int m_OSDBorder;
+	CComboBox m_TimeTooltipPosition;
+	CComboBox m_FontType;
+	CComboBox m_FontSize;
 	CSpinButtonCtrl m_OSDBorderCtrl;
+
 	COLORREF m_clrFaceABGR;
 	COLORREF m_clrOutlineABGR;
 	COLORREF m_clrFontABGR;
 	COLORREF m_clrGrad1ABGR;
 	COLORREF m_clrGrad2ABGR;
-
-	BOOL m_fUseWin7TaskBar;
-	BOOL m_fUseTimeTooltip;
-	CComboBox m_TimeTooltipPosition;
-	CComboBox m_FontSize;
-	CComboBox m_FontType;
-	int m_OSD_Size;
-	CString	m_OSD_Font;
-	BOOL m_fSmartSeek;
-	BOOL m_fChapterMarker;
-	BOOL m_fFlybar;
-	BOOL m_fFontShadow;
-	BOOL m_fFontAA;
 
 	int m_nThemeBrightness_Old;
 	int m_nThemeRed_Old;
@@ -76,15 +77,14 @@ public:
 	int m_nThemeBlue_Old;
 	int m_nOSDTransparent_Old;
 	int m_OSDBorder_Old;
+	BOOL m_fFontShadow_Old;
+	BOOL m_fFontAA_Old;
 
 	COLORREF m_clrFaceABGR_Old;
 	COLORREF m_clrOutlineABGR_Old;
 	COLORREF m_clrFontABGR_Old;
 	COLORREF m_clrGrad1ABGR_Old;
 	COLORREF m_clrGrad2ABGR_Old;
-
-	BOOL m_fFontShadow_Old;
-	BOOL m_fFontAA_Old;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
