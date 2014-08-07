@@ -30,7 +30,7 @@ class __declspec(uuid("1996C0A9-1F4C-4538-A6FF-ED0F591BE5D6"))
 private :
 	CComQIPtr<IMatroskaSplitterFilter> m_pMSF;
 
-	CButton m_cbLoadEmbeddedFonts;
+	CButton m_cbLoadEmbeddedFonts, m_cbCalcDuration;
 
 public:
 	CMatroskaSplitterSettingsWnd(void);
@@ -42,7 +42,7 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(300, 250); }
+	static CSize GetWindowSize() { return CSize(350, 250); }
 
 	DECLARE_MESSAGE_MAP()
 };

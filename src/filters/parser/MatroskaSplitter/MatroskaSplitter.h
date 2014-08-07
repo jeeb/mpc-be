@@ -57,9 +57,9 @@ class CMatroskaSplitterOutputPin : public CBaseSplitterOutputPin
 	CAutoPtrList<MatroskaPacket> m_packets;
 	CAtlList<MatroskaPacket*> m_rob;
 
-	typedef struct {
+	struct timeoverride {
 		REFERENCE_TIME rtStart, rtStop;
-	} timeoverride;
+	};
 	CAtlList<timeoverride> m_tos;
 
 protected:
@@ -93,7 +93,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 
 private:
 	CCritSec m_csProps;
-	bool m_bLoadEmbeddedFonts;
+	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
 
 protected:
 	CAutoPtr<MatroskaReader::CMatroskaFile> m_pFile;
@@ -144,6 +144,8 @@ public:
 
 	STDMETHODIMP SetLoadEmbeddedFonts(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetLoadEmbeddedFonts();
+	STDMETHODIMP SetCalcDuration(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetCalcDuration();
 };
 
 class __declspec(uuid("0A68C3B5-9164-4a54-AFAF-995B2FF0E0D4"))

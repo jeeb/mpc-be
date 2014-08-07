@@ -4,6 +4,7 @@
 //
 #define IDS_FILTER_SETTINGS_CAPTION     7000
 #define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
+#define IDS_MKVSPLT_CALC_DURATION       7701
 
 // Next default values for new objects
 // 

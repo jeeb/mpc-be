@@ -497,6 +497,7 @@
 #define IDS_ARS_SYSTEM_LAYOUT_CHANNELS  7610
 // matroska splitter
 #define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
+#define IDS_MKVSPLT_CALC_DURATION       7701
 // VTS reader
 #define IDS_VTSREADER_LOAD_PGC          7800
 ////////////////////////////////////////////

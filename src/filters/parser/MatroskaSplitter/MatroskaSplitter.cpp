@@ -36,6 +36,7 @@
 #define OPT_REGKEY_MATROSKASplit	_T("Software\\MPC-BE Filters\\Matroska Splitter")
 #define OPT_SECTION_MATROSKASplit	_T("Filters\\Matroska Splitter")
 #define OPT_LoadEmbeddedFonts		_T("LoadEmbeddedFonts")
+#define OPT_CalcDuration			_T("CalculateDuration")
 
 using namespace MatroskaReader;
 
@@ -94,6 +95,7 @@ CFilterApp theApp;
 CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CMatroskaSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_bLoadEmbeddedFonts(true)
+	, m_bCalcDuration(false)
 	, m_Seek_rt(INVALID_TIME)
 	, m_bSupportCueDuration(FALSE)
 {
@@ -106,9 +108,14 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_LoadEmbeddedFonts, dw)) {
 			m_bLoadEmbeddedFonts = !!dw;
 		}
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_CalcDuration, dw)) {
+			m_bCalcDuration = !!dw;
+		}
 	}
 #else
-	m_bLoadEmbeddedFonts = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+	m_bLoadEmbeddedFonts	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+	m_bCalcDuration			= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
 #endif
 }
 
@@ -204,7 +211,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
 	int iVideo = 1, iAudio = 1, iSubtitle = 1;
-	bool bHasVideo = 0;
+	bool bHasVideo = false;
 
 	POSITION pos = m_pFile->m_segment.Tracks.GetHeadPosition();
 	while (pos) {
@@ -1100,6 +1107,81 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	Info& info = m_pFile->m_segment.SegmentInfo;
 
 	m_rtDuration = (REFERENCE_TIME)(info.Duration * info.TimeCodeScale / 100);
+	
+	if (m_bCalcDuration && bHasVideo && m_pFile->m_segment.Cues.GetCount()) {
+		// calculate duration from video track;
+		m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+		m_pBlock.Free();
+
+		Segment& s = m_pFile->m_segment;
+		UINT64 TrackNumber = s.GetMasterTrack();
+
+		REFERENCE_TIME rtDur = INVALID_TIME;
+
+		POSITION pos1 = s.Cues.GetTailPosition();
+		while (pos1 && rtDur == INVALID_TIME) {
+			Cue* pCue = s.Cues.GetPrev(pos1);
+
+			POSITION pos2 = pCue->CuePoints.GetTailPosition();
+			while (pos2 && rtDur == INVALID_TIME) {
+				CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
+
+				POSITION pos3 = pCuePoint->CueTrackPositions.GetTailPosition();
+				while (pos3 && rtDur == INVALID_TIME) {
+					CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetPrev(pos3);
+
+					if (TrackNumber != pCueTrackPositions->CueTrack) {
+						continue;
+					}
+
+					m_pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
+					if (FAILED(m_pCluster->Parse())) {
+						continue;
+					}
+
+					do {
+						Cluster c;
+						c.ParseTimeCode(m_pCluster);
+
+						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
+
+							do {
+								CBlockGroupNode bgn;
+
+								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+									bgn.Parse(pBlock, true);
+								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+									bg->Block.Parse(pBlock, true);
+									if (!(bg->Block.Lacing & 0x80)) {
+										bg->ReferenceBlock.Set(0); // not a kf
+									}
+									bgn.AddTail(bg);
+								}
+
+								POSITION pos4 = bgn.GetHeadPosition();
+								while (pos4) {
+									BlockGroup* bg = bgn.GetNext(pos4);
+
+									if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack) {
+										REFERENCE_TIME rt = s.GetRefTime(c.TimeCode + bg->Block.TimeCode) + (bg->BlockDuration.IsValid() ? m_pFile->m_segment.GetRefTime(bg->BlockDuration) : 0);
+										rtDur = max(rtDur, rt);
+									}
+								}
+							} while (pBlock->NextBlock());
+						}
+					} while (m_pCluster->Next(true));
+				}
+			}
+		}
+		m_pCluster.Free();
+		m_pBlock.Free();
+
+		if (rtDur != INVALID_TIME) {
+			m_rtDuration = min(m_rtDuration, rtDur);
+		}
+	}
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
@@ -2384,9 +2466,11 @@ STDMETHODIMP CMatroskaSplitterFilter::Apply()
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MATROSKASplit)) {
 		key.SetDWORDValue(OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+		key.SetDWORDValue(OPT_CalcDuration, m_bCalcDuration);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
 #endif
 
 	return S_OK;
@@ -2403,4 +2487,17 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetLoadEmbeddedFonts()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_bLoadEmbeddedFonts;
+}
+
+STDMETHODIMP CMatroskaSplitterFilter::SetCalcDuration(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bCalcDuration = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bCalcDuration;
 }

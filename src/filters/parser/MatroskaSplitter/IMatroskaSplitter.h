@@ -27,4 +27,6 @@ public IUnknown {
 
 	STDMETHOD(SetLoadEmbeddedFonts(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetLoadEmbeddedFonts()) PURE;
+	STDMETHOD(SetCalcDuration(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetCalcDuration()) PURE;
 };

@@ -56,9 +56,13 @@ bool CMatroskaSplitterSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 
 	m_cbLoadEmbeddedFonts.Create(ResStr(IDS_MKVSPLT_LOAD_EMBEDDED_FONTS), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(280), m_fontheight)), this, IDC_STATIC);
+	p.y += IPP_SCALE(20);
+
+	m_cbCalcDuration.Create(ResStr(IDS_MKVSPLT_CALC_DURATION), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(280), m_fontheight)), this, IDC_STATIC);
 
 	if (m_pMSF) {
 		m_cbLoadEmbeddedFonts.SetCheck(m_pMSF->GetLoadEmbeddedFonts());
+		m_cbCalcDuration.SetCheck(m_pMSF->GetCalcDuration());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -80,6 +84,7 @@ bool CMatroskaSplitterSettingsWnd::OnApply()
 
 	if (m_pMSF) {
 		m_pMSF->SetLoadEmbeddedFonts(m_cbLoadEmbeddedFonts.GetCheck());
+		m_pMSF->SetCalcDuration(m_cbCalcDuration.GetCheck());
 		m_pMSF->Apply();
 	}
 
