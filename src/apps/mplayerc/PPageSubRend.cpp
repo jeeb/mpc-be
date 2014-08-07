@@ -167,7 +167,7 @@ BOOL CPPageSubRend::OnApply()
 		s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering = !!m_fSPCAllowAnimationWhenBuffering;
 
 		if (CMainFrame* pFrame = (CMainFrame*)GetParentFrame()) {
-			pFrame->UpdateSubtitle(true);
+			pFrame->UpdateSubtitle();
 		}
 	}
 
