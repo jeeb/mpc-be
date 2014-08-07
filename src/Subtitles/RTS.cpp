@@ -2639,17 +2639,19 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		stss = *m_pStyleOverride;
 	} else {
 		GetStyle(entry, stss);
-		if (m_bOverridePlacement) {
-			// Apply override placement to embedded style
-			stss.scrAlignment = 2;
-			LONG mw = m_dstScreenSize.cx - stss.marginRect.left - stss.marginRect.right;
-			stss.marginRect.bottom = std::lround(m_dstScreenSize.cy - m_dstScreenSize.cy * m_overridePlacement.cy / 100.0);
-			// We need to set top margin, otherwise subtitles outside video frame will be clipped. Support up to 3 lines of subtitles. Should be enough.
-			stss.marginRect.top    = m_dstScreenSize.cy - (stss.marginRect.bottom + std::lround(stss.fontSize * 3.0));
-			stss.marginRect.left   = std::lround(m_dstScreenSize.cx * m_overridePlacement.cx / 100.0 - mw / 2.0);
-			stss.marginRect.right  = m_dstScreenSize.cx - (stss.marginRect.left + mw);
-		}
 	}
+
+	if (m_bOverridePlacement) {
+		// Apply override placement to embedded style
+		stss.scrAlignment = 2;
+		LONG mw = m_dstScreenSize.cx - stss.marginRect.left - stss.marginRect.right;
+		stss.marginRect.bottom = std::lround(m_dstScreenSize.cy - m_dstScreenSize.cy * m_overridePlacement.cy / 100.0);
+		// We need to set top margin, otherwise subtitles outside video frame will be clipped. Support up to 3 lines of subtitles. Should be enough.
+		stss.marginRect.top = m_dstScreenSize.cy - (stss.marginRect.bottom + std::lround(stss.fontSize * 3.0));
+		stss.marginRect.left = std::lround(m_dstScreenSize.cx * m_overridePlacement.cx / 100.0 - mw / 2.0);
+		stss.marginRect.right = m_dstScreenSize.cx - (stss.marginRect.left + mw);
+	}
+
 	if (m_ePARCompensationType == EPCTUpscale) {
 		if (stss.fontScaleX / stss.fontScaleY == 1.0 && m_dPARCompensation != 1.0) {
 			if (m_dPARCompensation < 1.0) {
