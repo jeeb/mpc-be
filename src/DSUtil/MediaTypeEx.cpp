@@ -543,7 +543,8 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 	CString sub = CStringFromGUID(subtype);
 	CString format = CStringFromGUID(formattype);
 
-	sl.AddTail(ToString() + _T("\n"));
+	sl.AddTail(ToString());
+	sl.AddTail(_T(""));
 
 	sl.AddTail(_T("AM_MEDIA_TYPE: "));
 	str.Format(_T("majortype: %s %s"), GetGUIDString(majortype), major);
