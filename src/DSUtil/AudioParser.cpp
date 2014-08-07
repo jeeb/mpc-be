@@ -61,7 +61,7 @@ static inline UINT64 LatmGetValue(CGolombBuffer gb) {
 	int length = gb.BitRead(2);
 	UINT64 value = 0;
 
-	for (int i=0; i<=length; i++) {
+	for (int i = 0; i <= length; i++) {
 		value <<= 8;
 		value |= gb.BitRead(8);
 	}
@@ -69,6 +69,7 @@ static inline UINT64 LatmGetValue(CGolombBuffer gb) {
 	return value;
 }
 
+#define AOT_AAC_LC 2
 static bool ReadAudioConfig(CGolombBuffer gb, int& samplingFrequency, int& channelConfiguration)
 {
 	static int channels_layout[] = {0, 1, 2, 3, 4, 5, 6, 8};
@@ -116,7 +117,7 @@ static bool ReadAudioConfig(CGolombBuffer gb, int& samplingFrequency, int& chann
 		}
 	}
 
-	return true;
+	return audioObjectType == AOT_AAC_LC  ? true : false;
 }
 
 static bool StreamMuxConfig(CGolombBuffer gb, int& samplingFrequency, int& channelConfiguration, int& nExtraPos)
@@ -131,12 +132,16 @@ static bool StreamMuxConfig(CGolombBuffer gb, int& samplingFrequency, int& chann
 
 	if (!audio_mux_version_A) {
 		if (audio_mux_version == 1) {
-			LatmGetValue(gb); // taraFullness
+			LatmGetValue(gb);	// taraFullness
 		}
-		gb.BitRead(1); // all_same_framing
-		gb.BitRead(6); // numSubFrames
-		gb.BitRead(4); // numProgram
-		gb.BitRead(3); // int numLayer
+		gb.BitRead(1);			// all_same_framing
+		gb.BitRead(6);			// numSubFrames
+		if (gb.BitRead(4)) {	// numProgram
+			return false;		// Multiple programs don't support
+		}
+		if (gb.BitRead(3)) {	// int numLayer
+			return false;		// Multiple layers don't support
+		}
 
 		if (!audio_mux_version) {
 			// audio specific config.

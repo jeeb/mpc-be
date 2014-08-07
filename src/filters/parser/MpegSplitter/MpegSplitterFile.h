@@ -39,7 +39,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 	CAtlMap<DWORD, int> streamPTSCount;
 
-	template<class T>
+	template<class T, int validCount = 10>
 	class CValidStream {
 		BYTE m_nValidStream;
 		T m_val;
@@ -56,13 +56,13 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 			}
 			memcpy(&m_val, &val, sizeof(val));
 		}
-		BOOL IsValid() { return m_nValidStream >= 10; }
+		BOOL IsValid() { return m_nValidStream >= validCount; }
 	};
 
-	CAtlMap<DWORD, CValidStream<latm_aachdr>>	m_aaclatmValid;
-	CAtlMap<DWORD, CValidStream<aachdr>>		m_aacValid;
-	CAtlMap<DWORD, CValidStream<mpahdr>>		m_mpaValid;
-	CAtlMap<DWORD, CValidStream<ac3hdr>>		m_ac3Valid;
+	CAtlMap<DWORD, CValidStream<latm_aachdr, 3>>	m_aaclatmValid;
+	CAtlMap<DWORD, CValidStream<aachdr>>			m_aacValid;
+	CAtlMap<DWORD, CValidStream<mpahdr>>			m_mpaValid;
+	CAtlMap<DWORD, CValidStream<ac3hdr>>			m_ac3Valid;
 
 	BOOL m_bOpeningCompleted;
 
