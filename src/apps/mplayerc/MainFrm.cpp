@@ -17246,6 +17246,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 			}
 
 			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, &s.subdefstyle);
+			pRTS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
 
 			pRTS->Deinit();
 		} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile) || clsid == __uuidof(CXSUBSubtitle)) {

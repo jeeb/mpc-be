@@ -345,6 +345,8 @@ class __declspec(uuid("537DCACA-2812-4a4f-B2C6-1A34C17ADEB0"))
 	int m_polygonBaselineOffset;
 	STSStyle *m_pStyleOverride; // the app can decide to use this style instead of a built-in one
 	bool m_bOverrideStyle;
+	bool m_bOverridePlacement;
+	CSize m_overridePlacement;
 
 	void ParseEffect(CSubtitle* sub, CString str);
 	void ParseString(CSubtitle* sub, CStringW str, STSStyle& style);
@@ -373,6 +375,11 @@ public:
 		if (styleOverride != NULL) {
 			m_pStyleOverride = styleOverride;
 		}
+	}
+
+	void SetAlignment(bool bOverridePlacement, LONG lHorPos, LONG lVerPos) {
+		m_bOverridePlacement = bOverridePlacement;
+		m_overridePlacement.SetSize(lHorPos, lVerPos);
 	}
 
 public:
