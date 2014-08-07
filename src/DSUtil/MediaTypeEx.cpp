@@ -795,57 +795,27 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(_T(""));
 	}
 
-	/*
-	if (cbFormat > 0) {
-		sl.AddTail(_T("pbFormat:"));
-
-		for (ptrdiff_t i = 0, j = (cbFormat + 15) & ~15; i < j; i += 16) {
-			str.Format(_T("%04x:"), i);
-
-			for (ptrdiff_t k = i, l = min(i + 16, (int)cbFormat); k < l; k++) {
-				CString byte;
-				byte.Format(_T("%c%02x"), fmtsize > 0 && fmtsize == k ? '|' : ' ', pbFormat[k]);
-				str += byte;
-			}
-
-			for (ptrdiff_t k = min(i + 16, (int)cbFormat), l = i + 16; k < l; k++) {
-				str += _T("   ");
-			}
-
-			str += ' ';
-
-			for (ptrdiff_t k = i, l = min(i + 16, (int)cbFormat); k < l; k++) {
-				unsigned char c = (unsigned char)pbFormat[k];
-				CStringA ch;
-				ch.Format("%c", c >= 0x20 ? c : '.');
-				str += ch;
-			}
-
-			sl.AddTail(str);
-		}
-		sl.AddTail(_T(""));
-	}
-	*/
-	if (fmtsize && fmtsize < cbFormat) {
-		size_t extrasize = cbFormat - fmtsize;
+	if (fmtsize < cbFormat) { // extra and unknown data
+		ULONG extrasize = cbFormat - fmtsize;
 		str.Format(_T("Extradata: %u"), extrasize);
 		sl.AddTail(str);
-		for (size_t i = 0, j = (extrasize + 15) & ~15; i < j; i += 16) {
+		for (ULONG i = 0, j = (extrasize + 15) & ~15; i < j; i += 16) {
 			str.Format(_T("%04x:"), i);
+			ULONG line_end = min(i + 16, extrasize);
 
-			for (size_t k = i, l = min(i + 16, extrasize); k < l; k++) {
-				str.AppendFormat(_T(" %02x"), pbFormat[k + fmtsize]);
+			for (ULONG k = i; k < line_end; k++) {
+				str.AppendFormat(_T(" %02x"), pbFormat[fmtsize + k]);
 			}
 
-			for (size_t k = min(i + 16, (int)extrasize), l = i + 16; k < l; k++) {
+			for (ULONG k = line_end, l = i + 16; k < l; k++) {
 				str += _T("   ");
 			}
 
 			str += ' ';
 
 			CStringA ch;
-			for (size_t k = i, l = min(i + 16, extrasize); k < l; k++) {
-				unsigned char c = (unsigned char)pbFormat[k + fmtsize];
+			for (size_t k = i; k < line_end; k++) {
+				unsigned char c = (unsigned char)pbFormat[fmtsize + k];
 				ch.AppendFormat("%c", c >= 0x20 ? c : '.');
 			}
 			str += ch;
