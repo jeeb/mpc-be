@@ -576,10 +576,12 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		if (SUCCEEDED(pPin->ConnectionMediaType(&cmt))) {
 			CAtlList<CString> sl;
 			cmt.Dump(sl);
+			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				AddLine(sl.GetNext(pos));
+				tmp += (sl.GetNext(pos) + L"\r\n");
 			}
+			AddLine(tmp);
 		}
 	} else {
 		AddLine(L"- Not connected\r\n");
@@ -598,10 +600,12 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		} else {
 			CAtlList<CString> sl;
 			mt.Dump(sl);
+			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				AddLine(sl.GetNext(pos));
+				tmp += (sl.GetNext(pos) + L"\r\n");
 			}
+			AddLine(tmp);
 		}
 	}
 	EndEnumMediaTypes(pmt);
