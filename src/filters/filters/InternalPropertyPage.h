@@ -133,8 +133,6 @@ class __declspec(uuid("A1EB391C-6089-4A87-9988-BE50872317D4"))
 	CComboBox m_pin_combo;
 	CEdit m_info_edit;
 
-	void AddLine(CString str = _T(""));
-
 	typedef CAtlMap<CLSID, CString> CachedFilters;
 	CachedFilters m_CachedExternalFilters;
 	static CachedFilters m_CachedRegistryFilters;
@@ -148,7 +146,7 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() {
-		return _T("Pin Info");
+		return L"Pin Info";
 	}
 	static CSize GetWindowSize() {
 		return CSize(500, 300);

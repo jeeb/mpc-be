@@ -479,17 +479,11 @@ BEGIN_MESSAGE_MAP(CPinInfoWnd, CInternalPropertyPageWnd)
 	ON_CBN_SELCHANGE(IDC_PP_COMBO1, OnCbnSelchangeCombo1)
 END_MESSAGE_MAP()
 
-void CPinInfoWnd::AddLine(CString str)
-{
-	str += _T("\r\n");
-	int len = m_info_edit.GetWindowTextLength();
-	m_info_edit.SetSel(len, len, TRUE);
-	m_info_edit.ReplaceSel(str);
-}
-
+#define AddLine(str) infoStr.Append(CString(str) + L"\r\n")
 void CPinInfoWnd::OnCbnSelchangeCombo1()
 {
 	m_info_edit.SetWindowText(L"");
+	CString infoStr;
 
 	int i = m_pin_combo.GetCurSel();
 	if (i < 0) {
@@ -556,7 +550,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 				}
 			}
 
-			AddLine();
+			AddLine(L"");
 		}
 		PinInfo.pFilter->Release();
 	}
@@ -576,12 +570,10 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		if (SUCCEEDED(pPin->ConnectionMediaType(&cmt))) {
 			CAtlList<CString> sl;
 			cmt.Dump(sl);
-			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				tmp += (sl.GetNext(pos) + L"\r\n");
+				AddLine(sl.GetNext(pos));
 			}
-			AddLine(tmp);
 		}
 	} else {
 		AddLine(L"- Not connected\r\n");
@@ -600,16 +592,14 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		} else {
 			CAtlList<CString> sl;
 			mt.Dump(sl);
-			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				tmp += (sl.GetNext(pos) + L"\r\n");
+				AddLine(sl.GetNext(pos));
 			}
-			AddLine(tmp);
 		}
 	}
 	EndEnumMediaTypes(pmt);
 
-	m_info_edit.SetSel(0, 0);
+	m_info_edit.SetWindowText(infoStr);
 	m_info_edit.UnlockWindowUpdate();
 }
