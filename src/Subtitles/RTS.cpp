@@ -1519,10 +1519,9 @@ CRect CScreenLayoutAllocator::AllocRect(const CSubtitle* s, int segment, int ent
 
 CAtlMap<CStringW, SSATagCmd, CStringElementTraits<CStringW>> CRenderedTextSubtitle::s_SSATagCmds;
 
-CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock, STSStyle* styleOverride, bool bOverride)
+CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
-	, m_bOverrideStyle(bOverride)
-	, m_pStyleOverride(styleOverride)
+	, m_bOverrideStyle(false)
 	, m_bOverridePlacement(false)
 	, m_overridePlacement(50, 90)
 	, m_time(0)
@@ -2634,9 +2633,9 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	CStringW str = GetStrW(entry, true);
 
 	STSStyle stss, orgstss;
-	if (m_bOverrideStyle && m_pStyleOverride != NULL) {
+	if (m_bOverrideStyle) {
 		// this RTS has been signaled to ignore embedded styles, use the built-in one
-		stss = *m_pStyleOverride;
+		stss = m_styleOverride;
 	} else {
 		GetStyle(entry, stss);
 		if (m_bOverridePlacement) {
@@ -2685,7 +2684,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	// now, files containing embedded subtitles (and with styles) set m_dstScreenSize to a correct value
 	// but where no style is given, those defaults are taken - 384, 288
 	CSize dstScreenSize(m_dstScreenSize);
-	if (m_bOverrideStyle && m_pStyleOverride) {
+	if (m_bOverrideStyle) {
 		dstScreenSize = DEFSCREENSIZE;
 	}
 	
@@ -2752,7 +2751,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		str = str.Mid(i);
 	}
 
-	if (m_bOverrideStyle && m_pStyleOverride != NULL) {
+	if (m_bOverrideStyle) {
 		sub->EmptyEffects();
 	}
 

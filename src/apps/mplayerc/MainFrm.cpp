@@ -17092,7 +17092,7 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 		}
 
 		if (!pSubStream) {
-			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock, &AfxGetAppSettings().subdefstyle, AfxGetAppSettings().fUseDefaultSubtitlesStyle));
+			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
 
 			if (pRTS && pRTS->Open(fn, DEFAULT_CHARSET, GetSubName(fn, GetCurFileName())) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
@@ -17232,9 +17232,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 				pRTS->SetDefaultStyle(style);
 			}
 
-			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, &s.subdefstyle);
+			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, s.subdefstyle);
 			pRTS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
-
 			pRTS->Deinit();
 		} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile) || clsid == __uuidof(CXSUBSubtitle)) {
 			s.m_RenderersSettings.bPositionRelative	= s.subdefstyle.relativeTo;
