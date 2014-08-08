@@ -133,7 +133,7 @@ class __declspec(uuid("A1EB391C-6089-4A87-9988-BE50872317D4"))
 	CComboBox m_pin_combo;
 	CEdit m_info_edit;
 
-	void AddLine(CString str);
+	void AddLine(CString str = _T(""));
 
 	typedef CAtlMap<CLSID, CString> CachedFilters;
 	CachedFilters m_CachedExternalFilters;

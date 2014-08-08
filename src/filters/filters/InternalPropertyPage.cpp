@@ -481,7 +481,7 @@ END_MESSAGE_MAP()
 
 void CPinInfoWnd::AddLine(CString str)
 {
-	str.Replace(L"\n", L"\r\n");
+	str += _T("\r\n");
 	int len = m_info_edit.GetWindowTextLength();
 	m_info_edit.SetSel(len, len, TRUE);
 	m_info_edit.ReplaceSel(str);
@@ -526,7 +526,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			} else {
 				strName = FilterInfo.achName;
 			}
-			str.Format(L"Filter : %s - CLSID : %s\n", strName, CStringFromGUID(FilterClsid));
+			str.Format(L"Filter : %s - CLSID : %s", strName, CStringFromGUID(FilterClsid));
 			AddLine(str);
 			FilterInfo.pGraph->Release();
 
@@ -551,12 +551,12 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 				}
 
 				if (!module.IsEmpty()) {
-					str.Format(L"Module : %s\n", module);
+					str.Format(L"Module : %s", module);
 					AddLine(str);
 				}
 			}
 
-			AddLine(L"\n");
+			AddLine();
 		}
 		PinInfo.pFilter->Release();
 	}
@@ -565,27 +565,24 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 
 	CComPtr<IPin> pPinTo;
 	if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
-		str.Format(L"- Connected to:\n\nCLSID: %s\nFilter: %s\nPin: %s\n\n",
+		str.Format(L"- Connected to:\r\n\r\nCLSID: %s\r\nFilter: %s\r\nPin: %s\r\n",
 				   CString(CStringFromGUID(GetCLSID(pPinTo))),
 				   CString(GetFilterName(GetFilterFromPin(pPinTo))),
 				   CString(GetPinName(pPinTo)));
-
 		AddLine(str);
 
-		AddLine(L"- Connection media type:\n\n");
+		AddLine(L"- Connection media type:\r\n");
 
 		if (SUCCEEDED(pPin->ConnectionMediaType(&cmt))) {
 			CAtlList<CString> sl;
 			cmt.Dump(sl);
-			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				tmp += (sl.GetNext(pos) + '\n');
+				AddLine(sl.GetNext(pos));
 			}
-			AddLine(tmp);
 		}
 	} else {
-		str = L"- Not connected\n\n";
+		AddLine(L"- Not connected\r\n");
 	}
 
 	int iMT = 0;
@@ -593,20 +590,18 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 	BeginEnumMediaTypes(pPin, pEMT, pmt) {
 		CMediaTypeEx mt(*pmt);
 
-		str.Format(L"- Enumerated media type %d:\n\n", iMT++);
+		str.Format(L"- Enumerated media type %d:\r\n", iMT++);
 		AddLine(str);
 
 		if (cmt.majortype != GUID_NULL && mt == cmt) {
-			AddLine(L"Set as the current media type\n\n");
+			AddLine(L"Set as the current media type\r\n");
 		} else {
 			CAtlList<CString> sl;
 			mt.Dump(sl);
-			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				tmp += (sl.GetNext(pos) + '\n');
+				AddLine(sl.GetNext(pos));
 			}
-			AddLine(tmp);
 		}
 	}
 	EndEnumMediaTypes(pmt);
