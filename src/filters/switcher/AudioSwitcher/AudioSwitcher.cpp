@@ -82,7 +82,6 @@ CFilterApp theApp;
 
 CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CStreamSwitcherFilter(lpunk, phr, __uuidof(this))
-	, m_fCustomChannelMapping(false)
 	, m_rtAudioTimeShift(0)
 	, m_rtNextStart(0)
 	, m_rtNextStop(1)
@@ -91,8 +90,6 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_normalizeFactor(4.0)
 	, m_boost_mul(1.0f)
 {
-	memset(m_pSpeakerToChannelMap, 0, sizeof(m_pSpeakerToChannelMap));
-
 	if (phr) {
 		if (FAILED(*phr)) {
 			return;
@@ -123,89 +120,6 @@ HRESULT CAudioSwitcherFilter::CheckMediaType(const CMediaType* pmt)
 				|| ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_EXTENSIBLE))
 		   ? S_OK
 		   : VFW_E_TYPE_NOT_ACCEPTED;
-}
-
-template<class T, class U, int Umin, int Umax>
-__forceinline void mix(DWORD mask, int ch, int bps, BYTE* src, BYTE* dst)
-{
-	U sum = 0;
-
-	for (int i = 0, j = ch; i < j; i++) {
-		if (mask & (1<<i)) {
-			sum += *(T*)&src[bps*i];
-		}
-	}
-
-	if (sum < Umin) {
-		sum = Umin;
-	} else if (sum > Umax) {
-		sum = Umax;
-	}
-
-	*(T*)dst = (T)sum;
-}
-
-template<>
-__forceinline void mix<int, INT64, INT24_MIN, INT24_MAX>(DWORD mask, int ch, int bps, BYTE* src, BYTE* dst)
-{
-	INT64 sum = 0;
-
-	for (int i = 0, j = ch; i < j; i++) {
-		if (mask & (1<<i)) {
-			int tmp;
-			memcpy((BYTE*)&tmp+1, &src[bps*i], 3);
-			sum += tmp >> 8;
-		}
-	}
-
-	sum = min(max(sum, INT24_MIN), INT24_MAX);
-
-	memcpy(dst, (BYTE*)&sum, 3);
-}
-
-template<class T, class U, int Umin, int Umax>
-__forceinline void mix4(DWORD mask, BYTE* src, BYTE* dst)
-{
-	U sum = 0;
-	int bps = sizeof T;
-
-	if (mask & (1<<0)) {
-		sum += *(T*)&src[bps*0];
-	}
-	if (mask & (1<<1)) {
-		sum += *(T*)&src[bps*1];
-	}
-	if (mask & (1<<2)) {
-		sum += *(T*)&src[bps*2];
-	}
-	if (mask & (1<<3)) {
-		sum += *(T*)&src[bps*3];
-	}
-
-	if (sum < Umin) {
-		sum = Umin;
-	} else if (sum > Umax) {
-		sum = Umax;
-	}
-
-	*(T*)dst = (T)sum;
-}
-
-template<class T>
-T clamp(double s, T smin, T smax)
-{
-	if (s < -1) {
-		s = -1;
-	} else if (s > 1) {
-		s = 1;
-	}
-	T t = (T)(s * smax);
-	if (t < smin) {
-		t = smin;
-	} else if (t > smax) {
-		t = smax;
-	}
-	return t;
 }
 
 HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
@@ -273,63 +187,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return S_OK;
 	}
 
-	if (m_fCustomChannelMapping) {
-		size_t channelsCount = m_chs[wfe->nChannels-1].GetCount();
-		if (channelsCount > 0 && wfeout->nChannels <= channelsCount) {
-			for (int i = 0; i < wfeout->nChannels; i++) {
-				DWORD mask = m_chs[wfe->nChannels-1][i].Channel;
-
-				BYTE* src = pDataIn;
-				BYTE* dst = &pDataOut[bps*i];
-
-				int srcstep = bps*wfe->nChannels;
-				int dststep = bps*wfeout->nChannels;
-				int channels = min(AS_MAX_CHANNELS, wfe->nChannels);
-				if (fPCM) {
-					if (wfe->wBitsPerSample == 8) {
-						for (int k = 0; k < len; k++, src += srcstep, dst += dststep) {
-							mix<unsigned char, INT64, 0, UCHAR_MAX>(mask, channels, bps, src, dst);
-						}
-					} else if (wfe->wBitsPerSample == 16) {
-						if (wfe->nChannels != 4 || wfeout->nChannels != 4) {
-							for (int k = 0; k < len; k++, src += srcstep, dst += dststep) {
-								mix<short, INT64, SHRT_MIN, SHRT_MAX>(mask, channels, bps, src, dst);
-							}
-						} else { // most popular channels count
-							for (int k = 0; k < len; k++, src += srcstep, dst += dststep) {
-								mix4<short, INT64, SHRT_MIN, SHRT_MAX>(mask, src, dst);
-							}
-						}
-					} else if (wfe->wBitsPerSample == 24) {
-						for (int k = 0; k < len; k++, src += srcstep, dst += dststep) {
-							mix<int, INT64, INT24_MIN, INT24_MAX>(mask, channels, bps, src, dst);
-						}
-					} else if (wfe->wBitsPerSample == 32) {
-						for (int k = 0; k < len; k++, src += srcstep, dst += dststep) {
-							mix<int, __int64, INT_MIN, INT_MAX>(mask, channels, bps, src, dst);
-						}
-					}
-				} else if (fFloat) {
-					if (wfe->wBitsPerSample == 32) {
-						for (int k = 0; k < len; k++, src += srcstep, dst += dststep) {
-							mix<float, double, -1, 1>(mask, channels, bps, src, dst);
-						}
-					} else if (wfe->wBitsPerSample == 64) {
-						for (int k = 0; k < len; k++, src += srcstep, dst += dststep) {
-							mix<double, double, -1, 1>(mask, channels, bps, src, dst);
-						}
-					}
-				}
-			}
-		} else {
-			BYTE* pDataOut2 = NULL;
-			HRESULT hr2;
-			if (FAILED(hr2 = pOut->GetPointer(&pDataOut2)) || !pDataOut2) {
-				return hr2;
-			}
-			memset(pDataOut2, 0, pOut->GetSize());
-		}
-	} else {
+	{
 		HRESULT hr2;
 		if (S_OK != (hr2 = __super::Transform(pIn, pOut))) {
 			return hr2;
@@ -456,40 +314,6 @@ CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& c
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
 
-	if (m_fCustomChannelMapping) {
-		m_chs[wfe->nChannels-1].RemoveAll();
-
-		DWORD mask = DWORD((__int64(1)<<wfe->nChannels)-1);
-		for (int i = 0; i < AS_MAX_CHANNELS; i++) {
-			if (m_pSpeakerToChannelMap[wfe->nChannels-1][i]&mask) {
-				ChMap cm = {1<<i, m_pSpeakerToChannelMap[wfe->nChannels-1][i]};
-				m_chs[wfe->nChannels-1].Add(cm);
-			}
-		}
-
-		if (m_chs[wfe->nChannels-1].GetCount() > 0) {
-			mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
-			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)mt.pbFormat;
-			wfex->Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE)-sizeof(WAVEFORMATEX);
-			wfex->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
-			wfex->Samples.wValidBitsPerSample = wfe->wBitsPerSample;
-			wfex->SubFormat =
-				wfe->wFormatTag == WAVE_FORMAT_PCM ? KSDATAFORMAT_SUBTYPE_PCM :
-				wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT ? KSDATAFORMAT_SUBTYPE_IEEE_FLOAT :
-				wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE ? ((WAVEFORMATEXTENSIBLE*)wfe)->SubFormat :
-				KSDATAFORMAT_SUBTYPE_PCM; // can't happen
-
-			wfex->dwChannelMask = 0;
-			for (size_t i = 0; i < m_chs[wfe->nChannels-1].GetCount(); i++) {
-				wfex->dwChannelMask |= m_chs[wfe->nChannels-1][i].Speaker;
-			}
-
-			wfex->Format.nChannels = (WORD)m_chs[wfe->nChannels-1].GetCount();
-			wfex->Format.nBlockAlign = wfex->Format.nChannels*wfex->Format.wBitsPerSample>>3;
-			wfex->Format.nAvgBytesPerSec = wfex->Format.nBlockAlign*wfex->Format.nSamplesPerSec;
-		}
-	}
-
 	CorrectWaveFormatEx(&mt);
 
 	WAVEFORMATEX* wfeout = (WAVEFORMATEX*)mt.pbFormat;
@@ -527,68 +351,6 @@ HRESULT CAudioSwitcherFilter::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE
 }
 
 // IAudioSwitcherFilter
-
-STDMETHODIMP CAudioSwitcherFilter::GetInputSpeakerConfig(DWORD* pdwChannelMask)
-{
-	if (!pdwChannelMask) {
-		return E_POINTER;
-	}
-
-	*pdwChannelMask = 0;
-
-	CStreamSwitcherInputPin* pInPin = GetInputPin();
-	if (!pInPin || !pInPin->IsConnected()) {
-		return E_UNEXPECTED;
-	}
-
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
-
-	if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
-		WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
-		*pdwChannelMask = wfex->dwChannelMask;
-	} else {
-		*pdwChannelMask = 0/*wfe->nChannels == 1 ? 4 : wfe->nChannels == 2 ? 3 : 0*/;
-	}
-
-	return S_OK;
-}
-
-STDMETHODIMP CAudioSwitcherFilter::GetSpeakerConfig(bool* pfCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS])
-{
-	if (pfCustomChannelMapping) {
-		*pfCustomChannelMapping = m_fCustomChannelMapping;
-	}
-	memcpy(pSpeakerToChannelMap, m_pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
-
-	return S_OK;
-}
-
-STDMETHODIMP CAudioSwitcherFilter::SetSpeakerConfig(bool fCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS])
-{
-	if (m_State == State_Stopped || m_fCustomChannelMapping != fCustomChannelMapping
-			|| memcmp(m_pSpeakerToChannelMap, pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap))) {
-		PauseGraph;
-
-		CStreamSwitcherInputPin* pInput = GetInputPin();
-
-		SelectInput(NULL);
-
-		m_fCustomChannelMapping = fCustomChannelMapping;
-		memcpy(m_pSpeakerToChannelMap, pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
-
-		SelectInput(pInput);
-
-		ResumeGraph;
-	}
-
-	return S_OK;
-}
-
-STDMETHODIMP_(int) CAudioSwitcherFilter::GetNumberOfInputChannels()
-{
-	CStreamSwitcherInputPin* pInPin = GetInputPin();
-	return pInPin ? ((WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat)->nChannels : 0;
-}
 
 STDMETHODIMP_(REFERENCE_TIME) CAudioSwitcherFilter::GetAudioTimeShift()
 {

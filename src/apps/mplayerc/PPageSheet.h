@@ -77,14 +77,14 @@ private:
 	CPPageLogo m_logo;
 	CPPageWebServer m_webserver;
 	CPPagePlayback m_playback;
-	CPPageDVD m_dvd;
-	CPPageOutput m_output;
+	CPPageOutput m_video;
+	CPPageAudioSwitcher m_audio;
 	CPPageFullscreen m_fullscreen;
 	CPPageSync m_sync;
+	CPPageDVD m_dvd;
 	CPPageCapture m_tuner;
 	CPPageYoutube m_youtube;
 	CPPageInternalFilters m_internalfilters;
-	CPPageAudioSwitcher m_audioswitcher;
 	CPPageFiltersPerformance m_filtersperformance;
 	CPPageExternalFilters m_externalfilters;
 	CPPageFiltersPriority m_filterspriority;

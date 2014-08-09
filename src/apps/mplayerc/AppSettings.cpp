@@ -575,19 +575,13 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOSWITCHER, fEnableAudioSwitcher);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, fAudioTimeShift);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CUSTOMCHANNELMAPPING, fCustomChannelMapping);
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_SPEAKERTOCHANNELMAPPING, (BYTE*)pSpeakerToChannelMap, sizeof(pSpeakerToChannelMap));
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZE, fAudioNormalize);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, iAudioRecoverStep);
-
 	CString strTemp;
 	strTemp.Format( _T("%.1f"), dAudioBoost_dB);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOBOOST, strTemp);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPEAKERCHANNELS, nSpeakerChannels);
 
 	// Multi-monitor code
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
@@ -1123,42 +1117,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	strSubtitlePaths				= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, DEFAULT_SUBTITLE_PATHS);
 
 	fUseDefaultSubtitlesStyle		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, FALSE);
-	fEnableAudioSwitcher			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOSWITCHER, TRUE);
 	fAudioTimeShift					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, 0);
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
-	fCustomChannelMapping			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CUSTOMCHANNELMAPPING, 0);
-
-	BOOL bResult = pApp->GetProfileBinary( IDS_R_SETTINGS, IDS_RS_SPEAKERTOCHANNELMAPPING, &ptr, &len );
-	if (bResult && len == sizeof(pSpeakerToChannelMap)) {
-		memcpy(pSpeakerToChannelMap, ptr, sizeof(pSpeakerToChannelMap));
-	} else {
-		memset(pSpeakerToChannelMap, 0, sizeof(pSpeakerToChannelMap));
-		for (int j = 0; j < 18; j++) {
-			for (int i = 0; i <= j; i++) {
-				pSpeakerToChannelMap[j][i] = 1 << i;
-			}
-		}
-
-		pSpeakerToChannelMap[0][0] = 1<<0;
-		pSpeakerToChannelMap[0][1] = 1<<0;
-
-		pSpeakerToChannelMap[3][0] = 1<<0;
-		pSpeakerToChannelMap[3][1] = 1<<1;
-		pSpeakerToChannelMap[3][2] = 0;
-		pSpeakerToChannelMap[3][3] = 0;
-		pSpeakerToChannelMap[3][4] = 1<<2;
-		pSpeakerToChannelMap[3][5] = 1<<3;
-
-		pSpeakerToChannelMap[4][0] = 1<<0;
-		pSpeakerToChannelMap[4][1] = 1<<1;
-		pSpeakerToChannelMap[4][2] = 1<<2;
-		pSpeakerToChannelMap[4][3] = 0;
-		pSpeakerToChannelMap[4][4] = 1<<3;
-		pSpeakerToChannelMap[4][5] = 1<<4;
-	}
-	if (bResult) {
-		delete [] ptr;
-	}
 
 	fAudioNormalize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZE, FALSE);
 	iAudioRecoverStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, 20);
@@ -1167,8 +1127,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	if (dAudioBoost_dB < 0 || dAudioBoost_dB > 10) {
 		dAudioBoost_dB = 0;
 	}
-
-	nSpeakerChannels = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEAKERCHANNELS, 2);
 
 	{
 		for (unsigned int i = 0; ; i++) {

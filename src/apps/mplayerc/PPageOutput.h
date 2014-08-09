@@ -31,19 +31,12 @@ class CPPageOutput : public CPPageBase
 	DECLARE_DYNAMIC(CPPageOutput)
 
 private:
-	CStringArray m_AudioRendererDisplayNames;
 	CStringArray m_D3D9GUIDNames;
-
-	CComboBox m_iAudioRendererTypeCtrl;
-	CComboBox m_iSecAudioRendererTypeCtrl;
 
 	CComboBox m_iDSVideoRendererTypeCtrl;
 	CComboBox m_iRMVideoRendererTypeCtrl;
 	CComboBox m_iQTVideoRendererTypeCtrl;
 	CComboBox m_iD3D9RenderDeviceCtrl;
-
-	CButton m_audRendPropButton;
-	CButton m_DualAudioOutput;
 
 	int m_iDSVideoRendererType_store;
 public:
@@ -55,8 +48,6 @@ public:
 	int m_iRMVideoRendererType;
 	int m_iQTVideoRendererType;
 	int m_iAPSurfaceUsage;
-	int m_iAudioRendererType;
-	int m_iSecAudioRendererType;
 	int m_iDX9Resizer;
 	BOOL m_fVMRMixerMode;
 	BOOL m_fVMRMixerYUV;
@@ -67,8 +58,6 @@ public:
 
 	BOOL m_fD3D9RenderDevice;
 	int m_iD3D9RenderDevice;
-
-	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -85,7 +74,4 @@ public:
 	afx_msg void OnQTRendererChange();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
-	afx_msg void OnAudioRendererChange();
-	afx_msg void OnAudioRenderPropClick();
-	afx_msg void OnDualAudioOutputCheck();
 };

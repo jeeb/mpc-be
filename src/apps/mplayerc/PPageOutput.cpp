@@ -20,12 +20,11 @@
  */
 
 #include "stdafx.h"
-#include "PPageOutput.h"
-#include "../../DSUtil/SysVersion.h"
+#include <d3d9.h>
 #include <moreuuids.h>
+#include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
-#include "ComPropertyPage.h"
-#include "../../filters/filters.h"
+#include "PPageOutput.h"
 
 // CPPageOutput dialog
 
@@ -55,8 +54,6 @@ CPPageOutput::CPPageOutput()
 	, m_iRMVideoRendererType(VIDRNDT_RM_DEFAULT)
 	, m_iQTVideoRendererType(VIDRNDT_QT_DEFAULT)
 	, m_iAPSurfaceUsage(0)
-	, m_iAudioRendererType(0)
-	, m_iSecAudioRendererType(0)
 	, m_iDX9Resizer(0)
 	, m_fVMRMixerMode(FALSE)
 	, m_fVMRMixerYUV(FALSE)
@@ -79,13 +76,9 @@ void CPPageOutput::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_VIDRND_COMBO, m_iDSVideoRendererTypeCtrl);
 	DDX_Control(pDX, IDC_RMRND_COMBO, m_iRMVideoRendererTypeCtrl);
 	DDX_Control(pDX, IDC_QTRND_COMBO, m_iQTVideoRendererTypeCtrl);
-	DDX_Control(pDX, IDC_AUDRND_COMBO, m_iAudioRendererTypeCtrl);
-	DDX_Control(pDX, IDC_COMBO1, m_iSecAudioRendererTypeCtrl);
 	DDX_Control(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDeviceCtrl);
 	DDX_CBIndex(pDX, IDC_RMRND_COMBO, m_iRMVideoRendererType);
 	DDX_CBIndex(pDX, IDC_QTRND_COMBO, m_iQTVideoRendererType);
-	DDX_CBIndex(pDX, IDC_AUDRND_COMBO, m_iAudioRendererType);
-	DDX_CBIndex(pDX, IDC_COMBO1, m_iSecAudioRendererType);
 	DDX_CBIndex(pDX, IDC_DX_SURFACE, m_iAPSurfaceUsage);
 	DDX_CBIndex(pDX, IDC_DX9RESIZER_COMBO, m_iDX9Resizer);
 	DDX_CBIndex(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDevice);
@@ -95,10 +88,7 @@ void CPPageOutput::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_fVMR9AlterativeVSync);
 	DDX_Check(pDX, IDC_DSVMRLOADMIXER, m_fVMRMixerMode);
 	DDX_Check(pDX, IDC_DSVMRYUVMIXER, m_fVMRMixerYUV);
-
 	DDX_CBString(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
-	DDX_Control(pDX, IDC_BUTTON1, m_audRendPropButton);
-	DDX_Control(pDX, IDC_CHECK1, m_DualAudioOutput);
 }
 
 BEGIN_MESSAGE_MAP(CPPageOutput, CPPageBase)
@@ -109,9 +99,6 @@ BEGIN_MESSAGE_MAP(CPPageOutput, CPPageBase)
 	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
-	ON_CBN_SELCHANGE(IDC_AUDRND_COMBO, OnAudioRendererChange)
-	ON_BN_CLICKED(IDC_BUTTON1, OnAudioRenderPropClick)
-	ON_BN_CLICKED(IDC_CHECK1, OnDualAudioOutputCheck)
 END_MESSAGE_MAP()
 
 // CPPageOutput message handlers
@@ -138,86 +125,6 @@ BOOL CPPageOutput::OnInitDialog()
 	m_iEvrBuffers.Format(L"%d", renderersSettings.iEvrBuffers);
 
 	m_fResetDevice = s.m_RenderersSettings.fResetDevice;
-
-	m_AudioRendererDisplayNames.Add(_T(""));
-	m_iAudioRendererTypeCtrl.SetRedraw(FALSE);
-	m_iAudioRendererTypeCtrl.AddString(_T("1: ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
-	m_iAudioRendererType = 0;
-
-	m_DualAudioOutput.SetCheck(s.fDualAudioOutput);
-	m_iSecAudioRendererTypeCtrl.SetRedraw(FALSE);
-	m_iSecAudioRendererTypeCtrl.AddString(_T("1: ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
-	m_iSecAudioRendererType = 0;
-
-	OnDualAudioOutputCheck();
-
-	int i = 2;
-	CString fstr;
-
-	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-		LPOLESTR olestr = NULL;
-		if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
-			continue;
-		}
-
-		CStringW str(olestr);
-		CoTaskMemFree(olestr);
-
-		m_AudioRendererDisplayNames.Add(CString(str));
-
-		CComPtr<IPropertyBag> pPB;
-		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
-			CComVariant var;
-			pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL);
-
-			fstr = var.bstrVal;
-			var.Clear();
-		} else {
-			fstr = str;
-		}
-		CString Cbstr;
-		Cbstr.Format(_T("%d: %s"), i++, fstr);
-		m_iAudioRendererTypeCtrl.AddString(Cbstr);
-		m_iSecAudioRendererTypeCtrl.AddString(Cbstr);
-	}
-	EndEnumSysDev;
-
-
-	static CString AudioDevAddon[] = {
-		AUDRNDT_NULL_COMP,
-		AUDRNDT_NULL_UNCOMP,
-		IsWinVistaOrLater() ? AUDRNDT_MPC : L""
-	};
-
-	for (size_t idx = 0; idx < _countof(AudioDevAddon); idx++) {
-		if (AudioDevAddon[idx].GetLength() > 0) {
-			m_AudioRendererDisplayNames.Add(AudioDevAddon[idx]);
-
-			fstr.Format(_T("%d: %s"), i++, AudioDevAddon[idx]);
-			m_iAudioRendererTypeCtrl.AddString(fstr);
-			m_iSecAudioRendererTypeCtrl.AddString(fstr);
-		}
-	}
-
-	for (INT_PTR idx = 0; idx < m_AudioRendererDisplayNames.GetCount(); idx++) {
-		if (s.strAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {
-			m_iAudioRendererType = idx;
-		}
-
-		if (s.strSecondAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {
-			m_iSecAudioRendererType = idx;
-		}
-	}
-
-	CorrectComboListWidth(m_iAudioRendererTypeCtrl);
-	m_iAudioRendererTypeCtrl.SetRedraw(TRUE);
-	m_iAudioRendererTypeCtrl.Invalidate();
-	m_iAudioRendererTypeCtrl.UpdateWindow();
-
-	CorrectComboListWidth(m_iSecAudioRendererTypeCtrl);
-	m_iSecAudioRendererTypeCtrl.SetRedraw(TRUE);
-	m_iSecAudioRendererTypeCtrl.Invalidate();
-	m_iSecAudioRendererTypeCtrl.UpdateWindow();
 
 	IDirect3D9* pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (pD3D) {
@@ -343,7 +250,6 @@ BOOL CPPageOutput::OnInitDialog()
 	OnRMRendererChange();
 	OnQTRendererChange();
 	OnSurfaceChange();
-	OnAudioRendererChange();
 
 	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
@@ -387,9 +293,6 @@ BOOL CPPageOutput::OnApply()
 	renderersSettings.fVMRMixerYUV		                    = !!m_fVMRMixerYUV;
 
 	renderersSettings.m_AdvRendSets.fVMR9AlterativeVSync	= m_fVMR9AlterativeVSync != 0;
-	s.strAudioRendererDisplayName                           = m_AudioRendererDisplayNames[m_iAudioRendererType];
-	s.strSecondAudioRendererDisplayName                     = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];
-	s.fDualAudioOutput                                      = !!m_DualAudioOutput.GetCheck();
 	s.fD3DFullscreen			                            = m_fD3DFullscreen ? true : false;
 
 	renderersSettings.fResetDevice = !!m_fResetDevice;
@@ -615,135 +518,4 @@ void CPPageOutput::OnD3D9DeviceCheck()
 	UpdateData();
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(m_fD3D9RenderDevice);
 	SetModified();
-}
-
-void CPPageOutput::OnAudioRendererChange()
-{
-	UpdateData();
-
-	BOOL flag = FALSE;
-	CString str_audio = m_AudioRendererDisplayNames[m_iAudioRendererType];
-	if (str_audio == AUDRNDT_MPC) {
-		flag = TRUE;
-	} else {
-		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-			LPOLESTR olestr = NULL;
-			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
-				continue;
-			}
-
-			CStringW str(olestr);
-			CoTaskMemFree(olestr);
-
-			if (str == m_AudioRendererDisplayNames[m_iAudioRendererType]) {
-				CComPtr<IBaseFilter> pBF;
-				HRESULT hr = pMoniker->BindToObject(NULL, NULL, __uuidof(IBaseFilter), (void**)&pBF);
-				if (SUCCEEDED(hr)) {
-					if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
-						flag = TRUE;
-						break;
-					}
-				}
-			}
-		}
-		EndEnumSysDev
-	}
-
-	m_audRendPropButton.EnableWindow(flag);
-
-	SetModified();
-}
-
-void CPPageOutput::OnAudioRenderPropClick()
-{
-	CString str_audio = m_AudioRendererDisplayNames[m_iAudioRendererType];
-
-	if (str_audio == AUDRNDT_MPC) {
-		ShowPPage(CreateInstance<CMpcAudioRenderer>);
-	} else {
-		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-			LPOLESTR olestr = NULL;
-			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
-				continue;
-			}
-
-			CStringW str(olestr);
-			CoTaskMemFree(olestr);
-
-			if (str == str_audio) {
-				CComPtr<IBaseFilter> pBF;
-				HRESULT hr = pMoniker->BindToObject(NULL, NULL, __uuidof(IBaseFilter), (void**)&pBF);
-				if (SUCCEEDED(hr)) {
-					ISpecifyPropertyPages *pProp = NULL;
-					hr = pBF->QueryInterface(IID_ISpecifyPropertyPages, (void **)&pProp);
-					if (SUCCEEDED(hr)) {
-						// Get the filter's name and IUnknown pointer.
-						FILTER_INFO FilterInfo;
-						hr = pBF->QueryFilterInfo(&FilterInfo);
-						if (SUCCEEDED(hr)) {
-							IUnknown *pFilterUnk;
-							hr = pBF->QueryInterface(IID_IUnknown, (void **)&pFilterUnk);
-							if (SUCCEEDED(hr)) {
-
-								// Show the page.
-								CAUUID caGUID;
-								pProp->GetPages(&caGUID);
-								pProp->Release();
-
-								OleCreatePropertyFrame(
-									this->m_hWnd,			// Parent window
-									0, 0,					// Reserved
-									FilterInfo.achName,		// Caption for the dialog box
-									1,						// Number of objects (just the filter)
-									&pFilterUnk,			// Array of object pointers.
-									caGUID.cElems,			// Number of property pages
-									caGUID.pElems,			// Array of property page CLSIDs
-									0,						// Locale identifier
-									0, NULL					// Reserved
-								);
-
-								// Clean up.
-								CoTaskMemFree(caGUID.pElems);
-								pFilterUnk->Release();
-							}
-							if (FilterInfo.pGraph) {
-								FilterInfo.pGraph->Release();
-							}
-						}
-					}
-				}
-				break;
-			}
-		}
-		EndEnumSysDev
-	}
-}
-
-void CPPageOutput::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr))
-{
-	if (!CreateInstance) {
-		return;
-	}
-
-	HRESULT hr;
-	CUnknown* pObj = CreateInstance(NULL, &hr);
-
-	if (!pObj) {
-		return;
-	}
-
-	CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pObj;
-
-	if (SUCCEEDED(hr)) {
-		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pUnk) {
-			CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
-			ps.AddPages(pSPP);
-			ps.DoModal();
-		}
-	}
-}
-
-void CPPageOutput::OnDualAudioOutputCheck()
-{
-	m_iSecAudioRendererTypeCtrl.EnableWindow(!!m_DualAudioOutput.GetCheck());
 }

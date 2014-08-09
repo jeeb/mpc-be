@@ -25,15 +25,9 @@
 
 #define AudioSwitcherName L"MPC AudioSwitcher"
 
-#define AS_MAX_CHANNELS 18
-
 interface __declspec(uuid("CEDB2890-53AE-4231-91A3-B0AAFCD1DBDE"))
 IAudioSwitcherFilter :
 public IUnknown {
-	STDMETHOD(GetInputSpeakerConfig) (DWORD* pdwChannelMask) PURE;
-	STDMETHOD(GetSpeakerConfig) (bool* pfCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]) PURE;
-	STDMETHOD(SetSpeakerConfig) (bool fCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]) PURE;
-	STDMETHOD_(int, GetNumberOfInputChannels) () PURE;
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
 	STDMETHOD(GetNormalizeBoost) (bool& fNormalize, int& iRecoverStep, float& boost) PURE;
@@ -43,13 +37,6 @@ public IUnknown {
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
 {
-	typedef struct {
-		DWORD Speaker, Channel;
-	} ChMap;
-	CAtlArray<ChMap> m_chs[AS_MAX_CHANNELS];
-
-	bool m_fCustomChannelMapping;
-	DWORD m_pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS];
 	REFERENCE_TIME m_rtAudioTimeShift;
 	bool m_fNormalize;
 	int  m_iRecoverStep; // percent per second
@@ -73,10 +60,6 @@ public:
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 	// IAudioSwitcherFilter
-	STDMETHODIMP GetInputSpeakerConfig(DWORD* pdwChannelMask);
-	STDMETHODIMP GetSpeakerConfig(bool* pfCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]);
-	STDMETHODIMP SetSpeakerConfig(bool fCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]);
-	STDMETHODIMP_(int) GetNumberOfInputChannels();
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
 	STDMETHODIMP GetNormalizeBoost(bool& fNormalize, int& iRecoverStep, float& boost);

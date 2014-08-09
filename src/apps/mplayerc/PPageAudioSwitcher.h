@@ -34,34 +34,40 @@ class CPPageAudioSwitcher : public CPPageBase
 
 private:
 	CComQIPtr<IAudioSwitcherFilter> m_pASF;
-	DWORD m_pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS];
-	DWORD m_dwChannelMask;
+
+	CStringArray m_AudioRendererDisplayNames;
 
 public:
 	CPPageAudioSwitcher(IFilterGraph* pFG);
 	virtual ~CPPageAudioSwitcher();
 
-	enum { IDD = IDD_PPAGEAUDIOSWITCHER };
+	enum { IDD = IDD_PPAGEAUDIO };
 
-	BOOL m_fEnableAudioSwitcher;
-	BOOL m_fAudioNormalize;
-	int  m_iAudioRecoverStep;
-	CSliderCtrl m_AudioRecoverStepCtrl;
-	int m_AudioBoostPos;
-	CSliderCtrl m_AudioBoostCtrl;
-	BOOL m_fAudioTimeShift;
-	CButton m_fAudioTimeShiftCtrl;
-	int m_tAudioTimeShift;
-	CIntEdit m_tAudioTimeShiftCtrl;
+	int			m_iAudioRendererType;
+	CComboBox	m_iAudioRendererTypeCtrl;
+	int			m_iSecAudioRendererType;
+	CComboBox	m_iSecAudioRendererTypeCtrl;
+	CButton		m_audRendPropButton;
+	CButton		m_DualAudioOutput;
+
+	BOOL		m_fAutoloadAudio;
+	CString		m_sAudioPaths;
+	BOOL		m_fPrioritizeExternalAudio;
+
+	BOOL		m_fAudioNormalize;
+	int			m_iAudioRecoverStep;
+	CSliderCtrl	m_AudioRecoverStepCtrl;
+	int			m_AudioBoostPos;
+	CSliderCtrl	m_AudioBoostCtrl;
+	BOOL		m_fAudioTimeShift;
+	CButton		m_fAudioTimeShiftCtrl;
+	int			m_tAudioTimeShift;
+	CIntEdit	m_tAudioTimeShiftCtrl;
 	CSpinButtonCtrl m_tAudioTimeShiftSpin;
-	BOOL m_fCustomChannelMapping;
-	CButton m_fCustomChannelMappingCtrl;
-	CEdit m_nChannelsCtrl;
-	int m_nChannels;
-	CSpinButtonCtrl m_nChannelsSpinCtrl;
-	CListCtrl m_list;
 
 	CToolTipCtrl m_tooltip;
+
+	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -71,13 +77,13 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnNMClickList1(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
-	afx_msg void OnEnChangeEdit1();
-	afx_msg void OnUpdateAudioSwitcher(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateChannelMapping(CCmdUI* pCmdUI);
+	afx_msg void OnAudioRendererChange();
+	afx_msg void OnAudioRenderPropClick();
+	afx_msg void OnDualAudioOutputCheck();
+
+	afx_msg void OnBnClickedResetAudioPaths();
+
 	afx_msg void OnUpdateNormalize(CCmdUI* pCmdUI);
-public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	virtual void OnCancel();

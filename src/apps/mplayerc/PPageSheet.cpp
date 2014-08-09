@@ -29,7 +29,7 @@ IMPLEMENT_DYNAMIC(CPPageSheet, CTreePropSheet)
 
 CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd, UINT idPage)
 	: CTreePropSheet(pszCaption, pParentWnd, 0)
-	, m_audioswitcher(pFG)
+	, m_audio(pFG)
 	, m_bLockPage(false)
 {
 	int tree_width = 210;
@@ -46,14 +46,14 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	AddPage(&m_logo);
 	AddPage(&m_webserver);
 	AddPage(&m_playback);
-	AddPage(&m_dvd);
-	AddPage(&m_output);
+	AddPage(&m_video);
+	AddPage(&m_audio);
 	AddPage(&m_fullscreen);
 	AddPage(&m_sync);
+	AddPage(&m_dvd);
 	AddPage(&m_tuner);
 	AddPage(&m_youtube);
 	AddPage(&m_internalfilters);
-	AddPage(&m_audioswitcher);
 	AddPage(&m_filtersperformance);
 	AddPage(&m_externalfilters);
 	AddPage(&m_filterspriority);

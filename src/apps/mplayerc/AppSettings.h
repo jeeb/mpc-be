@@ -125,8 +125,6 @@ enum MCE_RAW_INPUT {
 #define AUDRNDT_NULL_UNCOMP _T("Null Audio Renderer (Uncompressed)")
 #define AUDRNDT_MPC _T("MPC Audio Renderer")
 
-#define AS_MAX_CHANNELS 18 // from AudioSwitcher.h
-
 #define DEFAULT_AUDIO_PATHS    _T(".;.\\audio;.\\fandub")
 #define DEFAULT_SUBTITLE_PATHS _T(".;.\\subtitles;.\\subs")
 #define DEFAULT_JUMPDISTANCE_1  1000
@@ -616,15 +614,11 @@ public:
 	bool			AudioFilters[ADEC_LAST];
 
 	// Audio Switcher
-	bool			fEnableAudioSwitcher;
 	bool			fAudioNormalize;
 	int				iAudioRecoverStep;
 	float			dAudioBoost_dB;
 	bool			fAudioTimeShift;
 	int				iAudioTimeShift;
-	bool			fCustomChannelMapping;
-	int				nSpeakerChannels;
-	DWORD			pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS];
 
 	// External Filters
 	CAutoPtrList<FilterOverride> m_filters;

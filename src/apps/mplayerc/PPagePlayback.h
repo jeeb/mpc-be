@@ -32,34 +32,31 @@ class CPPagePlayback : public CPPageBase
 
 	// private:
 	int m_oldVolume; //not very nice solution
-	CString m_sAudioPaths;
 
 public:
 	CPPagePlayback();
 	virtual ~CPPagePlayback();
 
-	CSliderCtrl	m_volumectrl;
-	CSliderCtrl	m_balancectrl;
 	int			m_nVolume;
+	CSliderCtrl	m_volumectrl;
+	int			m_nVolumeStep;
+	CComboBox	m_nVolumeStepCtrl;
 	int			m_nBalance;
+	CSliderCtrl	m_balancectrl;
 	int			m_iLoopForever;
 	CEdit		m_loopnumctrl;
 	int			m_nLoops;
 	BOOL		m_fRewind;
-	int			m_iZoomLevel;
-	BOOL		m_iRememberZoomLevel;
-	BOOL		m_fAutoloadAudio;
-	BOOL		m_fPrioritizeExternalAudio;
-	BOOL		m_fEnableWorkerThreadForOpening;
-	BOOL		m_fReportFailedPins;
-	CString		m_subtitlesLanguageOrder;
-	CString		m_audiosLanguageOrder;
-	int			m_nVolumeStep;
-	CComboBox	m_nVolumeStepCtrl;
 	int			m_nSpeedStep;
 	CComboBox	m_nSpeedStepCtrl;
-	BOOL		m_fUseInternalSelectTrackLogic;
+	BOOL		m_iRememberZoomLevel;
+	int			m_iZoomLevel;
 	CComboBox	m_zoomlevelctrl;
+	BOOL		m_fUseInternalSelectTrackLogic;
+	CString		m_subtitlesLanguageOrder;
+	CString		m_audiosLanguageOrder;
+	BOOL		m_fEnableWorkerThreadForOpening;
+	BOOL		m_fReportFailedPins;
 
 	enum { IDD = IDD_PPAGEPLAYBACK };
 
@@ -79,7 +76,5 @@ public:
 
 	afx_msg void OnBalanceTextDblClk();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
-	afx_msg void OnBnClickedButton1();
 	virtual void OnCancel();
-	afx_msg void OnBnClickedCheck3();
 };
