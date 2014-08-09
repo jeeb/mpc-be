@@ -24,9 +24,9 @@
 #include <moreuuids.h>
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
-#include "PPageOutput.h"
+#include "PPageVideo.h"
 
-// CPPageOutput dialog
+// CPPageVideo dialog
 
 static const LPCTSTR EmptyText = L"";
 
@@ -46,9 +46,9 @@ static bool IsRenderTypeAvailable(UINT VideoRendererType)
 	}
 }
 
-IMPLEMENT_DYNAMIC(CPPageOutput, CPPageBase)
-CPPageOutput::CPPageOutput()
-	: CPPageBase(CPPageOutput::IDD, CPPageOutput::IDD)
+IMPLEMENT_DYNAMIC(CPPageVideo, CPPageBase)
+CPPageVideo::CPPageVideo()
+	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
 	, m_iDSVideoRendererType(VIDRNDT_DS_DEFAULT)
 	, m_iDSVideoRendererType_store(VIDRNDT_DS_DEFAULT)
 	, m_iRMVideoRendererType(VIDRNDT_RM_DEFAULT)
@@ -66,11 +66,11 @@ CPPageOutput::CPPageOutput()
 {
 }
 
-CPPageOutput::~CPPageOutput()
+CPPageVideo::~CPPageVideo()
 {
 }
 
-void CPPageOutput::DoDataExchange(CDataExchange* pDX)
+void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_VIDRND_COMBO, m_iDSVideoRendererTypeCtrl);
@@ -91,7 +91,7 @@ void CPPageOutput::DoDataExchange(CDataExchange* pDX)
 	DDX_CBString(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 }
 
-BEGIN_MESSAGE_MAP(CPPageOutput, CPPageBase)
+BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
 	ON_CBN_SELCHANGE(IDC_RMRND_COMBO, OnRMRendererChange)
 	ON_CBN_SELCHANGE(IDC_QTRND_COMBO, OnQTRendererChange)
@@ -101,9 +101,9 @@ BEGIN_MESSAGE_MAP(CPPageOutput, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
 END_MESSAGE_MAP()
 
-// CPPageOutput message handlers
+// CPPageVideo message handlers
 
-BOOL CPPageOutput::OnInitDialog()
+BOOL CPPageVideo::OnInitDialog()
 {
 	__super::OnInitDialog();
 
@@ -277,7 +277,7 @@ BOOL CPPageOutput::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
-BOOL CPPageOutput::OnApply()
+BOOL CPPageVideo::OnApply()
 {
 	UpdateData();
 
@@ -310,7 +310,7 @@ BOOL CPPageOutput::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageOutput::OnUpdateMixerYUV(CCmdUI* pCmdUI)
+void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER)
 					&& (m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel()) == VIDRNDT_DS_VMR7WINDOWED
@@ -319,7 +319,7 @@ void CPPageOutput::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 						|| m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel()) == VIDRNDT_DS_VMR9RENDERLESS));
 }
 
-void CPPageOutput::OnSurfaceChange()
+void CPPageVideo::OnSurfaceChange()
 {
 	UpdateData();
 
@@ -338,7 +338,7 @@ void CPPageOutput::OnSurfaceChange()
 	SetModified();
 }
 
-void CPPageOutput::OnDSRendererChange()
+void CPPageVideo::OnDSRendererChange()
 {
 	UINT CurrentVR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
 
@@ -463,7 +463,7 @@ void CPPageOutput::OnDSRendererChange()
 	SetModified();
 }
 
-void CPPageOutput::OnRMRendererChange()
+void CPPageVideo::OnRMRendererChange()
 {
 	UpdateData();
 
@@ -482,7 +482,7 @@ void CPPageOutput::OnRMRendererChange()
 	SetModified();
 }
 
-void CPPageOutput::OnQTRendererChange()
+void CPPageVideo::OnQTRendererChange()
 {
 	UpdateData();
 
@@ -501,7 +501,7 @@ void CPPageOutput::OnQTRendererChange()
 	SetModified();
 }
 
-void CPPageOutput::OnFullscreenCheck()
+void CPPageVideo::OnFullscreenCheck()
 {
 	UpdateData();
 	if (m_fD3DFullscreen &&
@@ -513,7 +513,7 @@ void CPPageOutput::OnFullscreenCheck()
 	}
 }
 
-void CPPageOutput::OnD3D9DeviceCheck()
+void CPPageVideo::OnD3D9DeviceCheck()
 {
 	UpdateData();
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(m_fD3D9RenderDevice);

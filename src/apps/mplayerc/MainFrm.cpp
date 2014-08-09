@@ -9307,7 +9307,7 @@ void CMainFrame::OnPlayAudio(UINT nID)
 	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 
 	if (i == -1) {
-		ShowOptions(CPPageAudioSwitcher::IDD);
+		ShowOptions(CPPageAudio::IDD);
 	} else if (i >= 0 && pSS) {
 		pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE);
 	}
@@ -9317,7 +9317,7 @@ void CMainFrame::OnPlayAudioOption(UINT nID)
 {
 	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
 	if (i == -1) {
- 		ShowOptions(CPPageAudioSwitcher::IDD);
+ 		ShowOptions(CPPageAudio::IDD);
 	} else if (i == 0) {
 		OnFileLoadAudio();
  	}

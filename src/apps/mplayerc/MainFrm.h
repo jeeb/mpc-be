@@ -646,7 +646,7 @@ protected:  // control bar embedded members
 	LPCTSTR GetRecentFile();
 
 	friend class CPPagePlayback; // TODO
-	friend class CPPageAudioSwitcher; // TODO
+	friend class CPPageAudio; // TODO
 	friend class CMPlayerCApp; // TODO
 
 	void RestoreControlBars();

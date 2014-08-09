@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "PPageOutput.h"
+#include "PPageVideo.h"
 #include <moreuuids.h>
 #include "PPageMisc.h"
 #include <psapi.h>

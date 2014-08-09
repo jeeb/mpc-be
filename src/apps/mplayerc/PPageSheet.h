@@ -27,13 +27,13 @@
 #include "PPageLogo.h"
 #include "PPagePlayback.h"
 #include "PPageDVD.h"
-#include "PPageOutput.h"
+#include "PPageVideo.h"
 #include "PPageYoutube.h"
 #include "PPageFullscreen.h"
 #include "PPageSync.h"
 #include "PPageWebServer.h"
 #include "PPageInternalFilters.h"
-#include "PPageAudioSwitcher.h"
+#include "PPageAudio.h"
 #include "PPageFiltersPerformance.h"
 #include "PPageFiltersPriority.h"
 #include "PPageExternalFilters.h"
@@ -77,8 +77,8 @@ private:
 	CPPageLogo m_logo;
 	CPPageWebServer m_webserver;
 	CPPagePlayback m_playback;
-	CPPageOutput m_video;
-	CPPageAudioSwitcher m_audio;
+	CPPageVideo m_video;
+	CPPageAudio m_audio;
 	CPPageFullscreen m_fullscreen;
 	CPPageSync m_sync;
 	CPPageDVD m_dvd;

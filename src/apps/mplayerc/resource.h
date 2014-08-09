@@ -535,7 +535,7 @@
 #define IDD_PPAGEINTERNALFILTERS        10036
 #define IDD_PPAGELOGO                   10037
 #define IDD_PPAGEVIDREND                10038
-#define IDD_PPAGEOUTPUT                 10039
+#define IDD_PPAGEVIDEO                 10039
 #define IDD_PPAGEWEBSERVER              10040
 #define IDD_SAVETEXTFILEDIALOGTEMPL     10043
 #define IDD_CAPTURE_DLG                 10045

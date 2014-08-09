@@ -229,7 +229,7 @@
     <ClCompile Include="PngImage.cpp" />
     <ClCompile Include="PnSPresetsDlg.cpp" />
     <ClCompile Include="PPageAccelTbl.cpp" />
-    <ClCompile Include="PPageAudioSwitcher.cpp" />
+    <ClCompile Include="PPageAudio.cpp" />
     <ClCompile Include="PPageBase.cpp" />
     <ClCompile Include="PPageCapture.cpp" />
     <ClCompile Include="PPageDVD.cpp" />
@@ -244,7 +244,7 @@
     <ClCompile Include="PPageInternalFilters.cpp" />
     <ClCompile Include="PPageLogo.cpp" />
     <ClCompile Include="PPageMisc.cpp" />
-    <ClCompile Include="PPageOutput.cpp" />
+    <ClCompile Include="PPageVideo.cpp" />
     <ClCompile Include="PPagePlayback.cpp" />
     <ClCompile Include="PPagePlayer.cpp" />
     <ClCompile Include="PPageSheet.cpp" />
@@ -348,7 +348,7 @@
     <ClInclude Include="PngImage.h" />
     <ClInclude Include="PnSPresetsDlg.h" />
     <ClInclude Include="PPageAccelTbl.h" />
-    <ClInclude Include="PPageAudioSwitcher.h" />
+    <ClInclude Include="PPageAudio.h" />
     <ClInclude Include="PPageBase.h" />
     <ClInclude Include="PPageCapture.h" />
     <ClInclude Include="PPageDVD.h" />
@@ -363,7 +363,7 @@
     <ClInclude Include="PPageInternalFilters.h" />
     <ClInclude Include="PPageLogo.h" />
     <ClInclude Include="PPageMisc.h" />
-    <ClInclude Include="PPageOutput.h" />
+    <ClInclude Include="PPageVideo.h" />
     <ClInclude Include="PPagePlayback.h" />
     <ClInclude Include="PPagePlayer.h" />
     <ClInclude Include="PPageSheet.h" />

@@ -165,7 +165,7 @@
     <ClCompile Include="PPageAccelTbl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPageAudioSwitcher.cpp">
+    <ClCompile Include="PPageAudio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PPageBase.cpp">
@@ -210,7 +210,7 @@
     <ClCompile Include="PPageMisc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPageOutput.cpp">
+    <ClCompile Include="PPageVideo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PPagePlayback.cpp">
@@ -503,7 +503,7 @@
     <ClInclude Include="PPageAccelTbl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PPageAudioSwitcher.h">
+    <ClInclude Include="PPageAudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageBase.h">
@@ -548,7 +548,7 @@
     <ClInclude Include="PPageMisc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PPageOutput.h">
+    <ClInclude Include="PPageVideo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPagePlayback.h">

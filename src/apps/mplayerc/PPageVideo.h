@@ -24,11 +24,11 @@
 #include "PPageBase.h"
 
 
-// CPPageOutput dialog
+// CPPageVideo dialog
 
-class CPPageOutput : public CPPageBase
+class CPPageVideo : public CPPageBase
 {
-	DECLARE_DYNAMIC(CPPageOutput)
+	DECLARE_DYNAMIC(CPPageVideo)
 
 private:
 	CStringArray m_D3D9GUIDNames;
@@ -40,10 +40,10 @@ private:
 
 	int m_iDSVideoRendererType_store;
 public:
-	CPPageOutput();
-	virtual ~CPPageOutput();
+	CPPageVideo();
+	virtual ~CPPageVideo();
 
-	enum { IDD = IDD_PPAGEOUTPUT };
+	enum { IDD = IDD_PPAGEVIDEO };
 	int m_iDSVideoRendererType;
 	int m_iRMVideoRendererType;
 	int m_iQTVideoRendererType;

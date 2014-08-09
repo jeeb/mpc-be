@@ -26,11 +26,11 @@
 #include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
 
 
-// CPPageAudioSwitcher dialog
+// CPPageAudio dialog
 
-class CPPageAudioSwitcher : public CPPageBase
+class CPPageAudio : public CPPageBase
 {
-	DECLARE_DYNAMIC(CPPageAudioSwitcher)
+	DECLARE_DYNAMIC(CPPageAudio)
 
 private:
 	CComQIPtr<IAudioSwitcherFilter> m_pASF;
@@ -38,8 +38,8 @@ private:
 	CStringArray m_AudioRendererDisplayNames;
 
 public:
-	CPPageAudioSwitcher(IFilterGraph* pFG);
-	virtual ~CPPageAudioSwitcher();
+	CPPageAudio(IFilterGraph* pFG);
+	virtual ~CPPageAudio();
 
 	enum { IDD = IDD_PPAGEAUDIO };
 

@@ -806,7 +806,7 @@ BEGIN
     RTEXT           "",IDC_AUTHOR,100,207,190,8
 END
 
-IDD_PPAGEOUTPUT DIALOGEX 0, 0, 296, 236
+IDD_PPAGEVIDEO DIALOGEX 0, 0, 296, 236
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -1252,7 +1252,7 @@ BEGIN
         VERTGUIDE, 64
     END
 
-    IDD_PPAGEOUTPUT, DIALOG
+    IDD_PPAGEVIDEO, DIALOG
     BEGIN
         VERTGUIDE, 10
         VERTGUIDE, 114
@@ -1352,7 +1352,7 @@ IDB_PLAYERTOOLBAR       BITMAP                  "res\\toolbar.bmp"
 // Dialog Info
 //
 
-IDD_PPAGEOUTPUT DLGINIT
+IDD_PPAGEVIDEO DLGINIT
 BEGIN
     IDC_DX9RESIZER_COMBO, 0x403, 17, 0
 0x654e, 0x7261, 0x7365, 0x2074, 0x656e, 0x6769, 0x6268, 0x726f, "\000" 
@@ -2367,7 +2367,7 @@ BEGIN
     IDD_PPAGESUBSTYLE       "Subtitles::Default Style"
     IDD_PPAGEINTERNALFILTERS "Internal Filters"
     IDD_PPAGELOGO           "Player::Logo"
-    IDD_PPAGEOUTPUT         "Playback::Video"
+    IDD_PPAGEVIDEO         "Playback::Video"
     IDD_PPAGEYOUTUBE        "Playback::YouTube"
     IDD_PPAGEWEBSERVER      "Player::Web Interface"
 END

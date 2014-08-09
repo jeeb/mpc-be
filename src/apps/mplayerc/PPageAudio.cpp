@@ -25,13 +25,13 @@
 #include "../../filters/renderer/MpcAudioRenderer/MpcAudioRenderer.h"
 #include "ComPropertyPage.h"
 #include "MainFrm.h"
-#include "PPageAudioSwitcher.h"
+#include "PPageAudio.h"
 
-// CPPageAudioSwitcher dialog
+// CPPageAudio dialog
 
-IMPLEMENT_DYNAMIC(CPPageAudioSwitcher, CPPageBase)
-CPPageAudioSwitcher::CPPageAudioSwitcher(IFilterGraph* pFG)
-	: CPPageBase(CPPageAudioSwitcher::IDD, CPPageAudioSwitcher::IDD)
+IMPLEMENT_DYNAMIC(CPPageAudio, CPPageBase)
+CPPageAudio::CPPageAudio(IFilterGraph* pFG)
+	: CPPageBase(CPPageAudio::IDD, CPPageAudio::IDD)
 	, m_iAudioRendererType(0)
 	, m_iSecAudioRendererType(0)
 
@@ -47,11 +47,11 @@ CPPageAudioSwitcher::CPPageAudioSwitcher(IFilterGraph* pFG)
 	m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
 }
 
-CPPageAudioSwitcher::~CPPageAudioSwitcher()
+CPPageAudio::~CPPageAudio()
 {
 }
 
-void CPPageAudioSwitcher::DoDataExchange(CDataExchange* pDX)
+void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
@@ -78,7 +78,7 @@ void CPPageAudioSwitcher::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN2, m_tAudioTimeShiftSpin);
 }
 
-BEGIN_MESSAGE_MAP(CPPageAudioSwitcher, CPPageBase)
+BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_AUDRND_COMBO, OnAudioRendererChange)
 	ON_BN_CLICKED(IDC_BUTTON1, OnAudioRenderPropClick)
 	ON_BN_CLICKED(IDC_CHECK1, OnDualAudioOutputCheck)
@@ -91,9 +91,9 @@ BEGIN_MESSAGE_MAP(CPPageAudioSwitcher, CPPageBase)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
-// CPPageAudioSwitcher message handlers
+// CPPageAudio message handlers
 
-BOOL CPPageAudioSwitcher::OnInitDialog()
+BOOL CPPageAudio::OnInitDialog()
 {
 	__super::OnInitDialog();
 
@@ -202,7 +202,7 @@ BOOL CPPageAudioSwitcher::OnInitDialog()
 	return TRUE;
 }
 
-BOOL CPPageAudioSwitcher::OnApply()
+BOOL CPPageAudio::OnApply()
 {
 	UpdateData();
 
@@ -230,7 +230,7 @@ BOOL CPPageAudioSwitcher::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageAudioSwitcher::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr))
+void CPPageAudio::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr))
 {
 	if (!CreateInstance) {
 		return;
@@ -254,7 +254,7 @@ void CPPageAudioSwitcher::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOW
 	}
 }
 
-void CPPageAudioSwitcher::OnAudioRendererChange()
+void CPPageAudio::OnAudioRendererChange()
 {
 	UpdateData();
 
@@ -291,7 +291,7 @@ void CPPageAudioSwitcher::OnAudioRendererChange()
 	SetModified();
 }
 
-void CPPageAudioSwitcher::OnAudioRenderPropClick()
+void CPPageAudio::OnAudioRenderPropClick()
 {
 	CString str_audio = m_AudioRendererDisplayNames[m_iAudioRendererType];
 
@@ -356,12 +356,12 @@ void CPPageAudioSwitcher::OnAudioRenderPropClick()
 	}
 }
 
-void CPPageAudioSwitcher::OnDualAudioOutputCheck()
+void CPPageAudio::OnDualAudioOutputCheck()
 {
 	m_iSecAudioRendererTypeCtrl.EnableWindow(!!m_DualAudioOutput.GetCheck());
 }
 
-void CPPageAudioSwitcher::OnBnClickedResetAudioPaths()
+void CPPageAudio::OnBnClickedResetAudioPaths()
 {
 	m_sAudioPaths = DEFAULT_AUDIO_PATHS;
 
@@ -370,12 +370,12 @@ void CPPageAudioSwitcher::OnBnClickedResetAudioPaths()
 	SetModified();
 }
 
-void CPPageAudioSwitcher::OnUpdateNormalize(CCmdUI* pCmdUI)
+void CPPageAudio::OnUpdateNormalize(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK5));
 }
 
-void CPPageAudioSwitcher::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CPPageAudio::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	if (*pScrollBar == m_AudioBoostCtrl) {
 		UpdateData();
@@ -387,7 +387,7 @@ void CPPageAudioSwitcher::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScroll
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
-BOOL CPPageAudioSwitcher::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
+BOOL CPPageAudio::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 {
 	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
 
@@ -411,7 +411,7 @@ BOOL CPPageAudioSwitcher::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pRe
 	return TRUE;
 }
 
-void CPPageAudioSwitcher::OnCancel()
+void CPPageAudio::OnCancel()
 {
 	AppSettings& s = AfxGetAppSettings();
 

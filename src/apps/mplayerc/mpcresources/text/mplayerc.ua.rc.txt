@@ -320,7 +320,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 21		"Експорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
 5		"Video renderer"
 7		"Рендерер RealMedia відео"
 9		"Рендерер QuickTime відео"
@@ -1175,7 +1175,7 @@ STRING IDD_PPAGEINTERFACE		"Інтерфейс"
 STRING IDD_PPAGEINTERNALFILTERS		"Вбудовані фільтри"
 STRING IDD_PPAGELOGO		"Програвач::Логотип"
 STRING IDD_PPAGEMISC		"Різне"
-STRING IDD_PPAGEOUTPUT		"Відтворення::Video"
+STRING IDD_PPAGEVIDEO		"Відтворення::Video"
 STRING IDD_PPAGEPLAYBACK		"Відтворення"
 STRING IDD_PPAGEPLAYER		"Програвач"
 STRING IDD_PPAGESUBRENDERING		"Субтитри::Візуалізація"
