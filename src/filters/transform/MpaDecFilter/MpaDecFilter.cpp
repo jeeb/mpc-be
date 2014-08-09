@@ -827,7 +827,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	// RealAudio
 	CPaddedArray buffRA(FF_INPUT_BUFFER_PADDING_SIZE);
 	bool isRA = false;
-	if (bEOF && (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR)) {
+	if (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR) {
 		HRESULT hrRA = m_FFAudioDec.RealPrepare(p, int(end - p), buffRA);
 		if (hrRA == S_OK) {
 			p = buffRA.GetData();
