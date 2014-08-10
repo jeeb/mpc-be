@@ -146,11 +146,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 12		"Скинути"
 13		"Налаштування відкриття аудіофайлів"
 14		"Віддавати перевагу зовнішнім аудіофайлам перед вбудованими доріжками"
-16		"Sound processing"
+16		"Обробка звуку"
 17		"Затримка звуку (в мс):"
-20		"Auto gain control"
+20		"Автоматичне регулювання гучності"
 21		"Підсилення:"
-23		"Speed of sound amplifying:"
+23		"Швидкість додавання гучності:"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -320,22 +320,6 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 21		"Експорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Video renderer"
-7		"Рендерер RealMedia відео"
-9		"Рендерер QuickTime відео"
-11		"Налаштування VMR-7/VMR-9 (Renderless) і EVR-CP"
-12		"Вибір пристрою рендерингу D3D9"
-14		"Поверхня:"
-16		"Інтерполяція:"
-18		"Повноекранний Direct3D"
-19		"Альтернат. VSync"
-20		"Режим VMR Mixer"
-21		"Реініціалізація при зміні дисплею"
-22		"YUV мікшування"
-23		"Буфери EVR:"
-END
-
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Аудіо"
 6		"Гучність"
@@ -388,7 +372,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 31		"Історія"
 32		"Запам'ятов. останнє значення Pan-n-Scan"
 33		"Запам'ятов. останній список відтворення"
-34		"Number of recent files:"
+34		"Кількість останніх відкр. файлів:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
@@ -476,6 +460,22 @@ BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 14		"Задіяти підтримку Logitech LCD (експериментально)"
 15		"Швидке перемотування (по ключовим кадрам)"
 16		"Задіяти створення мінідампів"
+END
+
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+5		"Відеорендерер"
+7		"Рендерер RealMedia відео"
+9		"Рендерер QuickTime відео"
+11		"Налаштування VMR-7/VMR-9 (Renderless) і EVR-CP"
+12		"Вибір пристрою рендерингу D3D9"
+14		"Поверхня:"
+16		"Інтерполяція:"
+18		"Повноекранний Direct3D"
+19		"Альтернат. VSync"
+20		"Режим VMR Mixer"
+21		"Реініціалізація при зміні дисплею"
+22		"YUV мікшування"
+23		"Буфери EVR:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1163,7 +1163,7 @@ STRING IDD_FILEPROPCLIP		"Кліп"
 STRING IDD_FILEPROPDETAILS		"Детально"
 STRING IDD_FILEPROPRES		"Ресурси"
 STRING IDD_PPAGEACCELTBL		"Програвач::Гарячі клавіші"
-STRING IDD_PPAGEAUDIO		"Відтворення::Audio"
+STRING IDD_PPAGEAUDIO		"Відтворення::Аудіо"
 STRING IDD_PPAGECAPTURE		"Відтворення::Захоплення"
 STRING IDD_PPAGEDVD		"Відтворення::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Зовнішні фільтри"
@@ -1175,7 +1175,6 @@ STRING IDD_PPAGEINTERFACE		"Інтерфейс"
 STRING IDD_PPAGEINTERNALFILTERS		"Вбудовані фільтри"
 STRING IDD_PPAGELOGO		"Програвач::Логотип"
 STRING IDD_PPAGEMISC		"Різне"
-STRING IDD_PPAGEVIDEO		"Відтворення::Video"
 STRING IDD_PPAGEPLAYBACK		"Відтворення"
 STRING IDD_PPAGEPLAYER		"Програвач"
 STRING IDD_PPAGESUBRENDERING		"Субтитри::Візуалізація"
@@ -1183,6 +1182,7 @@ STRING IDD_PPAGESUBSTYLE		"Субтитри::Стандартний стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитри"
 STRING IDD_PPAGESYNC		"Відтворення::Налаштування EVR Sync"
 STRING IDD_PPAGETWEAKS		"Додатково"
+STRING IDD_PPAGEVIDEO		"Відтворення::Відео"
 STRING IDD_PPAGEWEBSERVER		"Програвач::Web-інтерфейс"
 STRING IDD_PPAGEYOUTUBE		"Відтворення::YouTube"
 STRING IDF_LOGO1		"Типовий"
@@ -1646,7 +1646,7 @@ STRING IDS_MFMT_WAVPACK		"WavPack"
 STRING IDS_MFMT_WEBM		"WebM"
 STRING IDS_MFMT_WMA		"Windows Media Audio"
 STRING IDS_MFMT_WMV		"Windows Media Video"
-STRING IDS_MKVSPLT_CALC_DURATION		"Calculate the duration based on the video data"
+STRING IDS_MKVSPLT_CALC_DURATION		"Розраховувати тривалість на основі даних відеопотоку"
 STRING IDS_MKVSPLT_LOAD_EMBEDDED_FONTS		"Завантажувати вбудовані шрифти"
 STRING IDS_MPADEC_AC3ENCODE		"Кодувати до AC-3"
 STRING IDS_MPADEC_DRC		"Застосувати DRC до AC-3 і E-AC3"
