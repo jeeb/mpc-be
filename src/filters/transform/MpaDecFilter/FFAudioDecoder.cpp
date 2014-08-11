@@ -65,6 +65,8 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_ADPCM_SWF,         AV_CODEC_ID_ADPCM_SWF },
 	// AMV IMA ADPCM
 	{ &MEDIASUBTYPE_IMA_AMV,           AV_CODEC_ID_ADPCM_IMA_AMV },
+	// ADX ADPCM
+	{ &MEDIASUBTYPE_ADX_ADPCM,         AV_CODEC_ID_ADPCM_ADX },
 	// MPEG Audio
 	{ &MEDIASUBTYPE_MPEG1Packet,       AV_CODEC_ID_MP1 },
 	{ &MEDIASUBTYPE_MPEG1Payload,      AV_CODEC_ID_MP1 },
@@ -237,9 +239,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 			m_pAVCtx->flags				|= CODEC_FLAG_TRUNCATED;
 		}
 
-		if (nCodecId != AV_CODEC_ID_AAC) {
-			m_pParser = av_parser_init(nCodecId);
-		}
+		m_pParser = av_parser_init(nCodecId);
 
 		const void* format = pCurrentMediaType->Format();
 		GUID format_type = pCurrentMediaType->formattype;

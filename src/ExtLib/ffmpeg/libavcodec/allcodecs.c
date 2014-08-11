@@ -133,7 +133,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (VP6, vp6);
     REGISTER_DECODER (VP6A, vp6a);
     REGISTER_DECODER (VP6F, vp6f);
-    REGISTER_DECODER(VP7, vp7);
+    REGISTER_DECODER (VP7, vp7);
     REGISTER_DECODER (VP8, vp8);
     REGISTER_DECODER (VP9, vp9);
     REGISTER_DECODER (WMV1, wmv1);
@@ -166,7 +166,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MP2FLOAT, mp2float);
     REGISTER_DECODER (MP3FLOAT, mp3float);
     REGISTER_DECODER (NELLYMOSER, nellymoser);
-    REGISTER_DECODER(OPUS, opus);
+    REGISTER_DECODER (OPUS, opus);
     REGISTER_DECODER (RA_144, ra_144);
     REGISTER_DECODER (RA_288, ra_288);
     REGISTER_DECODER (RALF, ralf);
@@ -190,6 +190,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC  (EAC3, eac3);
 
     /* ADPCM codecs */
+    REGISTER_DECODER (ADPCM_ADX, adpcm_adx);
     REGISTER_DECODER (ADPCM_4XM, adpcm_4xm);
     REGISTER_DECODER (ADPCM_CT, adpcm_ct);
     REGISTER_DECODER (ADPCM_EA, adpcm_ea);

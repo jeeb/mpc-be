@@ -367,6 +367,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 		names[WAVE_FORMAT_PS2_PCM]               = _T("PS2 PCM");
 		names[WAVE_FORMAT_PS2_ADPCM]             = _T("PS2 ADPCM");
 		names[WAVE_FORMAT_SPEEX]                 = _T("Speex");
+		names[WAVE_FORMAT_ADX_ADPCM]             = _T("ADX ADPCM");
 	}
 
 	if (!names.Lookup(wFormatTag, str)) {

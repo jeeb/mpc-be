@@ -148,7 +148,7 @@ protected:
 	HRESULT ProcessPCMfloatLE();
 
 	HRESULT GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData);
-	HRESULT Deliver(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
+	HRESULT Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 	HRESULT DeliverBitstream(BYTE* pBuff, int size, WORD type, int sample_rate, int frame_length);
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
@@ -199,10 +199,4 @@ public:
 	STDMETHODIMP_(bool) GetSPDIF(enctype et);
 
 	STDMETHODIMP SaveSettings();
-};
-
-class CMpaDecInputPin : public CDeCSSInputPin
-{
-public:
-	CMpaDecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName);
 };

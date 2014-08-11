@@ -2401,6 +2401,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IMA4);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ADPCM_SWF);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IMA_AMV);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ADX_ADPCM);
 		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
