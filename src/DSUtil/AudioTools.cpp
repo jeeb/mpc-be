@@ -22,6 +22,11 @@
 #include "stdafx.h"
 #include "AudioTools.h"
 
+#define INT8_PEAK       128
+#define INT16_PEAK      32768
+#define INT24_PEAK      8388608
+#define INT32_PEAK      2147483648
+
 #define limit(a, x, b) if ((x) < (a)) { x = a; } else if ((x) > (b)) { x = b;}
 
 // gains
@@ -96,62 +101,95 @@ void gain_double(const double factor, const size_t allsamples, double* pData)
 
 // get_peaks
 
-int16_t get_peak_int16(const size_t allsamples, int16_t* pData)
+double get_max_peak_uint8(uint8_t* pData, const size_t allsamples)
 {
-    int16_t peak = 0;
+    int max_peak = 0;
 
-    for (int16_t* end = pData + allsamples; pData < end; ++pData) {
-        if ((*pData) == INT16_MIN) {
-            peak = INT16_MAX;
-            break;
-        }
-        if (abs(*pData) > peak) {
-            peak = abs(*pData);
+    for (uint8_t* end = pData + allsamples; pData < end; ++pData) {
+        int peak = abs((int8_t)(*pData ^ 0x80));
+        if (peak > max_peak) {
+            max_peak = peak;
         }
     }
 
-    return peak;
+    return (double)max_peak / INT8_PEAK;
 }
 
-int32_t get_peak_int32 (const size_t allsamples, int32_t* pData)
+double get_max_peak_int16(int16_t* pData, const size_t allsamples)
 {
-    int32_t peak = 0;
+    int max_peak = 0;
+
+    for (int16_t* end = pData + allsamples; pData < end; ++pData) {
+        int peak = abs(*pData);
+        if (peak > max_peak) {
+            max_peak = peak;
+        }
+    }
+
+    return (double)max_peak / INT16_PEAK;
+}
+
+double get_max_peak_int24(BYTE* pData, const size_t allsamples)
+{
+    int max_peak = 0;
+
+    BYTE* end = pData + allsamples * 3;
+    while (pData < end) {
+        int32_t i32 = 0;
+        BYTE* p = (BYTE*)(&i32);
+        p[1] = *(pData);
+        p[2] = *(pData + 1);
+        p[3] = *(pData + 2);
+        int peak = abs(i32 >> 8);
+        if (peak > max_peak) {
+            max_peak = peak;
+        }
+    }
+
+    return (double)max_peak / INT24_PEAK;
+}
+
+double get_max_peak_int32 (int32_t* pData, const size_t allsamples)
+{
+    int max_peak = 0;
 
     for (int32_t* end = pData + allsamples; pData < end; ++pData) {
         if ((*pData) == INT32_MIN) {
-            peak = INT32_MAX;
-            break;
+            return 1.0;
         }
-        if (abs(*pData) > peak) {
-            peak = abs(*pData);
+        int peak = abs(*pData);
+        if (peak > max_peak) {
+            max_peak = peak;
         }
     }
 
-    return peak;
+    return (double)max_peak / INT32_PEAK;
 }
 
-float get_peak_float(const size_t allsamples, float* pData)
+double get_max_peak_float(float* pData, const size_t allsamples)
 {
-    float peak = 0.0f;
+    float max_peak = 0.0f;
 
     for (float* end = pData + allsamples; pData < end; ++pData) {
-        if (abs(*pData) > peak) {
-            peak = abs(*pData);
+        float peak = abs(*pData);
+        if (peak > max_peak) {
+            max_peak = peak;
         }
     }
 
-    return peak;
+    return (double)max_peak;
 }
 
-double get_peak_double(const size_t allsamples, double* pData)
+double get_max_peak_double(double* pData, const size_t allsamples)
 {
-    double peak = 0.0;
+    double max_peak = 0.0;
 
     for (double* end = pData + allsamples; pData < end; ++pData) {
-        if (abs(*pData) > peak) {
-            peak = abs(*pData);
+        double peak = abs(*pData);
+        if (peak > max_peak) {
+            max_peak = peak;
         }
     }
 
-    return peak;
+    return max_peak;
 }
