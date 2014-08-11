@@ -1473,7 +1473,7 @@ static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, int16_t* pout
 
 	for (int i = 0; i < 28; i++) {
 		short input = (short)(((pin[2+i/2] >> ((i&1) << 2)) & 0xf) << 12) >> shift;
-		int output = (a * tbl[1] + b * tbl[0] + 64 * input) / 64;
+		int output = (a * tbl[1] + b * tbl[0]) / 64 + input;
 
 		a = b;
 		b = output;
