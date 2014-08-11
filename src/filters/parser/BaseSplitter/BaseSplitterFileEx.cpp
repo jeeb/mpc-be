@@ -47,14 +47,14 @@ CBaseSplitterFileEx::~CBaseSplitterFileEx()
 bool CBaseSplitterFileEx::NextMpegStartCode(BYTE& code, __int64 len)
 {
 	BitByteAlign();
-	DWORD dw = (DWORD)-1;
+	DWORD dw = DWORD_MAX;
 	do {
 		if (len-- == 0 || !GetRemaining()) {
 			return false;
 		}
 		dw = (dw << 8) | (BYTE)BitRead(8);
-	} while ((dw&0xffffff00) != 0x00000100);
-	code = (BYTE)(dw&0xff);
+	} while ((dw & 0xffffff00) != 0x00000100);
+	code = (BYTE)(dw & 0xff);
 	return true;
 }
 
@@ -68,7 +68,7 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 
 	BYTE b = (BYTE)BitRead(8, true);
 
-	if ((b&0xf1) == 0x21) {
+	if ((b & 0xf1) == 0x21) {
 		h.type = mpeg1;
 
 		EXECUTE_ASSERT(BitRead(4) == 2);
@@ -83,7 +83,7 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 		MARKER; // 14..0
 		h.bitrate = BitRead(22);
 		MARKER;
-	} else if ((b&0xc4) == 0x44) {
+	} else if ((b & 0xc4) == 0x44) {
 		h.type = mpeg2;
 
 		EXECUTE_ASSERT(BitRead(2) == 1);
@@ -95,7 +95,7 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 		MARKER; // 29..15
 		h.scr |= BitRead(15);
 		MARKER; // 14..0
-		h.scr = (h.scr*300 + BitRead(9)) * 10 / 27;
+		h.scr = (h.scr * 300 + BitRead(9)) * 10 / 27;
 		MARKER;
 		h.bitrate = BitRead(22);
 		MARKER;
@@ -131,19 +131,20 @@ bool CBaseSplitterFileEx::Read(pssyshdr& h)
 	MARKER;
 	h.video_bound = (BYTE)BitRead(5);
 
-	EXECUTE_ASSERT((BitRead(8)&0x7f) == 0x7f); // reserved (should be 0xff, but not in reality)
+	EXECUTE_ASSERT((BitRead(8) & 0x7f) == 0x7f); // reserved (should be 0xff, but not in reality)
 
 	for (len -= 6; len > 3; len -= 3) { // TODO: also store these, somewhere, if needed
 		UINT64 stream_id = BitRead(8);
 		UNREFERENCED_PARAMETER(stream_id);
 		EXECUTE_ASSERT(BitRead(2) == 3);
-		UINT64 p_std_buff_size_bound = (BitRead(1)?1024:128)*BitRead(13);
+		UINT64 p_std_buff_size_bound = (BitRead(1) ? 1024 : 128) * BitRead(13);
 		UNREFERENCED_PARAMETER(p_std_buff_size_bound);
 	}
 
 	return true;
 }
 
+#define PTS(x) (10000 * x / 90 + m_rtPTSOffset)
 bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 {
 	memset(&h, 0, sizeof(h));
@@ -172,7 +173,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 		BYTE b = (BYTE)BitRead(2);
 
 		if (b == 1) {
-			h.std_buff_size = (BitRead(1)?1024:128)*BitRead(13);
+			h.std_buff_size = (BitRead(1) ? 1024 : 128) * BitRead(13);
 			if (h.len) {
 				h.len -= 2;
 			}
@@ -221,7 +222,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 		MARKER; // 29..15
 		h.pts |= BitRead(15);
 		MARKER; // 14..0
-		h.pts = 10000*h.pts/90 + m_rtPTSOffset;
+		h.pts = PTS(h.pts);
 	}
 
 	if (h.fdts) {
@@ -235,7 +236,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 		MARKER; // 29..15
 		h.dts |= BitRead(15);
 		MARKER; // 14..0
-		h.dts = 10000*h.dts/90 + m_rtPTSOffset;
+		h.dts = PTS(h.dts);
 	}
 
 	// skip to the end of header
@@ -247,10 +248,10 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 
 		if (h.len) {
 			h.len--;
-			if (h.pts) {
+			if (h.fpts) {
 				h.len -= 4;
 			}
-			if (h.dts) {
+			if (h.fdts) {
 				h.len -= 5;
 			}
 		}
@@ -258,7 +259,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 
 	if (h.type == mpeg2) {
 		if (h.len) {
-			h.len -= 3+h.hdrlen;
+			h.len -= 3 + h.hdrlen;
 		}
 
 		int left = h.hdrlen;
@@ -278,7 +279,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 				TRACE(_T("peshdr read - pes_ext %X is invalid\n"), pes_ext);
 				pes_ext = skip = 0;
 			}
-			for (int i=0; i<skip; i++) {
+			for (int i = 0; i < skip; i++) {
 				BitRead(8);
 			}
 			left -= skip;
@@ -354,8 +355,8 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 	__int64 shlen = GetPos() - shpos;
 
 	static float ar[] = {
-		1.0000f,1.0000f,0.6735f,0.7031f,0.7615f,0.8055f,0.8437f,0.8935f,
-		0.9157f,0.9815f,1.0255f,1.0695f,1.0950f,1.1575f,1.2015f,1.0000f
+		1.0000f, 1.0000f, 0.6735f, 0.7031f, 0.7615f, 0.8055f, 0.8437f, 0.8935f,
+		0.9157f, 0.9815f, 1.0255f, 1.0695f, 1.0950f, 1.1575f, 1.2015f, 1.0000f
 	};
 
 	h.arx = (int)((float)h.width / ar[h.ar] + 0.5);
@@ -374,20 +375,20 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 		h.level = BitRead(4);
 		h.progressive = BitRead(1);
 		h.chroma = BitRead(2);
-		h.width |= (BitRead(2)<<12);
-		h.height |= (BitRead(2)<<12);
-		h.bitrate |= (BitRead(12)<<18);
+		h.width |= (BitRead(2) << 12);
+		h.height |= (BitRead(2) << 12);
+		h.bitrate |= (BitRead(12) << 18);
 		MARKER;
-		h.vbv |= (BitRead(8)<<10);
+		h.vbv |= (BitRead(8) << 10);
 		h.lowdelay = BitRead(1);
-		h.ifps = (DWORD)(h.ifps * (BitRead(2)+1) / (BitRead(5)+1));
+		h.ifps = (DWORD)(h.ifps * (BitRead(2) + 1) / (BitRead(5) + 1));
 
 		shextlen = GetPos() - shextpos;
 
 		struct {
 			DWORD x, y;
-		} ar[] = {{h.width,h.height},{4,3},{16,9},{221,100},{h.width,h.height}};
-		int i = min(max(h.ar, 1), 5)-1;
+		} ar[] = {{h.width, h.height}, {4, 3}, {16, 9}, {221, 100}, {h.width, h.height}};
+		int i = min(max(h.ar, 1), 5) - 1;
 		h.arx = ar[i].x;
 		h.ary = ar[i].y;
 
@@ -428,7 +429,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 	}
 
 	h.ifps = 10 * h.ifps / 27;
-	h.bitrate = h.bitrate == (1<<30)-1 ? 0 : h.bitrate * 400;
+	h.bitrate = h.bitrate == (1 << 30) - 1 ? 0 : h.bitrate * 400;
 
 	CSize aspect(h.arx, h.ary);
 	ReduceDim(aspect);
@@ -497,14 +498,14 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 static int NextMpegStartCodeGb(CGolombBuffer& gb, BYTE& code)
 {
 	gb.BitByteAlign();
-	DWORD dw = (DWORD)-1;
+	DWORD dw = DWORD_MAX;
 	do {
 		if (gb.IsEOF()) {
 			return false;
 		}
 		dw = (dw << 8) | (BYTE)gb.BitRead(8);
-	} while ((dw&0xffffff00) != 0x00000100);
-	code = (BYTE)(dw&0xff);
+	} while ((dw & 0xffffff00) != 0x00000100);
+	code = (BYTE)(dw & 0xff);
 	return true;
 }
 
@@ -556,8 +557,8 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 	__int64 shlen = gb.GetPos() - shpos;
 
 	static float ar[] = {
-		1.0000f,1.0000f,0.6735f,0.7031f,0.7615f,0.8055f,0.8437f,0.8935f,
-		0.9157f,0.9815f,1.0255f,1.0695f,1.0950f,1.1575f,1.2015f,1.0000f
+		1.0000f, 1.0000f, 0.6735f, 0.7031f, 0.7615f, 0.8055f, 0.8437f, 0.8935f,
+		0.9157f, 0.9815f, 1.0255f, 1.0695f, 1.0950f, 1.1575f, 1.2015f, 1.0000f
 	};
 
 	h.arx = (int)((float)h.width / ar[h.ar] + 0.5);
@@ -576,20 +577,20 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 		h.level = gb.BitRead(4);
 		h.progressive = gb.BitRead(1);
 		h.chroma = gb.BitRead(2);
-		h.width |= (gb.BitRead(2)<<12);
-		h.height |= (gb.BitRead(2)<<12);
-		h.bitrate |= (gb.BitRead(12)<<18);
+		h.width |= (gb.BitRead(2) << 12);
+		h.height |= (gb.BitRead(2) << 12);
+		h.bitrate |= (gb.BitRead(12) << 18);
 		MARKERGB;
-		h.vbv |= (gb.BitRead(8)<<10);
+		h.vbv |= (gb.BitRead(8) << 10);
 		h.lowdelay = gb.BitRead(1);
-		h.ifps = (DWORD)(h.ifps * (gb.BitRead(2)+1) / (gb.BitRead(5)+1));
+		h.ifps = (DWORD)(h.ifps * (gb.BitRead(2) + 1) / (gb.BitRead(5) + 1));
 
 		shextlen = gb.GetPos() - shextpos;
 
 		struct {
 			DWORD x, y;
-		} ar[] = {{h.width,h.height},{4,3},{16,9},{221,100},{h.width,h.height}};
-		int i = min(max(h.ar, 1), 5)-1;
+		} ar[] = {{h.width, h.height}, {4, 3}, {16, 9}, {221, 100}, {h.width, h.height}};
+		int i = min(max(h.ar, 1), 5) - 1;
 		h.arx = ar[i].x;
 		h.ary = ar[i].y;
 
@@ -630,7 +631,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 	}
 
 	h.ifps = 10 * h.ifps / 27;
-	h.bitrate = h.bitrate == (1<<30)-1 ? 0 : h.bitrate * 400;
+	h.bitrate = h.bitrate == (1 << 30) - 1 ? 0 : h.bitrate * 400;
 
 	CSize aspect(h.arx, h.ary);
 	ReduceDim(aspect);
@@ -709,7 +710,7 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt, bool fAllowV
 	int bitrate = 0;
 
 	for (;;) {
-		for (; len >= 4 && BitRead(syncbits, true) != (1<<syncbits) - 1; len--) {
+		for (; len >= 4 && BitRead(syncbits, true) != (1 << syncbits) - 1; len--) {
 			BitRead(8);
 		}
 
@@ -1629,9 +1630,9 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 				if (i == 0) {
 					break;
 				}
-				Seek(GetPos()+m_tslen);
+				Seek(GetPos() + m_tslen);
 				if (BitRead(8, true) == 0x47) {
-					Seek(GetPos()-m_tslen);
+					Seek(GetPos() - m_tslen);
 					break;
 				}
 			}
@@ -1681,7 +1682,7 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 				h.PCR = BitRead(33);
 				BitRead(6);
 				UINT64 PCRExt = BitRead(9);
-				h.PCR = (h.PCR*300 + PCRExt) * 10 / 27;
+				h.PCR = (h.PCR * 300 + PCRExt) * 10 / 27;
 				i += 6;
 			}
 
@@ -1733,14 +1734,14 @@ bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)
 
 	if (fSync) {
 		for (int i = 0; i < 65536; i++) {
-			if ((BitRead(64, true)&0xfffffc00ffe00000i64) == 0x4156000055000000i64) {
+			if ((BitRead(64, true) & 0xfffffc00ffe00000i64) == 0x4156000055000000i64) {
 				break;
 			}
 			BitRead(8);
 		}
 	}
 
-	if ((BitRead(64, true)&0xfffffc00ffe00000i64) != 0x4156000055000000i64) {
+	if ((BitRead(64, true) & 0xfffffc00ffe00000i64) != 0x4156000055000000i64) {
 		return false;
 	}
 
@@ -1761,8 +1762,8 @@ bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)
 	__int64 pos = GetPos();
 
 	if (h.streamid == 1 && h.fpts) {
-		h.pts = 10000*BitRead(32)/90 + m_rtPTSOffset;
-	} else if (h.streamid == 2 && (h.fpts || (BitRead(32, true)&0xffffffe0) == 0x000001c0)) {
+		h.pts = PTS(BitRead(32));
+	} else if (h.streamid == 2 && (h.fpts || (BitRead(32, true) & 0xffffffe0) == 0x000001c0)) {
 		BYTE b;
 		if (!NextMpegStartCode(b, 4)) {
 			return false;
