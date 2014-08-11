@@ -42,6 +42,7 @@ CBaseSplitterParserOutputPin::CBaseSplitterParserOutputPin(CAtlArray<CMediaType>
 	, m_nChannels(0)
 	, m_nSamplesPerSec(0)
 	, m_wBitsPerSample(0)
+	, adx_block_size(0)
 {
 }
 
@@ -191,6 +192,9 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 	} else if (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_VOBSUB) {
 		// DVD(VobSub) Subtitle
 		return ParseVobSub(p);
+	} else if (m_mt.subtype == MEDIASUBTYPE_ADX_ADPCM) {
+		// ADX ADPCM
+		return ParseAdxADPCM(p);
 	} else {
 		m_p.Free();
 		m_pl.RemoveAll();
@@ -711,6 +715,57 @@ HRESULT CBaseSplitterParserOutputPin::ParseVobSub(CAutoPtr<Packet> p)
 		}
 		
 		hr = __super::DeliverPacket(p2);
+	}
+
+	return hr;
+}
+
+HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<Packet> p)
+{
+	HRESULT hr = S_OK;
+
+	if (!m_p) {
+		InitPacket(p);
+	}
+
+	m_p->Append(*p);
+
+	if (!adx_block_size) {
+		uint64 state	= 0;
+		BYTE* buf		= m_p->GetData();
+		for (size_t i = 0; i < m_p->GetCount(); i++) {
+			state = (state << 8) | buf[i];
+			if ((state & 0xFFFF0000FFFFFF00) == 0x8000000003120400ULL) {
+				int channels	= state & 0xFF;
+				int headersize	= ((state >> 32) & 0xFFFF) + 4;
+				if (channels > 0 && headersize >= 8) {
+					adx_block_size = 18 * channels;
+
+					BYTE* start	= buf + i - 7;
+					int size	= headersize + adx_block_size;
+					HandlePacket(0);
+					
+					m_p->RemoveAt(0, i - 7 + headersize + adx_block_size);
+					break;
+				}
+			}
+		}
+	}
+
+	if (!adx_block_size) {
+		if (m_p->GetCount() > 16) {
+			size_t remove_size = m_p->GetCount() - 16;
+			m_p->RemoveAt(0, remove_size);
+		}
+		return hr;
+	}
+
+	while (m_p->GetCount() >= (size_t)adx_block_size) {
+		BYTE* start	= m_p->GetData();
+		int size	= adx_block_size;
+		HandlePacket(0);
+
+		m_p->RemoveAt(0, size);
 	}
 
 	return hr;

@@ -37,6 +37,8 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 	DWORD	m_nSamplesPerSec;
 	WORD	m_wBitsPerSample;
 
+	int		adx_block_size;
+
 protected:
 	HRESULT DeliverPacket(CAutoPtr<Packet> p);
 	HRESULT DeliverEndFlush();
@@ -54,6 +56,7 @@ protected:
 	HRESULT ParseTrueHD(CAutoPtr<Packet> p);
 	HRESULT ParseDirac(CAutoPtr<Packet> p);
 	HRESULT ParseVobSub(CAutoPtr<Packet> p);
+	HRESULT ParseAdxADPCM(CAutoPtr<Packet> p);
 
 public:
 	CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets = 1);

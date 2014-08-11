@@ -2319,6 +2319,65 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt, bool find_s
 	return false;
 }
 
+bool CBaseSplitterFileEx::Read(adx_adpcm_hdr& h, int len, CMediaType* pmt)
+{
+	memset(&h, 0, sizeof(h));
+	__int64 start = GetPos();
+
+	if (BitRead(16) != 0x8000) {
+		return false;
+	}
+	SHORT offset = BitRead(16);
+	if (offset < 6) {
+		return false;
+	}
+
+	if (len > offset) {
+		BYTE copyright_string[6] = { 0 };
+		Seek(start + offset - 6 + 4);
+		ByteRead(copyright_string, 6);
+		if (memcmp(copyright_string, "(c)CRI", 6)) {
+			return false;
+		}
+		Seek(start + 2 + 2);
+	}
+
+	BYTE encoding		= BitRead(8);
+	BYTE block_size		= BitRead(8);
+	BYTE sample_size	= BitRead(8);
+	h.channels			= BitRead(8);
+	h.samplerate		= BitRead(32);
+	if (encoding != 3 || block_size != 18 || sample_size != 4) {
+		return false;
+	}
+	if (h.channels <= 0 || h.channels > 2) {
+		return false;
+	}
+	if (h.samplerate < 1 || h.samplerate > INT_MAX / (h.channels * 18 * 8)) {
+		return false;
+	}
+
+	if (!pmt) {
+		return true;
+	}
+
+	pmt->majortype			= MEDIATYPE_Audio;
+	pmt->subtype			= MEDIASUBTYPE_ADX_ADPCM;
+	pmt->formattype			= FORMAT_WaveFormatEx;
+
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+	memset(wfe, 0, sizeof(WAVEFORMATEX));
+	wfe->wFormatTag			= WAVE_FORMAT_ADX_ADPCM;
+	wfe->nChannels			= h.channels;
+	wfe->nSamplesPerSec		= h.samplerate;
+	wfe->wBitsPerSample		= 16;
+	wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample >> 3;
+	wfe->nAvgBytesPerSec	= wfe->nBlockAlign * wfe->nSamplesPerSec;
+
+	return true;
+}
+
+
 /*
 
 To see working buffer in debugger, look :

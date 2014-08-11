@@ -748,6 +748,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 			}
 		}
+		// ADX ADPCM
+		if (type == unknown && m_type == MPEG_TYPES::mpeg_ps) {
+			Seek(start);
+			CMpegSplitterFile::adx_adpcm_hdr h;
+			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
+				type = audio;
+			}
+		}
 	} else if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
 		if (s.pid) {
 			if (!m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::video].Find(s) && !m_streams[stream_type::subpic].Find(s)) {

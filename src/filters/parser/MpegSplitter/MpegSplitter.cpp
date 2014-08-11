@@ -342,6 +342,10 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 						Infos.AddTail(L"PS2 ADPCM");
 					}
 					break;
+					case WAVE_FORMAT_ADX_ADPCM: {
+						Infos.AddTail(L"ADX ADPCM");
+					}
+					break;
 					case WAVE_FORMAT_DTS2: {
 						if (pPresentationDesc) {
 							Infos.AddTail(pPresentationDesc);

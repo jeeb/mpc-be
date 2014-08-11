@@ -439,6 +439,11 @@ public:
 	struct hevchdr {
 	};
 
+	struct adx_adpcm_hdr {
+		DWORD channels;
+		DWORD samplerate;
+	};
+
 #pragma pack(pop)
 
 	bool Read(pshdr& h);
@@ -470,4 +475,5 @@ public:
 	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
 	bool Read(avchdr& h, spsppsindex index);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
+	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = NULL);
 };
