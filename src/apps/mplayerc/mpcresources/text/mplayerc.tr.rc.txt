@@ -150,7 +150,7 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 17		"Ses süresi değişimi (ms):"
 20		"Auto gain control"
 21		"Yükseltme:"
-23		"Speed of sound amplifying:"
+23		"Rate of increase volume:"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

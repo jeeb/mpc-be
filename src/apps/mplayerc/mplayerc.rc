@@ -132,7 +132,7 @@ BEGIN
     CONTROL         "Auto gain control",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,10,118,154,8
     LTEXT           "Boost:",IDC_STATIC4,10,146,55,8
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,129,145,109,12
-    LTEXT           "Speed of sound amplifying:",IDC_STATIC5,10,129,115,8
+    LTEXT           "Rate of increase volume:",IDC_STATIC5,10,129,115,8
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,129,128,109,12
 END
 
