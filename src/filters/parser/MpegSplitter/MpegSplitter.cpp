@@ -600,7 +600,7 @@ STDMETHODIMP CMpegSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 
 void CMpegSplitterFilter::ReadClipInfo(LPCOLESTR pszFileName)
 {
-	if (wcslen (pszFileName) > 0) {
+	if (wcslen(pszFileName) > 0) {
 		WCHAR Drive[_MAX_DRIVE];
 		WCHAR Dir[_MAX_PATH];
 		WCHAR Filename[_MAX_PATH];
@@ -613,26 +613,26 @@ void CMpegSplitterFilter::ReadClipInfo(LPCOLESTR pszFileName)
 
 			if (wcscmp(Ext, L".ssif") == 0) {
 				if (Drive[0]) {
-					strClipInfo.Format (_T("%s\\%s\\..\\..\\CLIPINF\\%s.clpi"), Drive, Dir, Filename);
+					strClipInfo.Format(_T("%s\\%s\\..\\..\\CLIPINF\\%s.clpi"), Drive, Dir, Filename);
 				} else {
-					strClipInfo.Format (_T("%s\\..\\..\\CLIPINF\\%s.clpi"), Dir, Filename);
+					strClipInfo.Format(_T("%s\\..\\..\\CLIPINF\\%s.clpi"), Dir, Filename);
 				}
 			} else {
 				if (Drive[0]) {
-					strClipInfo.Format (_T("%s\\%s\\..\\CLIPINF\\%s.clpi"), Drive, Dir, Filename);
+					strClipInfo.Format(_T("%s\\%s\\..\\CLIPINF\\%s.clpi"), Drive, Dir, Filename);
 				} else {
-					strClipInfo.Format (_T("%s\\..\\CLIPINF\\%s.clpi"), Dir, Filename);
+					strClipInfo.Format(_T("%s\\..\\CLIPINF\\%s.clpi"), Dir, Filename);
 				}
 			}
 
-			m_ClipInfo.ReadInfo (strClipInfo);
+			m_ClipInfo.ReadInfo(strClipInfo);
 		}
 	}
 }
 
 STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
-	return __super::Load (pszFileName, pmt);
+	return __super::Load(pszFileName, pmt);
 }
 
 HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)

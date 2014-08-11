@@ -610,155 +610,158 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		}
 	}
 
-	if (pesid >= 0xe0 && pesid < 0xf0 || pesid == 0xfe) { // mpeg video
-		// MPEG2
-		if (type == stream_type::unknown && (stream_type & MPEG2_VIDEO)) {
-			// Sequence/extension header can be split into multiple packets
-			if (!m_streams[stream_type::video].Find(s)) {
-				if (!seqh.Lookup(s)) {
-					seqh[s].Init();
-				}
+	if (pesid >= 0xe0 && pesid < 0xf0 || pesid == 0xfe) { // mpeg video/audio
+		if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::audio].Find(s)) {
+			// MPEG2
+			if (type == stream_type::unknown && (stream_type & MPEG2_VIDEO)) {
+				// Sequence/extension header can be split into multiple packets
+				if (!m_streams[stream_type::video].Find(s)) {
+					if (!seqh.Lookup(s)) {
+						seqh[s].Init();
+					}
 
-				if (seqh[s].data.GetCount()) {
-					if (seqh[s].data.GetCount() < 512) {
-						size_t size = seqh[s].data.GetCount();
-						seqh[s].data.SetCount(size + (size_t)len);
-						ByteRead(seqh[s].data.GetData() + size, len);
+					if (seqh[s].data.GetCount()) {
+						if (seqh[s].data.GetCount() < 512) {
+							size_t size = seqh[s].data.GetCount();
+							seqh[s].data.SetCount(size + (size_t)len);
+							ByteRead(seqh[s].data.GetData() + size, len);
+						} else {
+							seqhdr h;
+							if (Read(h, seqh[s].data, &s.mt)) {
+								type = stream_type::video;
+							}
+						}
 					} else {
-						seqhdr h;
-						if (Read(h, seqh[s].data, &s.mt)) {
-							type = stream_type::video;
+						CMediaType mt;
+						if (Read(seqh[s], len, &mt)) {
+							Seek(start);
+							seqh[s].data.SetCount((size_t)len);
+							ByteRead(seqh[s].data.GetData(), len);
 						}
 					}
-				} else {
-					CMediaType mt;
-					if (Read(seqh[s], len, &mt)) {
-						Seek(start);
-						seqh[s].data.SetCount((size_t)len);
-						ByteRead(seqh[s].data.GetData(), len);
+				}
+			}
+
+			// AVC/H.264
+			if (type == stream_type::unknown && (stream_type & H264_VIDEO)) {
+				Seek(start);
+				// PPS and SPS can be present on differents packets
+				// and can also be split into multiple packets
+				if (!avch.Lookup(s)) {
+					memset(&avch[s], 0, sizeof(avchdr));
+				}
+
+				if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[s], len, &s.mt)) {
+					if (avch[s].spspps[index_subsetsps].complete) {
+						type = stream_type::stereo;
+					} else {
+						type = stream_type::video;
 					}
 				}
 			}
-		}
 
-		// AVC/H.264
-		if (type == stream_type::unknown && (stream_type & H264_VIDEO)) {
-			Seek(start);
-			// PPS and SPS can be present on differents packets
-			// and can also be split into multiple packets
-			if (!avch.Lookup(s)) {
-				memset(&avch[s], 0, sizeof(avchdr));
-			}
-
-			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[s], len, &s.mt)) {
-				if (avch[s].spspps[index_subsetsps].complete) {
-					type = stream_type::stereo;
-				} else {
+			// HEVC/H.265
+			if (type == stream_type::unknown && (stream_type & HEVC_VIDEO) && m_type == MPEG_TYPES::mpeg_ts) {
+				Seek(start);
+				hevchdr h;
+				if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
 					type = stream_type::video;
 				}
 			}
-		}
 
-		// HEVC/H.265
-		if (type == stream_type::unknown && (stream_type & HEVC_VIDEO) && m_type == MPEG_TYPES::mpeg_ts) {
-			Seek(start);
-			hevchdr h;
-			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
-				type = stream_type::video;
-			}
-		}
+			// AAC
+			if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
+				Seek(start);
+				aachdr h = { 0 };
 
-		// AAC
-		if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
-			Seek(start);
-			aachdr h = { 0 };
-
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_aacValid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_aacValid[s].Handle(h);
+				if (!m_streams[stream_type::audio].Find(s)) {
+					if (Read(h, len, &s.mt)) {
+						if (m_aacValid[s].IsValid()) {
+							type = stream_type::audio;
+						} else {
+							m_aacValid[s].Handle(h);
+						}
 					}
 				}
 			}
 		}
 	} else if (pesid >= 0xc0 && pesid < 0xe0) { // mpeg audio
+		if (!m_streams[stream_type::audio].Find(s)) {
+			// AAC_LATM
+			if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
+				Seek(start);
+				latm_aachdr h = { 0 };
 
-		// AAC_LATM
-		if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
-			Seek(start);
-			latm_aachdr h = { 0 };
-
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_aaclatmValid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_aaclatmValid[s].Handle(h);
+				if (!m_streams[stream_type::audio].Find(s)) {
+					if (Read(h, len, &s.mt)) {
+						if (m_aaclatmValid[s].IsValid()) {
+							type = stream_type::audio;
+						} else {
+							m_aaclatmValid[s].Handle(h);
+						}
 					}
 				}
 			}
-		}
 
-		// AAC
-		if (type == stream_type::unknown && (stream_type & AAC_AUDIO)) {
-			Seek(start);
-			aachdr h = { 0 };
+			// AAC
+			if (type == stream_type::unknown && (stream_type & AAC_AUDIO)) {
+				Seek(start);
+				aachdr h = { 0 };
 
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_aacValid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_aacValid[s].Handle(h);
+				if (!m_streams[stream_type::audio].Find(s)) {
+					if (Read(h, len, &s.mt)) {
+						if (m_aacValid[s].IsValid()) {
+							type = stream_type::audio;
+						} else {
+							m_aacValid[s].Handle(h);
+						}
 					}
 				}
 			}
-		}
 
-		// MPEG Audio
-		if (type == stream_type::unknown && (stream_type & MPEG_AUDIO)) {
-			Seek(start);
-			mpahdr h = { 0 };
+			// MPEG Audio
+			if (type == stream_type::unknown && (stream_type & MPEG_AUDIO)) {
+				Seek(start);
+				mpahdr h = { 0 };
 
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_mpaValid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_mpaValid[s].Handle(h);
+				if (!m_streams[stream_type::audio].Find(s)) {
+					if (Read(h, len, &s.mt)) {
+						if (m_mpaValid[s].IsValid()) {
+							type = stream_type::audio;
+						} else {
+							m_mpaValid[s].Handle(h);
+						}
 					}
 				}
 			}
-		}
 
-		// AC3
-		if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
-			Seek(start);
-			ac3hdr h = { 0 };
+			// AC3
+			if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
+				Seek(start);
+				ac3hdr h = { 0 };
 
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_ac3Valid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_ac3Valid[s].Handle(h);
+				if (!m_streams[stream_type::audio].Find(s)) {
+					if (Read(h, len, &s.mt)) {
+						if (m_ac3Valid[s].IsValid()) {
+							type = stream_type::audio;
+						} else {
+							m_ac3Valid[s].Handle(h);
+						}
 					}
 				}
 			}
-		}
-		// ADX ADPCM
-		if (type == unknown && m_type == MPEG_TYPES::mpeg_ps) {
-			Seek(start);
-			CMpegSplitterFile::adx_adpcm_hdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
-				type = audio;
+			// ADX ADPCM
+			if (type == unknown && m_type == MPEG_TYPES::mpeg_ps) {
+				Seek(start);
+				CMpegSplitterFile::adx_adpcm_hdr h;
+				if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
+					type = audio;
+				}
 			}
 		}
 	} else if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
 		if (s.pid) {
-			if (!m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::video].Find(s) && !m_streams[stream_type::subpic].Find(s)) {
+			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::subpic].Find(s)) {
 
 				// AC3, E-AC3, TrueHD
 				if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
