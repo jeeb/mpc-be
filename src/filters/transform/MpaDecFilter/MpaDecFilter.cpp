@@ -1449,7 +1449,7 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 	return S_OK;
 }
 
-static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, float* pout)
+static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, int16_t* pout)
 {
 	int tbl_index = pin[0]>>4;
 	int shift     = pin[0]&0xf;
@@ -1462,23 +1462,23 @@ static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, float* pout)
 	}
 	// if (unk == 7) {ASSERT(0); return;} // ???
 
-	static double s_tbl[] = {
-		0.0, 0.0,  0.9375, 0.0,  1.796875, -0.8125,  1.53125, -0.859375,  1.90625, -0.9375,
-		0.0, 0.0, -0.9375, 0.0, -1.796875,  0.8125, -1.53125,  0.859375, -1.90625,  0.9375
+	static int s_tbl[] = {
+		0, 0,  60, 0,  115, -52,  98, -55,  122, -60,
+		0, 0, -60, 0, -115,  52, -98,  55, -122,  60
 	};
 
-	double* tbl = &s_tbl[tbl_index*2];
-	double& a = s.a[channel];
-	double& b = s.b[channel];
+	int* tbl = &s_tbl[tbl_index*2];
+	int& a = s.a[channel];
+	int& b = s.b[channel];
 
 	for (int i = 0; i < 28; i++) {
 		short input = (short)(((pin[2+i/2] >> ((i&1) << 2)) & 0xf) << 12) >> shift;
-		double output = a * tbl[1] + b * tbl[0] + input;
+		int output = (a * tbl[1] + b * tbl[0] + 64 * input) / 64;
 
 		a = b;
 		b = output;
 
-		*pout++ = (float)(output / 32768);
+		*pout++ = (int16_t)min(max(INT16_MIN, output), INT16_MAX);
 	}
 }
 
@@ -1493,11 +1493,11 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 	int samples = wfe->dwInterleave * 14 / 16 * 2;
 	int channels = wfe->nChannels;
 
-	SampleFormat out_sf = SAMPLE_FMT_FLTP;
-	size_t outSize = samples * channels * sizeof(float); // convert to float
+	SampleFormat out_sf = SAMPLE_FMT_S16P;
+	size_t outSize = samples * channels * sizeof(int16_t);
 	CAtlArray<BYTE> outBuff;
 	outBuff.SetCount(outSize);
-	float* pOut = (float*)outBuff.GetData();
+	int16_t* pOut = (int16_t*)outBuff.GetData();
 
 	while (p + size <= end) {
 		DWORD* dw = (DWORD*)p;

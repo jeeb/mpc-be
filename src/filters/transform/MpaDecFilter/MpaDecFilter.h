@@ -56,7 +56,7 @@ enum {
 
 struct ps2_state_t {
 	bool sync;
-	double a[2], b[2];
+	int a[2], b[2];
 	ps2_state_t() {
 		reset();
 	}
