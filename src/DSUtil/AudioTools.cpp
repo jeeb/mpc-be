@@ -24,6 +24,8 @@
 
 #define limit(a, x, b) if ((x) < (a)) { x = a; } else if ((x) > (b)) { x = b;}
 
+// gains
+
 void gain_uint8(const double factor, const size_t allsamples, uint8_t* pData)
 {
     uint8_t* end = pData + allsamples;
@@ -90,4 +92,66 @@ void gain_double(const double factor, const size_t allsamples, double* pData)
         limit(-1.0, d, 1.0);
         *pData = d;
     }
+}
+
+// get_peaks
+
+int16_t get_peak_int16(const size_t allsamples, int16_t* pData)
+{
+    int16_t peak = 0;
+
+    for (int16_t* end = pData + allsamples; pData < end; ++pData) {
+        if ((*pData) == INT16_MIN) {
+            peak = INT16_MAX;
+            break;
+        }
+        if (abs(*pData) > peak) {
+            peak = abs(*pData);
+        }
+    }
+
+    return peak;
+}
+
+int32_t get_peak_int32 (const size_t allsamples, int32_t* pData)
+{
+    int32_t peak = 0;
+
+    for (int32_t* end = pData + allsamples; pData < end; ++pData) {
+        if ((*pData) == INT32_MIN) {
+            peak = INT32_MAX;
+            break;
+        }
+        if (abs(*pData) > peak) {
+            peak = abs(*pData);
+        }
+    }
+
+    return peak;
+}
+
+float get_peak_float(const size_t allsamples, float* pData)
+{
+    float peak = 0.0f;
+
+    for (float* end = pData + allsamples; pData < end; ++pData) {
+        if (abs(*pData) > peak) {
+            peak = abs(*pData);
+        }
+    }
+
+    return peak;
+}
+
+double get_peak_double(const size_t allsamples, double* pData)
+{
+    double peak = 0.0;
+
+    for (double* end = pData + allsamples; pData < end; ++pData) {
+        if (abs(*pData) > peak) {
+            peak = abs(*pData);
+        }
+    }
+
+    return peak;
 }

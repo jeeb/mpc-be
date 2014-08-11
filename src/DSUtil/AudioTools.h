@@ -37,3 +37,8 @@ void gain_int24 (const double factor, const size_t allsamples, BYTE*    pData);
 void gain_int32 (const double factor, const size_t allsamples, int32_t* pData);
 void gain_float (const double factor, const size_t allsamples, float*   pData);
 void gain_double(const double factor, const size_t allsamples, double*  pData);
+
+int16_t get_peak_int16 (const size_t allsamples, int16_t* pData);
+int32_t get_peak_int32 (const size_t allsamples, int32_t* pData);
+float   get_peak_float (const size_t allsamples, float*   pData);
+double  get_peak_double(const size_t allsamples, double*  pData);
