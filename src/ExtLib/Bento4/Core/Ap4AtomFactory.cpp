@@ -336,6 +336,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 			break;
 
 		// container atoms
+		case AP4_ATOM_TYPE_MOOF:
+		case AP4_ATOM_TYPE_MFHD:
+		case AP4_ATOM_TYPE_TRAF:
+		case AP4_ATOM_TYPE_MVEX:
 		case AP4_ATOM_TYPE_TREF:
 		case AP4_ATOM_TYPE_HNTI:
 		case AP4_ATOM_TYPE_STBL:
@@ -364,6 +368,16 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 			AP4_UI32 context = m_Context;
 			m_Context = type; // set the context for the children
 			atom = new AP4_ContainerAtom(type, size, false, stream, *this);
+			m_Context = context; // restore the previous context
+			break;
+		}
+
+		case AP4_ATOM_TYPE_TFHD:
+		case AP4_ATOM_TYPE_TFDT: 
+		case AP4_ATOM_TYPE_TRUN: {
+			AP4_UI32 context = m_Context;
+			m_Context = type; // set the context for the children
+			atom = new AP4_UnknownAtom(type, size, true, stream);
 			m_Context = context; // restore the previous context
 			break;
 		}

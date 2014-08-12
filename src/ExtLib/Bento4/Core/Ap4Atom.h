@@ -414,6 +414,14 @@ const AP4_Atom::Type AP4_ATOM_TYPE_AVdn = AP4_ATOM_TYPE('A','V','d','n');
 // FFV1
 const AP4_Atom::Type AP4_ATOM_TYPE_FFV1 = AP4_ATOM_TYPE('F','F','V','1');
 
+// fragmented atom ...
+const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');
+const AP4_Atom::Type AP4_ATOM_TYPE_MOOF = AP4_ATOM_TYPE('m','o','o','f');
+const AP4_Atom::Type AP4_ATOM_TYPE_MFHD = AP4_ATOM_TYPE('m','f','h','d');
+const AP4_Atom::Type AP4_ATOM_TYPE_TRAF = AP4_ATOM_TYPE('t','r','a','f');
+const AP4_Atom::Type AP4_ATOM_TYPE_TFHD = AP4_ATOM_TYPE('t','f','h','d');
+const AP4_Atom::Type AP4_ATOM_TYPE_TFDT = AP4_ATOM_TYPE('t','f','d','t');
+const AP4_Atom::Type AP4_ATOM_TYPE_TRUN = AP4_ATOM_TYPE('t','r','u','n');
 
 /*----------------------------------------------------------------------
 |       AP4_AtomListInspector
