@@ -28,9 +28,11 @@ av_cold void ff_xvididct_init(IDCTDSPContext *c, AVCodecContext *avctx)
 
     if (high_bit_depth || avctx->lowres ||
         !(avctx->idct_algo == FF_IDCT_AUTO ||
-          avctx->idct_algo == FF_IDCT_XVIDMMX))
+          avctx->idct_algo == FF_IDCT_XVID))
         return;
 
     if (ARCH_X86)
         ff_xvididct_init_x86(c);
+
+    ff_init_scantable_permutation(c->idct_permutation, c->perm_type);
 }

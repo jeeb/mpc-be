@@ -82,6 +82,21 @@ enum AVFrameSideDataType {
      * See libavutil/display.h for a detailed description of the data.
      */
     AV_FRAME_DATA_DISPLAYMATRIX,
+    /**
+     * Active Format Description data consisting of a single byte as specified
+     * in ETSI TS 101 154 using AVActiveFormatDescription enum.
+     */
+    AV_FRAME_DATA_AFD,
+};
+
+enum AVActiveFormatDescription {
+    AV_AFD_SAME         = 8,
+    AV_AFD_4_3          = 9,
+    AV_AFD_16_9         = 10,
+    AV_AFD_14_9         = 11,
+    AV_AFD_4_3_SP_14_9  = 13,
+    AV_AFD_16_9_SP_14_9 = 14,
+    AV_AFD_SP_4_3       = 15,
 };
 
 typedef struct AVFrameSideData {
@@ -431,7 +446,6 @@ typedef struct AVFrame {
      */
     int flags;
 
-#if FF_API_AVFRAME_COLORSPACE
     /**
      * MPEG vs JPEG YUV range.
      * It must be accessed using av_frame_get_color_range() and
@@ -455,7 +469,6 @@ typedef struct AVFrame {
     enum AVColorSpace colorspace;
 
     enum AVChromaLocation chroma_location;
-#endif
 
     /**
      * frame timestamp estimated using various heuristics, in stream time base

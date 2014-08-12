@@ -1064,7 +1064,7 @@ void ff_er_frame_end(ERContext *s)
     if (!s->partitioned_frame) {
         for (i = 0; i < s->mb_num; i++) {
             const int mb_xy = s->mb_index2xy[i];
-            error = s->error_status_table[mb_xy];
+            int error = s->error_status_table[mb_xy];
             if (error & ER_MB_ERROR)
                 error |= ER_MB_ERROR;
             s->error_status_table[mb_xy] = error;
@@ -1075,7 +1075,7 @@ void ff_er_frame_end(ERContext *s)
     dc_error = ac_error = mv_error = 0;
     for (i = 0; i < s->mb_num; i++) {
         const int mb_xy = s->mb_index2xy[i];
-        error = s->error_status_table[mb_xy];
+        int error = s->error_status_table[mb_xy];
         if (error & ER_DC_ERROR)
             dc_error++;
         if (error & ER_AC_ERROR)
@@ -1091,7 +1091,7 @@ void ff_er_frame_end(ERContext *s)
     /* set unknown mb-type to most likely */
     for (i = 0; i < s->mb_num; i++) {
         const int mb_xy = s->mb_index2xy[i];
-        error = s->error_status_table[mb_xy];
+        int error = s->error_status_table[mb_xy];
         if (!((error & ER_DC_ERROR) && (error & ER_MV_ERROR)))
             continue;
 
@@ -1119,7 +1119,7 @@ void ff_er_frame_end(ERContext *s)
             const int mv_dir  = dir ? MV_DIR_BACKWARD : MV_DIR_FORWARD;
             int mv_type;
 
-            error = s->error_status_table[mb_xy];
+            int error = s->error_status_table[mb_xy];
 
             if (IS_INTRA(mb_type))
                 continue; // intra
@@ -1156,7 +1156,7 @@ void ff_er_frame_end(ERContext *s)
                 const int mb_type = s->cur_pic.mb_type[mb_xy];
                 int mv_dir = MV_DIR_FORWARD | MV_DIR_BACKWARD;
 
-                error = s->error_status_table[mb_xy];
+                int error = s->error_status_table[mb_xy];
 
                 if (IS_INTRA(mb_type))
                     continue;
@@ -1207,7 +1207,7 @@ void ff_er_frame_end(ERContext *s)
             const int mb_xy   = mb_x + mb_y * s->mb_stride;
             const int mb_type = s->cur_pic.mb_type[mb_xy];
 
-            error = s->error_status_table[mb_xy];
+            //error = s->error_status_table[mb_xy];
 
             if (IS_INTRA(mb_type) && s->partitioned_frame)
                 continue;
@@ -1260,7 +1260,7 @@ void ff_er_frame_end(ERContext *s)
             const int mb_xy   = mb_x + mb_y * s->mb_stride;
             const int mb_type = s->cur_pic.mb_type[mb_xy];
 
-            error = s->error_status_table[mb_xy];
+            int error = s->error_status_table[mb_xy];
 
             if (IS_INTER(mb_type))
                 continue;

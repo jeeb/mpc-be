@@ -2214,7 +2214,7 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
         s->codec_id == AV_CODEC_ID_MPEG4 &&
         avctx->idct_algo == FF_IDCT_AUTO &&
         (av_get_cpu_flags() & AV_CPU_FLAG_MMX)) {
-        avctx->idct_algo = FF_IDCT_XVIDMMX;
+        avctx->idct_algo = FF_IDCT_XVID;
         ff_dct_common_init(s);
         return 1;
     }
@@ -2687,6 +2687,7 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
 {
     Mpeg4DecContext *s = dst->priv_data;
     const Mpeg4DecContext *s1 = src->priv_data;
+    int init = s->m.context_initialized;
 
     int ret = ff_mpeg_update_thread_context(dst, src);
 
@@ -2694,6 +2695,9 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
         return ret;
 
     memcpy(((uint8_t*)s) + sizeof(MpegEncContext), ((uint8_t*)s1) + sizeof(MpegEncContext), sizeof(Mpeg4DecContext) - sizeof(MpegEncContext));
+
+    if (CONFIG_MPEG4_DECODER && !init && s1->xvid_build >= 0)
+        ff_xvididct_init(&s->m.idsp, dst);
 
     return 0;
 }

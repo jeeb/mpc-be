@@ -1337,12 +1337,6 @@
     <ClInclude Include="libavutil\libm.h">
       <Filter>libavutil</Filter>
     </ClInclude>
-    <ClInclude Include="libavutil\lls1.h">
-      <Filter>libavutil</Filter>
-    </ClInclude>
-    <ClInclude Include="libavutil\lls2.h">
-      <Filter>libavutil</Filter>
-    </ClInclude>
     <ClInclude Include="libavutil\log.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -1438,6 +1432,9 @@
     </ClInclude>
     <ClInclude Include="libavcodec\adx.h">
       <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\lls.h">
+      <Filter>libavutil</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2834,12 +2831,6 @@
     <ClCompile Include="libavutil\lfg.c">
       <Filter>libavutil</Filter>
     </ClCompile>
-    <ClCompile Include="libavutil\lls1.c">
-      <Filter>libavutil</Filter>
-    </ClCompile>
-    <ClCompile Include="libavutil\lls2.c">
-      <Filter>libavutil</Filter>
-    </ClCompile>
     <ClCompile Include="libavutil\log.c">
       <Filter>libavutil</Filter>
     </ClCompile>
@@ -2995,6 +2986,9 @@
     </ClCompile>
     <ClCompile Include="libavcodec\adxdec.c">
       <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\lls.c">
+      <Filter>libavutil</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

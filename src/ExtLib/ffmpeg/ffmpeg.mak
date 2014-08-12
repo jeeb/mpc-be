@@ -523,8 +523,7 @@ SRCS_LU = \
 	libavutil/intfloat_readwrite.c \
 	libavutil/intmath.c \
 	libavutil/lfg.c \
-	libavutil/lls1.c \
-	libavutil/lls2.c \
+	libavutil/lls.c \
 	libavutil/log.c \
 	libavutil/log2_tab.c \
 	libavutil/lzo.c \
