@@ -486,7 +486,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 		}
 
-		return bDuplicate ? S_FALSE : S_OK;
+		return Playlist.IsEmpty() ? E_FAIL : bDuplicate ? S_FALSE : S_OK;
 	}
 
 	return AmHresultFromWin32(GetLastError());
