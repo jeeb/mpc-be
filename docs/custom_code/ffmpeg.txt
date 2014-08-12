@@ -6,7 +6,6 @@
 
 * libavcodec/allcodecs.c
 * libavcodec/avcodec.h
-* libavcodec/dv_tablegen.c
 * libavcodec/error_resilience.c
 * libavcodec/h264.c
 * libavcodec/h264.h
