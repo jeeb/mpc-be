@@ -42,7 +42,8 @@ AP4_Sample::AP4_Sample() :
     m_Size(0),
     m_DescriptionIndex(0),
     m_Dts(0),
-    m_Cts(0)
+    m_Cts(0),
+    m_Duration(0)
 {
 }
 
@@ -74,7 +75,8 @@ AP4_Sample::AP4_Sample(const AP4_Sample& other) :
     m_Size(other.m_Size),
     m_DescriptionIndex(other.m_DescriptionIndex),
     m_Dts(other.m_Dts),
-    m_Cts(other.m_Cts)
+    m_Cts(other.m_Cts),
+    m_Duration(other.m_Duration)
 {
     AP4_ADD_REFERENCE(m_DataStream);
 }
@@ -102,6 +104,7 @@ AP4_Sample::operator=(const AP4_Sample& other)
     m_DescriptionIndex = other.m_DescriptionIndex;
     m_Dts              = other.m_Dts;
     m_Cts              = other.m_Cts;
+    m_Duration         = other.m_Duration;
 
     return *this;
 }

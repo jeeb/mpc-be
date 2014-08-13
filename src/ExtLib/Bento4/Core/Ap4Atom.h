@@ -55,6 +55,11 @@ const int AP4_ATOM_MAX_NAME_SIZE    = 256;
 const int AP4_ATOM_MAX_URI_SIZE     = 512;
 
 /*----------------------------------------------------------------------
+|   macros
++---------------------------------------------------------------------*/
+#define AP4_DYNAMIC_CAST(_class,_object) dynamic_cast<_class*>(_object)
+
+/*----------------------------------------------------------------------
 |       forward references
 +---------------------------------------------------------------------*/
 class AP4_AtomParent;
@@ -101,6 +106,7 @@ class AP4_Atom {
                                 bool            is_full,
                                 AP4_ByteStream& stream);
     virtual           ~AP4_Atom() {}
+    AP4_UI32           GetFlags() const { return m_Flags; }
     Type               GetType() { return m_Type; }
     void               SetType(Type type) { m_Type = type; }
     AP4_Size           GetHeaderSize();

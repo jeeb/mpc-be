@@ -20,5 +20,7 @@ AP4_MoofAtom::AP4_MoofAtom(AP4_Size         size,
 	: AP4_ContainerAtom(AP4_ATOM_TYPE_MOOF, size, false, stream, atom_factory)
 	, m_MoofOffset(0)
 {
-	stream.Tell(m_MoofOffset);
+	if (AP4_SUCCEEDED(stream.Tell(m_MoofOffset))) {
+		m_MoofOffset -= size;
+	}
 }
