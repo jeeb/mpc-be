@@ -318,9 +318,6 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('MPEG'):
 					mt.subtype = MEDIASUBTYPE_MPEG1Payload;
 					break;
-				case FCC('DXSB'):
-				case FCC('DXSA'):
-					label = L"XSub";
 				case FCC('H264'):
 				case FCC('h264'):
 				case FCC('X264'):
@@ -336,6 +333,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('UMSV'):
 				case FCC('UNMC'):
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('H264'));
+					break;
+				case FCC('DXSB'):
+				case FCC('DXSA'):
+					label = L"XSub";
 				default:
 					mt.subtype = FOURCCMap(pbmi->biCompression);
 			}
