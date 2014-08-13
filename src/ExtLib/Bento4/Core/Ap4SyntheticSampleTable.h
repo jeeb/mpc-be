@@ -68,6 +68,7 @@ class AP4_SyntheticSampleTable : public AP4_SampleTable
                                  AP4_Ordinal     description_index,
                                  AP4_TimeStamp   cts = 0,
                                  AP4_TimeStamp   dts = 0,
+                                 AP4_Duration    duration = 0,
                                  bool            sync = false);
 
 private:

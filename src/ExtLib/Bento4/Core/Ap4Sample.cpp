@@ -43,7 +43,8 @@ AP4_Sample::AP4_Sample() :
     m_DescriptionIndex(0),
     m_Dts(0),
     m_Cts(0),
-    m_Duration(0)
+    m_Duration(0),
+    m_IsSync(true)
 {
 }
 
@@ -55,12 +56,16 @@ AP4_Sample::AP4_Sample(AP4_ByteStream& data_stream,
                        AP4_Size        size,
                        AP4_Ordinal     description_index,
                        AP4_TimeStamp   dts,
-                       AP4_TimeStamp   cts_offset /* = 0 */ ) :
+                       AP4_TimeStamp   cts_offset,
+                       AP4_Duration    duration,
+                       bool            sync_flag) :
     m_Offset(offset),
     m_Size(size),
     m_DescriptionIndex(description_index),
     m_Dts(dts),
-    m_Cts(dts + cts_offset)
+    m_Cts(dts + cts_offset),
+    m_Duration(duration),
+    m_IsSync(sync_flag)
 {
     m_DataStream = &data_stream;
     AP4_ADD_REFERENCE(m_DataStream);
@@ -76,7 +81,8 @@ AP4_Sample::AP4_Sample(const AP4_Sample& other) :
     m_DescriptionIndex(other.m_DescriptionIndex),
     m_Dts(other.m_Dts),
     m_Cts(other.m_Cts),
-    m_Duration(other.m_Duration)
+    m_Duration(other.m_Duration),
+    m_IsSync(other.m_IsSync)
 {
     AP4_ADD_REFERENCE(m_DataStream);
 }
@@ -105,6 +111,7 @@ AP4_Sample::operator=(const AP4_Sample& other)
     m_Dts              = other.m_Dts;
     m_Cts              = other.m_Cts;
     m_Duration         = other.m_Duration;
+    m_IsSync           = other.m_IsSync;
 
     return *this;
 }
