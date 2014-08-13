@@ -13,9 +13,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "Ap4Atom.h"
-#include "Ap4Types.h"
 #include "Ap4Array.h"
-#include "Ap4DataBuffer.h"
 
 /*----------------------------------------------------------------------
 |       AP4_ElstAtom
@@ -39,7 +37,8 @@ public:
 	AP4_ElstAtom(AP4_Size         size,
 				 AP4_ByteStream&  stream);
 
-	AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
+	virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
+	virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
 
 	AP4_Array<AP4_ElstEntry>& GetList() { return m_Entries; }
 	AP4_UI64 GetDelay() const { return m_Delay; }

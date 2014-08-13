@@ -1,36 +1,39 @@
 /*****************************************************************
 |
-|    AP4 - chap Atom
+|    AP4 - moof Atom
 |
-|    Copyright 2012 Aleksoid1978
+|    Copyright 2014 Aleksoid1978
 |
  ****************************************************************/
 
-#ifndef _AP4_CHAP_ATOM_H_
-#define _AP4_CHAP_ATOM_H_
+#ifndef _AP4_MOOF_ATOM_H_
+#define _AP4_MOOF_ATOM_H_
 
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
-#include "Ap4Atom.h"
+#include "Ap4ContainerAtom.h"
 
 /*----------------------------------------------------------------------
-|       AP4_ChapAtom
+|       AP4_MoofAtom
 +---------------------------------------------------------------------*/
-
-class AP4_ChapAtom : public AP4_Atom
+class AP4_MoofAtom : public AP4_ContainerAtom
 {
 public:
-	AP4_ChapAtom(AP4_Size         size,
-                 AP4_ByteStream&  stream);
+	// methods
+	AP4_MoofAtom(AP4_Size         size,
+                 AP4_ByteStream&  stream,
+                 AP4_AtomFactory& atom_factory);
 
 	virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
 	virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
 
-	AP4_UI32 GetChapterTrackId() const { return m_ChapterTrackId; }
+	AP4_UI64 GetOffset() { return m_MoofOffset; }
 
 private:
-	AP4_UI32 m_ChapterTrackId;
+	// members
+	AP4_UI64 m_MoofOffset;
 };
 
-#endif // _AP4_CHAP_ATOM_H_
+#endif // _AP4_MOOF_ATOM_H_
+

@@ -35,12 +35,14 @@
 #include "Ap4IsmaCryp.h"
 #include "Ap4UrlAtom.h"
 #include "Ap4MoovAtom.h"
+#include "Ap4MfhdAtom.h"
 #include "Ap4MvhdAtom.h"
 #include "Ap4TrakAtom.h"
 #include "Ap4HdlrAtom.h"
 #include "Ap4DrefAtom.h"
 #include "Ap4TkhdAtom.h"
 #include "Ap4MdhdAtom.h"
+#include "Ap4MoofAtom.h"
 #include "Ap4StsdAtom.h"
 #include "Ap4StscAtom.h"
 #include "Ap4StcoAtom.h"
@@ -58,6 +60,10 @@
 #include "Ap4SchmAtom.h"
 #include "Ap4FrmaAtom.h"
 #include "Ap4TimsAtom.h"
+#include "Ap4TfdtAtom.h"
+#include "Ap4TfhdAtom.h"
+#include "Ap4TrexAtom.h"
+#include "Ap4TrunAtom.h"
 #include "Ap4RtpAtom.h"
 #include "Ap4SdpAtom.h"
 #include "Ap4IkmsAtom.h"
@@ -122,7 +128,6 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 									  AP4_Atom*	      parent)
 {
     AP4_Result result;
-
 
     // NULL by default
     atom = NULL;
@@ -336,10 +341,6 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 			break;
 
 		// container atoms
-		case AP4_ATOM_TYPE_MOOF:
-		case AP4_ATOM_TYPE_MFHD:
-		case AP4_ATOM_TYPE_TRAF:
-		case AP4_ATOM_TYPE_MVEX:
 		case AP4_ATOM_TYPE_TREF:
 		case AP4_ATOM_TYPE_HNTI:
 		case AP4_ATOM_TYPE_STBL:
@@ -372,15 +373,34 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 			break;
 		}
 
-		case AP4_ATOM_TYPE_TFHD:
-		case AP4_ATOM_TYPE_TFDT: 
-		case AP4_ATOM_TYPE_TRUN: {
-			AP4_UI32 context = m_Context;
-			m_Context = type; // set the context for the children
-			atom = new AP4_UnknownAtom(type, size, true, stream);
-			m_Context = context; // restore the previous context
+		case AP4_ATOM_TYPE_TREX:
+			atom = new AP4_TrexAtom(size, stream);
 			break;
-		}
+
+		case AP4_ATOM_TYPE_MOOF:
+			atom = new AP4_MoofAtom(size, stream, *this);
+			break;
+
+		case AP4_ATOM_TYPE_TRAF:
+		case AP4_ATOM_TYPE_MVEX:
+			atom = new AP4_ContainerAtom(type, size, false, stream, *this);
+			break;
+
+		case AP4_ATOM_TYPE_MFHD:
+			atom = new AP4_MfhdAtom(size, stream);
+			break;
+
+		case AP4_ATOM_TYPE_TFDT:
+			atom = new AP4_TfdtAtom(size, stream);
+			break;
+
+		case AP4_ATOM_TYPE_TFHD:
+			atom = new AP4_TfhdAtom(size, stream);
+			break;
+
+		case AP4_ATOM_TYPE_TRUN:
+			atom = new AP4_TrunAtom(size, stream);
+			break;
 
 		// full container atoms
 		case AP4_ATOM_TYPE_META:

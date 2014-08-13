@@ -13,9 +13,6 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "Ap4Atom.h"
-#include "Ap4Types.h"
-#include "Ap4Array.h"
-#include "Ap4DataBuffer.h"
 
 /*----------------------------------------------------------------------
 |       AP4_PaspAtom
@@ -27,7 +24,8 @@ public:
 	AP4_PaspAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-	AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
+	virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
+	virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
 
 	AP4_UI32 GetNum() const { return m_num; }
 	AP4_UI32 GetDen() const { return m_den; }
@@ -35,7 +33,6 @@ public:
 private:
 	AP4_UI32 m_num;
 	AP4_UI32 m_den;	
-
 };
 
 #endif // _AP4_PASP_ATOM_H_

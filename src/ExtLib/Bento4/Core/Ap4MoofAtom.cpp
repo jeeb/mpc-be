@@ -1,26 +1,24 @@
 /*****************************************************************
 |
-|    AP4 - chap Atom
+|    AP4 - moof Atom
 |
-|    Copyright 2012 Aleksoid1978
+|    Copyright 2014 Aleksoid1978
 |
  ****************************************************************/
-
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
-
 #include "Ap4.h"
-#include "Ap4ChapAtom.h"
+#include "Ap4MoofAtom.h"
 
 /*----------------------------------------------------------------------
-|       AP4_ChapAtom::AP4_ChapAtom
+|       AP4_MoofAtom::AP4_MoofAtom
 +---------------------------------------------------------------------*/
-
-AP4_ChapAtom::AP4_ChapAtom(AP4_Size         size,
-                           AP4_ByteStream&  stream)
-	: AP4_Atom(AP4_ATOM_TYPE_CHAP)
-	, m_ChapterTrackId(0)
+AP4_MoofAtom::AP4_MoofAtom(AP4_Size         size,
+                           AP4_ByteStream&  stream,
+                           AP4_AtomFactory& atom_factory)
+	: AP4_ContainerAtom(AP4_ATOM_TYPE_MOOF, size, false, stream, atom_factory)
+	, m_MoofOffset(0)
 {
-	stream.ReadUI32(m_ChapterTrackId);
+	stream.Tell(m_MoofOffset);
 }

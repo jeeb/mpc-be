@@ -20,8 +20,9 @@
 AP4_PaspAtom::AP4_PaspAtom(AP4_Size         size,
                            AP4_ByteStream&  stream)
 	: AP4_Atom(AP4_ATOM_TYPE_PASP)
+	, m_num(0)
+	, m_den(0)
 {
-	size -= AP4_ATOM_HEADER_SIZE;
 	stream.ReadUI32(m_num);
 	stream.ReadUI32(m_den);
 }
