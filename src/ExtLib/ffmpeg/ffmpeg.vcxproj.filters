@@ -293,9 +293,6 @@
     <ClInclude Include="libavcodec\x86\constants.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\x86\dca.h">
-      <Filter>libavcodec\x86</Filter>
-    </ClInclude>
     <ClInclude Include="libavcodec\x86\dirac_dwt.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
@@ -2989,6 +2986,9 @@
     </ClCompile>
     <ClCompile Include="libavutil\lls.c">
       <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\xvid_c_idct.c">
+      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

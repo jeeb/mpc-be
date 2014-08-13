@@ -414,6 +414,7 @@ SRCS_LC = \
 	libavcodec/wmv2dec.c \
 	libavcodec/wmv2dsp.c \
 	libavcodec/xiph.c \
+	libavcodec/xvid_c_idct.c \
 	libavcodec/xvididct.c \
 	\
 	libavcodec/x86/ac3dsp_init.c \
