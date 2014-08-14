@@ -44,7 +44,7 @@ Ap4_FragmentSampleTable::GetSample(AP4_Ordinal index, AP4_Sample& sample)
 |       Ap4_FragmentSampleTable::AddTrun
 +---------------------------------------------------------------------*/
 AP4_Result
-Ap4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_TrexAtom* trex, AP4_ByteStream& stream, AP4_UI64& dts_origin, AP4_UI64 moof_offset, AP4_Offset& mdat_payload_offset)
+Ap4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_TrexAtom* trex, AP4_ByteStream& stream, AP4_UI64& dts_origin, AP4_Offset moof_offset, AP4_Offset& mdat_payload_offset)
 {
 	if (trun) {
 		AP4_Flags tfhd_flags = tfhd->GetFlags();
@@ -131,7 +131,6 @@ Ap4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_Tre
 			} else if (trun_flags & AP4_TRUN_FLAG_SAMPLE_FLAGS_PRESENT) {
 				sample_flags = entry.sample_flags;
 			}
-
 			if ((sample_flags & AP4_FRAG_FLAG_SAMPLE_IS_DIFFERENCE) == 0) {
 				sample.SetSync(true);
 			} else {

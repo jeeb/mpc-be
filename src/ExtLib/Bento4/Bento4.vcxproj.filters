@@ -262,9 +262,6 @@
     <ClInclude Include="Core\Ap4TrexAtom.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Ap4MoofAtom.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Ap4FragmentSampleTable.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -495,9 +492,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4TrexAtom.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Ap4MoofAtom.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4FragmentSampleTable.cpp">

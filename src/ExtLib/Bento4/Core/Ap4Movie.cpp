@@ -38,8 +38,6 @@
 #include "Ap4TrexAtom.h"
 #include "Ap4TrunAtom.h"
 #include "Ap4MfhdAtom.h"
-#include "Ap4MoovAtom.h"
-#include "Ap4MvhdAtom.h"
 #include "Ap4AtomFactory.h"
 #include "Ap4Movie.h"
 
@@ -257,14 +255,14 @@ AP4_Movie::HasFragments()
 |   AP4_Movie::ProcessMoof
 +---------------------------------------------------------------------*/
 void
-AP4_Movie::ProcessMoof(AP4_MoofAtom* moof, AP4_ByteStream& stream)
+AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
 {
 	if (moof) {
-		AP4_Offset mdat_payload_offset = 0;
-		stream.Tell(mdat_payload_offset);
-		mdat_payload_offset += 8;
+		AP4_Offset offset = 0;
+		stream.Tell(offset);
+		AP4_Offset moof_offset = offset - moof->GetSize();
+		AP4_Offset mdat_payload_offset = offset + 8;
 
-		AP4_UI64 moof_offset = moof->GetOffset();
 		AP4_MfhdAtom* mfhd = AP4_DYNAMIC_CAST(AP4_MfhdAtom, moof->GetChild(AP4_ATOM_TYPE_MFHD));
 		if (mfhd) {
 			for (AP4_List<AP4_Atom>::Item* item = moof->GetChildren().FirstItem();

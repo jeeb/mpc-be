@@ -31,7 +31,7 @@ public:
 						 AP4_TrexAtom* trex,
 						 AP4_ByteStream& stream,
 						 AP4_UI64& dts_origin,
-						 AP4_UI64 moof_offset,
+						 AP4_Offset moof_offset,
 						 AP4_Offset& mdat_payload_offset);
 	AP4_Result   GetSample(AP4_Ordinal index, AP4_Sample& sample);
 	AP4_Cardinal GetSampleCount() { return m_FragmentSamples.ItemCount(); }

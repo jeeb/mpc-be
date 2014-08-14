@@ -59,7 +59,8 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory) :
                 break;
             case AP4_ATOM_TYPE_MOOF:
                 if (m_Movie) {
-                    m_Movie->ProcessMoof(AP4_DYNAMIC_CAST(AP4_MoofAtom, atom), stream);
+                    m_Movie->ProcessMoof(AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom),
+                                         stream);
                 }
             case AP4_ATOM_TYPE_FTYP:
                 //m_Movie = new AP4_Movie(dynamic_cast<AP4_FtypAtom*>(atom),  stream);

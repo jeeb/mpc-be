@@ -144,7 +144,6 @@
     <ClInclude Include="Core\Ap4List.h" />
     <ClInclude Include="Core\Ap4MdhdAtom.h" />
     <ClInclude Include="Core\Ap4MfhdAtom.h" />
-    <ClInclude Include="Core\Ap4MoofAtom.h" />
     <ClInclude Include="Core\Ap4MoovAtom.h" />
     <ClInclude Include="Core\Ap4Movie.h" />
     <ClInclude Include="Core\Ap4MvhdAtom.h" />
@@ -226,7 +225,6 @@
     <ClCompile Include="Core\Ap4IsmaCryp.cpp" />
     <ClCompile Include="Core\Ap4MdhdAtom.cpp" />
     <ClCompile Include="Core\Ap4MfhdAtom.cpp" />
-    <ClCompile Include="Core\Ap4MoofAtom.cpp" />
     <ClCompile Include="Core\Ap4MoovAtom.cpp" />
     <ClCompile Include="Core\Ap4Movie.cpp" />
     <ClCompile Include="Core\Ap4MvhdAtom.cpp" />

@@ -54,7 +54,7 @@ public:
 
     // methods
     AP4_List<AP4_Atom>& GetOtherAtoms() { return m_OtherAtoms;}
-    AP4_Movie*          GetMovie() { return m_Movie; }
+    AP4_Movie*          GetMovie()      { return m_Movie; }
     AP4_FtypAtom*       GetFileType()   { return m_FileType;  }
     virtual AP4_Result  Inspect(AP4_AtomInspector& inspector);
 

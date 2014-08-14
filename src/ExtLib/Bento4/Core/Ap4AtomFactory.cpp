@@ -42,7 +42,6 @@
 #include "Ap4DrefAtom.h"
 #include "Ap4TkhdAtom.h"
 #include "Ap4MdhdAtom.h"
-#include "Ap4MoofAtom.h"
 #include "Ap4StsdAtom.h"
 #include "Ap4StscAtom.h"
 #include "Ap4StcoAtom.h"
@@ -378,9 +377,6 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 			break;
 
 		case AP4_ATOM_TYPE_MOOF:
-			atom = new AP4_MoofAtom(size, stream, *this);
-			break;
-
 		case AP4_ATOM_TYPE_TRAF:
 		case AP4_ATOM_TYPE_MVEX:
 			atom = new AP4_ContainerAtom(type, size, false, stream, *this);
