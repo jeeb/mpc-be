@@ -1390,27 +1390,8 @@ bool CMP4SplitterFilter::DemuxLoop()
 			p->TrackNumber = (DWORD)track->GetId();
 			p->rtStart = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
 			p->rtStop = p->rtStart + (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
-			p->bSyncPoint = TRUE;
+			p->bSyncPoint = sample.IsSync();
 
-			if (movie->HasFragments()) {
-				p->bSyncPoint = sample.IsSync();
-			} else if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-				// FIXME: slow search & stss->m_Entries is private
-				if (stss->m_Entries.ItemCount() > 0) {
-					p->bSyncPoint = FALSE;
-					for (AP4_Cardinal i = 0; i < stss->m_Entries.ItemCount(); ++i) {
-						if (stss->m_Entries[i] - 1 < pPairNext->m_value.index) {
-							continue;
-						}
-						if (stss->m_Entries[i] - 1 == pPairNext->m_value.index) {
-							p->bSyncPoint = TRUE;
-						}
-						break;
-					}
-				}
-			}
-
-			//
 			if (track->GetType() == AP4_Track::TYPE_AUDIO && data.GetDataSize() >= 1 && data.GetDataSize() <= 16) {
 				WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 
