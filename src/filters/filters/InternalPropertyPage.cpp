@@ -479,7 +479,6 @@ BEGIN_MESSAGE_MAP(CPinInfoWnd, CInternalPropertyPageWnd)
 	ON_CBN_SELCHANGE(IDC_PP_COMBO1, OnCbnSelchangeCombo1)
 END_MESSAGE_MAP()
 
-#define AddLine(str) infoStr.Append(CString(str) + L"\r\n")
 void CPinInfoWnd::OnCbnSelchangeCombo1()
 {
 	m_info_edit.SetWindowText(L"");
@@ -494,10 +493,6 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 	if (!pPin) {
 		return;
 	}
-
-	m_info_edit.LockWindowUpdate();
-
-	CString str;
 
 	PIN_INFO PinInfo;
 	if (SUCCEEDED (pPin->QueryPinInfo(&PinInfo))) {
@@ -520,8 +515,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			} else {
 				strName = FilterInfo.achName;
 			}
-			str.Format(L"Filter : %s - CLSID : %s", strName, CStringFromGUID(FilterClsid));
-			AddLine(str);
+			infoStr.AppendFormat(L"Filter : %s - CLSID : %s\r\n", strName, CStringFromGUID(FilterClsid));
 			FilterInfo.pGraph->Release();
 
 			{
@@ -545,12 +539,11 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 				}
 
 				if (!module.IsEmpty()) {
-					str.Format(L"Module : %s", module);
-					AddLine(str);
+					infoStr.AppendFormat(L"Module : %s\r\n", module);
 				}
 			}
 
-			AddLine(L"");
+			infoStr.Append(L"\r\n");
 		}
 		PinInfo.pFilter->Release();
 	}
@@ -559,24 +552,23 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 
 	CComPtr<IPin> pPinTo;
 	if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
-		str.Format(L"- Connected to:\r\n\r\nCLSID: %s\r\nFilter: %s\r\nPin: %s\r\n",
+		infoStr.AppendFormat(L"- Connected to:\r\n\r\nCLSID: %s\r\nFilter: %s\r\nPin: %s\r\n\r\n",
 				   CString(CStringFromGUID(GetCLSID(pPinTo))),
 				   CString(GetFilterName(GetFilterFromPin(pPinTo))),
 				   CString(GetPinName(pPinTo)));
-		AddLine(str);
 
-		AddLine(L"- Connection media type:\r\n");
+		infoStr.Append(L"- Connection media type:\r\n\r\n");
 
 		if (SUCCEEDED(pPin->ConnectionMediaType(&cmt))) {
 			CAtlList<CString> sl;
 			cmt.Dump(sl);
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				AddLine(sl.GetNext(pos));
+				infoStr.Append(sl.GetNext(pos) + L"\r\n");
 			}
 		}
 	} else {
-		AddLine(L"- Not connected\r\n");
+		infoStr.Append(L"- Not connected\r\n\r\n");
 	}
 
 	int iMT = 0;
@@ -584,22 +576,20 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 	BeginEnumMediaTypes(pPin, pEMT, pmt) {
 		CMediaTypeEx mt(*pmt);
 
-		str.Format(L"- Enumerated media type %d:\r\n", iMT++);
-		AddLine(str);
+		infoStr.AppendFormat(L"- Enumerated media type %d:\r\n\r\n", iMT++);
 
 		if (cmt.majortype != GUID_NULL && mt == cmt) {
-			AddLine(L"Set as the current media type\r\n");
+			infoStr.AppendFormat(L"Set as the current media type\r\n\r\n");
 		} else {
 			CAtlList<CString> sl;
 			mt.Dump(sl);
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				AddLine(sl.GetNext(pos));
+				infoStr.Append(sl.GetNext(pos) + L"\r\n");
 			}
 		}
 	}
 	EndEnumMediaTypes(pmt);
 
 	m_info_edit.SetWindowText(infoStr);
-	m_info_edit.UnlockWindowUpdate();
 }
