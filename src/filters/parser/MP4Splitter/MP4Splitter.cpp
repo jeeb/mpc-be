@@ -1247,18 +1247,29 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
-			if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
+			if (movie->HasFragments()) {
+				for (AP4_Cardinal i = 0; i < track->GetSampleCount(); ++i) {
+					AP4_Sample sample;
+					if (AP4_SUCCEEDED(track->GetSample(i, sample)) && sample.IsSync()) {
+						REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+						SyncPoint sp = { rt, __int64(sample.GetOffset()) };
+						m_sps.Add(sp);
+					}
+				}
+			} else if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
 				for (AP4_Cardinal i = 0; i < stss->m_Entries.ItemCount(); ++i) {
 					AP4_UI32 index = stss->m_Entries[i] - 1;
 
 					AP4_Sample sample;
 					if (AP4_SUCCEEDED(track->GetSample(index, sample))) {
 						REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
-						SyncPoint sp = { rt, __int64(index) };
+						SyncPoint sp = { rt, __int64(sample.GetOffset()) };
 						m_sps.Add(sp);
 					}
 				}
 			}
+
+			break;
 		}
 	}
 
@@ -1301,8 +1312,10 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			continue;
 		}
 
-		// FIXME: slow search & stss->m_Entries is private
-		if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
+		if (movie->HasFragments()) {
+			;//
+		} else if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
+			// FIXME: slow search & stss->m_Entries is private
 			if (stss->m_Entries.ItemCount() > 1) {
 				AP4_Cardinal i = 1;
 				bool bFoundKeyFrame = false;
@@ -1378,8 +1391,10 @@ bool CMP4SplitterFilter::DemuxLoop()
 			p->rtStop = p->rtStart + (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
 			p->bSyncPoint = TRUE;
 
-			// FIXME: slow search & stss->m_Entries is private
-			if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
+			if (movie->HasFragments()) {
+				p->bSyncPoint = sample.IsSync();
+			} else if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
+				// FIXME: slow search & stss->m_Entries is private
 				if (stss->m_Entries.ItemCount() > 0) {
 					p->bSyncPoint = FALSE;
 					for (AP4_Cardinal i = 0; i < stss->m_Entries.ItemCount(); ++i) {
