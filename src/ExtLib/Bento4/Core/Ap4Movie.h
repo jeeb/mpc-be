@@ -33,6 +33,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "Ap4.h"
+#include "Ap4MoofAtom.h"
 #include "Ap4MoovAtom.h"
 #include "Ap4MvhdAtom.h"
 #include "Ap4Track.h"
@@ -60,6 +61,8 @@ public:
     AP4_Duration GetDuration();
     AP4_Duration GetDurationMs();
     bool         HasFragments();
+
+    void         ProcessMoof(AP4_MoofAtom* moof, AP4_ByteStream& stream);
 
 private:
     // members

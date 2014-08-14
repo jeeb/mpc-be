@@ -32,10 +32,9 @@
 #include "Ap4.h"
 #include "Ap4File.h"
 #include "Ap4Atom.h"
-#include "Ap4TrakAtom.h"
-#include "Ap4MoovAtom.h"
-#include "Ap4MvhdAtom.h"
 #include "Ap4AtomFactory.h"
+#include "Ap4MoovAtom.h"
+
 /*----------------------------------------------------------------------
 |       AP4_File::AP4_File
 +---------------------------------------------------------------------*/
@@ -58,6 +57,10 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory) :
                 m_Movie = new AP4_Movie(dynamic_cast<AP4_MoovAtom*>(atom),
                                         stream);
                 break;
+            case AP4_ATOM_TYPE_MOOF:
+                if (m_Movie) {
+                    m_Movie->ProcessMoof(AP4_DYNAMIC_CAST(AP4_MoofAtom, atom), stream);
+                }
             case AP4_ATOM_TYPE_FTYP:
                 //m_Movie = new AP4_Movie(dynamic_cast<AP4_FtypAtom*>(atom),  stream);
                 m_FileType = dynamic_cast<AP4_FtypAtom*>(atom);

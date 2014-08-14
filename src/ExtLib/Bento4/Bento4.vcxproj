@@ -129,6 +129,7 @@
     <ClInclude Include="Core\Ap4File.h" />
     <ClInclude Include="Core\Ap4FileByteStream.h" />
     <ClInclude Include="Core\Ap4FileWriter.h" />
+    <ClInclude Include="Core\Ap4FragmentSampleTable.h" />
     <ClInclude Include="Core\Ap4FrmaAtom.h" />
     <ClInclude Include="Core\Ap4FtabAtom.h" />
     <ClInclude Include="Core\Ap4FtypAtom.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="Core\Ap4EsdsAtom.cpp" />
     <ClCompile Include="Core\Ap4File.cpp" />
     <ClCompile Include="Core\Ap4FileWriter.cpp" />
+    <ClCompile Include="Core\Ap4FragmentSampleTable.cpp" />
     <ClCompile Include="Core\Ap4FrmaAtom.cpp" />
     <ClCompile Include="Core\Ap4FtabAtom.cpp" />
     <ClCompile Include="Core\Ap4FtypAtom.cpp" />

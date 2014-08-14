@@ -219,7 +219,7 @@ AP4_Track::SetId(AP4_UI32 id)
 AP4_UI64
 AP4_Track::GetDuration()
 {
-    return m_TrakAtom->GetDuration() + m_TimeShift;
+    return (m_FragmentSampleTable.GetDuration() ? m_FragmentSampleTable.GetDuration() : m_TrakAtom->GetDuration()) + m_TimeShift;
 }
 
 /*----------------------------------------------------------------------
@@ -228,8 +228,8 @@ AP4_Track::GetDuration()
 AP4_Duration
 AP4_Track::GetDurationMs()
 {
-    AP4_UI64 duration = m_TrakAtom->GetDuration() + m_TimeShift;
-    return AP4_DurationMsFromUnits(duration, m_MovieTimeScale);
+    AP4_UI64 duration = GetDuration();
+    return AP4_DurationMsFromUnits(duration, m_FragmentSampleTable.GetDuration() ? m_MediaTimeScale : m_MovieTimeScale);
 }
 
 /*----------------------------------------------------------------------
@@ -239,7 +239,7 @@ AP4_Cardinal
 AP4_Track::GetSampleCount()
 {
     // delegate to the sample table
-    return m_SampleTable ? m_SampleTable->GetSampleCount() : 0;
+    return m_FragmentSampleTable.GetDuration() ? m_FragmentSampleTable.GetSampleCount() : m_SampleTable ? m_SampleTable->GetSampleCount() : 0;
 }
 
 /*----------------------------------------------------------------------
@@ -249,7 +249,7 @@ AP4_Result
 AP4_Track::GetSample(AP4_Ordinal index, AP4_Sample& sample)
 {
     // delegate to the sample table
-    return m_SampleTable ? m_SampleTable->GetSample(index, sample) : AP4_FAILURE;
+    return m_FragmentSampleTable.GetDuration() ? m_FragmentSampleTable.GetSample(index, sample) : m_SampleTable ? m_SampleTable->GetSample(index, sample) : AP4_FAILURE;
 }
 
 /*----------------------------------------------------------------------

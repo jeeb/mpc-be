@@ -32,7 +32,12 @@
 #include "Ap4.h"
 #include "Ap4File.h"
 #include "Ap4Atom.h"
+#include "Ap4TfdtAtom.h"
+#include "Ap4TfhdAtom.h"
 #include "Ap4TrakAtom.h"
+#include "Ap4TrexAtom.h"
+#include "Ap4TrunAtom.h"
+#include "Ap4MfhdAtom.h"
 #include "Ap4MoovAtom.h"
 #include "Ap4MvhdAtom.h"
 #include "Ap4AtomFactory.h"
@@ -246,4 +251,71 @@ AP4_Movie::HasFragments()
     } else {
         return false;
     }
+}
+
+/*----------------------------------------------------------------------
+|   AP4_Movie::ProcessMoof
++---------------------------------------------------------------------*/
+void
+AP4_Movie::ProcessMoof(AP4_MoofAtom* moof, AP4_ByteStream& stream)
+{
+	if (moof) {
+		AP4_Offset mdat_payload_offset = 0;
+		stream.Tell(mdat_payload_offset);
+		mdat_payload_offset += 8;
+
+		AP4_UI64 moof_offset = moof->GetOffset();
+		AP4_MfhdAtom* mfhd = AP4_DYNAMIC_CAST(AP4_MfhdAtom, moof->GetChild(AP4_ATOM_TYPE_MFHD));
+		if (mfhd) {
+			for (AP4_List<AP4_Atom>::Item* item = moof->GetChildren().FirstItem();
+										   item;
+										   item = item->GetNext()) {
+				AP4_Atom* atom = item->GetData();
+				if (atom->GetType() == AP4_ATOM_TYPE_TRAF) {
+					AP4_ContainerAtom* traf = AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom);
+					if (traf) {
+						AP4_TfhdAtom* tfhd = AP4_DYNAMIC_CAST(AP4_TfhdAtom, traf->GetChild(AP4_ATOM_TYPE_TFHD));
+						if (!tfhd) {
+							continue;
+						}
+						AP4_Track* track = GetTrack(tfhd->GetTrackId());
+						if (!track) {
+							continue;
+						}
+
+						AP4_TfdtAtom* tfdt = AP4_DYNAMIC_CAST(AP4_TfdtAtom, traf->GetChild(AP4_ATOM_TYPE_TFDT));
+
+						AP4_TrexAtom*      trex = NULL;
+						AP4_ContainerAtom* mvex = AP4_DYNAMIC_CAST(AP4_ContainerAtom, m_MoovAtom->GetChild(AP4_ATOM_TYPE_MVEX));
+						if (mvex) {
+							for (AP4_List<AP4_Atom>::Item* child_item = mvex->GetChildren().FirstItem();
+														   child_item;
+														   child_item = child_item->GetNext()) {
+								AP4_Atom* child_atom = child_item->GetData();
+								if (child_atom->GetType() == AP4_ATOM_TYPE_TREX) {
+									trex = AP4_DYNAMIC_CAST(AP4_TrexAtom, child_atom);
+									if (trex && trex->GetTrackId() == tfhd->GetTrackId()) break;
+									trex = NULL;
+								}
+							}
+						}
+
+						AP4_UI64 dts_origin = tfdt ? tfdt->GetBaseMediaDecodeTime() : 0;
+						for (AP4_List<AP4_Atom>::Item* item = traf->GetChildren().FirstItem();
+													   item;
+													   item = item->GetNext()) {
+							AP4_Atom* atom = item->GetData();
+							if (atom->GetType() == AP4_ATOM_TYPE_TRUN) {
+								AP4_TrunAtom* trun = AP4_DYNAMIC_CAST(AP4_TrunAtom, traf->GetChild(AP4_ATOM_TYPE_TRUN));
+								if (trun) {
+									Ap4_FragmentSampleTable* sampleTable = track->GetFragmentSampleTable();
+									sampleTable->AddTrun(trun, tfhd, trex, stream, dts_origin, moof_offset, mdat_payload_offset);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

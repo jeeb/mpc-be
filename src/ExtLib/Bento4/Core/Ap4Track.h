@@ -36,6 +36,7 @@
 #include "Ap4Array.h"
 #include "Ap4SampleDescription.h"
 #include "Ap4SampleTable.h"
+#include "Ap4FragmentSampleTable.h"
 
 /*----------------------------------------------------------------------
 |       forward declarations
@@ -110,6 +111,8 @@ class AP4_Track {
 
     AP4_UI64      GetTimeShift() const { return m_TimeShift; }
 
+    Ap4_FragmentSampleTable* GetFragmentSampleTable() { return &m_FragmentSampleTable; }
+
  protected:
     // members
     AP4_TrakAtom*    m_TrakAtom;
@@ -123,6 +126,8 @@ class AP4_Track {
     AP4_UI32         m_Palette[256];
 
     AP4_UI64         m_TimeShift;
+
+    Ap4_FragmentSampleTable m_FragmentSampleTable;
 };
 
 #endif // _AP4_TRAK_H_

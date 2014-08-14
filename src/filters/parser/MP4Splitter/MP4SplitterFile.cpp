@@ -61,5 +61,5 @@ HRESULT CMP4SplitterFile::Init()
 
 	stream->Release();
 
-	return (movie && !movie->HasFragments()) ? S_OK : E_FAIL;
+	return movie ? S_OK : E_FAIL;
 }
