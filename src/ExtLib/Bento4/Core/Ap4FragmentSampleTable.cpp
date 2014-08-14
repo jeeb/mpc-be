@@ -169,3 +169,20 @@ Ap4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_Tre
 
 	return AP4_SUCCESS;
 }
+
+/*----------------------------------------------------------------------
+|       Ap4_FragmentSampleTable::GetSampleIndexForTimeStamp
++---------------------------------------------------------------------*/
+AP4_Result
+Ap4_FragmentSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordinal& index)
+{
+	for (AP4_Ordinal i = 0; i < m_FragmentSamples.ItemCount(); i++) {
+		if (m_FragmentSamples[i].GetCts() > ts) {
+			AP4_Sample& sample = m_FragmentSamples[i];
+			index = i == 0 ? i : i - 1;
+			return AP4_SUCCESS;
+		}
+	}
+
+	return AP4_FAILURE;
+}

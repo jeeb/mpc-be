@@ -289,7 +289,7 @@ AP4_Track::GetSampleIndexForTimeStampMs(AP4_TimeStamp ts, AP4_Ordinal& index)
     // convert the ts in the timescale of the track's media
     ts = AP4_ConvertTime(ts, 1000, m_MediaTimeScale);
 
-    return m_SampleTable->GetSampleIndexForTimeStamp(ts, index);
+    return m_FragmentSampleTable.GetDuration() ? m_FragmentSampleTable.GetSampleIndexForTimeStamp(ts, index) : m_SampleTable->GetSampleIndexForTimeStamp(ts, index);
 }
 
 // MPC-BE custom code start
@@ -303,7 +303,7 @@ AP4_Track::GetSampleIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index)
     // MPC-BE custom code end
     //AP4_TimeStamp ts = (AP4_TimeStamp)(double(rt) * m_MediaTimeScale / 10000000 + 0.5);
 
-    return m_SampleTable->GetSampleIndexForTimeStamp(ts, index);
+    return m_FragmentSampleTable.GetDuration() ? m_FragmentSampleTable.GetSampleIndexForTimeStamp(ts, index) : m_SampleTable->GetSampleIndexForTimeStamp(ts, index);
 }
 // MPC-BE custom code end
 

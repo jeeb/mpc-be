@@ -290,12 +290,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
 
-			REFERENCE_TIME AvgTimePerFrame = track->GetSampleCount() ? track->GetDurationMs() * 10000 / (track->GetSampleCount()) : 0;
+			REFERENCE_TIME AvgTimePerFrame = 0;
 			if (track->GetType() == AP4_Track::TYPE_VIDEO) {
+				AvgTimePerFrame = track->GetSampleCount() ? track->GetDurationMs() * 10000 / (track->GetSampleCount()) : 0;
 				if (AP4_SttsAtom* stts = dynamic_cast<AP4_SttsAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stts"))) {
 					AP4_Duration totalDuration	= stts->GetTotalDuration();
 					AP4_UI32 totalFrames		= stts->GetTotalFrames();
-					if (totalFrames) {
+					if (totalDuration && totalFrames) {
 						AvgTimePerFrame = 10000000.0 / track->GetMediaTimeScale() * totalDuration / totalFrames;
 					}
 				}
@@ -1312,24 +1313,24 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			continue;
 		}
 
-		if (movie->HasFragments()) {
-			;//
-		} else if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-			// FIXME: slow search & stss->m_Entries is private
-			if (stss->m_Entries.ItemCount() > 1) {
-				AP4_Cardinal i = 1;
-				bool bFoundKeyFrame = false;
-				while (i < stss->m_Entries.ItemCount()) {
-					if (stss->m_Entries[i] - 1 > pPair->m_value.index) {
-						bFoundKeyFrame = true;
-						break;
+		if (!movie->HasFragments()) {
+			if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
+				// FIXME: slow search & stss->m_Entries is private
+				if (stss->m_Entries.ItemCount() > 1) {
+					AP4_Cardinal i = 1;
+					bool bFoundKeyFrame = false;
+					while (i < stss->m_Entries.ItemCount()) {
+						if (stss->m_Entries[i] - 1 > pPair->m_value.index) {
+							bFoundKeyFrame = true;
+							break;
+						}
+						++i;
 					}
-					++i;
+					if (!bFoundKeyFrame && pPair->m_value.index > stss->m_Entries.ItemCount()) {
+						i = stss->m_Entries.ItemCount();
+					}
+					pPair->m_value.index = stss->m_Entries[i - 1] - 1;
 				}
-				if (!bFoundKeyFrame && pPair->m_value.index > stss->m_Entries.ItemCount()) {
-					i = stss->m_Entries.ItemCount();
-				}
-				pPair->m_value.index = stss->m_Entries[i - 1] - 1;
 			}
 		}
 
