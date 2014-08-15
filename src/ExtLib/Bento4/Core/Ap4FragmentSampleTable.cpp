@@ -185,3 +185,12 @@ Ap4_FragmentSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordina
 
 	return AP4_FAILURE;
 }
+
+/*----------------------------------------------------------------------
+|       Ap4_FragmentSampleTable::EnsureCapacity
++---------------------------------------------------------------------*/
+AP4_Result
+Ap4_FragmentSampleTable::EnsureCapacity(AP4_Cardinal sample_count)
+{
+	return m_FragmentSamples.EnsureCapacity(sample_count);
+}

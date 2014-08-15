@@ -40,6 +40,8 @@ public:
 	AP4_Result   GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
 											AP4_Ordinal& index);
 
+	AP4_Result   EnsureCapacity(AP4_Cardinal sample_count);
+
 private:
 	// members
 	AP4_Array<AP4_Sample> m_FragmentSamples;
