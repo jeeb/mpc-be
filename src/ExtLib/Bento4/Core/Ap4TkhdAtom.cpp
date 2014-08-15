@@ -55,7 +55,9 @@ AP4_TkhdAtom::AP4_TkhdAtom(AP4_UI64 creation_time,
     m_Volume(volume),
     m_Reserved3(0),
     m_Width(width),
-    m_Height(height)
+    m_Height(height),
+    m_Num(0),
+    m_Den(0)
 {
     m_Flags = AP4_TKHD_FLAG_DEFAULTS;
 
@@ -77,7 +79,9 @@ AP4_TkhdAtom::AP4_TkhdAtom(AP4_UI64 creation_time,
 |       AP4_TkhdAtom::AP4_TkhdAtom
 +---------------------------------------------------------------------*/
 AP4_TkhdAtom::AP4_TkhdAtom(AP4_Size size, AP4_ByteStream& stream) :
-    AP4_Atom(AP4_ATOM_TYPE_TKHD, size, true, stream)
+    AP4_Atom(AP4_ATOM_TYPE_TKHD, size, true, stream),
+    m_Num(0),
+    m_Den(0)
 {
     if (m_Version == 0) {
 		AP4_UI32 tmp = 0;
@@ -101,11 +105,25 @@ AP4_TkhdAtom::AP4_TkhdAtom(AP4_Size size, AP4_ByteStream& stream) :
     stream.ReadUI16(m_AlternateGroup);
     stream.ReadUI16(m_Volume);
     stream.ReadUI16(m_Reserved3);
-    for (int i=0; i<9; i++) {
+    for (int i = 0; i < 9; i++) {
         stream.ReadUI32(m_Matrix[i]);
     }
     stream.ReadUI32(m_Width);
     stream.ReadUI32(m_Height);
+
+    if (m_Width && m_Height &&
+        ((m_Matrix[0] != 65536  ||
+          m_Matrix[4] != 65536) &&
+         !m_Matrix[1] &&
+         !m_Matrix[3] &&
+         !m_Matrix[5] && !m_Matrix[7])) {
+
+        AP4_UI32 width  = m_Width >> 16;
+        AP4_UI32 height = m_Height >> 16;
+
+        m_Num = ((double)(AP4_UI64)width * m_Matrix[0] + (AP4_UI64)height * m_Matrix[3] + ((AP4_UI64)m_Matrix[6] << 16)) * height;
+        m_Den = ((double)(AP4_UI64)width * m_Matrix[1] + (AP4_UI64)height * m_Matrix[4] + ((AP4_UI64)m_Matrix[7] << 16)) * width;
+    }
 }
 
 /*----------------------------------------------------------------------

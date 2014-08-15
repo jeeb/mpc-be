@@ -158,15 +158,28 @@ void SetTrackName(CString *TrackName, CString Suffix)
 	} \
 	SetTrackName(&TrackName, tname); \
 
-static void SetAspect(VIDEOINFOHEADER2* vih2, CSize Aspect, LONG w, LONG h)
+static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, LONG codec_height, VIDEOINFOHEADER2* vih2)
 {
 	if (!Aspect.cx || !Aspect.cy) {
-		Aspect.SetSize(w, h);
-		ReduceDim(Aspect);
+		if (width && height) {
+			if (width != codec_width || height != codec_height) {
+				Aspect.SetSize(width * codec_height, height * codec_width);
+			} else {
+				Aspect.SetSize(width, height);
+			}
+		} else {
+			Aspect.SetSize(codec_width, codec_height);
+		}
+	} else {
+		Aspect.cx *= codec_width;
+		Aspect.cy *= codec_height;
 	}
+	ReduceDim(Aspect);
 
-	vih2->dwPictAspectRatioX = Aspect.cx;
-	vih2->dwPictAspectRatioY = Aspect.cy;
+	if (vih2) {
+		vih2->dwPictAspectRatioX = Aspect.cx;
+		vih2->dwPictAspectRatioY = Aspect.cx;
+	}
 }
 
 static CString ConvertStr(const char* S)
@@ -273,14 +286,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			CSize Aspect(0, 0);
-			if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
-				AP4_UI32 w = tkhd->GetWidth() >> 16;
-				AP4_UI32 h = tkhd->GetHeight() >> 16;
-				if (w && h) {
-					Aspect.SetSize(w, h);
-					ReduceDim(Aspect);
-				}
-			}
+			AP4_UI32 width = 0;
+			AP4_UI32 height = 0;
 
 			CString TrackName = ConvertStr(track->GetTrackName().c_str());
 			if (TrackName.GetLength() && TrackName[0] < 0x20) {
@@ -292,6 +299,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			REFERENCE_TIME AvgTimePerFrame = 0;
 			if (track->GetType() == AP4_Track::TYPE_VIDEO) {
+				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
+					width = tkhd->GetWidth() >> 16;
+					height = tkhd->GetHeight() >> 16;
+					double num = 0;
+					double den = 0;
+					tkhd->GetAspect(num, den);
+					if (num > 0 && den > 0) {
+						Aspect = ReduceDim(num/den);
+					}
+				}
+
 				AvgTimePerFrame = track->GetSampleCount() ? track->GetDurationMs() * 10000 / (track->GetSampleCount()) : 0;
 				if (AP4_SttsAtom* stts = dynamic_cast<AP4_SttsAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stts"))) {
 					AP4_Duration totalDuration	= stts->GetTotalDuration();
@@ -340,10 +358,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					LONG biHeight = (LONG)video_desc->GetHeight();
 
 					if (!biWidth || !biHeight) {
-						if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
-							biWidth = tkhd->GetWidth()>>16;
-							biHeight = tkhd->GetHeight()>>16;
-						}
+						biWidth = width;
+						biHeight = height;
 					}
 
 					if (!biWidth || !biHeight) {
@@ -362,7 +378,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					vih2->rcSource				= vih2->rcTarget = CRect(0, 0, biWidth, biHeight);
 					vih2->AvgTimePerFrame		= AvgTimePerFrame;
 
-					SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
+					SetAspect(Aspect, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
 
 					memcpy(vih2 + 1, di->GetData(), di->GetDataSize());
 
@@ -381,11 +397,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								pbmi.biPlanes		= 1;
 								pbmi.biBitCount		= 24;
 
-								if (Aspect == CSize(0, 0)) {
-									Aspect.cx = pbmi.biWidth;
-									Aspect.cy = pbmi.biHeight;
-								}
-								ReduceDim(Aspect);
 								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 								mt.SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
 								mts.Add(mt);
@@ -409,11 +420,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								pbmi.biPlanes		= 1;
 								pbmi.biBitCount		= 24;
 
-								if (Aspect == CSize(0, 0)) {
-									Aspect.cx = pbmi.biWidth;
-									Aspect.cy = pbmi.biHeight;
-								}
-								ReduceDim(Aspect);
 								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 								mt.SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
 								mts.Add(mt);
@@ -640,16 +646,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biBitCount		= 24;
 
 					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-							Aspect.cx = pbmi.biWidth * pasp->GetNum();
-							Aspect.cy = pbmi.biHeight * pasp->GetDen();
+						if (!Aspect.cx && pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+							Aspect.cx = pasp->GetNum();
+							Aspect.cy = pasp->GetDen();
 						}
 					}
-					if (Aspect == CSize(0, 0)) {
-						Aspect.cx = pbmi.biWidth;
-						Aspect.cy = pbmi.biHeight;
-					}
-					ReduceDim(Aspect);
+					SetAspect(Aspect, width, height, pbmi.biWidth, pbmi.biHeight, vih2);
+
 					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 
 					mts.Add(mt);
@@ -678,16 +681,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biBitCount		= 24;
 
 					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-							Aspect.cx = pbmi.biWidth * pasp->GetNum();
-							Aspect.cy = pbmi.biHeight * pasp->GetDen();
+						if (!Aspect.cx && pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+							Aspect.cx = pasp->GetNum();
+							Aspect.cy = pasp->GetDen();
 						}
 					}
-					if (Aspect == CSize(0, 0)) {
-						Aspect.cx = pbmi.biWidth;
-						Aspect.cy = pbmi.biHeight;
-					}
-					ReduceDim(Aspect);
+
+					SetAspect(Aspect, width, height, pbmi.biWidth, pbmi.biHeight, vih2);
+
 					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 					mt.SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
 
@@ -780,13 +781,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih2->AvgTimePerFrame			= AvgTimePerFrame;
 
 						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
-							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-								Aspect.cx = vih2->bmiHeader.biWidth * pasp->GetNum();
-								Aspect.cy = vih2->bmiHeader.biHeight * pasp->GetDen();
-								ReduceDim(Aspect);
+							if (!Aspect.cx && pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+								Aspect.cx = pasp->GetNum();
+								Aspect.cy = pasp->GetDen();
 							}
 						}
-						SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
+						SetAspect(Aspect, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
 
 						if (ExtraSize) {
 							memcpy(vih2 + 1, db.GetData(), ExtraSize);

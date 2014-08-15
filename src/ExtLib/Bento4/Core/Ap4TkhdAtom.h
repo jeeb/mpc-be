@@ -91,6 +91,10 @@ public:
         }
         return (AP4_Integer)(rotation + 0.5);
     }
+    void GetAspect(double& num, double& den) {
+        num = m_Num;
+        den = m_Den;
+	}
 // MPC-BE custom code end
 
  private:
@@ -109,6 +113,8 @@ public:
     AP4_UI32 m_Matrix[9];
     AP4_UI32 m_Width;
     AP4_UI32 m_Height;
+    double m_Num;
+    double m_Den;
 };
 
 #endif // _AP4_TKHD_ATOM_H_

@@ -184,6 +184,7 @@ extern void				CorrectWaveFormatEx(CMediaType *pmt);
 
 extern void				ReduceDim(LONG& num, LONG& den);
 extern void				ReduceDim(SIZE &dim);
+extern SIZE				ReduceDim(double value);
 
 typedef enum FF_FIELD_TYPE{
 	PICT_NONE,

@@ -27,6 +27,7 @@
 #include "Mpeg2Def.h"
 #include "AudioParser.h"
 #include <moreuuids.h>
+#include <basestruct.h>
 #include <emmintrin.h>
 #include <math.h>
 #include <InitGuid.h>
@@ -3218,59 +3219,90 @@ void CorrectWaveFormatEx(CMediaType *pmt)
 }
 
 // code from ffmpeg
-static LONG av_gcd(LONG a, LONG b){
+static INT64 av_gcd(INT64 a, INT64 b){
     if(b) return av_gcd(b, a%b);
     else  return a;
 }
-static inline int av_reduce(LONG& num, LONG& den, INT64 _max)
+
+int av_reduce(int *dst_num, int *dst_den,
+              INT64 num, INT64 den, INT64 max)
 {
-    CSize a0 = { 0, 1 }, a1 = { 1, 0 };
+    AV_Rational a0 = { 0, 1 }, a1 = { 1, 0 };
     int sign = (num < 0) ^ (den < 0);
-    LONG gcd = av_gcd(abs(num), abs(den));
+    INT64 gcd = av_gcd(abs(num), abs(den));
 
     if (gcd) {
         num = abs(num) / gcd;
         den = abs(den) / gcd;
     }
-    if (num <= _max && den <= _max) {
-        a1 = CSize(num, den);
+    if (num <= max && den <= max) {
+        a1 = { num, den };
         den = 0;
     }
 
     while (den) {
-        LONG x         = num / den;
-        LONG next_den  = num - den * x;
-        LONG a2n       = x * a1.cx + a0.cx;
-        LONG a2d       = x * a1.cy + a0.cy;
+        INT64 x         = num / den;
+        INT64 next_den  = num - den * x;
+        INT64 a2n       = x * a1.num + a0.num;
+        INT64 a2d       = x * a1.den + a0.den;
 
-        if (a2n > _max || a2d > _max) {
-            if (a1.cx) x =        (_max - a0.cx) / a1.cx;
-            if (a1.cy) x = min(x, (_max - a0.cy) / a1.cy);
+        if (a2n > max || a2d > max) {
+            if (a1.num) x =          (max - a0.num) / a1.num;
+            if (a1.den) x = min(x, (max - a0.den) / a1.den);
 
-            if (den * (2 * x * a1.cy + a0.cy) > num * a1.cy)
-                a1 = CSize(x * a1.cx + a0.cx, x * a1.cy + a0.cy);
+            if (den * (2 * x * a1.den + a0.den) > num * a1.den)
+                a1 = { x * a1.num + a0.num, x * a1.den + a0.den };
             break;
         }
 
         a0  = a1;
-        a1  = CSize(a2n, a2d);
+        a1  = { a2n, a2d };
         num = den;
         den = next_den;
     }
+    ASSERT(av_gcd(a1.num, a1.den) <= 1U);
 
-    num = sign ? -a1.cx : a1.cx;
-    den = a1.cy;
+    *dst_num = sign ? -a1.num : a1.num;
+    *dst_den = a1.den;
 
     return den == 0;
+}
+
+AV_Rational av_d2q(double d, int max)
+{
+    AV_Rational a;
+#define LOG2  0.69314718055994530941723212145817656807550013436025
+    int exponent;
+    INT64 den;
+    if (isnan(d))
+        return { 0,0 };
+    if (fabs(d) > INT_MAX + 3LL)
+        return  { d < 0 ? -1 : 1, 0 };
+    exponent = max( (int)(log(fabs(d) + 1e-20)/LOG2), 0);
+    den = 1LL << (61 - exponent);
+    // (int64_t)rint() and llrint() do not work with gcc on ia64 and sparc64
+    av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, max);
+    if ((!a.num || !a.den) && d && max>0 && max<INT_MAX)
+        av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, INT_MAX);
+
+    return a;
 }
 //
 
 void ReduceDim(LONG& num, LONG& den)
 {
-	av_reduce(num, den, 255);
+	int _num, _den;
+	av_reduce(&_num, &_den, num, den, 255);
+	num = _num; den = _den;
 }
 
 void ReduceDim(SIZE &dim)
 {
-	av_reduce(dim.cx, dim.cy, 255);
+	ReduceDim(dim.cx, dim.cy);
+}
+
+SIZE ReduceDim(double value)
+{
+	AV_Rational a = av_d2q(value, INT_MAX);
+	return { a.num, a.den };
 }
