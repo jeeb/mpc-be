@@ -81,6 +81,11 @@ class AP4_SttsAtom : public AP4_Atom
 
  private:
     AP4_Array<AP4_SttsTableEntry> m_Entries;
+    struct {
+        AP4_Ordinal entry_index;
+        AP4_Ordinal sample;
+        AP4_UI64    dts;
+    } m_LookupCache;
 
     // MPC-BE custom code start
     AP4_Duration m_TotalDuration;

@@ -45,6 +45,9 @@ AP4_SttsAtom::AP4_SttsAtom() :
     m_TimeShift(0)
     // MPC-BE custom code end
 {
+    m_LookupCache.entry_index = 0;
+    m_LookupCache.sample      = 0;
+    m_LookupCache.dts         = 0;
 }
 
 /*----------------------------------------------------------------------
@@ -58,6 +61,10 @@ AP4_SttsAtom::AP4_SttsAtom(AP4_Size size, AP4_ByteStream& stream) :
     m_TimeShift(0)
     // MPC-BE custom code end
 {
+    m_LookupCache.entry_index = 0;
+    m_LookupCache.sample      = 0;
+    m_LookupCache.dts         = 0;
+
     AP4_UI32 entry_count;
     stream.ReadUI32(entry_count);
     while (entry_count--) {
@@ -86,25 +93,49 @@ AP4_SttsAtom::AP4_SttsAtom(AP4_Size size, AP4_ByteStream& stream) :
 AP4_Result
 AP4_SttsAtom::GetDts(AP4_Ordinal sample, AP4_TimeStamp& dts, AP4_Duration& duration)
 {
-    AP4_Ordinal sample_count_in_entry = sample;
+    // default value
     dts = 0;
+    duration = 0;
+    
+    // sample indexes start at 1
+    if (sample == 0) return AP4_ERROR_OUT_OF_RANGE;
 
-    for (AP4_UI32 i = 0; i < m_Entries.ItemCount(); i++) {
+    // check the lookup cache
+    AP4_Ordinal lookup_start  = 0;
+    AP4_Ordinal sample_start = 0;
+    AP4_UI64    dts_start    = 0;
+    if (sample >= m_LookupCache.sample) {
+        // start from the cached entry
+        lookup_start = m_LookupCache.entry_index;
+        sample_start = m_LookupCache.sample;
+        dts_start    = m_LookupCache.dts;
+    }
+
+    // look from the last known point
+    for (AP4_Ordinal i = lookup_start; i < m_Entries.ItemCount(); i++) {
         AP4_SttsTableEntry& entry = m_Entries[i];
 
-        // check if we have the correct entry 
-        if (sample_count_in_entry <= entry.m_SampleCount) {
-            dts += (sample_count_in_entry - 1) * entry.m_SampleDuration;
+        // check if we have reached the sample
+        if (sample <= sample_start+entry.m_SampleCount) {
+            // we are within the sample range for the current entry
+            dts = dts_start + (AP4_UI64)(sample-1 - sample_start) * (AP4_UI64)entry.m_SampleDuration;
             duration = entry.m_SampleDuration;
+            
+            // update the lookup cache
+            m_LookupCache.entry_index = i;
+            m_LookupCache.sample      = sample_start;
+            m_LookupCache.dts         = dts_start;
+            
             return AP4_SUCCESS;
-        } else {
-            dts += entry.m_SampleCount * entry.m_SampleDuration;
-            sample_count_in_entry -= entry.m_SampleCount;
         }
+ 
+        // update the sample and dts bases
+        sample_start += entry.m_SampleCount;
+        dts_start    += entry.m_SampleCount*entry.m_SampleDuration;
     }
 
     // sample is greater than the number of samples
-    return AP4_FAILURE;
+    return AP4_ERROR_OUT_OF_RANGE;
 }
 
 /*----------------------------------------------------------------------

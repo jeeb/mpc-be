@@ -45,12 +45,15 @@ class AP4_StssAtom : public AP4_Atom
  public:
     // methods
     AP4_StssAtom(AP4_Size size, AP4_ByteStream& stream);
+    const AP4_Array<AP4_UI32>& GetEntries() { return m_Entries; }
     virtual AP4_Result InspectFields(AP4_AtomInspector& inspector);
     virtual bool       IsSampleSync(AP4_Ordinal sample);
     virtual AP4_Result WriteFields(AP4_ByteStream& stream);
 
-    AP4_Array<AP4_UI32> m_Entries; // FIXME
  private:
+    // members
+    AP4_Array<AP4_UI32> m_Entries;
+    AP4_Ordinal         m_LookupCache;
 };
 
 #endif // _AP4_STSS_ATOM_H_

@@ -38,7 +38,8 @@
 |       AP4_StssAtom::AP4_StssAtom
 +---------------------------------------------------------------------*/
 AP4_StssAtom::AP4_StssAtom(AP4_Size size, AP4_ByteStream& stream) :
-    AP4_Atom(AP4_ATOM_TYPE_STSS, size, true, stream)
+    AP4_Atom(AP4_ATOM_TYPE_STSS, size, true, stream),
+    m_LookupCache(0)
 {
     AP4_UI32 entry_count;
     stream.ReadUI32(entry_count);
@@ -80,12 +81,22 @@ AP4_StssAtom::IsSampleSync(AP4_Ordinal sample)
 {
     unsigned int entry_index = 0;
 
+    // check bounds
+    if (sample == 0 || m_Entries.ItemCount() == 0) return false;
+
+    // see if we can start from the cached index
+    if (m_Entries[m_LookupCache] <= sample) {
+        entry_index = m_LookupCache;
+    }
+
+    // do a linear search
     while (entry_index < m_Entries.ItemCount() &&
-           m_Entries[entry_index] >= sample) {
+           m_Entries[entry_index] <= sample) {
         if (m_Entries[entry_index] == sample) {
+            m_LookupCache = entry_index;
             return true;
         }
-	entry_index++;
+	    entry_index++;
     }
 
     return false;

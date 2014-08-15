@@ -236,7 +236,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mainvideoID = track->GetId();
 			}
 			if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-				if (stss->m_Entries.ItemCount() > 0) {
+				const AP4_Array<AP4_UI32>& entries = stss->GetEntries();
+				if (entries.ItemCount() > 0) {
 					mainvideoID = track->GetId();
 					break;
 				}
@@ -1258,8 +1259,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 			} else if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-				for (AP4_Cardinal i = 0; i < stss->m_Entries.ItemCount(); ++i) {
-					AP4_UI32 index = stss->m_Entries[i] - 1;
+				const AP4_Array<AP4_UI32>& entries = stss->GetEntries();
+				for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
+					AP4_UI32 index = entries[i] - 1;
 
 					AP4_Sample sample;
 					if (AP4_SUCCEEDED(track->GetSample(index, sample))) {
@@ -1315,21 +1317,21 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		if (!movie->HasFragments()) {
 			if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
-				// FIXME: slow search & stss->m_Entries is private
-				if (stss->m_Entries.ItemCount() > 1) {
+				const AP4_Array<AP4_UI32>& entries = stss->GetEntries();
+				if (entries.ItemCount() > 1) {
 					AP4_Cardinal i = 1;
 					bool bFoundKeyFrame = false;
-					while (i < stss->m_Entries.ItemCount()) {
-						if (stss->m_Entries[i] - 1 > pPair->m_value.index) {
+					while (i < entries.ItemCount()) {
+						if (entries[i] - 1 > pPair->m_value.index) {
 							bFoundKeyFrame = true;
 							break;
 						}
 						++i;
 					}
-					if (!bFoundKeyFrame && pPair->m_value.index > stss->m_Entries.ItemCount()) {
-						i = stss->m_Entries.ItemCount();
+					if (!bFoundKeyFrame && pPair->m_value.index > entries.ItemCount()) {
+						i = entries.ItemCount();
 					}
-					pPair->m_value.index = stss->m_Entries[i - 1] - 1;
+					pPair->m_value.index = entries[i - 1] - 1;
 				}
 			}
 		}
