@@ -137,7 +137,6 @@ BOOL CPPageInterface::OnInitDialog()
 	m_TimeTooltipPosition.AddString(ResStr(IDS_TIME_TOOLTIP_ABOVE));
 	m_TimeTooltipPosition.AddString(ResStr(IDS_TIME_TOOLTIP_BELOW));
 	m_TimeTooltipPosition.SetCurSel(s.nTimeTooltipPosition);
-	m_TimeTooltipPosition.EnableWindow(m_fUseTimeTooltip);
 
 	m_OSD_Size	= s.nOSDSize;
 	m_OSD_Font	= s.strOSDFont;
@@ -184,7 +183,7 @@ BOOL CPPageInterface::OnInitDialog()
 	EnableToolTips(TRUE);
 
 	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
-	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek);
+	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek && m_fUseTimeTooltip);
 
 	UpdateData(FALSE);
 
@@ -598,7 +597,7 @@ void CPPageInterface::OnUsePreview()
 	UpdateData();
 
 	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
-	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek);
+	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek && m_fUseTimeTooltip);
 }
 
 void CPPageInterface::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
