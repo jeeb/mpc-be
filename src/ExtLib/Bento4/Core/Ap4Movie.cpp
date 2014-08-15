@@ -301,12 +301,12 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
 						Ap4_FragmentSampleTable* sampleTable = track->GetFragmentSampleTable();
 
 						AP4_Cardinal sample_count = 0;
-						for (AP4_List<AP4_Atom>::Item* item = traf->GetChildren().FirstItem();
-													   item;
-													   item = item->GetNext()) {
-							AP4_Atom* atom = item->GetData();
-							if (atom->GetType() == AP4_ATOM_TYPE_TRUN) {
-								AP4_TrunAtom* trun = AP4_DYNAMIC_CAST(AP4_TrunAtom, traf->GetChild(AP4_ATOM_TYPE_TRUN));
+						for (AP4_List<AP4_Atom>::Item* child_item = traf->GetChildren().FirstItem();
+													   child_item;
+													   child_item = child_item->GetNext()) {
+							AP4_Atom* child_atom = child_item->GetData();
+							if (child_atom->GetType() == AP4_ATOM_TYPE_TRUN) {
+								AP4_TrunAtom* trun = AP4_DYNAMIC_CAST(AP4_TrunAtom, child_atom);
 								if (trun) {
 									sample_count += trun->GetEntries().ItemCount();
 								}
@@ -317,12 +317,12 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
 						}
 
 						AP4_UI64 dts_origin = tfdt ? tfdt->GetBaseMediaDecodeTime() : 0;
-						for (AP4_List<AP4_Atom>::Item* item = traf->GetChildren().FirstItem();
-													   item;
-													   item = item->GetNext()) {
-							AP4_Atom* atom = item->GetData();
-							if (atom->GetType() == AP4_ATOM_TYPE_TRUN) {
-								AP4_TrunAtom* trun = AP4_DYNAMIC_CAST(AP4_TrunAtom, traf->GetChild(AP4_ATOM_TYPE_TRUN));
+						for (AP4_List<AP4_Atom>::Item* child_item = traf->GetChildren().FirstItem();
+													   child_item;
+													   child_item = child_item->GetNext()) {
+							AP4_Atom* child_atom = child_item->GetData();
+							if (child_atom->GetType() == AP4_ATOM_TYPE_TRUN) {
+								AP4_TrunAtom* trun = AP4_DYNAMIC_CAST(AP4_TrunAtom, child_atom);
 								if (trun) {
 									sampleTable->AddTrun(trun, tfhd, trex, stream, dts_origin, moof_offset, mdat_payload_offset);
 								}
