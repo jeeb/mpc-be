@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
 
 // CPPagePlayer dialog
@@ -220,6 +221,16 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_list.InsertColumn(COL_VFR_F, ResStr(IDS_PPAGE_FS_CLN_FROM_FPS), LVCFMT_RIGHT, 60);
 	m_list.InsertColumn(COL_VFR_T, ResStr(IDS_PPAGE_FS_CLN_TO_FPS), LVCFMT_RIGHT, 60);
 	m_list.InsertColumn(COL_SRR, ResStr(IDS_PPAGE_FS_CLN_DISPLAY_MODE), LVCFMT_LEFT, 135);
+
+	if (IsWinVistaOrLater()) {
+		LVCOLUMN col;
+		col.mask = LVCF_MINWIDTH;
+		col.cxMin = 40;
+		for (int nCol = COL_Z; nCol <= COL_SRR; nCol++) {
+			m_list.SetColumn(nCol, &col);
+		}
+		m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_COLUMNSNAPPOINTS);
+	}
 
 	ModesUpdate();
 	UpdateData(FALSE);
