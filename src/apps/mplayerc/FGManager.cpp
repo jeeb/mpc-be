@@ -2770,7 +2770,12 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 					  TRUE, 1, guids, NULL, NULL, TRUE, FALSE, 0, NULL, NULL, NULL))) {
 			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, NULL); pMoniker = NULL) {
 				CFGFilterRegistry f(pMoniker);
-				m_armerit = max(m_armerit, f.GetMerit());
+				// RDP DShow Redirection Filter's merit is so high that it flaws the graph building process so we ignore it.
+				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
+				// should connect between the video decoder and the renderer can't (e.g. VSFilter). - from MPC-HC
+				if (f.GetCLSID() != CLSID_RDPDShowRedirectionFilter) {
+					m_armerit = max(m_armerit, f.GetMerit());
+				}
 			}
 		}
 
@@ -2786,7 +2791,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 #if !DBOXVersion
 	// Switchers
 	if (!m_IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", m_armerit + 0x2000);
+		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", MERIT64_ABOVE_DSHOW);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 		m_transform.AddTail(pFGF);
 
