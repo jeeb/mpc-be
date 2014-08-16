@@ -320,22 +320,6 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 21		"Esporta"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Video renderer"
-7		"Video RealMedia"
-9		"Video QuickTime"
-11		"Impostazioni di VMR-7/VMR-9 (Renderless) e EVR-CP"
-12		"Seleziona D3D9 Render Device"
-14		"Superficie:"
-16		"Resizer:"
-18		"Schermo intero Direct3D"
-19		"VSync alternativo"
-20		"VMR Mixer Mode"
-21		"Resetta quando cambia display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
-END
-
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Audio"
 6		"Volume"
@@ -476,6 +460,22 @@ BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 14		"Abilita supporto Logitech LCD (sperimentale)"
 15		"Ricerca veloce sul fotogramma"
 16		"Abilita file 'MiniDump'"
+END
+
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+5		"Video renderer"
+7		"Video RealMedia"
+9		"Video QuickTime"
+11		"Impostazioni di VMR-7/VMR-9 (Renderless) e EVR-CP"
+12		"Seleziona D3D9 Render Device"
+14		"Superficie:"
+16		"Resizer:"
+18		"Schermo intero Direct3D"
+19		"VSync alternativo"
+20		"VMR Mixer Mode"
+21		"Resetta quando cambia display"
+22		"YUV Mixing"
+23		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1175,7 +1175,6 @@ STRING IDD_PPAGEINTERFACE		"Interfaccia"
 STRING IDD_PPAGEINTERNALFILTERS		"Filtri Interni"
 STRING IDD_PPAGELOGO		"Lettore::Logo"
 STRING IDD_PPAGEMISC		"Altro"
-STRING IDD_PPAGEVIDEO		"Riproduzione::Video"
 STRING IDD_PPAGEPLAYBACK		"Riproduzione"
 STRING IDD_PPAGEPLAYER		"Lettore"
 STRING IDD_PPAGESUBRENDERING		"Sottotitoli::Rendering"
@@ -1183,6 +1182,7 @@ STRING IDD_PPAGESUBSTYLE		"Sottotitoli::Stile Predefinito"
 STRING IDD_PPAGESUBTITLES		"Sottotitoli"
 STRING IDD_PPAGESYNC		"Riproduzione::Impostazioni EVR Sync"
 STRING IDD_PPAGETWEAKS		"Varie"
+STRING IDD_PPAGEVIDEO		"Riproduzione::Video"
 STRING IDD_PPAGEWEBSERVER		"Lettore::Interfaccia Web"
 STRING IDD_PPAGEYOUTUBE		"Riproduzione::YouTube"
 STRING IDF_LOGO1		"Default"

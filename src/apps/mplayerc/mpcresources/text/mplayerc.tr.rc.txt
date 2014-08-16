@@ -320,22 +320,6 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 21		"Ver"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Video renderer"
-7		"RealMedia Video'su"
-9		"QuickTime Video'su"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Yüzey:"
-16		"Resizer:"
-18		"Tam Ekran Direct3D"
-19		"Değişken Eşzam."
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
-END
-
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Ses"
 6		"Ses"
@@ -476,6 +460,22 @@ BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 14		"Enable Logitech LCD support (experimental)"
 15		"Fast seek (on keyframe)"
 16		"Enable MiniDump"
+END
+
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+5		"Video renderer"
+7		"RealMedia Video'su"
+9		"QuickTime Video'su"
+11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+12		"Select D3D9 Render Device"
+14		"Yüzey:"
+16		"Resizer:"
+18		"Tam Ekran Direct3D"
+19		"Değişken Eşzam."
+20		"VMR Mixer Mode"
+21		"Reset when changing display"
+22		"YUV Mixing"
+23		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1175,7 +1175,6 @@ STRING IDD_PPAGEINTERFACE		"Interface"
 STRING IDD_PPAGEINTERNALFILTERS		"Dahili Süzgeçler"
 STRING IDD_PPAGELOGO		"Oynatıcı::Tema"
 STRING IDD_PPAGEMISC		"Çeşitli"
-STRING IDD_PPAGEVIDEO		"Yürütme::Video"
 STRING IDD_PPAGEPLAYBACK		"Yürütme"
 STRING IDD_PPAGEPLAYER		"Oynatıcı"
 STRING IDD_PPAGESUBRENDERING		"Altyazılar::Rendering"
@@ -1183,6 +1182,7 @@ STRING IDD_PPAGESUBSTYLE		"Altyazılar::Görünüm"
 STRING IDD_PPAGESUBTITLES		"Altyazılar"
 STRING IDD_PPAGESYNC		"Yürütme::EVR Zam. Ayarları"
 STRING IDD_PPAGETWEAKS		"İnce Ayarlar"
+STRING IDD_PPAGEVIDEO		"Yürütme::Video"
 STRING IDD_PPAGEWEBSERVER		"Oynatıcı::İnternet Arabirimi"
 STRING IDD_PPAGEYOUTUBE		"Playback::YouTube"
 STRING IDF_LOGO1		"Default"

@@ -320,22 +320,6 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 21		"导出"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Video renderer"
-7		"RealMedia 视频"
-9		"QuickTime 视频"
-11		"VMR-7/VMR-9 (未渲染)and EVR (自定义)设置"
-12		"选择 D3D9 渲染设备"
-14		"表面:"
-16		"改变大小:"
-18		"D3D 全屏"
-19		"其它垂直同步"
-20		"VMR-9 混合器模式"
-21		"在更改显示时重新初始化"
-22		"YUV 混合"
-23		"EVR 缓冲:"
-END
-
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"音频"
 6		"音量"
@@ -476,6 +460,22 @@ BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 14		"开启罗技 LCD 支持(实验性)"
 15		"快速搜索(以关键帧)"
 16		"使用小型存储器转储 (MiniDump)"
+END
+
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+5		"Video renderer"
+7		"RealMedia 视频"
+9		"QuickTime 视频"
+11		"VMR-7/VMR-9 (未渲染)and EVR (自定义)设置"
+12		"选择 D3D9 渲染设备"
+14		"表面:"
+16		"改变大小:"
+18		"D3D 全屏"
+19		"其它垂直同步"
+20		"VMR-9 混合器模式"
+21		"在更改显示时重新初始化"
+22		"YUV 混合"
+23		"EVR 缓冲:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1175,7 +1175,6 @@ STRING IDD_PPAGEINTERFACE		"界面"
 STRING IDD_PPAGEINTERNALFILTERS		"内部滤镜"
 STRING IDD_PPAGELOGO		"播放器::徽标"
 STRING IDD_PPAGEMISC		"其它"
-STRING IDD_PPAGEVIDEO		"回放::Video"
 STRING IDD_PPAGEPLAYBACK		"回放"
 STRING IDD_PPAGEPLAYER		"播放器"
 STRING IDD_PPAGESUBRENDERING		"字幕::渲染"
@@ -1183,6 +1182,7 @@ STRING IDD_PPAGESUBSTYLE		"字幕::默认风格"
 STRING IDD_PPAGESUBTITLES		"字幕"
 STRING IDD_PPAGESYNC		"回放::EVR 同步渲染器 设置"
 STRING IDD_PPAGETWEAKS		"调节"
+STRING IDD_PPAGEVIDEO		"回放::Video"
 STRING IDD_PPAGEWEBSERVER		"播放器::Web 接口"
 STRING IDD_PPAGEYOUTUBE		"回放::YouTube"
 STRING IDF_LOGO1		"默认"

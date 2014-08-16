@@ -320,22 +320,6 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 21		"Exporteren"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Videorenderer"
-7		"RealMedia-video"
-9		"QuickTime-video"
-11		"Instellingen van VMR-7/VMR-9 (Renderless) en EVR-CP"
-12		"Kies D3D9-renderapparaat"
-14		"Oppervlak:"
-16		"Herschalen:"
-18		"D3D-volledigscherm"
-19		"Alternatieve VSync"
-20		"VMR Mixer-modus"
-21		"Herinitialisatie bij verandering van monitor"
-22		"YUV-Mixen"
-23		"EVR-buffers:"
-END
-
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Audio"
 6		"Volume"
@@ -476,6 +460,22 @@ BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 14		"Activeer Logitech LCD-ondersteuning (experimenteel)"
 15		"Snel zoeken (op keyframe)"
 16		"Activeer MiniDump"
+END
+
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+5		"Videorenderer"
+7		"RealMedia-video"
+9		"QuickTime-video"
+11		"Instellingen van VMR-7/VMR-9 (Renderless) en EVR-CP"
+12		"Kies D3D9-renderapparaat"
+14		"Oppervlak:"
+16		"Herschalen:"
+18		"D3D-volledigscherm"
+19		"Alternatieve VSync"
+20		"VMR Mixer-modus"
+21		"Herinitialisatie bij verandering van monitor"
+22		"YUV-Mixen"
+23		"EVR-buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1175,7 +1175,6 @@ STRING IDD_PPAGEINTERFACE		"Interface"
 STRING IDD_PPAGEINTERNALFILTERS		"Interne Filters"
 STRING IDD_PPAGELOGO		"Speler::Logo"
 STRING IDD_PPAGEMISC		"Overige"
-STRING IDD_PPAGEVIDEO		"Weergave::Video"
 STRING IDD_PPAGEPLAYBACK		"Weergave"
 STRING IDD_PPAGEPLAYER		"Speler"
 STRING IDD_PPAGESUBRENDERING		"Ondertiteling::Rendering"
@@ -1183,6 +1182,7 @@ STRING IDD_PPAGESUBSTYLE		"Ondertiteling::Standaardstijl"
 STRING IDD_PPAGESUBTITLES		"Ondertiteling"
 STRING IDD_PPAGESYNC		"Weergave::EVR Sync-instellingen"
 STRING IDD_PPAGETWEAKS		"Tweaks"
+STRING IDD_PPAGEVIDEO		"Weergave::Video"
 STRING IDD_PPAGEWEBSERVER		"Speler::Web Interface"
 STRING IDD_PPAGEYOUTUBE		"Weergave::YouTube"
 STRING IDF_LOGO1		"Standaard"

@@ -320,22 +320,6 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 21		"Экспорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Видео-рендерер"
-7		"RealMedia видео"
-9		"QuickTime видео"
-11		"Параметры VMR-7/9 (renderless) и EVR-CP"
-12		"Устройство D3D9-рендеринга"
-14		"Поверхность:"
-16		"Интерполяция:"
-18		"Полноэкранный Direct3D"
-19		"Альт. VSync"
-20		"Режим VMR Mixer"
-21		"Реинициализация при смене монитора"
-22		"YUV Mixing"
-23		"Буферы EVR:"
-END
-
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Аудио"
 6		"Громкость"
@@ -476,6 +460,22 @@ BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 14		"Включить поддержку Logitech LCD (экспериментально)"
 15		"Быстрая перемотка (по ключевым кадрам)"
 16		"Включить создание MiniDump"
+END
+
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+5		"Видео-рендерер"
+7		"RealMedia видео"
+9		"QuickTime видео"
+11		"Параметры VMR-7/9 (renderless) и EVR-CP"
+12		"Устройство D3D9-рендеринга"
+14		"Поверхность:"
+16		"Интерполяция:"
+18		"Полноэкранный Direct3D"
+19		"Альт. VSync"
+20		"Режим VMR Mixer"
+21		"Реинициализация при смене монитора"
+22		"YUV Mixing"
+23		"Буферы EVR:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1175,7 +1175,6 @@ STRING IDD_PPAGEINTERFACE		"Интерфейс"
 STRING IDD_PPAGEINTERNALFILTERS		"Встроенные фильтры"
 STRING IDD_PPAGELOGO		"Проигрыватель::Логотип"
 STRING IDD_PPAGEMISC		"Разное"
-STRING IDD_PPAGEVIDEO		"Воспроизведение::Видео"
 STRING IDD_PPAGEPLAYBACK		"Воспроизведение"
 STRING IDD_PPAGEPLAYER		"Проигрыватель"
 STRING IDD_PPAGESUBRENDERING		"Субтитры::Отрисовка"
@@ -1183,6 +1182,7 @@ STRING IDD_PPAGESUBSTYLE		"Субтитры::Стандартный стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитры"
 STRING IDD_PPAGESYNC		"Воспроизведение::Настройка EVR Sync"
 STRING IDD_PPAGETWEAKS		"Дополнительно"
+STRING IDD_PPAGEVIDEO		"Воспроизведение::Видео"
 STRING IDD_PPAGEWEBSERVER		"Проигрыватель::Web-интерфейс"
 STRING IDD_PPAGEYOUTUBE		"Воспроизведение::YouTube"
 STRING IDF_LOGO1		"Стандартный"
