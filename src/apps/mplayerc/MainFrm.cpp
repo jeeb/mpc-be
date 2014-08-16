@@ -9825,7 +9825,7 @@ void CMainFrame::OnNormalizeVolume()
 		AppSettings& s = AfxGetAppSettings();
 		CString osdMessage;
 		s.fAudioNormalize = !s.fAudioNormalize;
-		osdMessage = ResStr(s.fAudioNormalize ? IDS_OSD_NORMALIZE_ON : IDS_OSD_NORMALIZE_OFF);
+		osdMessage = ResStr(s.fAudioNormalize ? IDS_OSD_AUTO_GAIN_CONTROL_ON : IDS_OSD_AUTO_GAIN_CONTROL_OFF);
 		pASF->SetNormalizeBoost(s.fAudioNormalize, s.iAudioRecoverStep, s.dAudioBoost_dB);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
 	}
