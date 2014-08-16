@@ -2289,7 +2289,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_AAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
-					(audio[ADEC_AAC]) ? MERIT64_ABOVE_DSHOW+1 : MERIT64_DO_USE);
+					(audio[ADEC_AAC]) ? MERIT64_ABOVE_DSHOW + 1 : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_MPEG2_PACK, MEDIASUBTYPE_RAW_AAC1);
 		pFGF->AddType(MEDIATYPE_MPEG2_PES, MEDIASUBTYPE_RAW_AAC1);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RAW_AAC1);
@@ -2638,10 +2638,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	while (pos) {
 		FilterOverride* fo = s.m_filters.GetPrev(pos);
 
-		if (!fo->fDisabled && fo->name == _T("Broadcom Video Decoder")) {
-			bOverrideBroadcom = true;
-		}
-
 		if (fo->fDisabled || (fo->type == FilterOverride::EXTERNAL && !CPath(MakeFullPath(fo->path)).FileExists())) {
 			continue;
 		}
@@ -2668,34 +2664,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			pFGF->SetTypes(fo->guids);
 			m_override.AddTail(pFGF);
 		}
-	}
-
-	/* Use Broadcom decoder (if installed) for VC-1, H.264 and MPEG-2 */
-	if (!bOverrideBroadcom && !IsPreview) {
-		pFGF = DNew CFGFilterRegistry(GUIDFromCString(_T("{2DE1D17E-46B1-42A8-9AEC-E20E80D9B1A9}")), MERIT64_ABOVE_DSHOW);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_H264);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_h264);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_X264);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_x264);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_VSSH);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_vssh);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DAVC);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_davc);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_PAVC);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_pavc);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_AVC1);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_avc1);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_H264_bis);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CCV1);
-
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_WVC1);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_wvc1);
-
-		pFGF->AddType(MEDIATYPE_DVD_ENCRYPTED_PACK, MEDIASUBTYPE_MPEG2_VIDEO);
-		pFGF->AddType(MEDIATYPE_MPEG2_PACK, MEDIASUBTYPE_MPEG2_VIDEO);
-		pFGF->AddType(MEDIATYPE_MPEG2_PES, MEDIASUBTYPE_MPEG2_VIDEO);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG2_VIDEO);
-		m_transform.AddHead(pFGF);
 	}
 }
 
@@ -2834,21 +2802,21 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", m_vrmerit));
 				break;
 			case VIDRNDT_DS_NULL_COMP:
-				pFGF = DNew CFGFilterInternal<CNullVideoRenderer>(L"Null Video Renderer (Any)", MERIT64_ABOVE_DSHOW+2);
+				pFGF = DNew CFGFilterInternal<CNullVideoRenderer>(L"Null Video Renderer (Any)", MERIT64_ABOVE_DSHOW + 2);
 				pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
 				m_transform.AddTail(pFGF);
 				break;
 			case VIDRNDT_DS_NULL_UNCOMP:
-				pFGF = DNew CFGFilterInternal<CNullUVideoRenderer>(L"Null Video Renderer (Uncompressed)", MERIT64_ABOVE_DSHOW+2);
+				pFGF = DNew CFGFilterInternal<CNullUVideoRenderer>(L"Null Video Renderer (Uncompressed)", MERIT64_ABOVE_DSHOW + 2);
 				pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
 				m_transform.AddTail(pFGF);
 				break;
 		}
 	} else {
 		if (IsWinVistaOrLater()) {
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"EVR - Preview Window", MERIT64_ABOVE_DSHOW+2));
+			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"EVR - Preview Window", MERIT64_ABOVE_DSHOW + 2));
 		} else {
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"VMR9 - Preview window", MERIT64_ABOVE_DSHOW+2));
+			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"VMR9 - Preview window", MERIT64_ABOVE_DSHOW + 2));
 		}
 	}
 
