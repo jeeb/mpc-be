@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "../../DSUtil/SysVersion.h"
 #include "PPageAccelTbl.h"
 
 
@@ -1506,6 +1507,16 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	}
 
 	SetupList();
+
+	if (IsWinVistaOrLater()) {
+		LVCOLUMN col;
+		col.mask = LVCF_MINWIDTH;
+		col.cxMin = 20;
+		for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
+			m_list.SetColumn(nCol, &col);
+		}
+		m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_COLUMNSNAPPOINTS);
+	}
 
 	// subclass the keylist control
 	OldControlProc = (WNDPROC) SetWindowLongPtr(m_list.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);
