@@ -366,7 +366,6 @@ AP4_HintTrack::SetSdpText(const char* text)
 /*----------------------------------------------------------------------
 |       AP4_Track::GetTrackName
 +---------------------------------------------------------------------*/
-
 AP4_String
 AP4_Track::GetTrackName()
 {
@@ -379,7 +378,6 @@ AP4_Track::GetTrackName()
 /*----------------------------------------------------------------------
 |       AP4_Track::GetTrackLanguage
 +---------------------------------------------------------------------*/
-
 AP4_String
 AP4_Track::GetTrackLanguage()
 {
@@ -392,7 +390,6 @@ AP4_Track::GetTrackLanguage()
 /*----------------------------------------------------------------------
 |       AP4_Track::SetPalette
 +---------------------------------------------------------------------*/
-
 AP4_Result
 AP4_Track::SetPalette(AP4_UI32 Palette[256])
 {
@@ -400,4 +397,33 @@ AP4_Track::SetPalette(AP4_UI32 Palette[256])
     m_hasPalette = true;
 
     return AP4_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_Track::CreateFragmentFromStdSamples
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_Track::CreateFragmentFromStdSamples()
+{
+    if (m_SampleTable && m_SampleTable->GetSampleCount() && m_FragmentSampleTable.GetSampleCount() == 0) {
+        AP4_Array<AP4_Sample>& samples = m_FragmentSampleTable.GetSampleTable();
+        if (AP4_FAILED(samples.SetItemCount(m_SampleTable->GetSampleCount()))) {
+            return AP4_FAILURE;
+        }
+
+        AP4_Duration duration = m_FragmentSampleTable.GetDuration();
+        for (AP4_Cardinal i = 0; i < m_SampleTable->GetSampleCount(); i++) {
+            AP4_Sample sample;
+            if (AP4_SUCCEEDED(m_SampleTable->GetSample(i, sample))) {
+                samples[i] = sample;
+                duration += sample.GetDuration();
+            }
+        }
+
+        if (duration > m_FragmentSampleTable.GetDuration()) {
+            m_FragmentSampleTable.SetDuration(duration);
+        }
+    }
+
+	return AP4_SUCCESS;
 }

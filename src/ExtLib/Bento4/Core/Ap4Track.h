@@ -111,7 +111,8 @@ class AP4_Track {
 
     AP4_UI64      GetTimeShift() const { return m_TimeShift; }
 
-    Ap4_FragmentSampleTable* GetFragmentSampleTable() { return &m_FragmentSampleTable; }
+    AP4_FragmentSampleTable* GetFragmentSampleTable() { return &m_FragmentSampleTable; }
+    AP4_Result               CreateFragmentFromStdSamples();
 
  protected:
     // members
@@ -127,7 +128,7 @@ class AP4_Track {
 
     AP4_UI64         m_TimeShift;
 
-    Ap4_FragmentSampleTable m_FragmentSampleTable;
+    AP4_FragmentSampleTable m_FragmentSampleTable;
 };
 
 #endif // _AP4_TRAK_H_

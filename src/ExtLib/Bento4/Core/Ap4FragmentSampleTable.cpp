@@ -18,18 +18,18 @@
 const AP4_UI32 AP4_FRAG_FLAG_SAMPLE_IS_DIFFERENCE = 0x00010000;
 
 /*----------------------------------------------------------------------
-|       Ap4_FragmentSampleTable::Ap4_FragmentSampleTable
+|       AP4_FragmentSampleTable::AP4_FragmentSampleTable
 +---------------------------------------------------------------------*/
-Ap4_FragmentSampleTable::Ap4_FragmentSampleTable() :
+AP4_FragmentSampleTable::AP4_FragmentSampleTable() :
 	m_Duration(0)
 {
 }
 
 /*----------------------------------------------------------------------
-|       Ap4_FragmentSampleTable::GetSample
+|       AP4_FragmentSampleTable::GetSample
 +---------------------------------------------------------------------*/
 AP4_Result
-Ap4_FragmentSampleTable::GetSample(AP4_Ordinal index, AP4_Sample& sample)
+AP4_FragmentSampleTable::GetSample(AP4_Ordinal index, AP4_Sample& sample)
 {
 	if (index >= m_FragmentSamples.ItemCount()) return AP4_ERROR_OUT_OF_RANGE;
 
@@ -41,10 +41,10 @@ Ap4_FragmentSampleTable::GetSample(AP4_Ordinal index, AP4_Sample& sample)
 }
 
 /*----------------------------------------------------------------------
-|       Ap4_FragmentSampleTable::AddTrun
+|       AP4_FragmentSampleTable::AddTrun
 +---------------------------------------------------------------------*/
 AP4_Result
-Ap4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_TrexAtom* trex, AP4_ByteStream& stream, AP4_UI64& dts_origin, AP4_Offset moof_offset, AP4_Offset& mdat_payload_offset)
+AP4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_TrexAtom* trex, AP4_ByteStream& stream, AP4_UI64& dts_origin, AP4_Offset moof_offset, AP4_Offset& mdat_payload_offset)
 {
 	if (trun) {
 		AP4_Flags tfhd_flags = tfhd->GetFlags();
@@ -170,10 +170,10 @@ Ap4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_Tre
 }
 
 /*----------------------------------------------------------------------
-|       Ap4_FragmentSampleTable::GetSampleIndexForTimeStamp
+|       AP4_FragmentSampleTable::GetSampleIndexForTimeStamp
 +---------------------------------------------------------------------*/
 AP4_Result
-Ap4_FragmentSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordinal& index)
+AP4_FragmentSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordinal& index)
 {
 	for (AP4_Ordinal i = 0; i < m_FragmentSamples.ItemCount(); i++) {
 		if (m_FragmentSamples[i].GetCts() > ts) {
@@ -184,13 +184,4 @@ Ap4_FragmentSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, AP4_Ordina
 	}
 
 	return AP4_FAILURE;
-}
-
-/*----------------------------------------------------------------------
-|       Ap4_FragmentSampleTable::EnsureCapacity
-+---------------------------------------------------------------------*/
-AP4_Result
-Ap4_FragmentSampleTable::EnsureCapacity(AP4_Cardinal sample_count)
-{
-	return m_FragmentSamples.EnsureCapacity(sample_count);
 }

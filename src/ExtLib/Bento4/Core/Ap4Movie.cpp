@@ -298,7 +298,7 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
 							}
 						}
 
-						Ap4_FragmentSampleTable* sampleTable = track->GetFragmentSampleTable();
+						AP4_FragmentSampleTable* sampleTable = track->GetFragmentSampleTable();
 
 						AP4_Cardinal sample_count = 0;
 						for (AP4_List<AP4_Atom>::Item* child_item = traf->GetChildren().FirstItem();
@@ -312,7 +312,16 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
 								}
 							}
 						}
-						if (!sample_count || AP4_FAILED(sampleTable->EnsureCapacity(sample_count + sampleTable->GetSampleCount()))) {
+
+						if (!sample_count) {
+							return;
+						}
+
+						if (sampleTable->GetSampleCount() == 0) {
+							track->CreateFragmentFromStdSamples();
+						}
+
+						if (AP4_FAILED(sampleTable->EnsureCapacity(sample_count + sampleTable->GetSampleCount()))) {
 							return;
 						}
 
