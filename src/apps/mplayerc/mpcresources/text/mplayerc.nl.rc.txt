@@ -146,11 +146,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 12		"Resetten"
 13		"Instellingen voor audio inladen"
 14		"Prefereer externe audiobestanden boven ingesloten audiospoor"
-16		"Sound processing"
+16		"Geluidsbewerking"
 17		"Audio-tijdsverschuiving (ms):"
-20		"Auto gain control"
+20		"Automatische versterkingsregeling"
 21		"Boost:"
-23		"Rate of increase volume:"
+23		"Tempo van volumetoename:"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -321,7 +321,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Video renderer"
+5		"Videorenderer"
 7		"RealMedia-video"
 9		"QuickTime-video"
 11		"Instellingen van VMR-7/VMR-9 (Renderless) en EVR-CP"
@@ -388,7 +388,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 31		"Geschiedenis"
 32		"Laatste Pan&&Scan-zoom onthouden"
 33		"Laatste afspeellijst onthouden"
-34		"Number of recent files:"
+34		"Aantal recente bestanden:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
@@ -1646,7 +1646,7 @@ STRING IDS_MFMT_WAVPACK		"WavPack"
 STRING IDS_MFMT_WEBM		"WebM"
 STRING IDS_MFMT_WMA		"Windows Media Audio"
 STRING IDS_MFMT_WMV		"Windows Media Video"
-STRING IDS_MKVSPLT_CALC_DURATION		"Calculate the duration based on the video data"
+STRING IDS_MKVSPLT_CALC_DURATION		"Tijdsduur berekenen gebaseerd op videodata"
 STRING IDS_MKVSPLT_LOAD_EMBEDDED_FONTS		"Laad ingesloten lettertypen"
 STRING IDS_MPADEC_AC3ENCODE		"Naar AC-3 coderen"
 STRING IDS_MPADEC_DRC		"DRC voor AC-3/E-AC3 toepassen"
