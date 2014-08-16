@@ -2083,7 +2083,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	// hmmm, shouldn't there be an option in the GUI to enable/disable this filter?
-	pFGF = DNew CFGFilterInternal<CAVI2AC3Filter>(AVI2AC3FilterName, MERIT64(0x00680000)+1);
+	pFGF = DNew CFGFilterInternal<CAVI2AC3Filter>(AVI2AC3FilterName, MERIT64(0x00680000) + 1);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVE_DOLBY_AC3);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DTS2);
 	m_transform.AddTail(pFGF);
@@ -2700,8 +2700,8 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 
 CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CFGManagerCustom(pName, pUnk, hWnd, IsPreview)
-	, m_vrmerit(MERIT64(MERIT_PREFERRED))
-	, m_armerit(MERIT64(MERIT_PREFERRED))
+	, m_vrmerit(MERIT64_PREFERRED)
+	, m_armerit(MERIT64_PREFERRED)
 {
 	DbgLog((LOG_TRACE, 3, L"--> CFGManagerPlayer::CFGManagerPlayer on thread: %d", GetCurrentThreadId()));
 	CFGFilter* pFGF;
