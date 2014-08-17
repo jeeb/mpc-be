@@ -16446,8 +16446,10 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					}
 				}
 
-				if (!sep && (cStreamsA > 1) && fExternal) {
-					pSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
+				if (!sep && cStreamsA > 1 && fExternal) {
+					if (pSub->GetMenuItemCount()) {
+						pSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
+					}
 					sep = true;
 				}
 
