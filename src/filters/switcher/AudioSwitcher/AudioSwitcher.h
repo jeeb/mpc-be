@@ -43,7 +43,7 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	double m_normalizeFactor;
 	float m_boost_mul;
 
-	REFERENCE_TIME m_rtNextStart, m_rtNextStop;
+	REFERENCE_TIME m_rtNextStart;
 
 public:
 	CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr);

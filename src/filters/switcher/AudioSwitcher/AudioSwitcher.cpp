@@ -29,6 +29,44 @@
 #define NORMALIZATION_REGAIN_STEP      20
 #define NORMALIZATION_REGAIN_THRESHOLD 0.75
 
+enum e_sample_format { SF_NONE, SF_UINT8, SF_INT16, SF_INT24, SF_INT32, SF_FLOAT, SF_DOUBLE };
+
+e_sample_format GetSampleFormat(WAVEFORMATEX* wfe)
+{
+	e_sample_format sample_format = SF_NONE;
+
+	WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+	WORD tag = wfe->wFormatTag;
+
+	if (tag == WAVE_FORMAT_PCM || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_PCM)) {
+		switch (wfe->wBitsPerSample) {
+		case 8:
+			sample_format = SF_UINT8;
+			break;
+		case 16:
+			sample_format = SF_INT16;
+			break;
+		case 24:
+			sample_format = SF_INT24;
+			break;
+		case 32:
+			sample_format = SF_INT32;
+			break;
+		}
+	} else if (tag == WAVE_FORMAT_IEEE_FLOAT || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)) {
+		switch (wfe->wBitsPerSample) {
+		case 32:
+			sample_format = SF_FLOAT;
+			break;
+		case 64:
+			sample_format = SF_DOUBLE;
+			break;
+		}
+	}
+
+	return sample_format;
+}
+
 #ifdef REGISTER_FILTER
 
 #include <InitGuid.h>
@@ -84,7 +122,6 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CStreamSwitcherFilter(lpunk, phr, __uuidof(this))
 	, m_rtAudioTimeShift(0)
 	, m_rtNextStart(0)
-	, m_rtNextStop(1)
 	, m_fNormalize(false)
 	, m_iRecoverStep(NORMALIZATION_REGAIN_STEP)
 	, m_normalizeFactor(4.0)
@@ -124,6 +161,8 @@ HRESULT CAudioSwitcherFilter::CheckMediaType(const CMediaType* pmt)
 
 HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 {
+	HRESULT hr;
+
 	CStreamSwitcherInputPin* pInPin = GetInputPin();
 	CStreamSwitcherOutputPin* pOutPin = GetOutputPin();
 	if (!pInPin || !pOutPin) {
@@ -134,130 +173,79 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	WAVEFORMATEX* wfeout = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
 	WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
 
-	int bps = wfe->wBitsPerSample>>3;
-
-	int len = pIn->GetActualDataLength() / (bps*wfe->nChannels);
-	int lenout = (UINT64)len * wfeout->nSamplesPerSec / wfe->nSamplesPerSec;
-
-	REFERENCE_TIME rtStart, rtStop;
-	if (SUCCEEDED(pIn->GetTime(&rtStart, &rtStop))) {
-		rtStart += m_rtAudioTimeShift;
-		rtStop += m_rtAudioTimeShift;
-		pOut->SetTime(&rtStart, &rtStop);
-
-		m_rtNextStart = rtStart;
-		m_rtNextStop = rtStop;
-	} else {
-		pOut->SetTime(&m_rtNextStart, &m_rtNextStop);
+	e_sample_format sample_format = GetSampleFormat(wfe);
+	if (sample_format == SF_NONE) {
+		return __super::Transform(pIn, pOut);
 	}
 
-	REFERENCE_TIME rtDur = 10000000i64*len/wfe->nSamplesPerSec;
+	const unsigned in_bytespersample = wfe->wBitsPerSample / 8;
+	const unsigned in_samples        = pIn->GetActualDataLength() / (wfe->nChannels * in_bytespersample);
+	const unsigned in_allsamples     = in_samples * wfe->nChannels;
+	const size_t   in_size           = in_allsamples * in_bytespersample;
 
-	m_rtNextStart += rtDur;
-	m_rtNextStop += rtDur;
+	REFERENCE_TIME rtDur = 10000000i64 * in_samples / wfe->nSamplesPerSec;
+
+	REFERENCE_TIME rtStart, rtStop;
+	if (FAILED(pIn->GetTime(&rtStart, &rtStop))) {
+		rtStart = m_rtNextStart;
+		rtStop  = m_rtNextStart + rtDur;
+	}
+	m_rtNextStart = rtStop;
 
 	if (pIn->IsDiscontinuity() == S_OK) {
 		m_normalizeFactor = 4.0;
 	}
 
-	WORD tag = wfe->wFormatTag;
-	bool fPCM = tag == WAVE_FORMAT_PCM || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_PCM);
-	bool fFloat = tag == WAVE_FORMAT_IEEE_FLOAT || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
-	if (!fPCM && !fFloat) {
-		return __super::Transform(pIn, pOut);
-	}
 
 	BYTE* pDataIn = NULL;
 	BYTE* pDataOut = NULL;
-
-	HRESULT hr;
-	if (FAILED(hr = pIn->GetPointer(&pDataIn))) {
-		return hr;
-	}
-	if (FAILED(hr = pOut->GetPointer(&pDataOut))) {
+	if (FAILED(hr = pIn->GetPointer(&pDataIn)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
 	}
 
-	if (!pDataIn || !pDataOut || len < 0 || lenout < 0) {
+	if (!pDataIn || !pDataOut || in_samples < 0) {
 		return S_FALSE;
 	}
-	// len = 0 doesn't mean it's failed, return S_OK otherwise might screw the sound
-	if (len == 0) {
+
+	// in_samples = 0 doesn't mean it's failed, return S_OK otherwise might screw the sound
+	if (in_samples == 0) {
 		pOut->SetActualDataLength(0);
 		return S_OK;
 	}
+	
 
-	{
-		HRESULT hr2;
-		if (S_OK != (hr2 = __super::Transform(pIn, pOut))) {
-			return hr2;
-		}
+	// copy input data to output and SetActualDataLength for output
+	if (S_OK != (hr = __super::Transform(pIn, pOut))) {
+		return hr;
 	}
+	const size_t out_allsamples = pOut->GetActualDataLength() / in_bytespersample;
 
 	if (m_fNormalize ||  m_boost_mul > 1.0f) {
-		size_t samples = lenout * wfeout->nChannels;
 		double sample_mul = 1.0;
 
 		if (m_fNormalize) {
 			double sample_max = 0.0;
 
 			// calculate max peak
-			if (fPCM) {
-				int32_t maxpeak = 0;
-				if (wfe->wBitsPerSample == 8) {
-					for (size_t i = 0; i < samples; i++) {
-						int32_t peak = abs((int8_t)(pDataOut[i] ^ 0x80));
-						if (peak > maxpeak) {
-							maxpeak = peak;
-						}
-					}
-					sample_max = (double)maxpeak / INT8_MAX;
-				} else if (wfe->wBitsPerSample == 16) {
-					for (size_t i = 0; i < samples; i++) {
-						int32_t peak = abs(((int16_t*)pDataOut)[i]);
-						if (peak > maxpeak) {
-							maxpeak = peak;
-						}
-					}
-					sample_max = (double)maxpeak / INT16_MAX;
-				} else if (wfe->wBitsPerSample == 24) {
-					for (size_t i = 0; i < samples; i++) {
-						int32_t peak = 0;
-						BYTE* p = (BYTE*)(&peak);
-						p[1] = pDataOut[i * 3];
-						p[2] = pDataOut[i * 3 + 1];
-						p[3] = pDataOut[i * 3 + 2];
-						peak = abs(peak);
-						if (peak > maxpeak) {
-							maxpeak = peak;
-						}
-					}
-					sample_max = (double)maxpeak / INT32_MAX;
-				} else if (wfe->wBitsPerSample == 32) {
-					for (size_t i = 0; i < samples; i++) {
-						int32_t peak = abs(((int32_t*)pDataOut)[i]);
-						if (peak > maxpeak) {
-							maxpeak = peak;
-						}
-					}
-					sample_max = (double)maxpeak / INT32_MAX;
-				}
-			} else if (fFloat) {
-				if (wfe->wBitsPerSample == 32) {
-					for (size_t i = 0; i < samples; i++) {
-						double sample = (double)abs(((float*)pDataOut)[i]);
-						if (sample > sample_max) {
-							sample_max = sample;
-						}
-					}
-				} else if (wfe->wBitsPerSample == 64) {
-					for (size_t i = 0; i < samples; i++) {
-						double sample = (double)abs(((double*)pDataOut)[i]);
-						if (sample > sample_max) {
-							sample_max = sample;
-						}
-					}
-				}
+			switch (sample_format) {
+			case SF_UINT8:
+				sample_max = get_max_peak_uint8((uint8_t*)pDataOut, out_allsamples);
+				break;
+			case SF_INT16:
+				sample_max = get_max_peak_int16((int16_t*)pDataOut, out_allsamples);
+				break;
+			case SF_INT24:
+				sample_max = get_max_peak_int24(pDataOut, out_allsamples);
+				break;
+			case SF_INT32:
+				sample_max = get_max_peak_int32((int32_t*)pDataOut, out_allsamples);
+				break;
+			case SF_FLOAT:
+				sample_max = get_max_peak_float((float*)pDataOut, out_allsamples);
+				break;
+			case SF_DOUBLE:
+				sample_max = get_max_peak_double((double*)pDataOut, out_allsamples);
+				break;
 			}
 
 			double normFact = 1.0 / sample_max;
@@ -279,27 +267,32 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 
 		if (sample_mul != 1.0) {
-			if (fPCM) {
-				if (wfe->wBitsPerSample == 8) {
-					gain_uint8(sample_mul, samples, (uint8_t*)pDataOut);
-				} else if(wfe->wBitsPerSample == 16) {
-					gain_int16(sample_mul, samples, (int16_t*)pDataOut);
-				} else if(wfe->wBitsPerSample == 24) {
-					gain_int24(sample_mul, samples, pDataOut);
-				} else if(wfe->wBitsPerSample == 32) {
-					gain_int32(sample_mul, samples, (int32_t*)pDataOut);
-				}
-			} else if (fFloat) {
-				if (wfe->wBitsPerSample == 32) {
-					gain_float(sample_mul, samples, (float*)pDataOut);
-				} else if(wfe->wBitsPerSample == 64) {
-					gain_double(sample_mul, samples, (double*)pDataOut);
-				}
+			switch (sample_format) {
+			case SF_UINT8:
+				gain_uint8(sample_mul, out_allsamples, (uint8_t*)pDataOut);
+				break;
+			case SF_INT16:
+				gain_int16(sample_mul, out_allsamples, (int16_t*)pDataOut);
+				break;
+			case SF_INT24:
+				gain_int24(sample_mul, out_allsamples, pDataOut);
+				break;
+			case SF_INT32:
+				gain_int32(sample_mul, out_allsamples, (int32_t*)pDataOut);
+				break;
+			case SF_FLOAT:
+				gain_float(sample_mul, out_allsamples, (float*)pDataOut);
+				break;
+			case SF_DOUBLE:
+				gain_double(sample_mul, out_allsamples, (double*)pDataOut);
+				break;
 			}
 		}
 	}
 
-	pOut->SetActualDataLength(lenout * bps * wfeout->nChannels);
+	rtStart += m_rtAudioTimeShift;
+	rtStop  += m_rtAudioTimeShift;
+	pOut->SetTime(&rtStart, &rtStop);
 
 	return S_OK;
 }
