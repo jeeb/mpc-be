@@ -5137,7 +5137,7 @@ void CMainFrame::OnFileOpenQuick()
 	CAtlArray<CString> mask;
 	s.m_Formats.GetFilter(filter, mask);
 
-	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
+	DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR;
 	if (!s.fKeepHistory) {
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
@@ -5746,7 +5746,7 @@ void CMainFrame::OnFileSaveAs()
 	ext_list.Append(ResStr(IDS_MAINFRM_48));
 
 	CFileDialog fd(FALSE, 0, out,
-				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
+				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 				   ext_list, GetModalParent(), 0);
 
 	if (OpenImageCheck(in)) {
@@ -6571,7 +6571,7 @@ void CMainFrame::OnFileLoadSubtitle()
 	szFilter += L"||";
 
 	CFileDialog fd(TRUE, NULL, NULL,
-				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
+				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT,
 				   szFilter, GetModalParent(), 0);
 	fd.m_ofn.lpstrInitialDir = GetFolderOnly(GetCurFileName()).AllocSysString();
 
@@ -6579,9 +6579,15 @@ void CMainFrame::OnFileLoadSubtitle()
 		return;
 	}
 
+	CAtlList<CString> fns;
+	POSITION pos = fd.GetStartPosition();
+	while (pos) {
+		fns.AddTail(fd.GetNextPathName(pos));
+	}
+
 	if (b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)fd.GetPathName()))) {
+		if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)fns.GetHead()))) {
 			pDVS->put_SelectedLanguage(0);
 			pDVS->put_HideSubtitles(true);
 			pDVS->put_HideSubtitles(false);
@@ -6589,11 +6595,14 @@ void CMainFrame::OnFileLoadSubtitle()
 		return;
 	}
 
-	ISubStream *pSubStream = NULL;
-	if (LoadSubtitle(fd.GetPathName(), &pSubStream)) {
-		SetSubtitle(pSubStream);    // the subtitle at the insert position according to LoadSubtitle()
-
-		AddSubtitlePathsAddons(fd.GetPathName());
+	pos = fns.GetHeadPosition();
+	while (pos) {
+		CString fname = fns.GetNext(pos);
+		ISubStream *pSubStream = NULL;
+		if (LoadSubtitle(fname, &pSubStream)) {
+			SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
+			AddSubtitlePathsAddons(fname);
+		}
 	}
 }
 
@@ -6617,7 +6626,7 @@ void CMainFrame::OnFileLoadAudio()
 	CString path = AddSlash(GetFolderOnly(GetCurFileName()));
 
 	CFileDialog fd(TRUE, NULL, NULL,
-				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
+				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT,
 				   filter, GetModalParent(), 0);
 
 	fd.m_ofn.lpstrInitialDir = path;
@@ -6628,16 +6637,20 @@ void CMainFrame::OnFileLoadAudio()
 
 	CPlaylistItem* pli = m_wndPlaylistBar.GetCur();
 	if (pli && pli->m_fns.GetCount()) {
-		const CString pathName = fd.GetPathName();
-		AddAudioPathsAddons(pathName);
-		pli->m_fns.AddTail(pathName);
+		POSITION pos = fd.GetStartPosition();
+		while (pos) {
+			CString fname = fd.GetNextPathName(pos);
 
-		if (SUCCEEDED(m_pGB->RenderFile(pathName, NULL))) {
-			CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
-			if (pSSa) {
-				DWORD cStreams = 0;
-				if (SUCCEEDED(pSSa->Count(&cStreams)) && cStreams > 0) {
-					pSSa->Enable(cStreams - 1, AMSTREAMSELECTENABLE_ENABLE);
+			if (SUCCEEDED(m_pGB->RenderFile(fname, NULL))) {
+				pli->m_fns.AddTail(fname);
+				AddAudioPathsAddons(fname);
+
+				CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
+				if (pSSa) {
+					DWORD cStreams = 0;
+					if (SUCCEEDED(pSSa->Count(&cStreams)) && cStreams > 0) {
+						pSSa->Enable(cStreams - 1, AMSTREAMSELECTENABLE_ENABLE);
+					}
 				}
 			}
 		}
@@ -6672,7 +6685,7 @@ void CMainFrame::OnFileSaveSubtitle()
 				// remember to set lpszDefExt to the first extension in the filter so that the save dialog autocompletes the extension
 				// and tracks attempts to overwrite in a graceful manner
 				CFileDialog fd(FALSE, _T("idx"), suggestedFileName,
-							   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
+							   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 							   _T("VobSub (*.idx, *.sub)|*.idx;*.sub||"), GetModalParent(), 0);
 
 				if (fd.DoModal() == IDOK) {
