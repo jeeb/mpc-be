@@ -392,12 +392,12 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 								}
 							}
 							if (bIsSplitter) {
-								CFGFilter* pFGFAsync = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_PRIORITY + 1);
+								CFGFilter* pFGFAsync = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_HIGH + 1);
 								fl.Insert(pFGFAsync, 0);
 							}
 						}
 						
-						pFGF->SetMerit(MERIT64_PRIORITY);
+						pFGF->SetMerit(MERIT64_HIGH);
 						fl.Insert(pFGF, 0, false, false);
 
 						break;
@@ -1130,7 +1130,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			}
 
 			BOOL bIsEnd = FALSE;
-			if (pFGF->GetMerit() == MERIT64_PRIORITY) {
+			if (pFGF->GetMerit() == MERIT64_HIGH) {
 				DbgLog((LOG_TRACE, 3, L"FGM: Connecting priority filter '%s' FAILED!", pFGF->GetName()));
 				bIsEnd = TRUE;
 			} else {
@@ -2758,7 +2758,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 #if !DBOXVersion
 	if (!m_IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", MERIT64_MAX);
+		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", MERIT64_HIGHEST);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 		m_transform.AddTail(pFGF);
 

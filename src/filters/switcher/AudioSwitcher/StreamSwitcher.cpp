@@ -1027,18 +1027,18 @@ HRESULT CStreamSwitcherOutputPin::DecideBufferSize(IMemAllocator* pAllocator, AL
 
 // virtual
 
-class __declspec(uuid("AEFA5024-215A-4FC7-97A4-1043C86FD0B8"))
-		MatrixMixer {};
-
 HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 {
 	CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPin);
 
+	CLSID clsid = GetCLSID(pBF);
+
 	return
 		IsAudioWaveRenderer(pBF)
-			|| GetCLSID(pBF) == __uuidof(MatrixMixer)
-			|| GetCLSID(pBF) == CLSID_InfTee
-			|| CStringFromGUID(GetCLSID(pBF)) == L"{B86F6BEE-E7C0-4D03-8D52-5B4430CF6C88}" // ffdshow Audio Processor
+			|| clsid == CLSID_InfTee
+			|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer
+			|| clsid == GUIDFromCString(L"{A753A1EC-973E-4718-AF8E-A3F554D45C44}") // AC3Filter
+			|| clsid == GUIDFromCString(L"{B86F6BEE-E7C0-4D03-8D52-5B4430CF6C88}") // ffdshow Audio Processor
 		? __super::CheckConnect(pPin)
 		: E_FAIL;
 
