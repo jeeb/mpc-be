@@ -1035,7 +1035,10 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 	CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPin);
 
 	return
-		IsAudioWaveRenderer(pBF) || GetCLSID(pBF) == __uuidof(MatrixMixer) || GetCLSID(pBF) == CLSID_InfTee
+		IsAudioWaveRenderer(pBF)
+			|| GetCLSID(pBF) == __uuidof(MatrixMixer)
+			|| GetCLSID(pBF) == CLSID_InfTee
+			|| CStringFromGUID(GetCLSID(pBF)) == L"{B86F6BEE-E7C0-4D03-8D52-5B4430CF6C88}" // ffdshow Audio Processor
 		? __super::CheckConnect(pPin)
 		: E_FAIL;
 
