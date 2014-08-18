@@ -4468,7 +4468,7 @@ void CMainFrame::OnStreamAudio(UINT nID)
 			}
 		}
 
-		CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
+		CComQIPtr<IAMStreamSelect> pSSa = m_pSwitcherFilter;
 		if (pSSa) {
 			DWORD cStreamsA = 0;
 			int i;
@@ -6655,6 +6655,9 @@ void CMainFrame::OnFileLoadAudio()
 			}
 		}
 	}
+
+	m_pSwitcherFilter.Release();
+	m_pSwitcherFilter = FindSwitcherFilter();
 }
 
 void CMainFrame::OnFileSaveSubtitle()
@@ -9317,7 +9320,7 @@ void CMainFrame::OnPlayAudio(UINT nID)
 {
 	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
 
-	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+	CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 
 	if (i == -1) {
 		ShowOptions(CPPageAudio::IDD);
@@ -9353,7 +9356,7 @@ void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 	UINT nID = pCmdUI->m_nID;
 	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
 
-	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+	CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 
 	/*if (i == -1)
 	{
@@ -9677,7 +9680,7 @@ void CMainFrame::OnSelectStream(UINT nID)
 
 	if (iGr == 1) { // Audio Stream
 		bool bExternalTrack = false;
-		CComQIPtr<IAMStreamSelect> pSSA = FindSwitcherFilter();
+		CComQIPtr<IAMStreamSelect> pSSA = m_pSwitcherFilter;
 		if (pSSA) {
 			DWORD cStreamsA = 0;
 			if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
@@ -14067,7 +14070,7 @@ void CMainFrame::OpenSetupAudioStream()
 			}
 		}
 
-		CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
+		CComQIPtr<IAMStreamSelect> pSSa = m_pSwitcherFilter;
 		if (pSSa) {
 
 			/*
@@ -14278,7 +14281,7 @@ void CMainFrame::OpenSetupAudioStream()
 	// if no selected above ...
 	/*
 	AudioSwitcher always select first stream
-	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+	CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 	if (pSS) {
 		pSS->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
 	}
@@ -15045,6 +15048,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
+		m_pSwitcherFilter = FindSwitcherFilter();
+
 		OpenSetupAudioStream();
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
@@ -15175,6 +15180,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMC.Release();
 	m_pMainFSF.Release();
 	m_pMainSourceFilter.Release();
+	m_pSwitcherFilter.Release();
 
 	if (m_pGB) {
 		m_pGB->RemoveFromROT();
@@ -15202,7 +15208,6 @@ void CMainFrame::CloseMediaPrivate()
 	}
 
 	m_pProv.Release();
-	m_pMainSourceFilter.Release();
 
 	m_fRealMediaGraph = m_fShockwaveGraph = m_fQuicktimeGraph = false;
 
@@ -15634,7 +15639,7 @@ void CMainFrame::SetupAudioSwitcherSubMenu()
 	if (m_iMediaLoadState == MLS_LOADED) {
 		UINT id = ID_AUDIO_SUBITEM_START;
 
-		CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 		if (pSS) {
 			DWORD cStreams = 0;
 			if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
@@ -16350,7 +16355,7 @@ void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
 {
 	bool bSetCheck = true;
-	CComQIPtr<IAMStreamSelect> pSSA = FindSwitcherFilter();
+	CComQIPtr<IAMStreamSelect> pSSA = m_pSwitcherFilter;
 	if (pSSA) {
 		DWORD cStreamsA = 0;
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
@@ -16569,7 +16574,7 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 	bool bSplitterMenu = false;
 	int nID = (int)id;
 
-	CComQIPtr<IAMStreamSelect> pSSA = FindSwitcherFilter();
+	CComQIPtr<IAMStreamSelect> pSSA = m_pSwitcherFilter;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
@@ -17338,7 +17343,7 @@ void CMainFrame::SetSubtitleTrackIdx(int index)
 void CMainFrame::SetAudioTrackIdx(int index)
 {
 	if (m_iMediaLoadState == MLS_LOADED) {
-		CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 
 		DWORD cStreams = 0;
 		DWORD dwFlags = AMSTREAMSELECTENABLE_ENABLE;
@@ -18888,7 +18893,7 @@ void CMainFrame::SendAudioTracksToApi()
 	CStringW	strAudios;
 
 	if (m_iMediaLoadState == MLS_LOADED) {
-		CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 
 		DWORD cStreams = 0;
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {

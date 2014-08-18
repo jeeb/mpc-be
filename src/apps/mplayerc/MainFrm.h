@@ -250,9 +250,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComPtr<ISubPicAllocatorPresenter>  m_pCAP;
 	CComPtr<ISubPicAllocatorPresenter2> m_pCAP2;
 
-	CComQIPtr<IBaseFilter> m_pMainSourceFilter;
-
-	CComQIPtr<IFileSourceFilter> m_pMainFSF;
+	CComQIPtr<IBaseFilter>			m_pMainSourceFilter;
+	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
+	CComQIPtr<IFileSourceFilter>	m_pMainFSF;
 
 	void SetVolumeBoost(float fAudioBoost_dB);
 	void SetBalance(int balance);
@@ -261,7 +261,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	CCritSec m_csSubLock;
 	CInterfaceList<ISubStream> m_pSubStreams;
-	int m_iSubtitleSel; // if (m_iSubtitleSel&(1<<31)): disabled
+	int m_iSubtitleSel; // if (m_iSubtitleSel & (1 << 31)): disabled ...
 	DWORD_PTR m_nSubtitleId;
 
 	friend class CTextPassThruFilter;
