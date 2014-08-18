@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include "../../DSUtil/SysVersion.h"
 #include "PPageAccelTbl.h"
 
 
@@ -1481,10 +1480,10 @@ BOOL CPPageAccelTbl::OnInitDialog()
 
 	m_list.CreateEx(
 		WS_EX_CLIENTEDGE,
-		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_TABSTOP|LVS_REPORT|LVS_SHOWSELALWAYS|LVS_NOSORTHEADER,
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER,
 		r, this, IDC_LIST1);
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER|LVS_EX_GRIDLINES);
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_GRIDLINES);
 
 	for (int i = 0, j = m_list.GetHeaderCtrl()->GetItemCount(); i < j; i++) {
 		m_list.DeleteColumn(0);
@@ -1507,16 +1506,6 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	}
 
 	SetupList();
-
-	if (IsWinVistaOrLater()) {
-		LVCOLUMN col;
-		col.mask = LVCF_MINWIDTH;
-		col.cxMin = 20;
-		for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
-			m_list.SetColumn(nCol, &col);
-		}
-		m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_COLUMNSNAPPOINTS);
-	}
 
 	// subclass the keylist control
 	OldControlProc = (WNDPROC) SetWindowLongPtr(m_list.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);

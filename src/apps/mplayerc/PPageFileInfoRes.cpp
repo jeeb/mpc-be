@@ -95,7 +95,7 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 		m_icon.SetIcon(m_hIcon);
 	}
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT);
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
 	m_list.InsertColumn(0, _T("Name"), LVCFMT_LEFT, 187);
 	m_list.InsertColumn(1, _T("Mime Type"), LVCFMT_LEFT, 127);

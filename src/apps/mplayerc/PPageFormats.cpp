@@ -627,7 +627,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_bFileExtChanged = false;
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT);
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
 	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT, 300);
 	m_list.InsertColumn(COL_ENGINE, _T("Engine"), LVCFMT_RIGHT, 60);

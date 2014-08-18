@@ -67,7 +67,7 @@ private:
 	CString m_url;
 	bool m_fReplaceSubs;
 
-	CListCtrl m_list;
+	CPlayerListCtrl m_list;
 	CList<isdb_subtitle> m_selsubs;
 	CStatusBarCtrl m_status;
 

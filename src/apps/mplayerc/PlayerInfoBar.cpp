@@ -58,11 +58,11 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 	}
 
 	CAutoPtr<CStatusLabel> l(DNew CStatusLabel(true, false));
-	l->Create(label, WS_CHILD|WS_VISIBLE|WS_CLIPCHILDREN|WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
+	l->Create(label, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
 	m_label.Add(l);
 
 	CAutoPtr<CStatusLabel> i(DNew CStatusLabel(false, true));
-	i->Create(info, WS_CHILD|WS_VISIBLE|WS_CLIPCHILDREN|WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
+	i->Create(info, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
 	m_info.Add(i);
 
 	Relayout();
@@ -112,7 +112,7 @@ void CPlayerInfoBar::RemoveAllLines()
 
 BOOL CPlayerInfoBar::Create(CWnd* pParentWnd)
 {
-	return CDialogBar::Create(pParentWnd, IDD_PLAYERINFOBAR, WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM, IDD_PLAYERINFOBAR);
+	return CDialogBar::Create(pParentWnd, IDD_PLAYERINFOBAR, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM, IDD_PLAYERINFOBAR);
 }
 
 BOOL CPlayerInfoBar::PreCreateWindow(CREATESTRUCT& cs)

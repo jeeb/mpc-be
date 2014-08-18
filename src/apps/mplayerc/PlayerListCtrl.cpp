@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "PlayerListCtrl.h"
 #include "WinHotkeyCtrl.h"
+#include "../../DSUtil/SysVersion.h"
 
 // CInPlaceHotKey
 
@@ -706,7 +707,7 @@ CWinHotkeyCtrl* CPlayerListCtrl::ShowInPlaceWinHotkey(int nItem, int nCol)
 		return(NULL);
 	}
 
-	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL|ES_LEFT;
+	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT;
 
 	CWinHotkeyCtrl* pWinHotkey = DNew CInPlaceWinHotkey(nItem, nCol, GetItemText(nItem, nCol));
 	pWinHotkey->Create(dwStyle, rect, this, IDC_WINHOTKEY1);
@@ -728,7 +729,7 @@ CEdit* CPlayerListCtrl::ShowInPlaceEdit(int nItem, int nCol)
 		return(NULL);
 	}
 
-	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL;
+	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL;
 
 	LV_COLUMN lvcol;
 	lvcol.mask = LVCF_FMT;
@@ -752,7 +753,7 @@ CEdit* CPlayerListCtrl::ShowInPlaceFloatEdit(int nItem, int nCol)
 		return(NULL);
 	}
 
-	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL|ES_RIGHT;
+	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE|ES_AUTOHSCROLL|ES_RIGHT;
 
 	CEdit* pFloatEdit = DNew CInPlaceFloatEdit(nItem, nCol, GetItemText(nItem, nCol));
 	pFloatEdit->Create(dwStyle, rect, this, IDC_EDIT1);
@@ -769,7 +770,7 @@ CComboBox* CPlayerListCtrl::ShowInPlaceComboBox(int nItem, int nCol, CAtlList<CS
 		return(NULL);
 	}
 
-	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD|WS_VISIBLE|WS_VSCROLL/*|WS_HSCROLL*/
+	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | WS_VSCROLL/* | WS_HSCROLL*/
 								  |CBS_DROPDOWNLIST|CBS_DISABLENOSCROLL/*|CBS_NOINTEGRALHEIGHT*/;
 	CComboBox* pComboBox = DNew CInPlaceComboBox(nItem, nCol, lstItems, nSel);
 	pComboBox->Create(dwStyle, rect, this, IDC_COMBO1);
@@ -797,7 +798,7 @@ CListBox* CPlayerListCtrl::ShowInPlaceListBox(int nItem, int nCol, CAtlList<CStr
 		return(NULL);
 	}
 
-	DWORD dwStyle = WS_BORDER|WS_CHILD|WS_VISIBLE|WS_VSCROLL/*|WS_HSCROLL*/|LBS_NOTIFY;
+	DWORD dwStyle = WS_BORDER | WS_CHILD | WS_VISIBLE | WS_VSCROLL/* | WS_HSCROLL*/ | LBS_NOTIFY;
 	CListBox* pListBox = DNew CInPlaceListBox(nItem, nCol, lstItems, nSel);
 	pListBox->Create(dwStyle, rect, this, IDC_LIST1);
 
@@ -1059,4 +1060,21 @@ BOOL CPlayerListCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 
 	return GetParent()->SendMessage(WM_NOTIFY, id, (LPARAM)pNMHDR);
+}
+
+int CPlayerListCtrl::InsertColumn(_In_ int nCol, _In_z_ LPCTSTR lpszColumnHeading,
+		_In_ int nFormat, _In_ int nWidth, _In_ int nSubItem, _In_ int nMinWidth)
+{
+	nCol = __super::InsertColumn(nCol, lpszColumnHeading, nFormat, nWidth, nSubItem);
+	if (nCol != -1
+			&& nMinWidth > 0
+			&& IsWinVistaOrLater()) {
+		LVCOLUMN col;
+		col.mask	= LVCF_MINWIDTH;
+		col.cxMin	= 40;
+		SetColumn(nCol, &col);
+		SetExtendedStyle(GetExtendedStyle() | LVS_EX_COLUMNSNAPPOINTS);
+	}
+
+	return nCol;
 }

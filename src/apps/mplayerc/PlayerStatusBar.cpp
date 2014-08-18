@@ -43,7 +43,7 @@ CPlayerStatusBar::~CPlayerStatusBar()
 
 BOOL CPlayerStatusBar::Create(CWnd* pParentWnd)
 {
-	return CDialogBar::Create(pParentWnd, IDD_PLAYERSTATUSBAR, WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM, IDD_PLAYERSTATUSBAR);
+	return CDialogBar::Create(pParentWnd, IDD_PLAYERSTATUSBAR, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM, IDD_PLAYERSTATUSBAR);
 }
 
 BOOL CPlayerStatusBar::PreCreateWindow(CREATESTRUCT& cs)
@@ -69,10 +69,10 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CRect r;
 	r.SetRectEmpty();
 
-	m_type.Create(_T(""), WS_CHILD|WS_VISIBLE|SS_ICON, r, this, IDC_STATIC1);
-	m_status.Create(_T(""), WS_CHILD|WS_VISIBLE|SS_OWNERDRAW, r, this, IDC_PLAYERSTATUS);
+	m_type.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_ICON, r, this, IDC_STATIC1);
+	m_status.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_OWNERDRAW, r, this, IDC_PLAYERSTATUS);
 	m_status.SetWindowPos(&m_time, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
-	m_time.Create(_T(""), WS_CHILD|WS_VISIBLE|SS_OWNERDRAW, r, this, IDC_PLAYERTIME);
+	m_time.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_OWNERDRAW, r, this, IDC_PLAYERTIME);
 
 	Relayout();
 

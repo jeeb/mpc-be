@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include <afxwin.h>
-#include "../../DSUtil/SysVersion.h"
 #include "MainFrm.h"
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include "SubtitleDlDlg.h"
@@ -188,7 +187,7 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	m_status.Create(WS_CHILD|WS_VISIBLE|CCS_BOTTOM, CRect(0,0,0,0), this, IDC_STATUSBAR);
+	m_status.Create(WS_CHILD | WS_VISIBLE | CCS_BOTTOM, CRect(0,0,0,0), this, IDC_STATUSBAR);
 
 	int n, curPos = 0;
 	CArray<int> columnWidth;
@@ -223,16 +222,6 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	m_list.InsertColumn(COL_FORMAT, ResStr(IDS_SUBDL_DLG_FORMAT_COL), LVCFMT_CENTER, columnWidth[2]);
 	m_list.InsertColumn(COL_DISC, ResStr(IDS_SUBDL_DLG_DISC_COL), LVCFMT_CENTER, columnWidth[3]);
 	m_list.InsertColumn(COL_TITLES, ResStr(IDS_SUBDL_DLG_TITLES_COL), LVCFMT_LEFT, columnWidth[4]);
-
-	if (IsWinVistaOrLater()) {
-		LVCOLUMN col;
-		col.mask = LVCF_MINWIDTH;
-		col.cxMin = 20;
-		for (int nCol = COL_FILENAME; nCol <= COL_TITLES; nCol++) {
-			m_list.SetColumn(nCol, &col);
-		}
-		m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_COLUMNSNAPPOINTS);
-	}
 
 	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
 	AddAnchor(IDC_CHECK1, BOTTOM_LEFT);

@@ -11604,7 +11604,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			}
 		}
 
-		dwRemove = WS_CAPTION|WS_THICKFRAME;
+		dwRemove = WS_CAPTION | WS_THICKFRAME;
 		GetMonitorInfo(hm, &mi);
 		if (fToNearest) {
 			r = mi.rcMonitor;
@@ -13703,7 +13703,7 @@ void CMainFrame::OpenSetupVideo()
 			m_pVW->put_Owner((OAHWND)m_pVideoWnd->m_hWnd);
 		}
 
-		m_pVW->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
+		m_pVW->put_WindowStyle(WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 		m_pVW->put_MessageDrain((OAHWND)m_hWnd);
 
 		for (CWnd* pWnd = m_wndView.GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -13712,7 +13712,7 @@ void CMainFrame::OpenSetupVideo()
 
 		if (b_UseSmartSeek && m_wndPreView) {
 			m_pVW_preview->put_Owner((OAHWND)m_wndPreView.GetVideoHWND());
-			m_pVW_preview->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
+			m_pVW_preview->put_WindowStyle(WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 		}
 	}
 

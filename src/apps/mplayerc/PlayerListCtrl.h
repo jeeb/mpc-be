@@ -189,4 +189,7 @@ public:
 	afx_msg void OnLbnSelChangeList1();
 	afx_msg BOOL OnHdnItemchanging(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
+
+	int InsertColumn(_In_ int nCol, _In_z_ LPCTSTR lpszColumnHeading,
+		_In_ int nFormat = LVCFMT_LEFT, _In_ int nWidth = -1, _In_ int nSubItem = -1, _In_ int nMinWidth = 20);
 };

@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
-#include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
 
 // CPPagePlayer dialog
@@ -215,22 +214,12 @@ BOOL CPPageFullscreen::OnInitDialog()
 		m_f_hmonitor = _T("Current");
  	}
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER
-							|LVS_EX_GRIDLINES|LVS_EX_BORDERSELECT|LVS_EX_ONECLICKACTIVATE|LVS_EX_CHECKBOXES|LVS_EX_FLATSB);
-	m_list.InsertColumn(COL_Z, ResStr(IDS_PPAGE_FS_CLN_ON_OFF), LVCFMT_LEFT, 60);
-	m_list.InsertColumn(COL_VFR_F, ResStr(IDS_PPAGE_FS_CLN_FROM_FPS), LVCFMT_RIGHT, 60);
-	m_list.InsertColumn(COL_VFR_T, ResStr(IDS_PPAGE_FS_CLN_TO_FPS), LVCFMT_RIGHT, 60);
-	m_list.InsertColumn(COL_SRR, ResStr(IDS_PPAGE_FS_CLN_DISPLAY_MODE), LVCFMT_LEFT, 135);
-
-	if (IsWinVistaOrLater()) {
-		LVCOLUMN col;
-		col.mask = LVCF_MINWIDTH;
-		col.cxMin = 40;
-		for (int nCol = COL_Z; nCol <= COL_SRR; nCol++) {
-			m_list.SetColumn(nCol, &col);
-		}
-		m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_COLUMNSNAPPOINTS);
-	}
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle()| LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER
+							| LVS_EX_GRIDLINES | LVS_EX_BORDERSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_CHECKBOXES | LVS_EX_FLATSB);
+	m_list.InsertColumn(COL_Z, ResStr(IDS_PPAGE_FS_CLN_ON_OFF), LVCFMT_LEFT, 60, 40);
+	m_list.InsertColumn(COL_VFR_F, ResStr(IDS_PPAGE_FS_CLN_FROM_FPS), LVCFMT_RIGHT, 60, 40);
+	m_list.InsertColumn(COL_VFR_T, ResStr(IDS_PPAGE_FS_CLN_TO_FPS), LVCFMT_RIGHT, 60, 40);
+	m_list.InsertColumn(COL_SRR, ResStr(IDS_PPAGE_FS_CLN_DISPLAY_MODE), LVCFMT_LEFT, 135, 40);
 
 	ModesUpdate();
 	UpdateData(FALSE);

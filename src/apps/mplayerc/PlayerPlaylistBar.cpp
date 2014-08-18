@@ -703,15 +703,15 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	}
 
 	m_list.CreateEx(
-		0,//less margins//WS_EX_DLGMODALFRAME|WS_EX_CLIENTEDGE,
-		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_TABSTOP
-		|LVS_OWNERDRAWFIXED
-		|LVS_NOCOLUMNHEADER
-		|LVS_EDITLABELS
-		|LVS_REPORT|/*LVS_SINGLESEL|*/LVS_AUTOARRANGE|LVS_NOSORTHEADER, // TODO: remove LVS_SINGLESEL and implement multiple item repositioning (dragging is ready)
+		0,//less margins//WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE,
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP
+		| LVS_OWNERDRAWFIXED
+		| LVS_NOCOLUMNHEADER
+		| LVS_EDITLABELS
+		| LVS_REPORT | /*LVS_SINGLESEL|*/ LVS_AUTOARRANGE | LVS_NOSORTHEADER, // TODO: remove LVS_SINGLESEL and implement multiple item repositioning (dragging is ready)
 		CRect(0,0,100,100), this, IDC_PLAYLIST);
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 	m_list.InsertColumn(COL_NAME, _T("Name"), LVCFMT_LEFT, 380);
 
 	CDC* pDC = m_list.GetDC();

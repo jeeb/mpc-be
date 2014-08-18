@@ -250,8 +250,8 @@ void CPlayerToolBar::SwitchTheme()
 BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 {
 	VERIFY(__super::CreateEx(pParentWnd,
-			TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
-			WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS));
+			TBSTYLE_FLAT | TBSTYLE_TRANSPARENT | TBSTYLE_AUTOSIZE | TBSTYLE_CUSTOMERASE,
+			WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM | CBRS_TOOLTIPS));
 
 	if (m_BackGroundbm.FileExists(CString(L"background"))) {
 		m_BackGroundbm.LoadExternalGradient(L"background");

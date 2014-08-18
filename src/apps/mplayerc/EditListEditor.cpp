@@ -108,22 +108,22 @@ BOOL CEditListEditor::Create(CWnd* pParentWnd, UINT defDockBarID)
 		return FALSE;
 	}
 
-	m_stUsers.Create (_T("User :"), WS_VISIBLE|WS_CHILD, CRect (5,5,100,21), this, 0);
-	m_cbUsers.Create (WS_CHILD|WS_VISIBLE|CBS_DROPDOWNLIST, CRect (90,0, 260, 21), this, 0);
+	m_stUsers.Create(_T("User :"), WS_VISIBLE | WS_CHILD, CRect (5,5,100,21), this, 0);
+	m_cbUsers.Create(WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, CRect (90,0, 260, 21), this, 0);
 	FillCombo(_T("Users.txt"), m_cbUsers, false);
 
-	m_stHotFolders.Create (_T("Hot folder :"), WS_VISIBLE|WS_CHILD, CRect (5,35,100,51), this, 0);
-	m_cbHotFolders.Create (WS_CHILD|WS_VISIBLE|CBS_DROPDOWNLIST, CRect (90,30, 260, 21), this, 0);
+	m_stHotFolders.Create(_T("Hot folder :"), WS_VISIBLE | WS_CHILD, CRect (5,35,100,51), this, 0);
+	m_cbHotFolders.Create(WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, CRect (90,30, 260, 21), this, 0);
 	FillCombo(_T("HotFolders.txt"), m_cbHotFolders, true);
 
 	m_list.CreateEx(
-		WS_EX_DLGMODALFRAME|WS_EX_CLIENTEDGE,
-		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_TABSTOP
-		|LVS_OWNERDRAWFIXED
-		|LVS_REPORT|LVS_SINGLESEL|LVS_AUTOARRANGE|LVS_NOSORTHEADER,
+		WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE,
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP
+		| LVS_OWNERDRAWFIXED
+		| LVS_REPORT | LVS_SINGLESEL | LVS_AUTOARRANGE | LVS_NOSORTHEADER,
 		CRect(0,0,100,100), this, IDC_EDITLIST);
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
 	m_list.InsertColumn(COL_IN,	 _T("Nb."),  LVCFMT_LEFT, 35);
 	m_list.InsertColumn(COL_IN,	 _T("In"),  LVCFMT_LEFT, 100);

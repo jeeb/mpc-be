@@ -107,7 +107,7 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	v_rect.right	-= (wb+1);
 	v_rect.bottom	-= (wb+1);
 
-	if (!m_view.Create(NULL,_T(""), WS_CHILD|WS_VISIBLE, v_rect, this, NULL)) {
+	if (!m_view.Create(NULL,_T(""), WS_CHILD | WS_VISIBLE, v_rect, this, NULL)) {
 		return -1;
 	}
 

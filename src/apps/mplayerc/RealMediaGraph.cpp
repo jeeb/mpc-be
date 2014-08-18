@@ -478,12 +478,12 @@ STDMETHODIMP CRealMediaPlayer::OnInit(RMAAudioFormat* pFormat)
 CRealMediaPlayerWindowed::CRealMediaPlayerWindowed(HWND hWndParent, CRealMediaGraph* pRMG)
 	: CRealMediaPlayer(hWndParent, pRMG)
 {
-	if (!m_wndWindowFrame.CreateEx(WS_EX_NOPARENTNOTIFY, NULL, NULL, WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
+	if (!m_wndWindowFrame.CreateEx(WS_EX_NOPARENTNOTIFY, NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 								   CRect(0, 0, 0, 0), CWnd::FromHandle(m_hWndParent), 0, NULL)) {
 		return;
 	}
 
-	if (!m_wndDestFrame.Create(NULL, NULL, WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
+	if (!m_wndDestFrame.Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 							   CRect(0, 0, 0, 0), &m_wndWindowFrame, 0, NULL)) {
 		return;
 	}
@@ -525,7 +525,7 @@ bool CRealMediaPlayerWindowed::CreateSite(IRMASite** ppSite)
 		return false;
 	}
 
-	DWORD style = WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
+	DWORD style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 	if (!AfxGetAppSettings().fIntRealMedia) {
 		style |= WS_DISABLED;
 	}

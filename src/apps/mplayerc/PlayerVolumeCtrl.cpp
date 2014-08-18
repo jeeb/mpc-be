@@ -37,7 +37,7 @@ CVolumeCtrl::~CVolumeCtrl()
 
 bool CVolumeCtrl::Create(CWnd* pParentWnd)
 {
-	VERIFY(CSliderCtrl::Create(WS_CHILD|WS_VISIBLE|TBS_NOTICKS|TBS_HORZ|TBS_TOOLTIPS, CRect(0,0,0,0), pParentWnd, IDC_SLIDER1));
+	VERIFY(CSliderCtrl::Create(WS_CHILD | WS_VISIBLE | TBS_NOTICKS | TBS_HORZ | TBS_TOOLTIPS, CRect(0,0,0,0), pParentWnd, IDC_SLIDER1));
 
 	AppSettings& s = AfxGetAppSettings();
 
