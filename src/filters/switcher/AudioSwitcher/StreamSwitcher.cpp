@@ -1036,7 +1036,7 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 	return
 		IsAudioWaveRenderer(pBF)
 			|| clsid == CLSID_InfTee
-			|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer may be unstable when changing format, use at your own risk ...
+			//|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer may be unstable when changing format, use at your own risk ...
 			|| clsid == GUIDFromCString(L"{A753A1EC-973E-4718-AF8E-A3F554D45C44}") // AC3Filter
 			|| clsid == CLSID_ffdshowAudioProcessor
 		? __super::CheckConnect(pPin)
