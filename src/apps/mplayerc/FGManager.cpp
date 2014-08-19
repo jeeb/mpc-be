@@ -2644,7 +2644,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 		ULONGLONG merit =
 			IsPreview ? MERIT64_DO_USE :
-			fo->iLoadType == FilterOverride::PREFERRED ? MERIT64_ABOVE_DSHOW :
+			fo->iLoadType == FilterOverride::PREFERRED ? MERIT64_ABOVE_DSHOW + 0x100 :
 			fo->iLoadType == FilterOverride::MERIT ? MERIT64(fo->dwMerit) :
 			MERIT64_DO_NOT_USE; // fo->iLoadType == FilterOverride::BLOCKED
 
