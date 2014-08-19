@@ -144,6 +144,7 @@ double get_max_peak_int24(BYTE* pData, const size_t allsamples)
         if (peak > max_peak) {
             max_peak = peak;
         }
+		pData += 3;
     }
 
     return (double)max_peak / INT24_PEAK;
