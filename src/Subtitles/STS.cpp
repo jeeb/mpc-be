@@ -988,6 +988,22 @@ static void ReplaceNoCase(CStringW& str, CStringW from, CStringW to)
 	}
 }
 
+static int FindNoCase(LPCWSTR pszString, LPCWSTR pszSearch)
+{
+	int lenString = wcslen(pszString);
+	int lenSearch = wcslen(pszSearch);
+	if (lenSearch == 0 || lenSearch > lenString) {
+		return -1;
+	}
+	for (int i = 0; i < lenString - lenSearch + 1; ++i) {
+		if (!_wcsnicmp(&pszString[i], pszSearch, lenSearch )) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 static CStringW SMI2SSA(CStringW str, int CharSet)
 {
 	ReplaceNoCase(str, L"&nbsp;", L" ");
@@ -997,6 +1013,8 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 	ReplaceNoCase(str, L"</i>", L"{\\i}");
 	ReplaceNoCase(str, L"<b>", L"{\\b1}");
 	ReplaceNoCase(str, L"</b>", L"{\\b}");
+	ReplaceNoCase(str, L"<u>", L"{\\u1}");
+	ReplaceNoCase(str, L"</u>", L"{\\u}");
 
 	CStringW lstr = str;
 	lstr.MakeLower();
@@ -1075,12 +1093,11 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 
 static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
-	CStringW buff, caption;
+	CStringW buff, samiBuff;
 
 	ULONGLONG pos = file->GetPosition();
 
 	bool fSAMI = false;
-
 	while (file->ReadString(buff) && !fSAMI) {
 		if (buff.MakeUpper().Find(L"<SAMI>") >= 0) {
 			fSAMI = true;
@@ -1094,60 +1111,58 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	file->Seek(pos, CFile::begin);
 
 	bool fComment = false;
+	bool bEnd = false;
 
-	int start_time = 0;
-
-	while (file->ReadString(buff)) {
+	while (file->ReadString(buff) && !bEnd) {
 		FastTrim(buff);
 		if (buff.IsEmpty()) {
 			continue;
 		}
 
-		CStringW ubuff = buff;
-		ubuff.MakeUpper();
-
-		if (ubuff.Find(L"<!--") >= 0 || ubuff.Find(L"<TITLE>") >= 0) {
+		if (FindNoCase(buff, L"<!--") >= 0 || FindNoCase(buff, L"<TITLE>") >= 0) {
 			fComment = true;
 		}
 
 		if (!fComment) {
-			int i;
-
-			if ((i = ubuff.Find(L"<SYNC START=")) >= 0) {
-				int time = 0;
-
-				for (i = 12; i < ubuff.GetLength(); i++) {
-					if (ubuff[i] != '>' && ubuff[i] != 'M') {
-						if (iswdigit(ubuff[i])) {
-							time *= 10;
-							time += ubuff[i] - 0x30;
-						}
-					} else {
-						break;
-					}
+			long end_time = MAXLONG;
+			int syncpos = FindNoCase(buff, L"<SYNC START=");
+			if (syncpos == -1) {
+				syncpos = FindNoCase(buff, L"</BODY>");
+				if (syncpos == -1) {
+					syncpos = FindNoCase(buff, L"</SAMI>");
 				}
 
-				ret.Add(
-					SMI2SSA(caption, CharSet),
-					file->IsUnicode(),
-					start_time, time);
-
-				start_time = time;
-				caption.Empty();
+				if (syncpos == 0) {
+					bEnd = true;
+				}
+			} else {
+				end_time = wcstol((LPCWSTR)buff + 12, NULL, 10);
 			}
 
-			caption += buff;
+			if (syncpos == 0) {
+				if (FindNoCase(samiBuff, L"<SYNC START=") == 0) {
+					long start_time = wcstol((LPCWSTR)samiBuff + 12, NULL, 10);
+					int endtime_pos = -1;
+					if ((endtime_pos = FindNoCase(samiBuff, L"END=")) > 0) {
+						end_time = wcstol((LPCWSTR)samiBuff + endtime_pos + 4, NULL, 10);
+					}
+
+					ret.Add(
+						SMI2SSA(samiBuff, CharSet),
+						file->IsUnicode(),
+						start_time, end_time);
+				}
+
+				samiBuff.Empty();
+			}
+
+			samiBuff += buff;
 		}
 
-		if (ubuff.Find(L"-->") >= 0 || ubuff.Find(L"</TITLE>") >= 0) {
+		if (FindNoCase(buff, L"-->") >= 0 || FindNoCase(buff, L"</TITLE>") >= 0) {
 			fComment = false;
 		}
 	}
-
-	ret.Add(
-		SMI2SSA(caption, CharSet),
-		file->IsUnicode(),
-		start_time, MAXLONG);
 
 	return true;
 }
