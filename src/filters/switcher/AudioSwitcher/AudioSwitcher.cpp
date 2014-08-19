@@ -24,48 +24,11 @@
 #include "AudioSwitcher.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioTools.h"
+#include "../../../AudioTools/AudioHelper.h"
 #include <math.h>
 
 #define NORMALIZATION_REGAIN_STEP      20
 #define NORMALIZATION_REGAIN_THRESHOLD 0.75
-
-enum e_sample_format { SF_NONE, SF_UINT8, SF_INT16, SF_INT24, SF_INT32, SF_FLOAT, SF_DOUBLE };
-
-e_sample_format GetSampleFormat(WAVEFORMATEX* wfe)
-{
-	e_sample_format sample_format = SF_NONE;
-
-	WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
-	WORD tag = wfe->wFormatTag;
-
-	if (tag == WAVE_FORMAT_PCM || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_PCM)) {
-		switch (wfe->wBitsPerSample) {
-		case 8:
-			sample_format = SF_UINT8;
-			break;
-		case 16:
-			sample_format = SF_INT16;
-			break;
-		case 24:
-			sample_format = SF_INT24;
-			break;
-		case 32:
-			sample_format = SF_INT32;
-			break;
-		}
-	} else if (tag == WAVE_FORMAT_IEEE_FLOAT || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)) {
-		switch (wfe->wBitsPerSample) {
-		case 32:
-			sample_format = SF_FLOAT;
-			break;
-		case 64:
-			sample_format = SF_DOUBLE;
-			break;
-		}
-	}
-
-	return sample_format;
-}
 
 #ifdef REGISTER_FILTER
 
@@ -173,8 +136,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	WAVEFORMATEX* wfeout = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
 	WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
 
-	e_sample_format sample_format = GetSampleFormat(wfe);
-	if (sample_format == SF_NONE) {
+	SampleFormat sample_format = GetSampleFormat(wfe);
+	if (sample_format == SAMPLE_FMT_NONE) {
 		return __super::Transform(pIn, pOut);
 	}
 
@@ -228,22 +191,22 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 			// calculate max peak
 			switch (sample_format) {
-			case SF_UINT8:
+			case SAMPLE_FMT_U8:
 				sample_max = get_max_peak_uint8((uint8_t*)pDataOut, out_allsamples);
 				break;
-			case SF_INT16:
+			case SAMPLE_FMT_S16:
 				sample_max = get_max_peak_int16((int16_t*)pDataOut, out_allsamples);
 				break;
-			case SF_INT24:
+			case SAMPLE_FMT_S24:
 				sample_max = get_max_peak_int24(pDataOut, out_allsamples);
 				break;
-			case SF_INT32:
+			case SAMPLE_FMT_S32:
 				sample_max = get_max_peak_int32((int32_t*)pDataOut, out_allsamples);
 				break;
-			case SF_FLOAT:
+			case SAMPLE_FMT_FLT:
 				sample_max = get_max_peak_float((float*)pDataOut, out_allsamples);
 				break;
-			case SF_DOUBLE:
+			case SAMPLE_FMT_DBL:
 				sample_max = get_max_peak_double((double*)pDataOut, out_allsamples);
 				break;
 			}
@@ -268,22 +231,22 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 		if (sample_mul != 1.0) {
 			switch (sample_format) {
-			case SF_UINT8:
+			case SAMPLE_FMT_U8:
 				gain_uint8(sample_mul, out_allsamples, (uint8_t*)pDataOut);
 				break;
-			case SF_INT16:
+			case SAMPLE_FMT_S16:
 				gain_int16(sample_mul, out_allsamples, (int16_t*)pDataOut);
 				break;
-			case SF_INT24:
+			case SAMPLE_FMT_S24:
 				gain_int24(sample_mul, out_allsamples, pDataOut);
 				break;
-			case SF_INT32:
+			case SAMPLE_FMT_S32:
 				gain_int32(sample_mul, out_allsamples, (int32_t*)pDataOut);
 				break;
-			case SF_FLOAT:
+			case SAMPLE_FMT_FLT:
 				gain_float(sample_mul, out_allsamples, (float*)pDataOut);
 				break;
-			case SF_DOUBLE:
+			case SAMPLE_FMT_DBL:
 				gain_double(sample_mul, out_allsamples, (double*)pDataOut);
 				break;
 			}

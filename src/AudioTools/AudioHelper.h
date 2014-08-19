@@ -47,6 +47,8 @@
                      (uint64_t)(x) << 56)
 #endif
 
+SampleFormat GetSampleFormat(WAVEFORMATEX* wfe);
+
 HRESULT convert_to_int16(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, int16_t* pOut);
 HRESULT convert_to_int24(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, BYTE* pOut);
 HRESULT convert_to_int32(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, int32_t* pOut);

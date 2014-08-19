@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <MMReg.h>
 #include "AudioHelper.h"
 
 #define INT8_PEAK       128
@@ -35,6 +36,43 @@
 #define round_d(x) ((x) > 0 ? (x) + 0.5  : (x) - 0.5)
 
 #define limit(a, x, b) if (x < a) { x = a; } else if (x > b) { x = b; }
+
+
+SampleFormat GetSampleFormat(WAVEFORMATEX* wfe)
+{
+	SampleFormat sample_format = SAMPLE_FMT_NONE;
+
+	WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+	WORD tag = wfe->wFormatTag;
+
+	if (tag == WAVE_FORMAT_PCM || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_PCM)) {
+		switch (wfe->wBitsPerSample) {
+		case 8:
+			sample_format = SAMPLE_FMT_U8;
+			break;
+		case 16:
+			sample_format = SAMPLE_FMT_S16;
+			break;
+		case 24:
+			sample_format = SAMPLE_FMT_S24;
+			break;
+		case 32:
+			sample_format = SAMPLE_FMT_S32;
+			break;
+		}
+	} else if (tag == WAVE_FORMAT_IEEE_FLOAT || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)) {
+		switch (wfe->wBitsPerSample) {
+		case 32:
+			sample_format = SAMPLE_FMT_FLT;
+			break;
+		case 64:
+			sample_format = SAMPLE_FMT_DBL;
+			break;
+		}
+	}
+
+	return sample_format;
+}
 
 HRESULT convert_to_int16(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, int16_t* pOut)
 {
