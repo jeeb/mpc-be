@@ -137,14 +137,13 @@ double get_max_peak_int24(BYTE* pData, const size_t allsamples)
     while (pData < end) {
         int32_t i32 = 0;
         BYTE* p = (BYTE*)(&i32);
-        p[1] = *(pData);
-        p[2] = *(pData + 1);
-        p[3] = *(pData + 2);
+        p[1] = *(pData++);
+        p[2] = *(pData++);
+        p[3] = *(pData++);
         int peak = abs(i32 >> 8);
         if (peak > max_peak) {
             max_peak = peak;
         }
-		pData += 3;
     }
 
     return (double)max_peak / INT24_PEAK;
