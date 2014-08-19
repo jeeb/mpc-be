@@ -18623,7 +18623,6 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
-	UpdateThumbarButton();
 
 	AfxGetAppSettings().SaveSettings();
 }
@@ -19198,6 +19197,8 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 		ImageList_Destroy(himl);
 	}
 
+	UpdateThumbarButton();
+
 	return hr;
 }
 
@@ -19313,7 +19314,7 @@ HRESULT CMainFrame::UpdateThumbarButton()
 	} else {
 		buttons[0].dwFlags = THBF_DISABLED;
 		buttons[1].dwFlags = THBF_DISABLED;
-		buttons[2].dwFlags = THBF_DISABLED;
+		buttons[2].dwFlags = m_wndPlaylistBar.GetCount() > 0 ? THBF_ENABLED : THBF_DISABLED;
 		buttons[3].dwFlags = THBF_DISABLED;
 		buttons[4].dwFlags = THBF_DISABLED;
 
@@ -19359,8 +19360,14 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				break;
 
-			case IDTB_BUTTON2:
-				SendMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+			case IDTB_BUTTON2: {
+					OAFilterState fs = GetMediaState();
+					if (fs != -1) {
+						SendMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+					} else {
+						SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+					}
+				}
 				break;
 
 			case IDTB_BUTTON3:
