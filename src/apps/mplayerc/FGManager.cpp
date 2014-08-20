@@ -40,6 +40,8 @@
 #include "MediaFormats.h"
 #include <IPinHook.h>
 
+#define MERIT64_EXT_FILTERS_PREFER (MERIT64_ABOVE_DSHOW + 0x2000)
+
 class CFGMPCVideoDecoderInternal : public CFGFilterInternal<CMPCVideoDecFilter>
 {
 	bool	m_IsPreview;
@@ -57,7 +59,7 @@ public:
 		CAtlList<SUPPORTED_FORMATS> fmts;
 		GetFormatList(fmts);
 
-		if (m_merit == MERIT64_ABOVE_DSHOW) {
+		if (m_merit >= MERIT64_ABOVE_DSHOW) {
 			// High merit MPC Video Decoder
 			POSITION pos = fmts.GetHeadPosition();
 			while (pos) {
@@ -354,7 +356,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		POSITION pos = m_override.GetHeadPosition();
 		while (pos) {
 			CFGFilter* pFGF = m_override.GetNext(pos);
-			if (pFGF->GetMerit() >= MERIT64_ABOVE_DSHOW) { // FilterOverride::PREFERRED
+			if (pFGF->GetMerit() >= MERIT64_EXT_FILTERS_PREFER) { // FilterOverride::PREFERRED
 				fl.Insert(pFGF, 0, false, false);
 			}
 		}
@@ -2530,7 +2532,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	// High merit MPC Video Decoder
-	pFGF = DNew CFGMPCVideoDecoderInternal(MPCVideoDecName, MERIT64_ABOVE_DSHOW, IsPreview);
+	pFGF = DNew CFGMPCVideoDecoderInternal(MPCVideoDecName, MERIT64_ABOVE_DSHOW + 1, IsPreview);
 	m_transform.AddTail(pFGF);
 
 	// Low merit MPC Video Decoder
@@ -2644,7 +2646,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 		ULONGLONG merit =
 			IsPreview ? MERIT64_DO_USE :
-			fo->iLoadType == FilterOverride::PREFERRED ? MERIT64_ABOVE_DSHOW + 0x100 :
+			fo->iLoadType == FilterOverride::PREFERRED ? MERIT64_EXT_FILTERS_PREFER :
 			fo->iLoadType == FilterOverride::MERIT ? MERIT64(fo->dwMerit) :
 			MERIT64_DO_NOT_USE; // fo->iLoadType == FilterOverride::BLOCKED
 
