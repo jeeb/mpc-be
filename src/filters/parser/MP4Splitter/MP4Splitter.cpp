@@ -169,11 +169,7 @@ static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, 
 {
 	if (!Aspect.cx || !Aspect.cy) {
 		if (width && height) {
-			if (width != codec_width || height != codec_height) {
-				Aspect.SetSize(width * codec_height, height * codec_width);
-			} else {
-				Aspect.SetSize(width, height);
-			}
+			Aspect.SetSize(width, height);
 		} else {
 			Aspect.SetSize(codec_width, codec_height);
 		}
