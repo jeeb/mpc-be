@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "SampleFormat.h"
 
-typedef struct SampleFmtProp {
+static const struct SampleFmtProp {
     int bits;
     bool planar;
-} SampleFmtProp;
-
-static const SampleFmtProp sample_fmt_info[SAMPLE_FMT_NB] = {
+}
+sample_fmt_info[SAMPLE_FMT_NB] = {
 //   bits planar
     {  8, false }, // SAMPLE_FMT_U8
     { 16, false }, // SAMPLE_FMT_S16
