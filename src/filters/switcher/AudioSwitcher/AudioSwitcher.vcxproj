@@ -222,6 +222,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\AudioTools\AudioTools.vcxproj">
+      <Project>{1b6de4c0-9d27-4150-a327-e7f3b492b5f0}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
