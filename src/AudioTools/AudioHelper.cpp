@@ -388,7 +388,6 @@ HRESULT convert_to_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 				              (uint32_t)pIn[3 * i + 1] << 16 |
 				              (uint32_t)pIn[3 * i + 2] << 24;
 				*pOut++ = (float)((double)i32 / INT32_PEAK);
-				pIn += sizeof(int32_t);
 			}
 			break;
 		case SAMPLE_FMT_S32:
