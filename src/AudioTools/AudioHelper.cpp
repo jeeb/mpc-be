@@ -384,10 +384,13 @@ HRESULT convert_to_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 			break;
 		case SAMPLE_FMT_S24:
 			for (size_t i = 0; i < allsamples; ++i) {
-				int32_t i32 = (uint32_t)pIn[3 * i]     << 8  |
-				              (uint32_t)pIn[3 * i + 1] << 16 |
-				              (uint32_t)pIn[3 * i + 2] << 24;
-				*pOut++ = (float)((double)i32 / INT32_PEAK);
+				int32_t i32 = 0;
+				BYTE* p = (BYTE*)(&i32);
+				p[1] = *(pIn++);
+				p[2] = *(pIn++);
+				p[3] = *(pIn++);
+				i32 >>= 8;
+				*pOut++ = (float)((double)i32 / INT24_PEAK);
 			}
 			break;
 		case SAMPLE_FMT_S32:
