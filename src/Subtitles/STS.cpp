@@ -1147,10 +1147,12 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 						end_time = wcstol((LPCWSTR)samiBuff + endtime_pos + 4, NULL, 10);
 					}
 
-					ret.Add(
-						SMI2SSA(samiBuff, CharSet),
-						file->IsUnicode(),
-						start_time, end_time);
+					if (end_time > start_time) {
+						ret.Add(
+							SMI2SSA(samiBuff, CharSet),
+							file->IsUnicode(),
+							start_time, end_time);
+					}
 				}
 
 				samiBuff.Empty();
@@ -2481,6 +2483,41 @@ CStringA CSimpleTextSubtitle::GetStrA(int i, bool fSSA)
 	return WToA(GetStrWA(i, fSSA));
 }
 
+static CString CodeToCharacter(CString str)
+{
+	if (str.Find(L"&#") == -1) {
+		return str;
+	}
+
+	CString tmp;
+	int strLen = str.GetLength();
+
+	LPCWSTR pszString = str;
+	LPCWSTR pszEnd = pszString + strLen;
+
+	while (pszString < pszEnd) {
+		int pos = FindNoCase(pszString, L"&#");
+		if (pos == -1 || (strLen - pos < 3)) {
+			pos = pszEnd - pszString;
+			tmp.Append(pszString, pos);
+			break;
+		}
+		tmp.Append(pszString, pos);
+
+		pszString += pos + 2;
+		int Radix = 10;
+		if (towlower(*pszString) == L'x') {
+			pszString++;
+			Radix = 16;
+		}
+
+		wchar_t value = wcstol(pszString, (LPWSTR*)&pszString, Radix);
+		tmp += value;
+	}
+
+	return tmp;
+}
+
 CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 {
 	STSEntry const& stse = GetAt(i);
@@ -2495,6 +2532,8 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 	if (!fSSA) {
 		str = RemoveSSATags(str, true, CharSet);
 	}
+
+	str = CodeToCharacter(str);
 
 	return str;
 }
