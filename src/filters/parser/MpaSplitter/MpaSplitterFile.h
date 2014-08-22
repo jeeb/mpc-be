@@ -24,6 +24,8 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../../DSUtil/ID3Tag.h"
 
+#define DEF_SYNC_SIZE 8096
+
 class CMpaSplitterFile : public CBaseSplitterFileEx
 {
 	CMediaType m_mt;
@@ -63,6 +65,6 @@ public:
 		return m_startpos;
 	}
 
-	bool Sync(int limit = 8096);
-	bool Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit = 8096);
+	bool Sync(int limit = DEF_SYNC_SIZE);
+	bool Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit = DEF_SYNC_SIZE, BOOL bExtraCheck = FALSE);
 };

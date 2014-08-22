@@ -181,9 +181,11 @@ bool CMpaSplitterFilter::DemuxLoop()
 	int FrameSize;
 	REFERENCE_TIME rtDuration;
 
+	BOOL bFirst = TRUE;
+
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (m_pFile->GetRemaining() > 9 || m_pFile->IsStreaming())) {
-		m_pFile->WaitAvailable(1500, 8096, GetRequestHandle());
-		if (!m_pFile->Sync(FrameSize, rtDuration)) {
+		m_pFile->WaitAvailable(1500, DEF_SYNC_SIZE, GetRequestHandle());
+		if (!m_pFile->Sync(FrameSize, rtDuration, DEF_SYNC_SIZE, bFirst)) {
 			continue;
 		}
 
@@ -199,6 +201,8 @@ bool CMpaSplitterFilter::DemuxLoop()
 		hr = DeliverPacket(p);
 
 		m_rtime += rtDuration;
+
+		bFirst = FALSE;
 	}
 
 	return true;

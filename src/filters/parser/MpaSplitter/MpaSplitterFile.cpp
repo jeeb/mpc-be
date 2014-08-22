@@ -229,14 +229,14 @@ HRESULT CMpaSplitterFile::Init()
 	return S_OK;
 }
 
-bool CMpaSplitterFile::Sync(int limit/* = 8096*/)
+bool CMpaSplitterFile::Sync(int limit/* = DEF_SYNC_SIZE*/)
 {
 	int FrameSize;
 	REFERENCE_TIME rtDuration;
 	return Sync(FrameSize, rtDuration, limit);
 }
 
-bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit/* = 8096*/)
+bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit/* = DEF_SYNC_SIZE*/, BOOL bExtraCheck/* = FALSE*/)
 {
 	__int64 endpos = min(GetLength(), GetPos() + limit);
 
@@ -246,6 +246,18 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 
 			if (Read(h, (int)(endpos - GetPos()), NULL, true)) {
 				Seek(GetPos() - MPA_HEADER_SIZE);
+				if (bExtraCheck) {
+					__int64 pos = GetPos();
+					if (pos + h.FrameSize + MPA_HEADER_SIZE < GetLength()) {
+						Seek(pos + h.FrameSize);
+						mpahdr h2;
+						if (!Read(h2, MPA_HEADER_SIZE, NULL, true)) {
+							Seek(pos + 1);
+							continue;
+						}
+					}
+					Seek(pos);
+				}
 				AdjustDuration(h.nBytesPerSec);
 
 				FrameSize	= h.FrameSize;
