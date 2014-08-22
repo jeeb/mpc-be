@@ -255,26 +255,11 @@ void CEVRAllocatorPresenter::StopWorkerThreads()
 			}
 		}
 
-		if (m_hRenderThread) {
-			CloseHandle(m_hRenderThread);
-			m_hRenderThread = NULL;
-		}
-		if (m_hGetMixerThread) {
-			CloseHandle(m_hGetMixerThread);
-			m_hGetMixerThread = NULL;
-		}
-		if (m_hVSyncThread) {
-			CloseHandle(m_hVSyncThread);
-			m_hVSyncThread = NULL;
-		}
-		if (m_hEvtFlush) {
-			CloseHandle(m_hEvtFlush);
-			m_hEvtFlush = NULL;
-		}
-		if (m_hEvtQuit) {
-			CloseHandle(m_hEvtQuit);
-			m_hEvtQuit = NULL;
-		}
+		SAFE_CLOSE_HANDLE(m_hRenderThread);
+		SAFE_CLOSE_HANDLE(m_hGetMixerThread);
+		SAFE_CLOSE_HANDLE(m_hVSyncThread);
+		SAFE_CLOSE_HANDLE(m_hEvtFlush);
+		SAFE_CLOSE_HANDLE(m_hEvtQuit);
 
 		m_bEvtFlush	= false;
 		m_bEvtQuit	= false;

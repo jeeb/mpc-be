@@ -1023,16 +1023,15 @@ void CMainFrame::OnDestroy()
 			TerminateThread(m_hNotifyRenderThread, 0xDEAD);
 		}
 
-		CloseHandle(m_hNotifyRenderThread);
-		m_hNotifyRenderThread = NULL;
+		SAFE_CLOSE_HANDLE(m_hNotifyRenderThread);
 	}
 
 	m_ExtSubFiles.RemoveAll();
 	m_ExtSubFilesTime.RemoveAll();
 	m_ExtSubPaths.RemoveAll();
 
-	CloseHandle(m_hStopNotifyRenderThreadEvent);
-	CloseHandle(m_hRefreshNotifyRenderThreadEvent);
+	SAFE_CLOSE_HANDLE(m_hStopNotifyRenderThreadEvent);
+	SAFE_CLOSE_HANDLE(m_hRefreshNotifyRenderThreadEvent);
 
 	__super::OnDestroy();
 }

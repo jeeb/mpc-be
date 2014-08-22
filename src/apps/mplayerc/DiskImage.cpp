@@ -170,9 +170,8 @@ TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 
 void DiskImage::UnmountDiskImage()
 {
-	if (m_DriveType == WIN8 && m_VHDHandle != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_VHDHandle);
-		m_VHDHandle = INVALID_HANDLE_VALUE;
+	if (m_DriveType == WIN8) {
+		SAFE_CLOSE_HANDLE(m_VHDHandle);
 	}
 
 #if ENABLE_DTLITE_SUPPORT
@@ -319,10 +318,7 @@ TCHAR DiskImage::MountWin8(LPCTSTR pathName)
 		}
 	}
 
-	if (m_VHDHandle != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_VHDHandle);
-		m_VHDHandle = INVALID_HANDLE_VALUE;
-	}
+	SAFE_CLOSE_HANDLE(m_VHDHandle);
 
 	return 0;
 }

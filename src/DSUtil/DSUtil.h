@@ -288,9 +288,12 @@ static CUnknown* WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT* phr)
 	return punk;
 }
 
-#define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if (p) { delete[] (p);   (p)=NULL; } }
-#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
+#define SAFE_DELETE(p)       { if (p) { delete (p);     (p) = NULL; } }
+#define SAFE_DELETE_ARRAY(p) { if (p) { delete [] (p);  (p) = NULL; } }
+#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p) = NULL; } }
+#define SAFE_CLOSE_HANDLE(p) { if (p) { if ((p) != INVALID_HANDLE_VALUE) VERIFY(CloseHandle(p)); (p) = NULL; } }
+
+#define EXIT_ON_ERROR(hres)  { if (FAILED(hres)) return hres; }
 
 #ifndef uint8
 	typedef unsigned char		uint8;

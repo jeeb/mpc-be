@@ -2515,28 +2515,19 @@ void CSyncAP::StopWorkerThreads()
 		m_bEvtSkip = true;
 		if (m_hRenderThread && WaitForSingleObject (m_hRenderThread, 10000) == WAIT_TIMEOUT) {
 			ASSERT (FALSE);
-			TerminateThread (m_hRenderThread, 0xDEAD);
+			TerminateThread(m_hRenderThread, 0xDEAD);
 		}
-		if (m_hRenderThread) {
-			CloseHandle (m_hRenderThread);
-		}
+		SAFE_CLOSE_HANDLE(m_hRenderThread);
+
 		if (m_hMixerThread && WaitForSingleObject (m_hMixerThread, 10000) == WAIT_TIMEOUT) {
-			ASSERT (FALSE);
-			TerminateThread (m_hMixerThread, 0xDEAD);
-		}
-		if (m_hMixerThread) {
-			CloseHandle (m_hMixerThread);
+			ASSERT(FALSE);
+			TerminateThread(m_hMixerThread, 0xDEAD);
 		}
 
-		if (m_hEvtFlush) {
-			CloseHandle(m_hEvtFlush);
-		}
-		if (m_hEvtQuit) {
-			CloseHandle(m_hEvtQuit);
-		}
-		if (m_hEvtSkip) {
-			CloseHandle(m_hEvtSkip);
-		}
+		SAFE_CLOSE_HANDLE(m_hMixerThread);
+		SAFE_CLOSE_HANDLE(m_hEvtFlush);
+		SAFE_CLOSE_HANDLE(m_hEvtQuit);
+		SAFE_CLOSE_HANDLE(m_hEvtSkip);
 
 		m_bEvtFlush = false;
 		m_bEvtQuit = false;
