@@ -1218,11 +1218,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		//UNREFERENCED_PARAMETER(_185p1);
 
 		CString str;
-		str.Format(ResStr(IDS_SCALE_16_9), 0.5, 0.5, 1, _16p9/_4p3);
+		str.Format(ResStr(IDS_SCALE_16_9), 0.5, 0.5, 1.0, _16p9 / _4p3);
 		m_pnspresets.Add(str);
-		str.Format(ResStr(IDS_SCALE_WIDESCREEN), 0.5, 0.5, _16p9/_4p3, _16p9/_4p3);
+		str.Format(ResStr(IDS_SCALE_WIDESCREEN), 0.5, 0.5, _16p9 / _4p3, _16p9 / _4p3);
 		m_pnspresets.Add(str);
-		str.Format(ResStr(IDS_SCALE_ULTRAWIDE), 0.5, 0.5, _235p1/_4p3, _235p1/_4p3);
+		str.Format(ResStr(IDS_SCALE_ULTRAWIDE), 0.5, 0.5, _235p1 / _4p3, _235p1 / _4p3);
 		m_pnspresets.Add(str);
 	}
 
