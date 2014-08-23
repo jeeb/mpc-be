@@ -1039,6 +1039,7 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 			//|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer may be unstable when changing format, use at your own risk ...
 			|| clsid == GUIDFromCString(L"{A753A1EC-973E-4718-AF8E-A3F554D45C44}") // AC3Filter
 			|| clsid == CLSID_ffdshowAudioProcessor
+			|| clsid == GUIDFromCString(L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}") // DC-DSP Filter
 		? __super::CheckConnect(pPin)
 		: E_FAIL;
 
