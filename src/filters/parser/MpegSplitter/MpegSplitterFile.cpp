@@ -595,6 +595,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	s.pesid	= pesid;
 	s.ps1id	= ps1id;
 
+	if (m_bOpeningCompleted && m_ClipInfo.IsHdmv()) {
+		return s;
+	}
+
 	const __int64 start		= GetPos();
 	enum stream_type type	= stream_type::unknown;
 
