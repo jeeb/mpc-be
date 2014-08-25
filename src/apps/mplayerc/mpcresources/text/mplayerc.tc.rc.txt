@@ -168,7 +168,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
-5		"DVD 光碟機或是「 VIDEO_TS 」資料夾的位置"
+5		"DVD 光碟機或是「VIDEO_TS」資料夾的位置"
 6		"預設值"
 7		"使用者自訂路徑:"
 10		"DVD 導覽與外部 OGM 分離器的偏好語言"
@@ -262,7 +262,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
-6		"使用「 Dark 」主題 (預設)"
+6		"使用「Dark」主題 (預設)"
 7		"亮度 :"
 9		"預設值"
 10		"B"
@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"材質設定 (再次開啟視訊即可看見變更)"
 19		"預先緩衝的子畫面數目:"
 22		"最大材質解析度:"
-23		"只有在使用名為 ""VMR-7 (無轉換)"" 、 ""VMR-9 (無轉換)"" 、 ""EVR 自訂呈現"" 、 ""EVR 同步繪製"" 、 ""Haali 繪製器"" 或 ""madVR"" 的視訊繪製器時能用 DirectShow 顯示字幕。VMR-7 需要 Windows XP, VMR-9 需要 DirectX 9, 同時兩者都需要有硬體加速的 D3D 顯示卡。"
+23		"只有在使用名為「VMR-7/9 (無轉換)」、「EVR 自訂呈現」、「EVR 同步繪製」、「Haali 繪製器」或「madVR」的視訊繪製器時能用 DirectShow 顯示字幕。VMR-7 需要 Windows XP, VMR-9 需要 DirectX 9, 同時兩者都需要有硬體加速的 D3D 顯示卡。"
 24		"問問題之前"
 25		"如果您覆寫並啟用在顯示卡裡的全螢幕反鋸齒 (FSAA) 設定，字幕不會變得比較好看，卻會吃更多的 CPU 資源。"
 27		"警告"
@@ -1665,7 +1665,7 @@ STRING IDS_MPEG2_ENABLE_PLANAR		"啟用平面的 YUV 媒體類型 (NV12, YV12, I
 STRING IDS_MPEG2_FORCED_SUBS		"總是顯示強制字幕"
 STRING IDS_MPEG2_HUE		"色調"
 STRING IDS_MPEG2_INTERLACE_FLAG		"在輸出媒體類型設定交錯旗標"
-STRING IDS_MPEG2_NOTE1		"注意: 使用非平面的輸出格式、Bob 去交錯器，或是調整色彩屬性會降低效能。必要的時候去交錯器會從「 Auto 」切換到「 Blend 」。"
+STRING IDS_MPEG2_NOTE1		"注意: 使用非平面的輸出格式、Bob 去交錯器，或是調整色彩屬性會降低效能。必要的時候去交錯器會從「Auto」切換到「Blend」。"
 STRING IDS_MPEG2_READ_AR		"從串流中讀取長寬比例"
 STRING IDS_MPEG2_RESET		"重設"
 STRING IDS_MPEG2_SATURATION		"飽和度"
@@ -1729,8 +1729,8 @@ STRING IDS_NEW_UPDATE_AVAILABLE		"新版本 %s 已經發布。\n\n您要前往 M
 STRING IDS_NO_MORE_MEDIA		"目前的資料夾內已無更多媒體檔案。"
 STRING IDS_OPEN_WITH_MPC		"以 MPC-BE 播放"
 STRING IDS_OPTIONS_CAPTION		"選項"
-STRING IDS_OSD_AUTO_GAIN_CONTROL_OFF		"Àuto gain control: Off"
-STRING IDS_OSD_AUTO_GAIN_CONTROL_ON		"Àuto gain control: On"
+STRING IDS_OSD_AUTO_GAIN_CONTROL_OFF		"自動增益控制: 關閉"
+STRING IDS_OSD_AUTO_GAIN_CONTROL_ON		"自動增益控制: 開啟"
 STRING IDS_OSD_BRIGHTNESS		"亮度: %s"
 STRING IDS_OSD_CONTRAST		"對比: %s"
 STRING IDS_OSD_CUSTOM_CH_MAPPING_OFF		"自訂的聲道對應: 關閉"
@@ -1953,7 +1953,7 @@ STRING IDS_THUMB_ROWNUMBER		"列:"
 STRING IDS_THUMB_THUMBNAILS		"分佈"
 STRING IDS_TIME_TOOLTIP_ABOVE		"搜尋列之上"
 STRING IDS_TIME_TOOLTIP_BELOW		"搜尋列之下"
-STRING IDS_TOGGLE_AUTO_GAIN_CONTROL		"Toggle àuto gain control"
+STRING IDS_TOGGLE_AUTO_GAIN_CONTROL		"切換自動增益控制"
 STRING IDS_TOOLTIP_FULLSCREEN		"全螢幕"
 STRING IDS_TOOLTIP_LOCK		"鎖定"
 STRING IDS_TOOLTIP_MAXIMIZE		"最大化"
