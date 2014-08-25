@@ -41,6 +41,7 @@ CPPageFullscreen::CPPageFullscreen()
 	, m_bExitFullScreenAtFocusLost(FALSE)
 	, m_bRestoreResAfterExit(TRUE)
 	, m_nCurMon(0)
+	, m_list(0)
 {
 }
 
