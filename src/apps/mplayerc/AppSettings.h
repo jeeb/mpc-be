@@ -168,26 +168,60 @@ enum {
 
 #pragma pack(push, 1)
 struct dispmode {
-	bool fValid;
-	CSize size;
-	int bpp, freq;
-	DWORD dmDisplayFlags;
+	bool bValid = false;
+	CSize size = 0;
+	int bpp = 0;
+	int freq = 0;
+	DWORD dmDisplayFlags = 0;
+
+	bool operator == (const dispmode& dm) const {
+		return (bValid == dm.bValid && size == dm.size && bpp == dm.bpp && freq == dm.freq && dmDisplayFlags == dm.dmDisplayFlags);
+	};
+
+	bool operator < (const dispmode& dm) const {
+		bool bRet = false;
+
+		// Ignore bValid when sorting
+		if (size.cx < dm.size.cx) {
+			bRet = true;
+		} else if (size.cx == dm.size.cx) {
+			if (size.cy < dm.size.cy) {
+				bRet = true;
+			} else if (size.cy == dm.size.cy) {
+				if (freq < dm.freq) {
+					bRet = true;
+				} else if (freq == dm.freq) {
+					if (bpp < dm.bpp) {
+						bRet = true;
+					} else if (bpp == dm.bpp) {
+						bRet = (dmDisplayFlags & DM_INTERLACED) && !(dm.dmDisplayFlags & DM_INTERLACED);
+					}
+				}
+			}
+		}
+
+		return bRet;
+	};
 };
 
 struct fpsmode {
-	double vfr_from;
-	double vfr_to;
-	bool fChecked;
+	double vfr_from = 0.000;
+	double vfr_to = 0.000;
+	bool bChecked = false;
 	dispmode dmFSRes;
-	bool fIsData;
+	bool bValid = false;
+
+	void Empty() {
+		memset(this, 0, sizeof(*this));
+	}
 };
 
 #define MaxFpsCount 30
 struct AChFR { //AutoChangeFullscrRes
-	int bEnabled;
+	int bEnabled = 0;
 	fpsmode dmFullscreenRes[MaxFpsCount];
-	bool bApplyDefault;
-	bool bSetGlobal;
+	bool bApplyDefault = false;
+	bool bSetGlobal = false;
 };
 
 struct AccelTbl {

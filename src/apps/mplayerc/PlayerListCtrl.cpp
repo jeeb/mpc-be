@@ -487,6 +487,9 @@ IMPLEMENT_DYNAMIC(CPlayerListCtrl, CListCtrl)
 CPlayerListCtrl::CPlayerListCtrl(int tStartEditingDelay)
 	: m_tStartEditingDelay(tStartEditingDelay)
 	, m_nItemClicked(-1)
+	, m_nTimerID(0)
+	, m_nSubItemClicked(-1)
+	, m_fInPlaceDirty(false)
 {
 }
 
@@ -887,7 +890,10 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		SetFocus();
 	}
 
-	KillTimer(1);
+	if (m_nTimerID) {
+		KillTimer(m_nTimerID);
+		m_nTimerID = 0;
+	}
 
 	int nItemClickedNow, nSubItemClickedNow;
 
@@ -905,7 +911,7 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		dispinfo.item.iSubItem = m_nSubItemClicked;
 		if (GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo)) {
 			if (m_tStartEditingDelay > 0) {
-				SetTimer(1, m_tStartEditingDelay, NULL);
+				m_nTimerID = SetTimer(1, m_tStartEditingDelay, NULL);
 			} else {
 				dispinfo.hdr.code = LVN_DOLABELEDIT;
 				GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo);
@@ -921,8 +927,9 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CPlayerListCtrl::OnTimer(UINT_PTR nIDEvent)
 {
-	if (nIDEvent == 1) {
-		KillTimer(1);
+	if (nIDEvent == m_nTimerID) {
+		KillTimer(m_nTimerID);
+		m_nTimerID = 0;
 
 		UINT flag = LVIS_FOCUSED;
 		if ((GetItemState(m_nItemClicked, flag) & flag) == flag && m_nSubItemClicked >= 0) {
@@ -935,6 +942,14 @@ void CPlayerListCtrl::OnTimer(UINT_PTR nIDEvent)
 			dispinfo.item.iSubItem = m_nSubItemClicked;
 			GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo);
 		}
+	} else if (nIDEvent == 43) {
+		// CListCtrl does really strange things on this timer.
+		// For example, when using mouse scroll right after mouse left button was clicked,
+		// this timer scrolls the control back to the clicked item after a while.
+		// There is no known problems with simply killing this timer.
+		VERIFY(KillTimer(nIDEvent));
+	} else {
+		__super::OnTimer(nIDEvent);
 	}
 }
 
@@ -1071,7 +1086,7 @@ int CPlayerListCtrl::InsertColumn(_In_ int nCol, _In_z_ LPCTSTR lpszColumnHeadin
 			&& IsWinVistaOrLater()) {
 		LVCOLUMN col;
 		col.mask	= LVCF_MINWIDTH;
-		col.cxMin	= 40;
+		col.cxMin	= nMinWidth;
 		SetColumn(nCol, &col);
 		SetExtendedStyle(GetExtendedStyle() | LVS_EX_COLUMNSNAPPOINTS);
 	}

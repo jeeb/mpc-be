@@ -52,7 +52,7 @@ extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 extern CStringA GetContentType(CString fn, CAtlList<CString>* redir = NULL);
 extern WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
 
-extern void GetCurDispMode(dispmode& dm, CString& DisplayName);
+extern bool GetCurDispMode(dispmode& dm, CString& DisplayName);
 extern bool GetDispMode(int i, dispmode& dm, CString& DisplayName);
 extern void SetDispMode(dispmode& dm, CString& DisplayName);
 extern void SetAudioRenderer(int AudioDevNo);

@@ -11612,7 +11612,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		}
 		hMenu = NULL;
 	} else {
-		if (s.AutoChangeFullscrRes.bEnabled == 1 && s.AutoChangeFullscrRes.bApplyDefault && s.AutoChangeFullscrRes.dmFullscreenRes[0].fChecked == 1) {
+		if (s.AutoChangeFullscrRes.bEnabled == 1 && s.AutoChangeFullscrRes.bApplyDefault && s.AutoChangeFullscrRes.dmFullscreenRes[0].bChecked == 1) {
 			SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor);
 		}
 
@@ -11841,8 +11841,8 @@ void CMainFrame::AutoChangeMonitorMode()
 		}
 
 		for (int rs = 0; rs < MaxFpsCount ; rs++) {
-			if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].fIsData == true
-					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].fChecked == 1
+			if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].bValid
+					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].bChecked
 					&& MediaFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
 					&& MediaFPS <= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_to) {
 
@@ -11855,8 +11855,8 @@ void CMainFrame::AutoChangeMonitorMode()
 
 		if (iMonValid == 1 && s.dFPS >= 1){
 			for (int rs = 0; rs < MaxFpsCount ; rs++) {
-				if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].fIsData == true
-					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].fChecked == 1
+				if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].bValid
+					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].bChecked
 					&& s.dFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
 					&& s.dFPS <= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_to) {
 
@@ -11871,7 +11871,7 @@ void CMainFrame::AutoChangeMonitorMode()
 						&& (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.freq == s.dm_def.freq)) {
 
 						if (m_nWasSetDispMode == 1) {
-							ChangeDisplaySettingsEx (mf_hmonitor, NULL, NULL, 0, NULL);
+							ChangeDisplaySettingsEx(mf_hmonitor, NULL, NULL, 0, NULL);
 							m_nWasSetDispMode = 0;
 						}
 					}
@@ -11880,9 +11880,8 @@ void CMainFrame::AutoChangeMonitorMode()
 				}
 			}
 			if (bHasRule == 0) {
-
 				if ((dmCur.size == s.dm_def.size) && (dmCur.bpp == s.dm_def.bpp) && (dmCur.freq == s.dm_def.freq)) {
-					ChangeDisplaySettingsEx (mf_hmonitor, NULL, NULL, 0, NULL);
+					ChangeDisplaySettingsEx(mf_hmonitor, NULL, NULL, 0, NULL);
 				} else {
 					SetDispMode(dmCur, mf_hmonitor);
 				}

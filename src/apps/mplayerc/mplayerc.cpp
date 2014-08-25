@@ -1660,46 +1660,31 @@ void CMPlayerCApp::OnHelpShowcommandlineswitches()
 }
 
 //
-void GetCurDispMode(dispmode& dm, CString& DisplayName)
+bool GetCurDispMode(dispmode& dm, CString& DisplayName)
 {
-	HDC hDC;
-	CString DisplayName1 = DisplayName;
-	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
-		CMonitor monitor;
-		CMonitors monitors;
-		monitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
-		monitor.GetName(DisplayName1);
-	}
-	hDC = CreateDC(DisplayName1, NULL, NULL, NULL);
-	if (hDC) {
-		dm.fValid = true;
-		dm.size = CSize(GetDeviceCaps(hDC, HORZRES), GetDeviceCaps(hDC, VERTRES));
-		dm.bpp = GetDeviceCaps(hDC, BITSPIXEL);
-		dm.freq = GetDeviceCaps(hDC, VREFRESH);
-		DeleteDC(hDC);
-	}
+	return GetDispMode(ENUM_CURRENT_SETTINGS, dm, DisplayName);
 }
 
 bool GetDispMode(int i, dispmode& dm, CString& DisplayName)
 {
 	DEVMODE devmode;
-	CString DisplayName1 = DisplayName;
 	devmode.dmSize = sizeof(DEVMODE);
-	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
-		CMonitor monitor;
-		CMonitors monitors;
-		monitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
-		monitor.GetName(DisplayName1);
+	if (DisplayName == L"Current" || DisplayName.IsEmpty()) {
+		CMonitor monitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+		monitor.GetName(DisplayName);
 	}
-	if (!EnumDisplaySettings(DisplayName1, i, &devmode)) {
-		return false;
+
+	dm.bValid = !!EnumDisplaySettings(DisplayName, i, &devmode);
+
+	if (dm.bValid) {
+		dm.size = CSize(devmode.dmPelsWidth, devmode.dmPelsHeight);
+		dm.bpp = devmode.dmBitsPerPel;
+		dm.freq = devmode.dmDisplayFrequency;
+		dm.dmDisplayFlags = devmode.dmDisplayFlags;
 	}
-	dm.fValid = true;
-	dm.size = CSize(devmode.dmPelsWidth, devmode.dmPelsHeight);
-	dm.bpp = devmode.dmBitsPerPel;
-	dm.freq = devmode.dmDisplayFrequency;
-	dm.dmDisplayFlags = devmode.dmDisplayFlags;
-	return true;
+
+	return dm.bValid;
+
 }
 
 void SetDispMode(dispmode& dm, CString& DisplayName)
@@ -1711,7 +1696,7 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 		return;
 	}
 
-	if (!dm.fValid) {
+	if (!dm.bValid) {
 		return;
 	}
 	DEVMODE dmScreenSettings;
@@ -1740,7 +1725,7 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 	} else if (s.AutoChangeFullscrRes.bEnabled == 2){
 		if (s.AutoChangeFullscrRes.bSetGlobal) {
 			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, (CDS_UPDATEREGISTRY/* | CDS_GLOBAL*/), NULL);
-		} else if (!s.AutoChangeFullscrRes.bSetGlobal) {
+		} else {
  			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
 		}
 	}

@@ -146,6 +146,7 @@ class CPlayerListCtrl : public CListCtrl
 private:
 	int m_nItemClicked, m_nSubItemClicked;
 	int m_tStartEditingDelay;
+	UINT_PTR m_nTimerID;
 
 	bool PrepareInPlaceControl(int nRow, int nCol, CRect& rect);
 

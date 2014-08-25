@@ -30,39 +30,45 @@ class CPPageFullscreen : public CPPageBase
 {
 	DECLARE_DYNAMIC(CPPageFullscreen)
 
-	//	private:
+private:
 	CAtlArray<dispmode> m_dms;
-	CAtlArray<CString> sl;
+	CAtlList<CString> m_displayModesString;
 	CStringArray m_MonitorDisplayNames, m_MonitorDeviceName;
 
-public:
-	CPPageFullscreen();
-	virtual ~CPPageFullscreen();
-
-	BOOL m_launchfullscreen;
-	BOOL m_fSetFullscreenRes;
-	BOOL m_fSetDefault;
-	BOOL m_fSetGlobal;
-
-	CPlayerListCtrl m_list;
-	enum {COL_Z, COL_VFR_F, COL_VFR_T, COL_SRR};
+	BOOL m_bLaunchFullScreen;
+	BOOL m_bSetFullscreenRes;
+	BOOL m_bSetDefault;
+	BOOL m_bSetGlobal;
 
 	AChFR m_AutoChangeFullscrRes;
-	CStringW m_f_hmonitor;
-	CStringW m_f_hmonitorID;
-	int iCurMon;
+	CString m_f_hmonitor;
+	CString m_f_hmonitorID;
+	int m_nCurMon;
+
+	CPlayerListCtrl m_list;
+	enum {
+		COL_Z,
+		COL_VFR_F,
+		COL_VFR_T,
+		COL_SRR
+	};
 
 	int m_iMonitorType;
 	CComboBox m_iMonitorTypeCtrl;
 
-	BOOL m_iShowBarsWhenFullScreen;
+	BOOL m_bShowBarsWhenFullScreen;
 	int m_nShowBarsWhenFullScreenTimeOut;
-	BOOL m_fExitFullScreenAtTheEnd, m_fExitFullScreenAtFocusLost;
+	BOOL m_bExitFullScreenAtTheEnd, m_bExitFullScreenAtFocusLost;
 	CSpinButtonCtrl m_nTimeOutCtrl;
-	BOOL m_fRestoreResAfterExit;
+	BOOL m_bRestoreResAfterExit;
 
-	int m_iSel;
-	int m_iSeldm[MaxFpsCount];
+	void ReindexList();
+	void GetCurDispModeString(CString& strMode);
+	CString FormatModeString(dispmode dmod);
+	void ModesUpdate();
+public:
+	CPPageFullscreen();
+	virtual ~CPPageFullscreen();
 
 	enum { IDD = IDD_PPAGEFULLSCREEN };
 
@@ -75,8 +81,6 @@ protected:
 
 public:
 	afx_msg void OnUpdateList(CCmdUI* pCmdUI);
-	afx_msg void OnNMClickList1(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
@@ -106,9 +110,4 @@ public:
 	afx_msg void OnMoveDown();
 	afx_msg void OnUpdateUp(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateDown(CCmdUI* pCmdUI);
-
-	void ReindexList();
-	void ReindexListSubItem();
-	void GetCurDispModeString(CString& strMode);
-	void ModesUpdate();
 };
