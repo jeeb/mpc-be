@@ -393,6 +393,11 @@ void CPPageExternalFilters::OnAddRegistered()
 			if (FilterOverride* f = dlg.m_filters.RemoveHead()) {
 				CAutoPtr<FilterOverride> p(f);
 
+				if (f->name.IsEmpty() && !f->guids.GetCount() && !f->dwMerit) {
+					// skip something strange
+					continue;
+				}
+
 				CString name = f->name;
 
 				if (f->type == FilterOverride::EXTERNAL) {
