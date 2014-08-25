@@ -136,6 +136,8 @@ BOOL CPPageSubRend::OnInitDialog()
 	m_fSPCAllowAnimationWhenBuffering = s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering;
 	m_nSubDelayInterval = s.nSubDelayInterval;
 
+	CorrectCWndWidth(GetDlgItem(IDC_CHECK3));
+
 	UpdateData(FALSE);
 
 	CreateToolTip();

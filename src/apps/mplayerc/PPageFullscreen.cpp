@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
 #include <algorithm>
 
@@ -213,10 +214,12 @@ BOOL CPPageFullscreen::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER
 							| LVS_EX_GRIDLINES | LVS_EX_BORDERSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_CHECKBOXES | LVS_EX_FLATSB);
-	m_list.InsertColumn(COL_Z, ResStr(IDS_PPAGE_FS_CLN_ON_OFF), LVCFMT_LEFT, 60, 40);
-	m_list.InsertColumn(COL_VFR_F, ResStr(IDS_PPAGE_FS_CLN_FROM_FPS), LVCFMT_RIGHT, 60, 40);
-	m_list.InsertColumn(COL_VFR_T, ResStr(IDS_PPAGE_FS_CLN_TO_FPS), LVCFMT_RIGHT, 60, 40);
-	m_list.InsertColumn(COL_SRR, ResStr(IDS_PPAGE_FS_CLN_DISPLAY_MODE), LVCFMT_LEFT, 135, 40);
+	m_list.InsertColumn(COL_Z, ResStr(IDS_PPAGE_FS_CLN_ON_OFF), LVCFMT_LEFT, 60, -1, -1);
+	m_list.InsertColumn(COL_VFR_F, ResStr(IDS_PPAGE_FS_CLN_FROM_FPS), LVCFMT_RIGHT, 60, -1, -1);
+	m_list.InsertColumn(COL_VFR_T, ResStr(IDS_PPAGE_FS_CLN_TO_FPS), LVCFMT_RIGHT, 60, -1, -1);
+	m_list.InsertColumn(COL_SRR, ResStr(IDS_PPAGE_FS_CLN_DISPLAY_MODE), LVCFMT_LEFT, 135, -1, -1);
+
+	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
 
 	ModesUpdate();
 	UpdateData(FALSE);
@@ -633,16 +636,23 @@ void CPPageFullscreen::ModesUpdate()
 		}
 	}
 
-	/*
-	strange - don't work ... until disable custom code in InsertColumn()
-	for (int i = 0; i <= COL_SRR; i++) {
-		m_list.SetColumnWidth(i, LVSCW_AUTOSIZE);
-		int nColumnWidth = m_list.GetColumnWidth(i);
-		m_list.SetColumnWidth(i, LVSCW_AUTOSIZE_USEHEADER);
-		int nHeaderWidth = m_list.GetColumnWidth(i);
-		m_list.SetColumnWidth(i, max(nColumnWidth, nHeaderWidth));
+	for (int nCol = 0; nCol <= COL_SRR; nCol++) {
+		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+		int nColumnWidth = m_list.GetColumnWidth(nCol);
+		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
+		int nHeaderWidth = m_list.GetColumnWidth(nCol);
+		int nNewWidth = max(nColumnWidth, nHeaderWidth);
+		m_list.SetColumnWidth(nCol, nNewWidth);
+		if (IsWinVistaOrLater()) {
+			LVCOLUMN col;
+			col.mask = LVCF_MINWIDTH;
+			col.cxMin = nNewWidth;
+			m_list.SetColumn(nCol, &col);
+		}
 	}
-	*/
+	if (IsWinVistaOrLater()) {
+		m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_COLUMNSNAPPOINTS);
+	}
 
 	m_list.SetRedraw(TRUE);
 }

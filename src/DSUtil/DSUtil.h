@@ -165,8 +165,9 @@ extern DWORD			YCrCbToRGB_Rec709(BYTE A, BYTE Y, BYTE Cr, BYTE Cb);
 extern void				TraceFilterInfo(IBaseFilter* pBF);
 extern void				TracePinInfo(IPin* pPin);
 
-extern void				SetThreadName( DWORD dwThreadID, LPCSTR szThreadName);
+extern void				SetThreadName(DWORD dwThreadID, LPCSTR szThreadName);
 extern void				CorrectComboListWidth(CComboBox& pComboBox);
+extern void				CorrectCWndWidth(CWnd* pWnd);
 
 extern void				getExtraData(const BYTE *format, const GUID *formattype, const size_t formatlen, BYTE *extra, unsigned int *extralen);
 extern void				audioFormatTypeHandler(const BYTE *format, const GUID *formattype, DWORD *pnSamples, WORD *pnChannels, WORD *pnBitsPerSample, WORD *pnBlockAlign, DWORD *pnBytesPerSec);

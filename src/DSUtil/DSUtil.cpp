@@ -2908,6 +2908,33 @@ void CorrectComboListWidth(CComboBox& pComboBox)
 	pComboBox.SetDroppedWidth(dx);
 }
 
+void CorrectCWndWidth(CWnd* pWnd)
+{
+	if (!pWnd) {
+		return;
+	}
+
+	CDC*   pDC = pWnd->GetDC();
+	CFont* pFont = pWnd->GetFont();
+	CFont* pOldFont = pDC->SelectObject(pFont);
+
+	CString str;
+	pWnd->GetWindowText(str);
+	CSize szText = pDC->GetTextExtent(str);
+
+	TEXTMETRIC tm;
+	pDC->GetTextMetrics(&tm);
+	pDC->SelectObject(pOldFont);
+	pWnd->ReleaseDC(pDC);
+
+	CRect r;
+	pWnd->GetWindowRect(r);
+	pWnd->GetOwner()->ScreenToClient(r);
+
+	r.right = r.left + ::GetSystemMetrics(SM_CXMENUCHECK) + szText.cx + tm.tmAveCharWidth;
+	pWnd->MoveWindow(r);
+}
+
 unsigned int lav_xiphlacing(unsigned char *s, unsigned int v)
 {
 	unsigned int n = 0;

@@ -85,6 +85,8 @@ BOOL CPPageFiltersPerformance::OnInitDialog()
 	m_DefaultCtrl.SetCheck(s.PerfomanceSettings.fDefault);
 	OnBnClickedCheck1();
 
+	CorrectCWndWidth(GetDlgItem(IDC_PERFOMANCE_DEFAULT));
+
 	UpdateData(FALSE);
 
 	CreateToolTip();
