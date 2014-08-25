@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Über MPC-BE"
 7		"MPC-BE"
 8		"Copyright © 2002-2014 MPC-BE Team, siehe Authors.txt Datei"
@@ -8,7 +8,7 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Dieses Programm ist Freeware und steht unter der\nGNU General Public License."
 14		"MPC-BE Compiler :"
 15		"FFmpeg Compiler :"
-20		"Deutsche Übersetzung von Markus Gaugg und Klaus Luppert"
+20		"Deutsche Übersetzung von Markus Gaugg,\nLuan und Klaus Luppert"
 23		"Libavcodec / Libavutil :"
 END
 
@@ -372,7 +372,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 31		"Verlauf und Privatsphäre"
 32		"Letzten Pan && Scan-Zoom merken"
 33		"Letzte Wiedergabeliste speichern"
-34		"Anzahl der Dateien:"
+34		"Anzahl der aufgelisteten Dateien:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
@@ -390,7 +390,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 27		"Warnung"
 28		"Untertitel für RealMedia und QuickTime sind möglich, wenn Sie deren spezielle\nDirectX 7 oder DirectX 9 Renderer einstellen."
 29		"Auflösung auf Zweierpotenz aufrunden"
-30		"Animationen beim Buffern erlauben"
+30		"Animationen beim Puffern erlauben"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -463,7 +463,7 @@ BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
-5		"Video renderer"
+5		"Video-Renderer"
 7		"RealMedia-Video"
 9		"QuickTime-Video"
 11		"Einstellungen für VMR-7/VMR-9 (Renderless) und EVR (Benutzerdefiniert) "
@@ -475,7 +475,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
 20		"VMR-Mixer-Modus"
 21		"Bei Anzeigewechsel neu initialisieren"
 22		"YUV-Mix-Modus"
-23		"EVR Buffer:"
+23		"EVR-Puffer:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1123,7 +1123,7 @@ END
 STRING IDC_BUTTON_EXT_SET		"Dieser Button bewirkt die Anzeige der momentan im System zugewiesenen Dateiendungen. Dies bedeutet, dass der Erweiterungen-Eintrag einen grauen Haken bekommt. Um die neu hinzugefügte Endung auch zu aktivieren, muss der graue Haken erneut angeklickt werden."
 STRING IDC_CACH_SIZE		"Cache-Größe für Datei-Operationen (in Kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Standardwert wird auch für andere Styles verwendet, für die noch nichts definiert wurde"
-STRING IDC_CHECK_SPCANIMWITHBUFFER		"Erlaubt Untertitel-Animation bei einem Buffer größer als 0. Ein Deaktivieren dieser Option spart zudem ein wenig CPU-Zeit. Bei flimmernden Untertiteln diese Option ebenfalls deaktiveren."
+STRING IDC_CHECK_SPCANIMWITHBUFFER		"Erlaubt Untertitel-Animation bei einem Puffer größer als 0. Ein Deaktivieren dieser Option spart zudem ein wenig CPU-Zeit. Bei flimmernden Untertiteln diese Option ebenfalls deaktiveren."
 STRING IDC_CHECK_SPCPOW2TEX		"Bei entfernen dieses Hakens wird etwas Videospeicher frei gegeben und Bandbreite bei der Übertragung vom lokalen Speicher zum Videospeicher gespart. Funktioniert aber vermutlich nicht mit älteren Grafikkarten."
 STRING IDC_CHECK_SUBRESYNC		"Erlaubt Untertitel anzuzeigen und zu bearbeiten (einschließlich Timecode). Navigation durch Untertitel. Kann die Ladegeschwindigkeit der Untertitel deutlich verlangsamen."
 STRING IDC_DSDXR		"Genauso wie VMR-9 (Renderless), benutzt aber einen richtigen 2-Pass bikubischen Resizer."
@@ -1156,7 +1156,7 @@ STRING IDC_REGULARSURF		"Video-Oberfläche ist eine normale Offscreen-Oberfläch
 STRING IDC_RMDX7		"Die Ausgabe der Real-Engine wird vom DirectX 7-basierten VMR-7 (Renderless) gerendert."
 STRING IDC_RMDX9		"Die Ausgabe der Real-Engine wird vom DirectX 9-basierten VMR-9 (Renderless) gerendert."
 STRING IDC_RMSYSDEF		"Real's eigener Renderer. SMIL Scripte funktionieren, können aber unter Umständen Probleme machen. Der Renderer verwendet DirectDraw und läuft nach Möglichkeit im Overlay Modus."
-STRING IDC_TEXTURESURF2D		"Video-Oberfläche ist eine Texture-Oberfläche, aber die 2D-Funktionen werden noch benutzt, um das Bild in den Backbuffer zu kopieren und zu strecken. Benötigt eine Grafikkarte die 32bit, RGBA, Nicht-2er-Potenz-Texturen unterstützt, und zwar mindestens in der Auflösung des Videos."
+STRING IDC_TEXTURESURF2D		"Video-Oberfläche ist eine Texture-Oberfläche, aber die 2D-Funktionen werden noch benutzt, um das Bild in den Backpuffer zu kopieren und zu strecken. Benötigt eine Grafikkarte die 32bit, RGBA, Nicht-2er-Potenz-Texturen unterstützt, und zwar mindestens in der Auflösung des Videos."
 STRING IDC_TEXTURESURF3D		"Video-Oberfläche ist eine Texture-Oberfläche und wird als zwei Dreiecke in 3D gezeichnet. In den Anzeigeeigenschaften aktiviertes Antialiasing kann einen bremsenden Effekt auf die Rendering-Geschwindigkeit haben."
 STRING IDD_FILEMEDIAINFO		"MediaInfo"
 STRING IDD_FILEPROPCLIP		"Allgemein"
@@ -1209,7 +1209,7 @@ STRING IDS_AG_AUDIOLANG		"Audiospur"
 STRING IDS_AG_AUDIO_FILE		"Audiodatei"
 STRING IDS_AG_AUTO		"Auto"
 STRING IDS_AG_BOSS_KEY		"Boss-Taste"
-STRING IDS_AG_BUFFERS		"Bufferspeicher"
+STRING IDS_AG_BUFFERS		"Pufferspeicher"
 STRING IDS_AG_CHAPTER		"Kapitel %d"
 STRING IDS_AG_CHAPTER2		"Kapitel: "
 STRING IDS_AG_CLOSE		"Schließen"
@@ -1398,14 +1398,14 @@ STRING IDS_BRIGHTNESS_INC		"Helligkeit erhöhen"
 STRING IDS_CANCEL		"Abbrechen"
 STRING IDS_CANNOT_CHANGE_FORMAT		"MPC-BE benötigt Administrator Rechte, um die Datei-Erweitungen zuweisen zu können. Bestätigen Sie die Zuweisung der Administratorrechte mittels eines Klicks auf den ""Administrator"" Knopf."
 STRING IDS_CAPTURE_ERROR		"Aufnahme Fehler"
-STRING IDS_CAPTURE_ERROR_ADD_BUFFER		"Der %s Buffer Filter konnte nicht zum Diagramm hinzugefügt werden."
+STRING IDS_CAPTURE_ERROR_ADD_BUFFER		"Der %s Puffer-Filter konnte nicht zum Diagramm hinzugefügt werden."
 STRING IDS_CAPTURE_ERROR_ADD_ENCODER		"Der %s Encoder Filter konnte nicht zum Diagramm hinzugefügt werden."
 STRING IDS_CAPTURE_ERROR_AUDIO		"Audio"
 STRING IDS_CAPTURE_ERROR_AUD_CAPT_PIN		"Es wurde kein Audio Capture Pin gefunden."
 STRING IDS_CAPTURE_ERROR_AUD_FILTER		"Der Audio Capture Filter kann nicht mit dem Graphen verbunden werden."
 STRING IDS_CAPTURE_ERROR_AUD_OUT_FILE		"Fehler bei der Initialisierung der Audio Ausgabe Datei."
 STRING IDS_CAPTURE_ERROR_COMPRESSION		"Die Kompression kann nicht auf den %s Encoder Filter angewandt werden."
-STRING IDS_CAPTURE_ERROR_CONNECT_BUFF		"Der %s Buffer Filter konnte nicht mit dem Diagramm verbunden werden."
+STRING IDS_CAPTURE_ERROR_CONNECT_BUFF		"Der %s Puffer-Filter konnte nicht mit dem Diagramm verbunden werden."
 STRING IDS_CAPTURE_ERROR_CONNECT_ENC		"Der %s Encoder Filter konnte nicht mit dem Diagramm verbunden werden."
 STRING IDS_CAPTURE_ERROR_DEVICE		"Das Aufnahmegerät kann nicht geöffnet werden."
 STRING IDS_CAPTURE_ERROR_MULTIPLEXER		"Der %s Stream konnte nicht mit dem Multiplexer Filter verbunden werden."
@@ -1418,7 +1418,7 @@ STRING IDS_CAPTURE_SETTINGS		"Aufnahmeeinstellungen"
 STRING IDS_CLEAR		"Löschen"
 STRING IDS_CONTRAST_DEC		"Kontrast verringern"
 STRING IDS_CONTRAST_INC		"Kontrast erhöhen"
-STRING IDS_CONTROLS_BUFFERING		"Fülle Bufferspeicher... (%d%%)"
+STRING IDS_CONTROLS_BUFFERING		"Fülle Pufferspeicher... (%d%%)"
 STRING IDS_CONTROLS_CAPTURING		"Aufnahme läuft..."
 STRING IDS_CONTROLS_CLOSED		"Geschlossen"
 STRING IDS_CONTROLS_CLOSING		"Schließe..."
@@ -1539,7 +1539,7 @@ STRING IDS_MAINFRM_39		", Größe: %I64dMB"
 STRING IDS_MAINFRM_4		"Untertitel speichern fehlgeschlagen"
 STRING IDS_MAINFRM_40		", Frei: %I64dKB"
 STRING IDS_MAINFRM_41		", Frei: %I64dMB"
-STRING IDS_MAINFRM_42		", Freie V/A Buffer: %03d/%03d"
+STRING IDS_MAINFRM_42		", Freie V/A Puffer: %03d/%03d"
 STRING IDS_MAINFRM_46		"Bitte Pfad der DVD/BD auswählen:"
 STRING IDS_MAINFRM_47		" erfolgreich geladen"
 STRING IDS_MAINFRM_48		"Alle Dateien (*.*)|*.*||"
