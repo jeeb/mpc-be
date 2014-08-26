@@ -1504,7 +1504,6 @@ BEGIN
         BEGIN
             MENUITEM "&Tearing Test\tCtrl+T",       ID_VIEW_TEARING_TEST
             MENUITEM "&Display Stats\tCtrl+J",      ID_VIEW_DISPLAYSTATS
-            MENUITEM "Remaining Time\tCtrl+I",      ID_VIEW_REMAINING_TIME
             MENUITEM SEPARATOR
             POPUP "Output Range"
             BEGIN
@@ -1856,7 +1855,6 @@ BEGIN
         BEGIN
             MENUITEM "&Tearing Test\tCtrl+T",       ID_VIEW_TEARING_TEST
             MENUITEM "&Display Stats\tCtrl+J",      ID_VIEW_DISPLAYSTATS
-            MENUITEM "Remaining Time\tCtrl+I",      ID_VIEW_REMAINING_TIME
             MENUITEM SEPARATOR
             POPUP "Output Range"
             BEGIN
@@ -1991,7 +1989,6 @@ BEGIN
             BEGIN
                 MENUITEM "&Tearing Test\tCtrl+T",       ID_VIEW_TEARING_TEST
                 MENUITEM "&Display Stats\tCtrl+J",      ID_VIEW_DISPLAYSTATS
-                MENUITEM "Remaining Time\tCtrl+I",      ID_VIEW_REMAINING_TIME
                 MENUITEM SEPARATOR
                 POPUP "Output Range"
                 BEGIN
@@ -2176,7 +2173,6 @@ BEGIN
         BEGIN
             MENUITEM "&Tearing Test\tCtrl+T",       ID_VIEW_TEARING_TEST
             MENUITEM "&Display Stats\tCtrl+J",      ID_VIEW_DISPLAYSTATS
-            MENUITEM "Remaining Time\tCtrl+I",      ID_VIEW_REMAINING_TIME
             MENUITEM SEPARATOR
             POPUP "Output Range"
             BEGIN

@@ -453,7 +453,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_SHADERS_TOGGLE, OnShaderToggle)
 	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE_SCREENSPACE, OnUpdateShaderToggleScreenSpace)
 	ON_COMMAND(ID_SHADERS_TOGGLE_SCREENSPACE, OnShaderToggleScreenSpace)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_REMAINING_TIME, OnUpdateViewRemainingTime)
 
 	ON_UPDATE_COMMAND_UI(ID_OSD_LOCAL_TIME, OnUpdateViewOSDLocalTime)
 	ON_UPDATE_COMMAND_UI(ID_OSD_FILE_NAME, OnUpdateViewOSDFileName)
@@ -7553,13 +7552,6 @@ void CMainFrame::OnViewVSyncOffsetDecrease()
 	}
 	r.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
-}
-
-void CMainFrame::OnUpdateViewRemainingTime(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	pCmdUI->Enable(s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
-	pCmdUI->SetCheck (m_bRemainingTime);
 }
 
 void CMainFrame::OnViewRemainingTime()

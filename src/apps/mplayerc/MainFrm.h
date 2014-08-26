@@ -927,7 +927,6 @@ public:
 	afx_msg void OnUpdateShaderToggleScreenSpace(CCmdUI* pCmdUI);
 	afx_msg void OnShaderToggle();
 	afx_msg void OnShaderToggleScreenSpace();
-	afx_msg void OnUpdateViewRemainingTime(CCmdUI* pCmdUI);
 	afx_msg void OnViewRemainingTime();
 
 	afx_msg void OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI);
