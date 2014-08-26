@@ -228,7 +228,7 @@ start:
 				if (type == 0x80 && PinNotExist) {
 					name.Format(L"Theora %d", streamId++);
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
-					pPinOut.Attach(DNew COggTheoraOutputPin(page.GetData(), name, this, this, &hr));
+					pPinOut.Attach(DNew COggTheoraOutputPin(page, name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 					streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
 				}
@@ -1255,39 +1255,79 @@ COggTextOutputPin::COggTextOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFil
 // COggTheoraOutputPin
 //
 
-COggTheoraOutputPin::COggTheoraOutputPin(BYTE* p, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+COggTheoraOutputPin::COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
+	, m_KfgShift(0)
+	, m_KfgMask(0)
+	, m_nVersion(0)
+	, m_rtAvgTimePerFrame(0)
 {
+	CGolombBuffer gb(page.GetData(), page.GetCount());
+	gb.SkipBytes(7);
+
+	m_nVersion	= (UINT)gb.BitRead(24);
+	LONG width	= gb.ReadShort() << 4;
+	LONG height	= gb.ReadShort() << 4;
+	if (m_nVersion > 0x030400) {
+		gb.BitRead(50); gb.BitRead(50);
+	}
+
+    if (m_nVersion >= 0x030200) {
+        LONG visible_width	= gb.BitRead(24);
+        LONG visible_height	= gb.BitRead(24);
+        if (visible_width <= width && visible_width > width - 16
+				&& visible_height <= height && visible_height > height - 16) {
+			width	= visible_width;
+            height	= visible_height;
+        }
+		gb.BitRead(16);
+    }
+
+	int nFpsNum	= gb.ReadDword();
+	int nFpsDen	= gb.ReadDword();
+	if (nFpsNum) {
+		m_rtAvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * nFpsDen / nFpsNum);
+	}
+
+	int nARnum	= gb.BitRead(24);
+	int nARden	= gb.BitRead(24);
+	CSize Aspect(width, height);
+	if (nARnum && nARden) {
+		Aspect.cx *= nARnum;
+		Aspect.cy *= nARden;
+	}
+	ReduceDim(Aspect);
+
+	if (m_nVersion >= 0x030200) {
+		gb.BitRead(38);
+	}
+	if (m_nVersion >= 0x304000) {
+		gb.BitRead(2);
+	}
+
+	m_KfgShift = gb.BitRead(5);
+	if (!m_KfgShift) {
+		m_KfgShift = 6; // Is it really default value ?
+	}
+	m_KfgMask = (1 << m_KfgShift) - 1;
+
 	CMediaType mt;
 	mt.majortype		= MEDIATYPE_Video;
 	mt.subtype			= FOURCCMap('OEHT');
 	mt.formattype		= FORMAT_MPEG2_VIDEO;
-	
+
 	MPEG2VIDEOINFO* vih	= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(sizeof(MPEG2VIDEOINFO));
 	memset(mt.Format(), 0, mt.FormatLength());
 	
-	vih->hdr.bmiHeader.biSize		 = sizeof(vih->hdr.bmiHeader);
-	vih->hdr.bmiHeader.biWidth		 = *(WORD*)&p[10] >> 4;
-	vih->hdr.bmiHeader.biHeight		 = *(WORD*)&p[12] >> 4;
-	vih->hdr.bmiHeader.biCompression = 'OEHT';
-	vih->hdr.bmiHeader.biPlanes		 = 1;
-	vih->hdr.bmiHeader.biBitCount	 = 24;
-	
-	m_nFpsNum	= (p[22]<<24)|(p[23]<<16)|(p[24]<<8)|p[25];
-	m_nFpsDenum	= (p[26]<<24)|(p[27]<<16)|(p[28]<<8)|p[29];
-	if (m_nFpsNum) {
-		m_rtAvgTimePerFrame			= (REFERENCE_TIME)(10000000.0 * m_nFpsDenum / m_nFpsNum);
-		vih->hdr.AvgTimePerFrame	= m_rtAvgTimePerFrame;
-	}
-	vih->hdr.dwPictAspectRatioX	= (p[14]<<16)|(p[15]<<8)|p[16];
-	vih->hdr.dwPictAspectRatioY	= (p[17]<<16)|(p[18]<<8)|p[19];
-
-	m_KfgShift		= (((p[40]<<8)+p[41]) &0x3E0) >> 5;
-	m_nIndexOffset	= TH_VERSION_CHECK(p[7],p[8],p[9],3,2,1);
-
-	if (m_KfgShift == 0) {
-		m_KfgShift = 6;    // Is it really default value ?
-	}
+	vih->hdr.bmiHeader.biSize			= sizeof(vih->hdr.bmiHeader);
+	vih->hdr.bmiHeader.biWidth			= width;
+	vih->hdr.bmiHeader.biHeight			= height;
+	vih->hdr.bmiHeader.biCompression	= FCC('THEO');
+	vih->hdr.bmiHeader.biPlanes			= 1;
+	vih->hdr.bmiHeader.biBitCount		= 24;
+	vih->hdr.AvgTimePerFrame			= m_rtAvgTimePerFrame;
+	vih->hdr.dwPictAspectRatioX			= Aspect.cx;
+	vih->hdr.dwPictAspectRatioY			= Aspect.cy;
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.Add(mt);
@@ -1334,14 +1374,18 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 
 REFERENCE_TIME COggTheoraOutputPin::GetRefTime(__int64 granule_position)
 {
-	LONGLONG iframe = granule_position >> m_KfgShift;
-	LONGLONG pframe = granule_position - (iframe << m_KfgShift);
+	LONGLONG iframe = (granule_position >> m_KfgShift);
+    if (m_nVersion < 0x030201) {
+		iframe++;
+	}
+
+	LONGLONG pframe = granule_position & m_KfgMask;
 	/*3.2.0 streams store the frame index in the granule position.
 	  3.2.1 and later store the frame count.
 	  We return the index, so adjust the value if we have a 3.2.1 or later
 	   stream.*/
 
-	REFERENCE_TIME rt = (iframe + pframe - m_nIndexOffset) * m_rtAvgTimePerFrame;
+	REFERENCE_TIME rt = (iframe + pframe) * m_rtAvgTimePerFrame;
 	return rt;
 }
 

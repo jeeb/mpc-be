@@ -156,18 +156,17 @@ public:
 
 class COggTheoraOutputPin : public COggSplitterOutputPin
 {
-	CAutoPtrList<Packet> m_initpackets;
-	LONGLONG				m_KfgShift;
-	int						m_nIndexOffset;
-	int						m_nFpsNum;
-	int						m_nFpsDenum;
+	CAutoPtrList<Packet>	m_initpackets;
+	LONG					m_KfgShift;
+	LONG					m_KfgMask;
+	UINT					m_nVersion;
 	REFERENCE_TIME			m_rtAvgTimePerFrame;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
-	COggTheoraOutputPin(BYTE* p, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 
 	HRESULT UnpackInitPage(OggPage& page);
 	bool IsInitialized() {
