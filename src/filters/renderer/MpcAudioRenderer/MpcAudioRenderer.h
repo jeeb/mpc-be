@@ -119,9 +119,9 @@ private:
 
 	// CMpcAudioRenderer WASAPI methods
 	HRESULT						GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
-	HRESULT						GetAudioDevice(IMMDevice **ppMMDevice);
-	HRESULT						CreateAudioClient(IMMDevice *pMMDevice, IAudioClient **ppAudioClient);
-	HRESULT						InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient **pAudioClient, IAudioRenderClient **ppRenderClient);
+	HRESULT						GetAudioDevice();
+	HRESULT						CreateAudioClient();
+	HRESULT						InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
 	HRESULT						CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
 	HRESULT						DoRenderSampleWasapi(IMediaSample *pMediaSample);
 	HRESULT						GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
@@ -134,8 +134,8 @@ private:
 	HRESULT						SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
 	void						CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec);
 
-	HRESULT						StartAudioClient(IAudioClient **ppAudioClient);
-	HRESULT						StopAudioClient(IAudioClient **ppAudioClient);
+	HRESULT						StartAudioClient();
+	HRESULT						StopAudioClient();
 
 	HRESULT						RenderWasapiBuffer();
 	void						CheckBufferStatus();
@@ -149,12 +149,12 @@ private:
 	WASAPI_MODE					m_WASAPIMode;
 	WASAPI_MODE					m_WASAPIModeAfterRestart;
 	CString						m_DeviceName;
-	IMMDevice					*pMMDevice;
+	IMMDevice					*m_pMMDevice;
 	IAudioClient				*m_pAudioClient;
 	IAudioRenderClient			*m_pRenderClient;
-	UINT32						nFramesInBuffer;
-	REFERENCE_TIME				hnsPeriod;
-	bool						isAudioClientStarted;
+	UINT32						m_nFramesInBuffer;
+	REFERENCE_TIME				m_hnsPeriod;
+	bool						m_isAudioClientStarted;
 	double						m_dVolume;
 	BOOL						m_bIsBitstream;
 	BOOL						m_bUseBitExactOutput;

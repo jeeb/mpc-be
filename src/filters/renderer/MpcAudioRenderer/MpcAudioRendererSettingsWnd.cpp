@@ -143,7 +143,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 	if (m_pMAR) {
 		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
-		m_pMAR->SetSystemLayoutChannels(m_cbUseBitExactOutput.GetCheck() && m_cbUseSystemLayoutChannels.GetCheck());
+		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
 		CString str;
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
