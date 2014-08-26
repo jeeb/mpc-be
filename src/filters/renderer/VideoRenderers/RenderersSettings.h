@@ -91,7 +91,6 @@ public:
 		bool   fVMR9AlterativeVSync;
 		int    iVMR9VSyncOffset;
 		bool   iVMR9VSyncAccurate;
-		bool   iVMR9FullscreenGUISupport;
 		bool   iVMR9VSync;
 		bool   iVMR9FullFloatingPointProcessing;
 		bool   iVMR9HalfFloatingPointProcessing;

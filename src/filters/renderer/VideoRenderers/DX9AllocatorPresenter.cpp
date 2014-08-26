@@ -387,9 +387,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 	bRet = bRet || New.fVMR9AlterativeVSync != Current.fVMR9AlterativeVSync;
 	bRet = bRet || New.iVMR9VSyncAccurate != Current.iVMR9VSyncAccurate;
 
-	if (m_bIsFullscreen) {
-		bRet = bRet || New.iVMR9FullscreenGUISupport != Current.iVMR9FullscreenGUISupport;
-	} else {
+	if (!m_bIsFullscreen) {
 		if (Current.iVMRDisableDesktopComposition) {
 			if (!m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = true;
@@ -574,9 +572,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		// there's no Desktop composition to take care of alternative vSync in exclusive mode, alternative vSync is therefore unused
 		m_pp.hDeviceWindow = m_hWnd;
 		m_pp.Flags = D3DPRESENTFLAG_VIDEO;
-		if (s.m_AdvRendSets.iVMR9FullscreenGUISupport && !m_bHighColorResolution) {
-			m_pp.Flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
-		}
 		m_D3DDevExError = L"No m_pD3DEx";
 		if (m_pD3DEx) {
 			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
@@ -613,11 +608,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 					 &m_pp, &m_pD3DDev);
 			m_DisplayType = d3ddm.Format;
 			m_BackbufferType = m_pp.BackBufferFormat;
-		}
-		if (m_pD3DDev && s.m_AdvRendSets.iVMR9FullscreenGUISupport && !m_bHighColorResolution) {
-			m_pD3DDev->SetDialogBoxMode(true);
-			//if (m_pD3DDev->SetDialogBoxMode(true) != S_OK)
-			//	ExitProcess(0);
 		}
 	} else {
 		m_pp.Windowed = TRUE;
@@ -1887,9 +1877,6 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			if (m_bIsFullscreen) {
 				strText += L"FS ";
-			}
-			if (s.m_AdvRendSets.iVMR9FullscreenGUISupport) {
-				strText += L"FSGui ";
 			}
 
 			if (s.m_AdvRendSets.iVMRDisableDesktopComposition) {

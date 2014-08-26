@@ -35,7 +35,6 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 	fVMR9AlterativeVSync              = 0;
 	iVMR9VSyncOffset                  = 0;
 	iVMR9VSyncAccurate                = 0;
-	iVMR9FullscreenGUISupport         = 0;
 	iVMR9VSync                        = 0;
 	iVMR9FullFloatingPointProcessing  = 0;
 	iVMR9HalfFloatingPointProcessing  = 0;
@@ -66,7 +65,6 @@ void CRenderersSettings::CAdvRendererSettings::SetOptimal()
 	fVMR9AlterativeVSync              = 0;
 	iVMR9VSyncOffset                  = 0;
 	iVMR9VSyncAccurate                = 0;
-	iVMR9FullscreenGUISupport         = 0;
 	iVMR9VSync                        = 0;
 	iVMR9FullFloatingPointProcessing  = 1;
 	iVMR9HalfFloatingPointProcessing  = 0;

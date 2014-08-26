@@ -1514,7 +1514,6 @@ BEGIN
             POPUP "Presentation"
             BEGIN
                 MENUITEM "D3D Fullscreen Mode",         ID_VIEW_D3DFULLSCREEN
-                MENUITEM "D3D Fullscreen GUI Support",  ID_VIEW_FULLSCREENGUISUPPORT
                 MENUITEM "10-bit RGB Output",           ID_VIEW_HIGHCOLORRESOLUTION
                 MENUITEM "Force 10-bit RGB Input",      ID_VIEW_FORCEINPUTHIGHCOLORRESOLUTION
                 MENUITEM "Full Floating Point Processing", ID_VIEW_FULLFLOATINGPOINTPROCESSING
@@ -1867,7 +1866,6 @@ BEGIN
             POPUP "Presentation"
             BEGIN
                 MENUITEM "D3D Fullscreen Mode",         ID_VIEW_D3DFULLSCREEN
-                MENUITEM "D3D Fullscreen GUI Support",  ID_VIEW_FULLSCREENGUISUPPORT
                 MENUITEM "10-bit RGB Output",           ID_VIEW_HIGHCOLORRESOLUTION
                 MENUITEM "Force 10-bit RGB Input",      ID_VIEW_FORCEINPUTHIGHCOLORRESOLUTION
                 MENUITEM "Full Floating Point Processing", ID_VIEW_FULLFLOATINGPOINTPROCESSING
@@ -2003,7 +2001,6 @@ BEGIN
                 POPUP "Presentation"
                 BEGIN
                     MENUITEM "D3D Fullscreen Mode",         ID_VIEW_D3DFULLSCREEN
-                    MENUITEM "D3D Fullscreen GUI Support",  ID_VIEW_FULLSCREENGUISUPPORT
                     MENUITEM "10-bit RGB Output",           ID_VIEW_HIGHCOLORRESOLUTION
                     MENUITEM "Force 10-bit RGB Input",      ID_VIEW_FORCEINPUTHIGHCOLORRESOLUTION
                     MENUITEM "Full Floating Point Processing", ID_VIEW_FULLFLOATINGPOINTPROCESSING
@@ -2189,7 +2186,6 @@ BEGIN
             POPUP "Presentation"
             BEGIN
                 MENUITEM "D3D Fullscreen Mode",         ID_VIEW_D3DFULLSCREEN
-                MENUITEM "D3D Fullscreen GUI Support",  ID_VIEW_FULLSCREENGUISUPPORT
                 MENUITEM "10-bit RGB Output",           ID_VIEW_HIGHCOLORRESOLUTION
                 MENUITEM "Force 10-bit RGB Input",      ID_VIEW_FORCEINPUTHIGHCOLORRESOLUTION
                 MENUITEM "Full Floating Point Processing", ID_VIEW_FULLFLOATINGPOINTPROCESSING

@@ -501,7 +501,7 @@ protected:
 	void CloseMediaPrivate();
 	void DoTunerScan(TunerScanData* pTSD);
 
-	CWnd *GetModalParent();
+	CWnd *GetModalParent() { return this; }
 
 	CString OpenCreateGraphObject(OpenMediaData* pOMD);
 	CString OpenFile(OpenFileData* pOFD);

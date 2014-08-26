@@ -384,7 +384,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISPLAYSTATS, OnUpdateViewDisplayStats)
 	ON_COMMAND(ID_VIEW_RESETSTATS, OnViewResetStats)
 	ON_COMMAND(ID_VIEW_DISPLAYSTATS, OnViewDisplayStatsSC)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_FULLSCREENGUISUPPORT, OnUpdateViewFullscreenGUISupport)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_HIGHCOLORRESOLUTION, OnUpdateViewHighColorResolution)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_FORCEINPUTHIGHCOLORRESOLUTION, OnUpdateViewForceInputHighColorResolution)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_FULLFLOATINGPOINTPROCESSING, OnUpdateViewFullFloatingPointProcessing)
@@ -426,7 +425,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCOFFSET_INCREASE, OnUpdateViewVSyncOffsetIncrease)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCOFFSET_DECREASE, OnUpdateViewVSyncOffsetDecrease)
-	ON_COMMAND(ID_VIEW_FULLSCREENGUISUPPORT, OnViewFullscreenGUISupport)
 	ON_COMMAND(ID_VIEW_HIGHCOLORRESOLUTION, OnViewHighColorResolution)
 	ON_COMMAND(ID_VIEW_FORCEINPUTHIGHCOLORRESOLUTION, OnViewForceInputHighColorResolution)
 	ON_COMMAND(ID_VIEW_FULLFLOATINGPOINTPROCESSING, OnViewFullFloatingPointProcessing)
@@ -7126,18 +7124,6 @@ void CMainFrame::OnUpdateViewAlternativeVSync(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(r.m_AdvRendSets.fVMR9AlterativeVSync);
 }
 
-void CMainFrame::OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
-
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9FullscreenGUISupport);
-}
-
 void CMainFrame::OnUpdateViewHighColorResolution(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -7484,15 +7470,6 @@ void CMainFrame::OnViewResetOptimal()
 	s.m_AdvRendSets.SetOptimal();
 	s.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_RESET_OPTIMAL));
-}
-
-void CMainFrame::OnViewFullscreenGUISupport()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iVMR9FullscreenGUISupport = !s.m_AdvRendSets.iVMR9FullscreenGUISupport;
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iVMR9FullscreenGUISupport ? ResStr(IDS_OSD_RS_D3D_FS_GUI_SUPP_ON) : ResStr(IDS_OSD_RS_D3D_FS_GUI_SUPP_OFF));
 }
 
 void CMainFrame::OnViewHighColorResolution()
@@ -12672,16 +12649,6 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	}
 
 	return hr;
-}
-
-CWnd *CMainFrame::GetModalParent()
-{
-	AppSettings& s = AfxGetAppSettings();
-	CWnd *pParentWnd = this;
-	if (m_pFullscreenWnd->IsWindow() && s.m_RenderersSettings.m_AdvRendSets.iVMR9FullscreenGUISupport) {
-		pParentWnd = m_pFullscreenWnd;
-	}
-	return pParentWnd;
 }
 
 static UINT YoutubeThreadProc(LPVOID pParam)
