@@ -174,7 +174,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "About"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_MAINFRAME_ICON,5,5,21,20
+    ICON            IDR_MAINFRAME,IDC_MAINFRAME_ICON,5,5,20,20
     LTEXT           "MPC-BE",IDC_STATIC1,30,5,195,8,SS_NOPREFIX
     CONTROL         "Copyright © 2002-2014 see Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
@@ -188,7 +188,7 @@ BEGIN
     EDITTEXT        IDC_SVN_NUMBER,130,50,100,13,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_MPC_COMPILER,130,67,100,13,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_FFMPEG_COMPILER,130,84,100,13,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "English translation made by MPC-BE Team",IDC_STATIC,30,153,195,8
+    LTEXT           "English translation made by MPC-BE Team",IDC_STATIC,30,153,150,18
     CONTROL         "<a>http://sourceforge.net/projects/mpcbe/</a>",IDC_SOURCEFORGE_LINK,
                     "SysLink",WS_TABSTOP,30,118,200,8
     LTEXT           "Libavcodec / Libavutil :",IDC_STATIC,30,103,96,8
