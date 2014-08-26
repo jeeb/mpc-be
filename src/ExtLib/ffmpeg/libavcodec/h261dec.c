@@ -75,7 +75,7 @@ static av_cold int h261_decode_init(AVCodecContext *avctx)
     MpegEncContext *const s = &h->s;
 
     // set defaults
-    ff_MPV_decode_defaults(s);
+    ff_mpv_decode_defaults(s);
     s->avctx       = avctx;
     s->width       = s->avctx->coded_width;
     s->height      = s->avctx->coded_height;
@@ -219,7 +219,7 @@ static int h261_decode_mb_skipped(H261Context *h, int mba1, int mba2)
         s->mb_skipped                  = 1;
         h->mtype                      &= ~MB_TYPE_H261_FIL;
 
-        ff_MPV_decode_mb(s, s->block);
+        ff_mpv_decode_mb(s, s->block);
     }
 
     return 0;
@@ -454,7 +454,7 @@ intra:
             s->block_last_index[i] = -1;
     }
 
-    ff_MPV_decode_mb(s, s->block);
+    ff_mpv_decode_mb(s, s->block);
 
     return SLICE_OK;
 }
@@ -592,8 +592,7 @@ retry:
 
     if (!s->context_initialized)
         // we need the IDCT permutaton for reading a custom matrix
-        if (ff_MPV_common_init(s) < 0)
-            return -1;
+        ff_mpv_idct_init(s);
 
     ret = h261_decode_picture_header(h);
 
@@ -606,10 +605,14 @@ retry:
     if (s->width != avctx->coded_width || s->height != avctx->coded_height) {
         ParseContext pc = s->parse_context; // FIXME move this demuxing hack to libavformat
         s->parse_context.buffer = 0;
-        ff_MPV_common_end(s);
+        ff_mpv_common_end(s);
         s->parse_context = pc;
     }
+
     if (!s->context_initialized) {
+        if ((ret = ff_mpv_common_init(s)) < 0)
+            return ret;
+
         ret = ff_set_dimensions(avctx, s->width, s->height);
         if (ret < 0)
             return ret;
@@ -626,7 +629,7 @@ retry:
          avctx->skip_frame >= AVDISCARD_ALL)
         return get_consumed_bytes(s, buf_size);
 
-    if (ff_MPV_frame_start(s, avctx) < 0)
+    if (ff_mpv_frame_start(s, avctx) < 0)
         return -1;
 
     ff_mpeg_er_frame_start(s);
@@ -640,7 +643,7 @@ retry:
             break;
         h261_decode_gob(h);
     }
-    ff_MPV_frame_end(s);
+    ff_mpv_frame_end(s);
 
     av_assert0(s->current_picture.f->pict_type == s->current_picture_ptr->f->pict_type);
     av_assert0(s->current_picture.f->pict_type == s->pict_type);
@@ -659,7 +662,7 @@ static av_cold int h261_decode_end(AVCodecContext *avctx)
     H261Context *h    = avctx->priv_data;
     MpegEncContext *s = &h->s;
 
-    ff_MPV_common_end(s);
+    ff_mpv_common_end(s);
     return 0;
 }
 

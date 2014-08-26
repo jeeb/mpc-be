@@ -49,6 +49,7 @@
     <None Include="libavcodec\x86\hevc_deblock.asm" />
     <None Include="libavcodec\x86\hevc_idct.asm" />
     <None Include="libavcodec\x86\hevc_mc.asm" />
+    <None Include="libavcodec\x86\hevc_res_add.asm" />
     <None Include="libavcodec\x86\hpeldsp.asm" />
     <None Include="libavcodec\x86\huffyuvdsp.asm" />
     <None Include="libavcodec\x86\idctdsp.asm" />
@@ -453,6 +454,7 @@
     <ClInclude Include="libavutil\mathematics.h" />
     <ClInclude Include="libavutil\md5.h" />
     <ClInclude Include="libavutil\mem.h" />
+    <ClInclude Include="libavutil\motion_vector.h" />
     <ClInclude Include="libavutil\old_pix_fmts.h" />
     <ClInclude Include="libavutil\opt.h" />
     <ClInclude Include="libavutil\parseutils.h" />
@@ -985,6 +987,7 @@
     <ClCompile Include="libswresample\resample_dsp.c" />
     <ClCompile Include="libswresample\resample_template.c" />
     <ClCompile Include="libswresample\swresample.c" />
+    <ClCompile Include="libswresample\swresample_frame.c" />
     <ClCompile Include="libswresample\x86\audio_convert_init.c" />
     <ClCompile Include="libswresample\x86\rematrix_init.c" />
     <ClCompile Include="libswresample\x86\resample_init.c" />

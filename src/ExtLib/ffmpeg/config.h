@@ -638,6 +638,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_DCA_DECODER 1
 #define CONFIG_EAC3_DECODER 1
 #define CONFIG_FLAC_DECODER 1
+#define CONFIG_FLAC_ENCODER 0
 #define CONFIG_GSM_DECODER 0
 #define CONFIG_GSM_MS_DECODER 0
 #define CONFIG_IMC_DECODER 0

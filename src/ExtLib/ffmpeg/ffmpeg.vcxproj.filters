@@ -271,6 +271,9 @@
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\hevc_res_add.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -1431,6 +1434,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\lls.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\motion_vector.h">
       <Filter>libavutil</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2989,6 +2995,9 @@
     </ClCompile>
     <ClCompile Include="libavcodec\xvid_c_idct.c">
       <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libswresample\swresample_frame.c">
+      <Filter>libswresample</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

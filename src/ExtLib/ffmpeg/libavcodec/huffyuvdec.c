@@ -660,11 +660,9 @@ static void decode_422_bitstream(HYuvContext *s, int count)
     dst1 = get_vlc2(&s->gb, s->vlc[plane].table, VLC_BITS, 3)<<2;\
     dst1 += get_bits(&s->gb, 2);\
 }
-static void decode_plane_bitstream(HYuvContext *s, int count, int plane)
+static void decode_plane_bitstream(HYuvContext *s, int width, int plane)
 {
-    int i;
-
-    count /= 2;
+    int i, count = width/2;
 
     if (s->bps <= 8) {
         OPEN_READER(re, &s->gb);
@@ -676,6 +674,14 @@ static void decode_plane_bitstream(HYuvContext *s, int count, int plane)
             for(i=0; i<count; i++){
                 READ_2PIX_PLANE(s->temp[0][2 * i], s->temp[0][2 * i + 1], plane, OP8bits);
             }
+        }
+        if( width&1 && BITS_LEFT(re, &s->gb)>0 ) {
+            unsigned int index;
+            int nb_bits, code, n;
+            UPDATE_CACHE(re, &s->gb);
+            index = SHOW_UBITS(re, &s->gb, VLC_BITS);
+            VLC_INTERN(s->temp[0][width-1], s->vlc[plane].table,
+                       &s->gb, re, VLC_BITS, 3);
         }
         CLOSE_READER(re, &s->gb);
     } else if (s->bps <= 14) {
@@ -689,6 +695,14 @@ static void decode_plane_bitstream(HYuvContext *s, int count, int plane)
                 READ_2PIX_PLANE(s->temp16[0][2 * i], s->temp16[0][2 * i + 1], plane, OP14bits);
             }
         }
+        if( width&1 && BITS_LEFT(re, &s->gb)>0 ) {
+            unsigned int index;
+            int nb_bits, code, n;
+            UPDATE_CACHE(re, &s->gb);
+            index = SHOW_UBITS(re, &s->gb, VLC_BITS);
+            VLC_INTERN(s->temp16[0][width-1], s->vlc[plane].table,
+                       &s->gb, re, VLC_BITS, 3);
+        }
         CLOSE_READER(re, &s->gb);
     } else {
         if (count >= (get_bits_left(&s->gb)) / (32 * 2)) {
@@ -699,6 +713,10 @@ static void decode_plane_bitstream(HYuvContext *s, int count, int plane)
             for(i=0; i<count; i++){
                 READ_2PIX_PLANE16(s->temp16[0][2 * i], s->temp16[0][2 * i + 1], plane);
             }
+        }
+        if( width&1 && get_bits_left(&s->gb)>0 ) {
+            int dst = get_vlc2(&s->gb, s->vlc[plane].table, VLC_BITS, 3)<<2;
+            s->temp16[0][width-1] = dst + get_bits(&s->gb, 2);
         }
     }
 }
@@ -729,7 +747,7 @@ static av_always_inline void decode_bgr_1(HYuvContext *s, int count,
 
     for (i = 0; i < count && BITS_LEFT(re, &s->gb) > 0; i++) {
         unsigned int index;
-        int code, n;
+        int code, n, nb_bits;
 
         UPDATE_CACHE(re, &s->gb);
         index = SHOW_UBITS(re, &s->gb, VLC_BITS);
@@ -740,7 +758,6 @@ static av_always_inline void decode_bgr_1(HYuvContext *s, int count,
             *(uint32_t *) &s->temp[0][4 * i] = s->pix_bgr_map[code];
             LAST_SKIP_BITS(re, &s->gb, n);
         } else {
-            int nb_bits;
             if (decorrelate) {
                 VLC_INTERN(s->temp[0][4 * i + G], s->vlc[1].table,
                            &s->gb, re, VLC_BITS, 3);
@@ -768,14 +785,14 @@ static av_always_inline void decode_bgr_1(HYuvContext *s, int count,
                 VLC_INTERN(s->temp[0][4 * i + R], s->vlc[2].table,
                            &s->gb, re, VLC_BITS, 3);
             }
-            if (alpha) {
-                UPDATE_CACHE(re, &s->gb);
-                index = SHOW_UBITS(re, &s->gb, VLC_BITS);
-                VLC_INTERN(s->temp[0][4 * i + A], s->vlc[2].table,
-                           &s->gb, re, VLC_BITS, 3);
-            } else
-                s->temp[0][4 * i + A] = 0;
         }
+        if (alpha) {
+            UPDATE_CACHE(re, &s->gb);
+            index = SHOW_UBITS(re, &s->gb, VLC_BITS);
+            VLC_INTERN(s->temp[0][4 * i + A], s->vlc[2].table,
+                       &s->gb, re, VLC_BITS, 3);
+        } else
+            s->temp[0][4 * i + A] = 0;
     }
     CLOSE_READER(re, &s->gb);
 }
@@ -800,7 +817,7 @@ static void draw_slice(HYuvContext *s, AVFrame *frame, int y)
     int h, cy, i;
     int offset[AV_NUM_DATA_POINTERS];
 
-    if (s->avctx->draw_horiz_band == NULL)
+    if (!s->avctx->draw_horiz_band)
         return;
 
     h  = y - s->last_slice_end;

@@ -555,6 +555,7 @@ SRCS_LR = \
 	libswresample/resample.c \
 	libswresample/resample_dsp.c \
 	libswresample/swresample.c \
+	libswresample/swresample_frame.c \
 	\
 	libswresample/x86/audio_convert_init.c \
 	libswresample/x86/rematrix_init.c \
@@ -607,6 +608,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/hevc_deblock.asm \
 	libavcodec/x86/hevc_idct.asm \
 	libavcodec/x86/hevc_mc.asm \
+	libavcodec/x86/hevc_res_add.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/idctdsp.asm \

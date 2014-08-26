@@ -12872,7 +12872,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					tmpName = PlayerYouTube(fn_https, &m_strTitleAlt, &m_strAuthorAlt);
 					m_strUrl = tmpName;
 
-					if (s.iYoutubeSource == 0) {
+					if (s.iYoutubeSource == 0 && CString(tmpName).MakeLower().Find(L".m3u8") == -1) {
 						if (!m_strTitleAlt.IsEmpty() && ::PathIsURL(tmpName)) {
 							m_fYoutubeThreadWork = TH_START;
 							m_YoutubeFile = tmpName;
@@ -12892,6 +12892,14 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 							}
 						}
 						PlayerYouTubePlaylistDelete();
+					}
+
+					if (CString(tmpName).MakeLower().Find(L".m3u8") > 0) {
+						CAtlList<CString> fns;
+						fns.AddTail(tmpName);
+						m_wndPlaylistBar.Open(fns, false);
+						m_wndPlaylistBar.SetFirstSelected();
+						m_strUrl = tmpName = m_wndPlaylistBar.GetCurFileName();
 					}
 				}
 
@@ -13027,7 +13035,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		if (fFirst) {
-			pOFD->title = (m_strTitleAlt.IsEmpty() ? fn : m_strTitleAlt);
+			pOFD->title = (m_strTitleAlt.IsEmpty() ? m_strUrl : m_strTitleAlt);
 			{
 				BeginEnumFilters(m_pGB, pEF, pBF);
 				if (m_pMainFSF = pBF) {
@@ -13122,7 +13130,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	SetupChapters();
 	LoadKeyFrames();
 
-	return _T("");
+	return L"";
 }
 
 void CMainFrame::SetupChapters()

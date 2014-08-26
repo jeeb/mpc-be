@@ -305,7 +305,7 @@ const uint8_t *ff_h264_decode_nal(H264Context *h, const uint8_t *src,
     av_fast_padded_malloc(&h->rbsp_buffer[bufidx], &h->rbsp_buffer_size[bufidx], length+MAX_MBPAIR_SIZE);
     dst = h->rbsp_buffer[bufidx];
 
-    if (dst == NULL)
+    if (!dst)
         return NULL;
 
     if(i>=length-1){ //no escaped 0
@@ -479,7 +479,7 @@ int ff_h264_alloc_tables(H264Context *h)
     if (!h->DPB) {
         h->DPB = av_mallocz_array(H264_MAX_PICTURE_COUNT, sizeof(*h->DPB));
         if (!h->DPB)
-            return AVERROR(ENOMEM);
+            goto fail;
         for (i = 0; i < H264_MAX_PICTURE_COUNT; i++)
             av_frame_unref(&h->DPB[i].f);
         av_frame_unref(&h->cur_pic.f);
@@ -852,9 +852,7 @@ static void decode_postinit(H264Context *h, int setup_finished)
         h->content_interpretation_type > 0 &&
         h->content_interpretation_type < 3) {
         AVStereo3D *stereo = av_stereo3d_create_side_data(&cur->f);
-        if (!stereo)
-            return;
-
+        if (stereo) {
         switch (h->frame_packing_arrangement_type) {
         case 0:
             stereo->type = AV_STEREO3D_CHECKERBOARD;
@@ -884,6 +882,7 @@ static void decode_postinit(H264Context *h, int setup_finished)
 
         if (h->content_interpretation_type == 2)
             stereo->flags = AV_STEREO3D_FLAG_INVERT;
+        }
     }
 
     if (h->sei_display_orientation_present &&
@@ -892,12 +891,11 @@ static void decode_postinit(H264Context *h, int setup_finished)
         AVFrameSideData *rotation = av_frame_new_side_data(&cur->f,
                                                            AV_FRAME_DATA_DISPLAYMATRIX,
                                                            sizeof(int32_t) * 9);
-        if (!rotation)
-            return;
-
-        av_display_rotation_set((int32_t *)rotation->data, angle);
-        av_display_matrix_flip((int32_t *)rotation->data,
-                               h->sei_vflip, h->sei_hflip);
+        if (rotation) {
+            av_display_rotation_set((int32_t *)rotation->data, angle);
+            av_display_matrix_flip((int32_t *)rotation->data,
+                                   h->sei_vflip, h->sei_hflip);
+        }
     }
 
     cur->mmco_reset = h->mmco_reset;
@@ -1742,7 +1740,7 @@ static int get_last_needed_nal(H264Context *h, const uint8_t *buf, int buf_size)
         ptr = ff_h264_decode_nal(h, buf + buf_index, &dst_length, &consumed,
                                  next_avc - buf_index);
 
-        if (ptr == NULL || dst_length < 0)
+        if (!ptr || dst_length < 0)
             return AVERROR_INVALIDDATA;
 
         buf_index += consumed;
@@ -1844,7 +1842,7 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
 
             ptr = ff_h264_decode_nal(hx, buf + buf_index, &dst_length,
                                      &consumed, next_avc - buf_index);
-            if (ptr == NULL || dst_length < 0) {
+            if (!ptr || dst_length < 0) {
                 ret = -1;
                 goto end;
             }

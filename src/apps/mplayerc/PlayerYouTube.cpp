@@ -27,6 +27,7 @@
 #define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\": \""
 #define MATCH_WIDTH_START			"meta property=\"og:video:width\" content=\""
 #define MATCH_DASHMPD_START			"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
+#define MATCH_HLSVP_START			"\"hlsvp\": \""
 #define MATCH_END					"\""
 
 #define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit \""
@@ -131,6 +132,9 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		int video_width_start = 0;
 		int video_width_len = 0;
 
+		int hlsvp_start = 0;
+		int hlsvp_len = 0;
+
 		int nMaxWidth = 0;
 
 		AppSettings& sApp = AfxGetAppSettings();
@@ -195,11 +199,23 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 						video_width_len = strpos(data + video_width_start, MATCH_END);
 					}
 
+					// "hlspv" - live streaming
+					if (!hlsvp_start && (hlsvp_start = strpos(data, MATCH_HLSVP_START)) != 0) {
+						hlsvp_start += strlen(MATCH_HLSVP_START);
+					}
+					if (hlsvp_start && !hlsvp_len) {
+						hlsvp_len = strpos(data + hlsvp_start, MATCH_END);
+					}
+
 					// optimization - to not download the entire page
 					if (stream_map_len && adaptive_fmts_len) {
 						if (nMaxWidth != 1920) {
 							break;
 						}
+					}
+
+					if (hlsvp_len) {
+						break;
 					}
 				} while (dwBytesRead);
 
@@ -212,7 +228,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			return fn;
 		}
 
-		if (!stream_map_len) {
+		if (!stream_map_len && !hlsvp_len) {
 			if (strstr(data, YOUTUBE_MP_URL)) {
 				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
 				fn.Empty();
@@ -222,6 +238,21 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		}
 
 		CString Title = PlayerYouTubeSearchTitle(data);
+
+		if (hlsvp_len) {
+			char *tmp = DNew char[hlsvp_len + 1];
+			memcpy(tmp, data + hlsvp_start, hlsvp_len);
+			tmp[hlsvp_len] = 0;
+			free(data);
+
+			CStringA strA = CStringA(tmp);
+			delete[] tmp;
+
+			CString url = UrlDecode(UrlDecode(strA));
+			url.Replace(L"\\/", L"/");
+
+			return url;
+		}
 
 		char *tmp = DNew char[stream_map_len + adaptive_fmts_len + 2];
 		memcpy(tmp, data + stream_map_start, stream_map_len);
