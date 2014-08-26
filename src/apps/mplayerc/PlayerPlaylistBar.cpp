@@ -1012,7 +1012,7 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>
 	} else if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
 		ParseBDMVPlayList(fns.GetHead());
 		return;
-	} else if (ct == _T("audio/x-mpegurl") || ct == _T("application/http-live-streaming-m3u")) {
+	} else if (ct == _T("audio/x-mpegurl")) {
 		ParseM3UPlayList(fns.GetHead());
 		return;
 	} else if (ct == _T("application/x-cue-metadata")) {
@@ -1210,7 +1210,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	while (f.ReadString(str)) {
 		str = str.Trim();
 
-		if (str.IsEmpty() || (str.Find(L"#EXTM3U") == 0)) {
+		if (str.IsEmpty() || (str.Find(_T("#EXTM3U")) == 0)) {
 			continue;
 		}
 
@@ -1219,9 +1219,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 			pli->m_type = CPlaylistItem::file;
 		}
 
-		if (str.Find(L"#") == 0) {
-			if (str.Find(L"#EXTINF:") == 0) {
-				int k = str.Find(L"#EXTINF:") + CString(L"#EXTINF:").GetLength();
+		if (str.Find(_T("#")) == 0) {
+			if (str.Find(_T("#EXTINF:")) == 0) {
+				int k = str.Find(_T("#EXTINF:")) + 8;
 				str = str.Mid(k, str.GetLength() - k);
 
 				k = str.Find(_T(","));
@@ -1233,10 +1233,6 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 						str = str.Mid(k, str.GetLength() - k);
 					}
 				}
-				pli->m_label = str.Trim();
-			} if (str.Find(L"#EXT-X-STREAM-INF:") == 0) {
-				int k = str.Find(L"#EXT-X-STREAM-INF:") + CString(L"#EXT-X-STREAM-INF:").GetLength();
-				str = str.Mid(k, str.GetLength() - k);
 				pli->m_label = str.Trim();
 			}
 		} else {

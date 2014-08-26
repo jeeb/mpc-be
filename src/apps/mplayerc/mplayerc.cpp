@@ -2009,9 +2009,6 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				if (str.Find("#EXTM3U") == 0 && str.Find("#EXT-X-MEDIA-SEQUENCE") > 0) {
 					return "application/http-live-streaming";
 				}
-				if (str.Find("#EXT-X-STREAM-INF:") >= 0) {
-					return "application/http-live-streaming-m3u";
-				}
 				if ((ct.Find(L"text/plain") == 0 || ct.Find(L"application/vnd.apple.mpegurl") == 0) && str.Find("#EXTM3U") == 0) {
 					ct = L"audio/x-mpegurl";
 				}
