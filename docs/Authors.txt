@@ -20,11 +20,11 @@ leothousan (Code)
 
 Translators:
 -------------
-Basque - azpidatziak - Xabier Aramendi - azpidatziak@users.sourceforge.net
+Basque - azpidatziak - Xabier Aramendi (azpidatziak@users.sourceforge.net)
 Chinese (Simplified) - insolo
 Chinese (Traditional) - beter
 Dutch - beter
-German - Markus Gaugg - gaugg@gmx.at, Sylt, Luan
+German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus
 Italian - Lord Maius
 Korean - kuh3h3
 Turkish - Thingol
