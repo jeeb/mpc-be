@@ -76,7 +76,7 @@ public:
 	CHdmvClipInfo &m_ClipInfo;
 	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
 
-	REFERENCE_TIME NextPTS(DWORD TrackNum);
+	REFERENCE_TIME NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly = FALSE);
 
 	CCritSec m_csProps;
 
@@ -98,11 +98,17 @@ public:
 		bool lang_set;
 		char lang[4];
 
+		enum stream_type {
+			NONE,
+			H264
+		} type;
+
 		stream() {
 			pid			= 0;
 			pesid		= 0;
 			ps1id		= 0;
 			lang_set	= false;
+			type		= stream_type::NONE;
 			mt.InitMediaType();
 			memset(lang, 0, _countof(lang));
 		}

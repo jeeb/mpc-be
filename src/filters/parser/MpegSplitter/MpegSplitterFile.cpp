@@ -287,7 +287,7 @@ void CMpegSplitterFile::OnUpdateDuration()
 	Seek(pos);
 }
 
-REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
+REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly/* = FALSE*/)
 {
 	REFERENCE_TIME rt	= INVALID_TIME;
 	__int64 rtpos		= -1;
@@ -328,13 +328,42 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 				continue;
 			}
 
+			__int64 packet_pos = GetPos();
+
 			if (h.payloadstart && ISVALIDPID(h.pid) && h.pid == TrackNum) {
 				if (NextMpegStartCode(b, 4)) {
 					peshdr h2;
 					if (Read(h2, b) && h2.fpts) { // pes packet
 						rt		= h2.pts;
 						rtpos	= pos2;
-						break;
+
+						BOOL bKeyFrame = TRUE;
+						if (bKeyFrameOnly) {
+							if (!h.randomaccess) {
+								bKeyFrame = FALSE;
+
+								CAtlArray<BYTE> p;
+								int nBytes = h.bytes - (GetPos() - packet_pos);
+								if (nBytes > 0) {
+									p.SetCount((size_t)nBytes);
+									ByteRead(p.GetData(), nBytes);
+
+									CH264Nalu Nalu;
+									Nalu.SetBuffer(p.GetData(), p.GetCount(), 0);
+									while (Nalu.ReadNext() && !bKeyFrame) {
+										NALU_TYPE nalu_type = Nalu.GetType();
+										if (nalu_type == NALU_TYPE_IDR || nalu_type == NALU_TYPE_SEI) {
+											bKeyFrame = TRUE;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						if (bKeyFrame) {
+							break;
+						}
 					}
 				}
 			}
@@ -353,14 +382,14 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 		}
 	}
 
-	if (rtpos >= 0) {
-		Seek(rtpos);
-	}
 	if (rt != INVALID_TIME) {
 		rt -= m_rtMin;
-	} else {
-		Seek(pos);
+		if (rtpos >= 0) {
+			pos = rtpos;
+		}
 	}
+
+	Seek(pos);
 
 	return rt;
 }
@@ -656,6 +685,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 
 				if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[s], len, &s.mt)) {
+					s.type = stream::stream_type::H264;
 					if (avch[s].spspps[index_subsetsps].complete) {
 						type = stream_type::stereo;
 					} else {

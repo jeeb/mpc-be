@@ -683,12 +683,15 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bSyncPoint	= !!h.fpts;
 				p->bAppendable	= !h.fpts;
 				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
-				p->rtStop		= p->rtStart+1;
+				p->rtStop		= p->rtStart + 1;
 
-				p->SetCount(h.len - (size_t)(m_pFile->GetPos() - pos));
-				m_pFile->ByteRead(p->GetData(), h.len - (m_pFile->GetPos() - pos));
+				__int64 nBytes = h.len - m_pFile->GetPos() - pos;
+				if (nBytes > 0) {
+					p->SetCount((size_t)nBytes);
+					m_pFile->ByteRead(p->GetData(), nBytes);
 
-				hr = DeliverPacket(p);
+					hr = DeliverPacket(p);
+				}
 			}
 			m_pFile->Seek(pos + h.len);
 		}
@@ -731,19 +734,20 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				if (m_rtDuration && p->rtStart > m_rtDuration) {
 					p->rtStart	= INVALID_TIME;
 				}
-				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart+1;
+				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
 				p->bSyncPoint	= !!h2.fpts && (p->rtStart != INVALID_TIME);
 #if (DEBUG) && 0
 				if (h2.fpts) {
 					TRACE(_T("h.pid = %d, m_rtPTSOffset = [%10I64d], h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, rtStartOffset, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
 				}
 #endif
+				__int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
+				if (nBytes > 0) {
+					p->SetCount(nBytes);
+					m_pFile->ByteRead(p->GetData(), nBytes);
 
-				size_t nBytes = h.bytes - (m_pFile->GetPos() - pos);
-				p->SetCount(nBytes);
-				m_pFile->ByteRead(p->GetData(), nBytes);
-
-				hr = DeliverPacket(p);
+					hr = DeliverPacket(p);
+				}
 			}
 		}
 
@@ -765,7 +769,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			p->bSyncPoint	= !!h.fpts;
 			p->bAppendable	= !h.fpts;
 			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
-			p->rtStop		= p->rtStart+1;
+			p->rtStop		= p->rtStart + 1;
 			
 			p->SetCount(h.length);
 			m_pFile->ByteRead(p->GetData(), h.length);
@@ -1236,6 +1240,37 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		REFERENCE_TIME rtmax	= rt - UNITS;
 		REFERENCE_TIME rtmin	= rtmax - UNITS/2;
+
+		CMpegSplitterFile::stream stream = pMasterStream->GetHead();
+		if (stream.type == CMpegSplitterFile::stream::stream_type::H264) {
+			__int64 save_seekpos = seekpos;
+			m_pFile->Seek(seekpos);
+
+			REFERENCE_TIME rtPTS = m_pFile->NextPTS(pMasterStream->GetHead(), TRUE);
+			while (rtPTS > rtmax && seekpos) {
+				seekpos = max(0, seekpos - MEGABYTE);
+				m_pFile->Seek(seekpos);
+				rtPTS = m_pFile->NextPTS(pMasterStream->GetHead(), TRUE);
+			}
+
+			if (rtPTS == INVALID_TIME || rtPTS > rtmax) {
+				seekpos	= save_seekpos;
+			} else {
+				seekpos = m_pFile->GetPos();
+				for (;;) {
+					m_pFile->Seek(m_pFile->GetPos() + 192);
+					rtPTS = m_pFile->NextPTS(pMasterStream->GetHead(), TRUE);
+					if (rtPTS > rtmax) {
+						m_pFile->Seek(seekpos);
+						break;
+					}
+					seekpos = m_pFile->GetPos();
+				}
+			}
+
+			m_pFile->Seek(seekpos);
+			return;
+		}
 
 		if (!m_pFile->m_bIsBadPacked) {
 			POSITION pos = pMasterStream->GetHeadPosition();
