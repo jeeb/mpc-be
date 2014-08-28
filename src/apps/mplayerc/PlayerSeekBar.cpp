@@ -701,8 +701,8 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	OAFilterState fs = pFrame->GetMediaState();
 
 	if (fs != -1) {
-		MoveThumb2(point);
 		if (pFrame->CanPreviewUse()) {
+			MoveThumb2(point);
 			UpdateToolTipPosition(point);
 		}
 	} else {
