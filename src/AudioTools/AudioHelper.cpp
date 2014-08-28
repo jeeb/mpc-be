@@ -23,20 +23,7 @@
 #include <MMReg.h>
 #include "AudioHelper.h"
 
-#define INT8_PEAK       128
-#define INT16_PEAK      32768
-#define INT24_PEAK      8388608
-#define INT32_PEAK      2147483648
-
-#define F16MAX ( float(INT16_MAX) / INT16_PEAK)
-#define D24MAX (double(INT24_MAX) / INT24_PEAK)
-#define D32MAX (double(INT32_MAX) / INT32_PEAK)
-
-#define round_f(x) ((x) > 0 ? (x) + 0.5f : (x) - 0.5f)
-#define round_d(x) ((x) > 0 ? (x) + 0.5  : (x) - 0.5)
-
 #define limit(a, x, b) if (x < a) { x = a; } else if (x > b) { x = b; }
-
 
 SampleFormat GetSampleFormat(WAVEFORMATEX* wfe)
 {
@@ -80,10 +67,7 @@ HRESULT convert_to_int16(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 
 	switch (sfmt) {
 		case SAMPLE_FMT_U8:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (int16_t)(*(int8_t*)pIn ^ 0x80) << 8;
-				pIn += sizeof(uint8_t);
-			}
+			convert_uint8_to_int16(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16:
 			memcpy(pOut, pIn, allsamples * sizeof(int16_t));
@@ -95,65 +79,52 @@ HRESULT convert_to_int16(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 			}
 			break;
 		case SAMPLE_FMT_S32:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = *(int16_t*)(pIn + 2); // read the high bits only
-				pIn += sizeof(int32_t);
-			}
+			convert_int32_to_int16(pOut, (int32_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLT:
-			for (size_t i = 0; i < allsamples; ++i) {
-				float f = *(float*)pIn;
-				limit(-1, f, F16MAX);
-				*pOut++ = (int16_t)round_f(f * INT16_PEAK);
-				pIn += sizeof(float);
-			}
+			convert_float_to_int16(pOut, (float*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_DBL:
-			for (size_t i = 0; i < allsamples; ++i) {
-				float f = (float)*(double*)pIn;
-				limit(-1, f, F16MAX);
-				*pOut++ = (int16_t)round_f(f * INT16_PEAK);
-				pIn += sizeof(double);
-			}
+			convert_double_to_int16(pOut, (double*)pIn, allsamples);
 			break;
 		// planar
 		case SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				uint8_t* p = (uint8_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					int8_t b = ((int8_t*)pIn)[nSamples * ch + i];
-					*pOut++ = (int16_t)(b ^ 0x80) << 8;
+					*pOut++ = SAMPLE_uint8_to_int16(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				int16_t* p = (int16_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = ((int16_t*)pIn)[nSamples * ch + i];
+					*pOut++ = p[nSamples * ch];
 				}
 			}
 			break;
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				int32_t* p = (int32_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = *(int16_t*)(pIn + (nSamples * ch + i) * sizeof(int32_t) + sizeof(int16_t)); // read the high bits only
+					*pOut++ = SAMPLE_int32_to_int16(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_FLTP:
 			for (size_t i = 0; i < nSamples; ++i) {
+				float* p = (float*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					float f = ((float*)pIn)[nSamples * ch + i];
-					limit(-1, f, F16MAX);
-					*pOut++ = (int16_t)round_f(f * INT16_PEAK);
+					*pOut++ = SAMPLE_float_to_int16(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_DBLP:
 			for (size_t i = 0; i < nSamples; ++i) {
+				double* p = (double*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					float f = (float)((double*)pIn)[nSamples * ch + i];
-					limit(-1, f, F16MAX);
-					*pOut++ = (int16_t)round_f(f * INT16_PEAK);
+					*pOut++ = SAMPLE_double_to_int16(p[nSamples * ch]);
 				}
 			}
 			break;
@@ -281,16 +252,10 @@ HRESULT convert_to_int32(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 
 	switch (sfmt) {
 		case SAMPLE_FMT_U8:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (int32_t)(*(int8_t*)pIn ^ 0x80) << 24;
-				pIn += sizeof(uint8_t);
-			}
+			convert_uint8_to_int32(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (int32_t)(*(int16_t*)pIn) << 16;
-				pIn += sizeof(int16_t);
-			}
+			convert_int16_to_int32(pOut, (int16_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S24:
 			for (size_t i = 0; i < allsamples; ++i) {
@@ -303,59 +268,49 @@ HRESULT convert_to_int32(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 			memcpy(pOut, pIn, nSamples * nChannels * sizeof(int32_t));
 			break;
 		case SAMPLE_FMT_FLT:
-			for (size_t i = 0; i < allsamples; ++i) {
-				double d = (double)(*(float*)pIn);
-				limit(-1, d, D32MAX);
-				*pOut++ = (int32_t)round_d(d * INT32_PEAK);
-				pIn += sizeof(float);
-			}
+			convert_float_to_int32(pOut, (float*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_DBL:
-			for (size_t i = 0; i < allsamples; ++i) {
-				double d = *(double*)pIn;
-				limit(-1, d, D32MAX);
-				*pOut++ = (int32_t)round_d(d * INT32_PEAK);
-				pIn += sizeof(double);
-			}
+			convert_double_to_int32(pOut, (double*)pIn, allsamples);
 			break;
 		// planar
 		case SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				uint8_t* p = (uint8_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					int8_t b = ((int8_t*)pIn)[nSamples * ch + i];
-					*pOut++ = (int32_t)(b ^ 0x80) << 24;
+					*pOut++ = SAMPLE_uint8_to_int32(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				int16_t* p = (int16_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = (int32_t)((int16_t*)pIn)[nSamples * ch + i] << 16;
+					*pOut++ = SAMPLE_int16_to_int32(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				int32_t* p = (int32_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = ((int32_t*)pIn)[nSamples * ch + i];
+					*pOut++ = p[nSamples * ch];
 				}
 			}
 			break;
 		case SAMPLE_FMT_FLTP:
 			for (size_t i = 0; i < nSamples; ++i) {
+				float* p = (float*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					double d = (double)((float*)pIn)[nSamples * ch + i];
-					limit(-1, d, D32MAX);
-					*pOut++ = (int32_t)round_d(d * INT32_PEAK);
+					*pOut++ = SAMPLE_float_to_int32(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_DBLP:
 			for (size_t i = 0; i < nSamples; ++i) {
+				double* p = (double*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					double d = ((double*)pIn)[nSamples * ch + i];
-					limit(-1, d, D32MAX);
-					*pOut++ = (int32_t)round_d(d * INT32_PEAK);
+					*pOut++ = SAMPLE_double_to_int32(p[nSamples * ch]);
 				}
 			}
 			break;
@@ -371,16 +326,10 @@ HRESULT convert_to_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 
 	switch (sfmt) {
 		case SAMPLE_FMT_U8:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)(*(int8_t*)pIn ^ 0x80) / INT8_PEAK;
-				pIn += sizeof(uint8_t);
-			}
+			convert_uint8_to_float(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)(*(int16_t*)pIn) / INT16_PEAK;
-				pIn += sizeof(int16_t);
-			}
+			convert_int16_to_float(pOut, (int16_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S24:
 			for (size_t i = 0; i < allsamples; ++i) {
@@ -394,53 +343,52 @@ HRESULT convert_to_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 			}
 			break;
 		case SAMPLE_FMT_S32:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)((double)(*(int32_t*)pIn) / INT32_PEAK);
-				pIn += sizeof(int32_t);
-			}
+			convert_int32_to_float(pOut, (int32_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLT:
 			memcpy(pOut, pIn, allsamples * sizeof(float));
 			break;
 		case SAMPLE_FMT_DBL:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)*(double*)pIn;
-				pIn += sizeof(double);
-			}
+			convert_double_to_float(pOut, (double*)pIn, allsamples);
 			break;
 		// planar
 		case SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				uint8_t* p = (uint8_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = (float)(((int8_t*)pIn)[nSamples * ch + i] ^ 0x80)/ INT8_PEAK;
+					*pOut++ = SAMPLE_uint8_to_float(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				int16_t* p = (int16_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = (float)((int16_t*)pIn)[nSamples * ch + i] / INT16_PEAK;
+					*pOut++ = SAMPLE_int16_to_float(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
+				int32_t* p = (int32_t*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = (float)((double)((int32_t*)pIn)[nSamples * ch + i] / INT32_PEAK);
+					*pOut++ = SAMPLE_int32_to_float(p[nSamples * ch]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_FLTP:
 			for (size_t i = 0; i < nSamples; ++i) {
+				float* p = (float*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = ((float*)pIn)[nSamples * ch + i];
+					*pOut++ = p[nSamples * ch];
 				}
 			}
 			break;
 		case SAMPLE_FMT_DBLP:
 			for (size_t i = 0; i < nSamples; ++i) {
+				double* p = (double*)pIn + i;
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = (float)((double*)pIn)[nSamples * ch + i];
+					*pOut++ = (float)p[nSamples * ch];
 				}
 			}
 			break;
@@ -457,66 +405,95 @@ HRESULT convert_to_planar_float(SampleFormat sfmt, WORD nChannels, DWORD nSample
 	switch (sfmt) {
 		case SAMPLE_FMT_U8:
 			for (int ch = 0; ch < nChannels; ++ch) {
+				uint8_t* p = (uint8_t*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
-					*pOut++ = (float)(((int8_t*)pIn)[nChannels * i + ch] ^ 0x80)/ INT8_PEAK;
+					*pOut++ = SAMPLE_uint8_to_float(p[nChannels * i]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S16:
 			for (int ch = 0; ch < nChannels; ++ch) {
+				int16_t* p = (int16_t*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
-					*pOut++ = (float)((int16_t*)pIn)[nChannels * i + ch] / INT16_PEAK;
+					*pOut++ = SAMPLE_int16_to_float(p[nChannels * i]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S32:
 			for (int ch = 0; ch < nChannels; ++ch) {
+				int32_t* p = (int32_t*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
-					*pOut++ = (float)((double)((int32_t*)pIn)[nChannels * i + ch] / INT32_PEAK);
+					*pOut++ = SAMPLE_int32_to_float(p[nChannels * i]);
 				}
 			}
 			break;
 		case SAMPLE_FMT_FLT:
 			for (int ch = 0; ch < nChannels; ++ch) {
+				float* p = (float*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
-					*pOut++ = ((float*)pIn)[nChannels * i + ch];
+					*pOut++ = p[nChannels * i];
 				}
 			}
 			break;
 		case SAMPLE_FMT_DBL:
 			for (int ch = 0; ch < nChannels; ++ch) {
+				double* p = (double*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
-					*pOut++ = (float)((double*)pIn)[nChannels * i + ch];
+					*pOut++ = (float)p[nChannels * i];
 				}
 			}
 			break;
 		// planar
 		case SAMPLE_FMT_U8P:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)(*(int8_t*)pIn ^ 0x80) / INT8_PEAK;
-				pIn += sizeof(uint8_t);
-			}
+			convert_uint8_to_float(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16P:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)(*(int16_t*)pIn) / INT16_PEAK;
-				pIn += sizeof(int16_t);
-			}
+			convert_int16_to_float(pOut, (int16_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S32P:
-			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)((double)(*(int32_t*)pIn) / INT32_PEAK);
-				pIn += sizeof(int32_t);
-			}
+			convert_int32_to_float(pOut, (int32_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLTP:
 			memcpy(pOut, pIn, allsamples * sizeof(float));
 			break;
 		case SAMPLE_FMT_DBLP:
+			convert_double_to_float(pOut, (double*)pIn, allsamples);
+			break;
+		default:
+			return E_INVALIDARG;
+	}
+	return S_OK;
+}
+
+HRESULT convert_float_to(SampleFormat sfmt, WORD nChannels, DWORD nSamples, float* pIn, BYTE* pOut)
+{
+	size_t allsamples = nSamples * nChannels;
+
+	switch (sfmt) {
+		case SAMPLE_FMT_U8:
+			convert_float_to_uint8((uint8_t*)pOut, pIn, allsamples);
+			break;
+		case SAMPLE_FMT_S16:
+			convert_float_to_int16((int16_t*)pOut, pIn, allsamples);
+			break;
+		case SAMPLE_FMT_S24:
 			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = (float)*(double*)pIn;
-				pIn += sizeof(double);
+				double d = (double)(*pIn++);
+				limit(-1, d, D32MAX);
+				uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
+				*pOut++ = (BYTE)(u32 >> 8);
+				*pOut++ = (BYTE)(u32 >> 16);
+				*pOut++ = (BYTE)(u32 >> 24);
 			}
+			break;
+		case SAMPLE_FMT_S32:
+			convert_float_to_int32((int32_t*)pOut, pIn, allsamples);
+			break;
+		case SAMPLE_FMT_FLT:
+			memcpy(pOut, pIn, allsamples * sizeof(float));
+			break;
+		case SAMPLE_FMT_DBL:
+			convert_float_to_double((double*)pOut, pIn, allsamples);
 			break;
 		default:
 			return E_INVALIDARG;
