@@ -38,7 +38,6 @@ CPPageAudio::CPPageAudio(IFilterGraph* pFG)
 	, m_fAutoloadAudio(FALSE)
 	, m_fPrioritizeExternalAudio(FALSE)
 
-	, m_fAudioTimeShift(FALSE)
 	, m_tAudioTimeShift(0)
 {
 	m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
@@ -69,8 +68,7 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC7, m_stcPotRealeaseTime);
 	DDX_Control(pDX, IDC_SLIDER3, m_sldPotGain);
 	DDX_Control(pDX, IDC_SLIDER4, m_sldPotRealeaseTime);
-	DDX_Check(pDX, IDC_CHECK4, m_fAudioTimeShift);
-	DDX_Control(pDX, IDC_CHECK4, m_fAudioTimeShiftCtrl);
+	DDX_Control(pDX, IDC_CHECK4, m_chkAudioTimeShift);
 	DDX_Text(pDX, IDC_EDIT2, m_tAudioTimeShift);
 	DDX_Control(pDX, IDC_EDIT2, m_tAudioTimeShiftCtrl);
 	DDX_Control(pDX, IDC_SPIN2, m_tAudioTimeShiftSpin);
@@ -184,7 +182,7 @@ BOOL CPPageAudio::OnInitDialog()
 	m_sldPotGain.SetPos(s.iAudioPotGain);
 	m_sldPotRealeaseTime.SetRange(5, 10, TRUE);
 	m_sldPotRealeaseTime.SetPos(s.iAudioPotRealeaseTime);
-	m_fAudioTimeShift	= s.fAudioTimeShift;
+	m_chkAudioTimeShift.SetCheck(s.fAudioTimeShift);
 	m_tAudioTimeShift	= s.iAudioTimeShift;
 	m_tAudioTimeShiftSpin.SetRange32(-1000*60*60*24, 1000*60*60*24);
 
@@ -214,11 +212,11 @@ BOOL CPPageAudio::OnApply()
 	s.strAudioPaths = m_sAudioPaths;
 
 	s.bAudioAutoVolumeControl	= !!m_chkAutoVolumeControl.GetCheck();
-	s.bAudioPotBoost		= !!m_chkPotBoostAudio.GetCheck();
-	s.iAudioPotGain			= m_sldPotGain.GetPos();
-	s.iAudioPotRealeaseTime	= m_sldPotRealeaseTime.GetPos();
-	s.fAudioTimeShift		= !!m_fAudioTimeShift;
-	s.iAudioTimeShift		= m_tAudioTimeShift;
+	s.bAudioPotBoost			= !!m_chkPotBoostAudio.GetCheck();
+	s.iAudioPotGain				= m_sldPotGain.GetPos();
+	s.iAudioPotRealeaseTime		= m_sldPotRealeaseTime.GetPos();
+	s.fAudioTimeShift			= !!m_chkAudioTimeShift.GetCheck();
+	s.iAudioTimeShift			= m_tAudioTimeShift;
 
 	if (m_pASF) {
 		m_pASF->SetAudioTimeShift(s.fAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);

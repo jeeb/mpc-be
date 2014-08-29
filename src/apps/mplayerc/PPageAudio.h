@@ -60,8 +60,7 @@ public:
 	CStatic		m_stcPotRealeaseTime;
 	CSliderCtrl	m_sldPotGain;
 	CSliderCtrl	m_sldPotRealeaseTime;
-	BOOL		m_fAudioTimeShift;
-	CButton		m_fAudioTimeShiftCtrl;
+	CButton		m_chkAudioTimeShift;
 	int			m_tAudioTimeShift;
 	CIntEdit	m_tAudioTimeShiftCtrl;
 	CSpinButtonCtrl m_tAudioTimeShiftSpin;

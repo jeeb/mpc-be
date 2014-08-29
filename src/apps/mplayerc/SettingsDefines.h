@@ -72,7 +72,7 @@
 #define IDS_RS_USEDEFAULTSUBTITLESSTYLE		_T("UseDefaultsubtitlesStyle")
 #define IDS_RS_MPEGINTERLACED				_T("MPEGInterlaced")
 #define IDS_RS_THUMBWIDTH					_T("ThumbWidth")
-#define IDS_RS_AUDIOAUTOVOLUMECONTROL			_T("AudioAutoVolumeControl")
+#define IDS_RS_AUDIOAUTOVOLUMECONTROL		_T("AudioAutoVolumeControl")
 #define IDS_RS_AUDIOPOTBOOST				_T("AudioPotBoost")
 #define IDS_RS_AUDIOPOTGAIN					_T("AudioPotGain")
 #define IDS_RS_AUDIOPOTREALEASETIME			_T("AudioPotRealeaseTime")
