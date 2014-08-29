@@ -199,6 +199,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioNormalizer.cpp" />
     <ClCompile Include="AudioSwitcher.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -209,6 +210,7 @@
     <None Include="AudioSwitcher.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioNormalizer.h" />
     <ClInclude Include="AudioSwitcher.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>

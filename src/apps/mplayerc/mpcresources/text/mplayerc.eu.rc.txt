@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Berrezarri Hautatutakoa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 5		"Audio Aurkezlea"
 7		"Ezaugarriak"
 8		"Biko irteera"
@@ -151,6 +151,8 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 20		"Berez irabazi agintea"
 21		"Bultzada:"
 23		"Soinu handitze abiadura:"
+25		"Boost audio"
+30		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -1365,6 +1367,8 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"erabili WASAPI, Elkarbanatu modua"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"erabili WASAPI, Bakarka modua, Bitjarioa"
 STRING IDS_AT_TOGGLE_SHADER		"Aldatu Pixel Itzalak"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Aldatu Ikusleiho Tarte Pixel Itzalak"
+STRING IDS_AUDIO_POTGAIN		"Gain (%d):"
+STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"
 STRING IDS_AUDIO_STREAM		"Audioa: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Irakurri Audio CD-a"
 STRING IDS_AUTOPLAY_PLAYBDMOVIE		"Irakurri Blu-ray Diska"

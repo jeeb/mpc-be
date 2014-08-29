@@ -38,9 +38,6 @@ CPPageAudio::CPPageAudio(IFilterGraph* pFG)
 	, m_fAutoloadAudio(FALSE)
 	, m_fPrioritizeExternalAudio(FALSE)
 
-	, m_fAudioNormalize(FALSE)
-	, m_iAudioRecoverStep(20)
-	, m_AudioBoostPos(0)
 	, m_fAudioTimeShift(FALSE)
 	, m_tAudioTimeShift(0)
 {
@@ -66,11 +63,12 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT4, m_sAudioPaths);
 	DDX_Check(pDX, IDC_CHECK3, m_fPrioritizeExternalAudio);
 
-	DDX_Check(pDX, IDC_CHECK5, m_fAudioNormalize);
-	DDX_Slider(pDX, IDC_SLIDER2, m_iAudioRecoverStep);
-	DDX_Control(pDX, IDC_SLIDER2, m_AudioRecoverStepCtrl);
-	DDX_Slider(pDX, IDC_SLIDER1, m_AudioBoostPos);
-	DDX_Control(pDX, IDC_SLIDER1, m_AudioBoostCtrl);
+	DDX_Control(pDX, IDC_CHECK5, m_chkAutoVolumeControl);
+	DDX_Control(pDX, IDC_CHECK6, m_chkPotBoostAudio);
+	DDX_Control(pDX, IDC_STATIC6, m_stcPotGain);
+	DDX_Control(pDX, IDC_STATIC7, m_stcPotRealeaseTime);
+	DDX_Control(pDX, IDC_SLIDER3, m_sldPotGain);
+	DDX_Control(pDX, IDC_SLIDER4, m_sldPotRealeaseTime);
 	DDX_Check(pDX, IDC_CHECK4, m_fAudioTimeShift);
 	DDX_Control(pDX, IDC_CHECK4, m_fAudioTimeShiftCtrl);
 	DDX_Text(pDX, IDC_EDIT2, m_tAudioTimeShift);
@@ -82,13 +80,10 @@ BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_AUDRND_COMBO, OnAudioRendererChange)
 	ON_BN_CLICKED(IDC_BUTTON1, OnAudioRenderPropClick)
 	ON_BN_CLICKED(IDC_CHECK1, OnDualAudioOutputCheck)
-
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedResetAudioPaths)
-
-	ON_UPDATE_COMMAND_UI(IDC_SLIDER2, OnUpdateNormalize)
-	ON_UPDATE_COMMAND_UI(IDC_STATIC5, OnUpdateNormalize)
+	ON_BN_CLICKED(IDC_CHECK5, OnAutoVolumeControlCheck)
+	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedSoundProcessingDefault)
 	ON_WM_HSCROLL()
-	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 // CPPageAudio message handlers
@@ -183,17 +178,19 @@ BOOL CPPageAudio::OnInitDialog()
 	m_fPrioritizeExternalAudio = s.fPrioritizeExternalAudio;
 	m_sAudioPaths              = s.strAudioPaths;
 
-	m_fAudioNormalize        = s.fAudioNormalize;
-	m_iAudioRecoverStep      = s.iAudioRecoverStep;
-	m_AudioRecoverStepCtrl.SetRange(10, 200, TRUE);
-	m_AudioBoostPos          = (int)(s.dAudioBoost_dB*10+0.1);
-	m_AudioBoostCtrl.SetRange(0, 100, TRUE);
-	m_fAudioTimeShift        = s.fAudioTimeShift;
-	m_tAudioTimeShift        = s.iAudioTimeShift;
+	m_chkAutoVolumeControl.SetCheck(s.bAudioAutoVolumeControl);
+	m_chkPotBoostAudio.SetCheck(s.bAudioPotBoost);
+	m_sldPotGain.SetRange(0, 100, TRUE);
+	m_sldPotGain.SetPos(s.iAudioPotGain);
+	m_sldPotRealeaseTime.SetRange(5, 10, TRUE);
+	m_sldPotRealeaseTime.SetPos(s.iAudioPotRealeaseTime);
+	m_fAudioTimeShift	= s.fAudioTimeShift;
+	m_tAudioTimeShift	= s.iAudioTimeShift;
 	m_tAudioTimeShiftSpin.SetRange32(-1000*60*60*24, 1000*60*60*24);
 
-	m_tooltip.Create(GetDlgItem(IDC_SLIDER1));
-	m_tooltip.Activate(TRUE);
+	UpdatePotGainInfo();
+	UpdatePotRealeaseTimeInfo();
+	OnAutoVolumeControlCheck();
 
 	UpdateData(FALSE);
 
@@ -216,15 +213,16 @@ BOOL CPPageAudio::OnApply()
 	s.fPrioritizeExternalAudio = !!m_fPrioritizeExternalAudio;
 	s.strAudioPaths = m_sAudioPaths;
 
-	s.fAudioNormalize        = !!m_fAudioNormalize;
-	s.iAudioRecoverStep      = m_iAudioRecoverStep;
-	s.dAudioBoost_dB         = (float)m_AudioBoostPos/10;
-	s.fAudioTimeShift        = !!m_fAudioTimeShift;
-	s.iAudioTimeShift        = m_tAudioTimeShift;
+	s.bAudioAutoVolumeControl	= !!m_chkAutoVolumeControl.GetCheck();
+	s.bAudioPotBoost		= !!m_chkPotBoostAudio.GetCheck();
+	s.iAudioPotGain			= m_sldPotGain.GetPos();
+	s.iAudioPotRealeaseTime	= m_sldPotRealeaseTime.GetPos();
+	s.fAudioTimeShift		= !!m_fAudioTimeShift;
+	s.iAudioTimeShift		= m_tAudioTimeShift;
 
 	if (m_pASF) {
 		m_pASF->SetAudioTimeShift(s.fAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
-		m_pASF->SetNormalizeBoost(s.fAudioNormalize, s.iAudioRecoverStep, s.dAudioBoost_dB);
+		m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioPotBoost, s.iAudioPotGain, s.iAudioPotRealeaseTime);
 	}
 
 	return __super::OnApply();
@@ -370,54 +368,46 @@ void CPPageAudio::OnBnClickedResetAudioPaths()
 	SetModified();
 }
 
-void CPPageAudio::OnUpdateNormalize(CCmdUI* pCmdUI)
+void CPPageAudio::OnAutoVolumeControlCheck()
 {
-	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK5));
+	if (m_chkAutoVolumeControl.GetCheck()) {
+		m_chkPotBoostAudio.EnableWindow();
+		m_stcPotGain.EnableWindow();
+		m_stcPotRealeaseTime.EnableWindow();
+		m_sldPotGain.EnableWindow();
+		m_sldPotRealeaseTime.EnableWindow();
+	} else {
+		m_chkPotBoostAudio.EnableWindow(FALSE);
+		m_stcPotGain.EnableWindow(FALSE);
+		m_stcPotRealeaseTime.EnableWindow(FALSE);
+		m_sldPotGain.EnableWindow(FALSE);
+		m_sldPotRealeaseTime.EnableWindow(FALSE);
+	}
+
+	SetModified();
+}
+
+void CPPageAudio::OnBnClickedSoundProcessingDefault()
+{
+	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);
+	m_chkPotBoostAudio.SetCheck(BST_CHECKED);
+	m_sldPotGain.SetPos(75);
+	m_sldPotRealeaseTime.SetPos(8);
+
+	UpdatePotGainInfo();
+	UpdatePotRealeaseTimeInfo();
+	OnAutoVolumeControlCheck();
 }
 
 void CPPageAudio::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	if (*pScrollBar == m_AudioBoostCtrl) {
-		UpdateData();
-		((CMainFrame*)GetParentFrame())->SetVolumeBoost((float)m_AudioBoostPos/10);
+	if (*pScrollBar == m_sldPotGain) {
+		UpdatePotGainInfo();
+	} else if (*pScrollBar == m_sldPotRealeaseTime) {
+		UpdatePotRealeaseTimeInfo();
 	}
 
 	SetModified();
 
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
-}
-
-BOOL CPPageAudio::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
-{
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
-
-	UINT_PTR nID = pNMHDR->idFrom;
-	if (pTTT->uFlags & TTF_IDISHWND) {
-		nID = ::GetDlgCtrlID((HWND)nID);
-	}
-
-	if (nID != IDC_SLIDER1) {
-		return FALSE;
-	}
-
-	static CString strTipText;
-
-	strTipText.Format(_T("+%.1f dB"), m_AudioBoostCtrl.GetPos()/10.0);
-
-	pTTT->lpszText = (LPWSTR)(LPCWSTR)strTipText;
-
-	*pResult = 0;
-
-	return TRUE;
-}
-
-void CPPageAudio::OnCancel()
-{
-	AppSettings& s = AfxGetAppSettings();
-
-	if (m_AudioBoostPos != (int)(s.dAudioBoost_dB*10+0.1)) {
-		((CMainFrame*)GetParentFrame())->SetVolumeBoost(s.dAudioBoost_dB);
-	}
-
-	__super::OnCancel();
 }

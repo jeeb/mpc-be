@@ -513,9 +513,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND_RANGE(ID_FILTERSTREAMS_SUBITEM_START, ID_FILTERSTREAMS_SUBITEM_END, OnSelectStream)
 	ON_COMMAND_RANGE(ID_VOLUME_UP, ID_VOLUME_MUTE, OnPlayVolume)
-	ON_COMMAND_RANGE(ID_VOLUME_BOOST_INC, ID_VOLUME_BOOST_MAX, OnPlayVolumeBoost)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_VOLUME_BOOST_INC, ID_VOLUME_BOOST_MAX, OnUpdatePlayVolumeBoost)
-	ON_COMMAND(ID_NORMALIZE, OnNormalizeVolume)
+	ON_COMMAND(ID_NORMALIZE, OnAutoVolumeControl)
 	ON_UPDATE_COMMAND_UI(ID_NORMALIZE, OnUpdateNormalizeVolume)
 	ON_COMMAND_RANGE(ID_COLOR_BRIGHTNESS_INC, ID_COLOR_RESET, OnPlayColor)
 	ON_COMMAND_RANGE(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_DONOTHING, OnAfterplayback)
@@ -9758,59 +9756,13 @@ void CMainFrame::OnPlayVolume(UINT nID)
 	m_Lcd.SetVolume((m_wndToolBar.Volume > -10000 ? m_wndToolBar.m_volctrl.GetPos() : 1));
 }
 
-void CMainFrame::OnPlayVolumeBoost(UINT nID)
-{
-	AppSettings& s = AfxGetAppSettings();
-
-	int i = (int)(s.dAudioBoost_dB*10+0.1);
-
-	switch (nID) {
-		case ID_VOLUME_BOOST_INC:
-			i = min(i+10, 100);
-			break;
-		case ID_VOLUME_BOOST_DEC:
-			i = max(i-10, 0);
-			break;
-		case ID_VOLUME_BOOST_MIN:
-			i = 0;
-			break;
-		case ID_VOLUME_BOOST_MAX:
-			i = 100;
-			break;
-	}
-
-	s.dAudioBoost_dB = i/10.f;
-	SetVolumeBoost(s.dAudioBoost_dB);
-}
-
-void CMainFrame::SetVolumeBoost(float fAudioBoost_dB)
-{
-	CString strBoost;
-	strBoost.Format(ResStr(IDS_BOOST_OSD), fAudioBoost_dB);
-
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
-		bool fNormalize;
-		int iAudioRecoverStep;
-		float boost;
-		pASF->GetNormalizeBoost(fNormalize, iAudioRecoverStep, boost);
-		pASF->SetNormalizeBoost(fNormalize, iAudioRecoverStep, fAudioBoost_dB);
-		m_OSD.DisplayMessage(OSD_TOPLEFT, strBoost);
-	}
-}
-
-void CMainFrame::OnUpdatePlayVolumeBoost(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable();
-}
-
-void CMainFrame::OnNormalizeVolume()
+void CMainFrame::OnAutoVolumeControl()
 {
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
 		AppSettings& s = AfxGetAppSettings();
-		CString osdMessage;
-		s.fAudioNormalize = !s.fAudioNormalize;
-		osdMessage = ResStr(s.fAudioNormalize ? IDS_OSD_AUTO_GAIN_CONTROL_ON : IDS_OSD_AUTO_GAIN_CONTROL_OFF);
-		pASF->SetNormalizeBoost(s.fAudioNormalize, s.iAudioRecoverStep, s.dAudioBoost_dB);
+		s.bAudioAutoVolumeControl = !s.bAudioAutoVolumeControl;
+		CString osdMessage = ResStr(s.bAudioAutoVolumeControl ? IDS_OSD_AUTO_GAIN_CONTROL_ON : IDS_OSD_AUTO_GAIN_CONTROL_OFF);
+		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioPotBoost, s.iAudioPotGain, s.iAudioPotRealeaseTime);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
 	}
 }

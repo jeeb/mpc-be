@@ -54,16 +54,20 @@ public:
 	CString		m_sAudioPaths;
 	BOOL		m_fPrioritizeExternalAudio;
 
-	BOOL		m_fAudioNormalize;
-	int			m_iAudioRecoverStep;
-	CSliderCtrl	m_AudioRecoverStepCtrl;
-	int			m_AudioBoostPos;
-	CSliderCtrl	m_AudioBoostCtrl;
+	CButton		m_chkAutoVolumeControl;
+	CButton		m_chkPotBoostAudio;
+	CStatic		m_stcPotGain;
+	CStatic		m_stcPotRealeaseTime;
+	CSliderCtrl	m_sldPotGain;
+	CSliderCtrl	m_sldPotRealeaseTime;
 	BOOL		m_fAudioTimeShift;
 	CButton		m_fAudioTimeShiftCtrl;
 	int			m_tAudioTimeShift;
 	CIntEdit	m_tAudioTimeShiftCtrl;
 	CSpinButtonCtrl m_tAudioTimeShiftSpin;
+
+	void UpdatePotGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_POTGAIN), m_sldPotGain.GetPos()); m_stcPotGain.SetWindowText(str); };
+	void UpdatePotRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldPotRealeaseTime.GetPos()); m_stcPotRealeaseTime.SetWindowText(str); };
 
 	CToolTipCtrl m_tooltip;
 
@@ -80,11 +84,9 @@ public:
 	afx_msg void OnAudioRendererChange();
 	afx_msg void OnAudioRenderPropClick();
 	afx_msg void OnDualAudioOutputCheck();
-
 	afx_msg void OnBnClickedResetAudioPaths();
+	afx_msg void OnAutoVolumeControlCheck();
+	afx_msg void OnBnClickedSoundProcessingDefault();
 
-	afx_msg void OnUpdateNormalize(CCmdUI* pCmdUI);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
-	virtual void OnCancel();
 };

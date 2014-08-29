@@ -254,7 +254,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
 	CComQIPtr<IFileSourceFilter>	m_pMainFSF;
 
-	void SetVolumeBoost(float fAudioBoost_dB);
+	void EnableAutoVolumeControl(bool enable);
 	void SetBalance(int balance);
 
 	// subtitles
@@ -974,9 +974,7 @@ public:
 
 	afx_msg void OnSelectStream(UINT nID);
 	afx_msg void OnPlayVolume(UINT nID);
-	afx_msg void OnPlayVolumeBoost(UINT nID);
-	afx_msg void OnUpdatePlayVolumeBoost(CCmdUI* pCmdUI);
-	afx_msg void OnNormalizeVolume();
+	afx_msg void OnAutoVolumeControl();
 	afx_msg void OnUpdateNormalizeVolume(CCmdUI* pCmdUI);
 	afx_msg void OnPlayColor(UINT nID);
 	afx_msg void OnAfterplayback(UINT nID);

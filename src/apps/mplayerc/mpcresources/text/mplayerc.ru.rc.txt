@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Сбросить выбранные"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 5		"Аудио-рендерер"
 7		"Свойства"
 8		"2-ой вывод"
@@ -151,6 +151,8 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 20		"Автоматическая регулировка громкости"
 21		"Усиление:"
 23		"Скорость добавления громкости:"
+25		"Boost audio"
+30		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -1365,6 +1367,8 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"используется WASAPI, Shared mo
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"используется WASAPI, Exclusive mode, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Вкл/Откл пиксельные шейдеры"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Вкл/Откл экранные шейдеры"
+STRING IDS_AUDIO_POTGAIN		"Gain (%d):"
+STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"
 STRING IDS_AUDIO_STREAM		"Аудио поток: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Воспроизведение Audio CD"
 STRING IDS_AUTOPLAY_PLAYBDMOVIE		"Воспроизведение Blu-ray Диска"

@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"선택 초기화"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 5		"오디오 렌더러"
 7		"등록정보"
 8		"듀얼 출력"
@@ -148,9 +148,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 14		"Prefer external audio files over embedded audio track"
 16		"Sound processing"
 17		"오디오 시간 조절 (ms):"
-20		"Auto gain control"
+20		"Auto volume control"
 21		"증폭:"
 23		"Rate of increase volume:"
+25		"Boost audio"
+30		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -1365,6 +1367,8 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"WASAPI 사용, 공유모드"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"WASAPI 사용, 독점모드, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"픽셸 셰이더 토글"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"화면 픽셀셰이더 토글"
+STRING IDS_AUDIO_POTGAIN		"Gain (%d):"
+STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"
 STRING IDS_AUDIO_STREAM		"오디오: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"오디오CD 재생"
 STRING IDS_AUTOPLAY_PLAYBDMOVIE		"Blu-ray 디스크 재생"

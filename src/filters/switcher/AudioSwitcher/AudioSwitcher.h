@@ -22,6 +22,7 @@
 #pragma once
 
 #include "StreamSwitcher.h"
+#include "AudioNormalizer.h"
 
 #define AudioSwitcherName L"MPC AudioSwitcher"
 
@@ -30,18 +31,22 @@ IAudioSwitcherFilter :
 public IUnknown {
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
-	STDMETHOD(GetNormalizeBoost) (bool& fNormalize, int& iRecoverStep, float& boost) PURE;
-	STDMETHOD(SetNormalizeBoost) (bool fNormalize, int iRecoverStep, float boost) PURE;
+	STDMETHOD(GetAutoVolumeControl) (bool& bAutoVolumeControl, bool& bPotBoost, int& iPotGain, int& iPotRealeaseTime) PURE;
+	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bPotBoost, int iPotGain, int iPotRealeaseTime) PURE;
 };
 
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
 {
+	CAudioNormalizer m_PotAudioNormalizer;
+	bool	m_bAutoVolumeControl;
+	bool	m_bPotBoost;
+	int		m_iPotGain;
+	int		m_iPotRealeaseTime;
+	float*	m_buffer;
+	size_t	m_buf_size;
+
 	REFERENCE_TIME m_rtAudioTimeShift;
-	bool m_fNormalize;
-	int  m_iRecoverStep; // percent per second
-	double m_normalizeFactor;
-	float m_boost_mul;
 
 	REFERENCE_TIME m_rtNextStart;
 
@@ -62,8 +67,8 @@ public:
 	// IAudioSwitcherFilter
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
-	STDMETHODIMP GetNormalizeBoost(bool& fNormalize, int& iRecoverStep, float& boost);
-	STDMETHODIMP SetNormalizeBoost(bool fNormalize, int iRecoverStep, float boost);
+	STDMETHODIMP GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bPotBoost, int& iPotGain, int& iPotRealeaseTime);
+	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bPotBoost, int iPotGain, int iPotRealeaseTime);
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);

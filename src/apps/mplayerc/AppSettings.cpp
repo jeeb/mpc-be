@@ -576,11 +576,10 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, fAudioTimeShift);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZE, fAudioNormalize);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, iAudioRecoverStep);
-	CString strTemp;
-	strTemp.Format( _T("%.1f"), dAudioBoost_dB);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOBOOST, strTemp);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTBOOST, bAudioPotBoost);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTGAIN, iAudioPotGain);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTREALEASETIME, iAudioPotRealeaseTime);
 
 	// Multi-monitor code
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
@@ -1119,13 +1118,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fAudioTimeShift					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, 0);
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
 
-	fAudioNormalize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMALIZE, FALSE);
-	iAudioRecoverStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIORECOVERSTEP, 20);
-	iAudioRecoverStep = min(max(10, iAudioRecoverStep), 200);
-	dAudioBoost_dB = (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOBOOST, _T("0")));
-	if (dAudioBoost_dB < 0 || dAudioBoost_dB > 10) {
-		dAudioBoost_dB = 0;
-	}
+	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
+	bAudioPotBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTBOOST, TRUE);
+	iAudioPotGain			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTGAIN, 75);
+	iAudioPotRealeaseTime = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTREALEASETIME, 8);
 
 	{
 		for (unsigned int i = 0; ; i++) {

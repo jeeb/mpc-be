@@ -648,9 +648,10 @@ public:
 	bool			AudioFilters[ADEC_LAST];
 
 	// Audio Switcher
-	bool			fAudioNormalize;
-	int				iAudioRecoverStep;
-	float			dAudioBoost_dB;
+	bool			bAudioAutoVolumeControl;
+	bool			bAudioPotBoost;
+	int				iAudioPotGain;
+	int				iAudioPotRealeaseTime;
 	bool			fAudioTimeShift;
 	int				iAudioTimeShift;
 
