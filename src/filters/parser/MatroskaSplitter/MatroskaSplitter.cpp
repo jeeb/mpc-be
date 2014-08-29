@@ -1001,10 +1001,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
-				if (iSubtitle == 1 && m_bLoadEmbeddedFonts) {
-					InstallFonts();
-				}
-
 				Name.Format(L"Subtitle %d", iSubtitle++);
 
 				mt.SetSampleSize(1);
@@ -1092,7 +1088,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	for (size_t i = 0; i < pinOut.GetCount(); i++) {
-
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut;
 		pPinOut.Attach(pinOut[i]);
 		TrackEntry* pTE = pinOutTE[i];
@@ -1185,8 +1180,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
-	SetProperty(L"TITL", info.Title);
-	// TODO
+	// fonts
+	if (m_bLoadEmbeddedFonts) {
+		InstallFonts();
+	}
 
 	// resources
 	pos = m_pFile->m_segment.Attachments.GetHeadPosition();
@@ -1219,6 +1216,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	// Tags
+	SetProperty(L"TITL", info.Title);
 	pos = m_pFile->m_segment.Tags.GetHeadPosition();
 	while (pos) {
 		Tags* Tags = m_pFile->m_segment.Tags.GetNext(pos);
@@ -1637,7 +1635,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
-	if (m_Seek_rt > 0) {
+	if (m_Seek_rt > 0 && m_bSupportCueDuration) {
 		CAtlList<UINT64> TrackNumbers;
 
 		Segment& s = m_pFile->m_segment;
@@ -1660,14 +1658,15 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
 			QWORD lastCueClusterPosition = ULONGLONG_MAX;
+			BOOL bBreak = FALSE;
 
-			if (pCluster) {
+			if (pCluster && !bBreak) {
 				pos1 = s.Cues.GetHeadPosition();
 				while (pos1) {
 					Cue* pCue = s.Cues.GetNext(pos1);
 
 					POSITION pos2 = pCue->CuePoints.GetTailPosition();
-					while (pos2) {
+					while (pos2 && !bBreak) {
 						CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
 
 						REFERENCE_TIME cueTime = s.GetRefTime(pCuePoint->CueTime);
@@ -1676,7 +1675,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 						}
 
 						POSITION pos3 = pCuePoint->CueTrackPositions.GetHeadPosition();
-						while (pos3) {
+						while (pos3 && !bBreak) {
 							CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
 
 							if (m_bSupportCueDuration && !TrackNumbers.Find(pCueTrackPositions->CueTrack)) {
@@ -1768,7 +1767,10 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 										hr = DeliverPacket(p);
 									};
 								}
-							} else if (cueTime + 60 * 10000000i64 >= m_Seek_rt) { // look no earlier than 5 minutes ...
+							} else if (cueTime < m_Seek_rt - 60 * 10000000i64) {
+								bBreak = TRUE;
+								break;
+							} else { // look no earlier than 1 minute ...
 								pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
 								if (FAILED(pCluster->Parse())) {
 									continue;
