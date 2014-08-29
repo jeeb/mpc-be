@@ -60,10 +60,9 @@ public:
 	CStatic		m_stcPotRealeaseTime;
 	CSliderCtrl	m_sldPotGain;
 	CSliderCtrl	m_sldPotRealeaseTime;
-	CButton		m_chkAudioTimeShift;
-	int			m_tAudioTimeShift;
-	CIntEdit	m_tAudioTimeShiftCtrl;
-	CSpinButtonCtrl m_tAudioTimeShiftSpin;
+	CButton		m_chkTimeShift;
+	int			m_iTimeShift;
+	CSpinButtonCtrl m_spnTimeShift;
 
 	void UpdatePotGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_POTGAIN), m_sldPotGain.GetPos()); m_stcPotGain.SetWindowText(str); };
 	void UpdatePotRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldPotRealeaseTime.GetPos()); m_stcPotRealeaseTime.SetWindowText(str); };
