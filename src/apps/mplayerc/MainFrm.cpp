@@ -9761,7 +9761,7 @@ void CMainFrame::OnAutoVolumeControl()
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
 		AppSettings& s = AfxGetAppSettings();
 		s.bAudioAutoVolumeControl = !s.bAudioAutoVolumeControl;
-		CString osdMessage = ResStr(s.bAudioAutoVolumeControl ? IDS_OSD_AUTO_GAIN_CONTROL_ON : IDS_OSD_AUTO_GAIN_CONTROL_OFF);
+		CString osdMessage = ResStr(s.bAudioAutoVolumeControl ? IDS_OSD_AUTOVOLUMECONTROL_ON : IDS_OSD_AUTOVOLUMECONTROL_OFF);
 		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormGain, s.iAudioNormRealeaseTime);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
 	}
