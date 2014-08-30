@@ -74,6 +74,7 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK4, m_chkTimeShift);
 	DDX_Text(pDX, IDC_EDIT2, m_iTimeShift);
+	DDX_Control(pDX, IDC_EDIT2, m_edtTimeShift);
 	DDX_Control(pDX, IDC_SPIN2, m_spnTimeShift);
 }
 
@@ -83,6 +84,7 @@ BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK1, OnDualAudioOutputCheck)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedResetAudioPaths)
 	ON_BN_CLICKED(IDC_CHECK5, OnAutoVolumeControlCheck)
+	ON_BN_CLICKED(IDC_CHECK4, OnTimeShiftCheck)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedSoundProcessingDefault)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
@@ -197,6 +199,7 @@ BOOL CPPageAudio::OnInitDialog()
 	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
 	OnAutoVolumeControlCheck();
+	OnTimeShiftCheck();
 
 	UpdateData(FALSE);
 
@@ -402,6 +405,17 @@ void CPPageAudio::OnAutoVolumeControlCheck()
 	SetModified();
 }
 
+void CPPageAudio::OnTimeShiftCheck()
+{
+	if (m_chkTimeShift.GetCheck()) {
+		m_edtTimeShift.EnableWindow();
+		m_spnTimeShift.EnableWindow();
+	} else {
+		m_edtTimeShift.EnableWindow(FALSE);
+		m_spnTimeShift.EnableWindow(FALSE);
+	}
+}
+
 void CPPageAudio::OnBnClickedSoundProcessingDefault()
 {
 	m_sldGain.SetPos(0);
@@ -409,11 +423,13 @@ void CPPageAudio::OnBnClickedSoundProcessingDefault()
 	m_chkNormBoostAudio.SetCheck(BST_CHECKED);
 	m_sldNormLevel.SetPos(75);
 	m_sldNormRealeaseTime.SetPos(8);
+	m_chkTimeShift.SetCheck(BST_UNCHECKED);
 
 	UpdateGainInfo();
 	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
 	OnAutoVolumeControlCheck();
+	OnTimeShiftCheck();
 }
 
 void CPPageAudio::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
