@@ -31,18 +31,18 @@ IAudioSwitcherFilter :
 public IUnknown {
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
-	STDMETHOD(GetAutoVolumeControl) (bool& bAutoVolumeControl, bool& bPotBoost, int& iPotGain, int& iPotRealeaseTime) PURE;
-	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bPotBoost, int iPotGain, int iPotRealeaseTime) PURE;
+	STDMETHOD(GetAutoVolumeControl) (bool& bAutoVolumeControl, bool& bNormBoost, int& iNormGain, int& iNormRealeaseTime) PURE;
+	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bNormBoost, int iNormGain, int iNormRealeaseTime) PURE;
 };
 
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
 {
-	CAudioNormalizer m_PotAudioNormalizer;
+	CAudioNormalizer m_AudioNormalizer;
 	bool	m_bAutoVolumeControl;
-	bool	m_bPotBoost;
-	int		m_iPotGain;
-	int		m_iPotRealeaseTime;
+	bool	m_bNormBoost;
+	int		m_iNormGain;
+	int		m_iNormRealeaseTime;
 	float*	m_buffer;
 	size_t	m_buf_size;
 
@@ -67,8 +67,8 @@ public:
 	// IAudioSwitcherFilter
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
-	STDMETHODIMP GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bPotBoost, int& iPotGain, int& iPotRealeaseTime);
-	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bPotBoost, int iPotGain, int iPotRealeaseTime);
+	STDMETHODIMP GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bNormBoost, int& iNormGain, int& iNormRealeaseTime);
+	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormGain, int iNormRealeaseTime);
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);

@@ -1,6 +1,3 @@
-/*
- * (C) 2014 Daum Communications (http://www.daum.net)
- */
 
 #pragma once
 

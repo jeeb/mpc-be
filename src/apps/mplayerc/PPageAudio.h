@@ -55,17 +55,17 @@ public:
 	BOOL		m_fPrioritizeExternalAudio;
 
 	CButton		m_chkAutoVolumeControl;
-	CButton		m_chkPotBoostAudio;
-	CStatic		m_stcPotGain;
-	CStatic		m_stcPotRealeaseTime;
-	CSliderCtrl	m_sldPotGain;
-	CSliderCtrl	m_sldPotRealeaseTime;
+	CButton		m_chkNormBoostAudio;
+	CStatic		m_stcNormGain;
+	CStatic		m_stcNormRealeaseTime;
+	CSliderCtrl	m_sldNormGain;
+	CSliderCtrl	m_sldNormRealeaseTime;
 	CButton		m_chkTimeShift;
 	int			m_iTimeShift;
 	CSpinButtonCtrl m_spnTimeShift;
 
-	void UpdatePotGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_POTGAIN), m_sldPotGain.GetPos()); m_stcPotGain.SetWindowText(str); };
-	void UpdatePotRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldPotRealeaseTime.GetPos()); m_stcPotRealeaseTime.SetWindowText(str); };
+	void UpdateNormGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN), m_sldNormGain.GetPos()); m_stcNormGain.SetWindowText(str); };
+	void UpdateNormRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldNormRealeaseTime.GetPos()); m_stcNormRealeaseTime.SetWindowText(str); };
 
 	CToolTipCtrl m_tooltip;
 

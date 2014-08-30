@@ -83,12 +83,12 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtAudioTimeShift(0)
 	, m_rtNextStart(0)
 	, m_bAutoVolumeControl(false)
-	, m_iPotGain(75)
-	, m_iPotRealeaseTime(8)
+	, m_iNormGain(75)
+	, m_iNormRealeaseTime(8)
 	, m_buffer(NULL)
 	, m_buf_size(0)
 {
-	m_PotAudioNormalizer.SetParam(m_iPotGain, true, m_iPotRealeaseTime);
+	m_AudioNormalizer.SetParam(m_iNormGain, true, m_iNormRealeaseTime);
 
 	if (phr) {
 		if (FAILED(*phr)) {
@@ -181,7 +181,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			if (S_OK != (hr = __super::Transform(pIn, pOut))) {
 				return hr;
 			}
-			out_samples = m_PotAudioNormalizer.MSteadyHQ32((float*)pDataOut, in_samples, wfe->nChannels);
+			out_samples = m_AudioNormalizer.MSteadyHQ32((float*)pDataOut, in_samples, wfe->nChannels);
 			out_size = out_samples * wfe->nChannels * get_bytes_per_sample(sample_format);
 		} else {
 			if (in_allsamples > m_buf_size) {
@@ -193,7 +193,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			}
 
 			convert_to_float(sample_format, wfe->nChannels, in_samples, pDataIn, m_buffer);
-			out_samples = m_PotAudioNormalizer.MSteadyHQ32(m_buffer, in_samples, wfe->nChannels);
+			out_samples = m_AudioNormalizer.MSteadyHQ32(m_buffer, in_samples, wfe->nChannels);
 			out_size = out_samples * wfe->nChannels * get_bytes_per_sample(sample_format);
 
 			if (out_size > pOut->GetSize()) {
@@ -266,24 +266,24 @@ STDMETHODIMP CAudioSwitcherFilter::SetAudioTimeShift(REFERENCE_TIME rtAudioTimeS
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bPotBoost, int& iPotGain, int& iPotRealeaseTime)
+STDMETHODIMP CAudioSwitcherFilter::GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bNormBoost, int& iNormGain, int& iNormRealeaseTime)
 {
 	bAutoVolumeControl	= m_bAutoVolumeControl;
-	bPotBoost			= m_bPotBoost;
-	iPotGain			= m_iPotGain;
-	iPotRealeaseTime	= m_iPotRealeaseTime;
+	bNormBoost			= m_bNormBoost;
+	iNormGain			= m_iNormGain;
+	iNormRealeaseTime	= m_iNormRealeaseTime;
 
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl, bool bPotBoost, int iPotGain, int iPotRealeaseTime)
+STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormGain, int iNormRealeaseTime)
 {
 	m_bAutoVolumeControl	= bAutoVolumeControl;
-	m_bPotBoost			= bPotBoost;
-	m_iPotGain			= min(max(0, iPotGain), 100);
-	m_iPotRealeaseTime	= min(max(5, iPotRealeaseTime), 10);
+	m_bNormBoost			= bNormBoost;
+	m_iNormGain				= min(max(0, iNormGain), 100);
+	m_iNormRealeaseTime		= min(max(5, iNormRealeaseTime), 10);
 
-	m_PotAudioNormalizer.SetParam(m_iPotGain, bPotBoost, m_iPotRealeaseTime);
+	m_AudioNormalizer.SetParam(m_iNormGain, bNormBoost, m_iNormRealeaseTime);
 
 	return S_OK;
 }

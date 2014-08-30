@@ -577,9 +577,9 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, fAudioTimeShift);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTBOOST, bAudioPotBoost);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTGAIN, iAudioPotGain);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTREALEASETIME, iAudioPotRealeaseTime);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMGAIN, iAudioNormGain);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
 
 	// Multi-monitor code
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
@@ -1119,9 +1119,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
 
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
-	bAudioPotBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTBOOST, TRUE);
-	iAudioPotGain			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTGAIN, 75);
-	iAudioPotRealeaseTime = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOPOTREALEASETIME, 8);
+	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
+	iAudioNormGain			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMGAIN, 75);
+	iAudioNormRealeaseTime	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, 8);
 
 	{
 		for (unsigned int i = 0; ; i++) {

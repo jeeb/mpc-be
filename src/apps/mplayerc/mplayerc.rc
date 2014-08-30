@@ -2644,7 +2644,7 @@ BEGIN
     IDS_AG_GO_TO            "Go To"
     IDS_AG_INCREASE_RATE    "Increase Rate"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
-    IDS_AUDIO_POTGAIN       "Gain (%d):"
+    IDS_AUDIO_GAIN          "Gain (%d):"
     IDS_AUDIO_RELEASETIME   "Release time (%d):"
 END
 
