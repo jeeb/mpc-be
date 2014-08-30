@@ -1366,7 +1366,7 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_5		"используется WASAPI, Exclusive
 STRING IDS_AT_TOGGLE_SHADER		"Вкл/Откл пиксельные шейдеры"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Вкл/Откл экранные шейдеры"
 STRING IDS_AUDIO_GAIN		"Усиление (%d):"
-STRING IDS_AUDIO_GAIN_DB		"Усиление (%+.1f dB):"
+STRING IDS_AUDIO_GAIN_DB		"Усиление (%+.1f дБ):"
 STRING IDS_AUDIO_RELEASETIME		"Время спада (%d):"
 STRING IDS_AUDIO_STREAM		"Аудио поток: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Воспроизведение Audio CD"
