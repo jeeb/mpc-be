@@ -33,6 +33,7 @@ public IUnknown {
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
 	STDMETHOD(GetAutoVolumeControl) (bool& bAutoVolumeControl, bool& bNormBoost, int& iNormGain, int& iNormRealeaseTime) PURE;
 	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bNormBoost, int iNormGain, int iNormRealeaseTime) PURE;
+	STDMETHOD(SetAudioGain) (float fGain_dB) PURE;
 };
 
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
@@ -45,6 +46,9 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	int		m_iNormRealeaseTime;
 	float*	m_buffer;
 	size_t	m_buf_size;
+
+	float	m_fGain_dB;
+	float	m_fGainFactor;
 
 	REFERENCE_TIME m_rtAudioTimeShift;
 
@@ -69,6 +73,7 @@ public:
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
 	STDMETHODIMP GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bNormBoost, int& iNormGain, int& iNormRealeaseTime);
 	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormGain, int iNormRealeaseTime);
+	STDMETHODIMP SetAudioGain(float fGain_dB);
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);

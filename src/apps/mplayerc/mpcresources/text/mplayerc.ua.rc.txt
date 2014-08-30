@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Скинути обране"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
 5		"Аудіорендерер"
 7		"Властивості"
 8		"Подвійний вивід"
@@ -149,10 +149,8 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 16		"Обробка звуку"
 17		"Затримка звуку (в мс):"
 20		"Автоматичне регулювання гучності"
-21		"Підсилення:"
-23		"Швидкість додавання гучності:"
-25		"Boost audio"
-30		"Default"
+23		"Boost audio"
+28		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -1368,6 +1366,7 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_5		"Використовувати WASAPI, р�
 STRING IDS_AT_TOGGLE_SHADER		"Перемикання перед-масштабовних шейдерів"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Перемикання після-масштабовних шейдерів"
 STRING IDS_AUDIO_GAIN		"Gain (%d):"
+STRING IDS_AUDIO_GAIN_DB		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"
 STRING IDS_AUDIO_STREAM		"Потік аудіо: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Відтворення AudioCD"

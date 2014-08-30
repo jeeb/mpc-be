@@ -87,6 +87,8 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_iNormRealeaseTime(8)
 	, m_buffer(NULL)
 	, m_buf_size(0)
+	, m_fGain_dB(0.0f)
+	, m_fGainFactor(1.0f)
 {
 	m_AudioNormalizer.SetParam(m_iNormGain, true, m_iNormRealeaseTime);
 
@@ -210,6 +212,31 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		if (S_OK != (hr = __super::Transform(pIn, pOut))) {
 			return hr;
 		}
+
+		if (m_fGainFactor != 1.0f) {
+			size_t out_allsamples = pOut->GetActualDataLength() / get_bytes_per_sample(sample_format);
+
+			switch (sample_format) {
+			case SAMPLE_FMT_U8:
+				gain_uint8(m_fGainFactor, out_allsamples, (uint8_t*)pDataOut);
+				break;
+			case SAMPLE_FMT_S16:
+				gain_int16(m_fGainFactor, out_allsamples, (int16_t*)pDataOut);
+				break;
+			case SAMPLE_FMT_S24:
+				gain_int24(m_fGainFactor, out_allsamples, pDataOut);
+				break;
+			case SAMPLE_FMT_S32:
+				gain_int32(m_fGainFactor, out_allsamples, (int32_t*)pDataOut);
+				break;
+			case SAMPLE_FMT_FLT:
+				gain_float(m_fGainFactor, out_allsamples, (float*)pDataOut);
+				break;
+			case SAMPLE_FMT_DBL:
+				gain_double(m_fGainFactor, out_allsamples, (double*)pDataOut);
+				break;
+			}
+		}
 	}
 
 	rtStart += m_rtAudioTimeShift;
@@ -284,6 +311,14 @@ STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl,
 	m_iNormRealeaseTime		= min(max(5, iNormRealeaseTime), 10);
 
 	m_AudioNormalizer.SetParam(m_iNormGain, bNormBoost, m_iNormRealeaseTime);
+
+	return S_OK;
+}
+
+STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(float fGain_dB)
+{
+	m_fGain_dB = min(max(-3.0f, fGain_dB), 10.0f);
+	m_fGainFactor = pow(10.0f, m_fGain_dB/20.0f);
 
 	return S_OK;
 }

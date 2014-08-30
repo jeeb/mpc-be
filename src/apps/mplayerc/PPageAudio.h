@@ -54,16 +54,21 @@ public:
 	CString		m_sAudioPaths;
 	BOOL		m_fPrioritizeExternalAudio;
 
+	CStatic		m_stcGain;
+	CSliderCtrl	m_sldGain;
+
 	CButton		m_chkAutoVolumeControl;
 	CButton		m_chkNormBoostAudio;
 	CStatic		m_stcNormGain;
 	CStatic		m_stcNormRealeaseTime;
 	CSliderCtrl	m_sldNormGain;
 	CSliderCtrl	m_sldNormRealeaseTime;
+
 	CButton		m_chkTimeShift;
 	int			m_iTimeShift;
 	CSpinButtonCtrl m_spnTimeShift;
 
+	void UpdateGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN_DB), m_sldGain.GetPos() / 10.0f); m_stcGain.SetWindowText(str); };
 	void UpdateNormGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN), m_sldNormGain.GetPos()); m_stcNormGain.SetWindowText(str); };
 	void UpdateNormRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldNormRealeaseTime.GetPos()); m_stcNormRealeaseTime.SetWindowText(str); };
 

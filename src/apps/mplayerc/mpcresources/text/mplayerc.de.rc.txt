@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Befehl &zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
 5		"Audio-Renderer"
 7		"Eigenschaften"
 8		"Duale Ausgabe"
@@ -149,10 +149,8 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 16		"Klangverarbeitung"
 17		"Audioverzögerung (ms):"
 20		"Automatische Verstärkungsregelung"
-21		"Tonverstärkung:"
-23		"Lautstärkesteigerungsrate:"
-25		"Boost audio"
-30		"Default"
+23		"Boost audio"
+28		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -1368,6 +1366,7 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_5		"WASAPIverwenden, Exclusive Modus, Bitstrea
 STRING IDS_AT_TOGGLE_SHADER		"Pre-Resize Pixel-Shader (Ein/Aus)"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Post-Resize Pixel-Shader (Ein/Aus)"
 STRING IDS_AUDIO_GAIN		"Gain (%d):"
+STRING IDS_AUDIO_GAIN_DB		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"
 STRING IDS_AUDIO_STREAM		"Audio: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Audio-CD wiedergeben"

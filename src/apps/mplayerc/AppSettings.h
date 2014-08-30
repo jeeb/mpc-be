@@ -652,8 +652,9 @@ public:
 	bool			bAudioNormBoost;
 	int				iAudioNormGain;
 	int				iAudioNormRealeaseTime;
-	bool			fAudioTimeShift;
+	bool			bAudioTimeShift;
 	int				iAudioTimeShift;
+	float			fAudioGain_dB;
 
 	// External Filters
 	CAutoPtrList<FilterOverride> m_filters;

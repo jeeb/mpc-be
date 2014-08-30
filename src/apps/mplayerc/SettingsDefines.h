@@ -72,10 +72,13 @@
 #define IDS_RS_USEDEFAULTSUBTITLESSTYLE		_T("UseDefaultsubtitlesStyle")
 #define IDS_RS_MPEGINTERLACED				_T("MPEGInterlaced")
 #define IDS_RS_THUMBWIDTH					_T("ThumbWidth")
+
 #define IDS_RS_AUDIOAUTOVOLUMECONTROL		_T("AudioAutoVolumeControl")
 #define IDS_RS_AUDIONORMBOOST				_T("AudioNormBoost")
 #define IDS_RS_AUDIONORMGAIN				_T("AudioNormGain")
 #define IDS_RS_AUDIONORMREALEASETIME		_T("AudioNormRealeaseTime")
+#define IDS_RS_AUDIOGAIN					_T("AudioGain")
+
 #define IDS_RS_D3DFULLSCREEN				_T("D3DFullScreen")
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		_T("MonitorAutoRefreshRate")
 #define IDS_RS_COLOR_BRIGHTNESS				_T("VideoBrightness")

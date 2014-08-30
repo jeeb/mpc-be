@@ -62,12 +62,16 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT4, m_sAudioPaths);
 	DDX_Check(pDX, IDC_CHECK3, m_fPrioritizeExternalAudio);
 
+	DDX_Control(pDX, IDC_SLIDER1, m_sldGain);
+	DDX_Control(pDX, IDC_STATIC4, m_stcGain);
+
 	DDX_Control(pDX, IDC_CHECK5, m_chkAutoVolumeControl);
 	DDX_Control(pDX, IDC_CHECK6, m_chkNormBoostAudio);
 	DDX_Control(pDX, IDC_STATIC6, m_stcNormGain);
 	DDX_Control(pDX, IDC_STATIC7, m_stcNormRealeaseTime);
 	DDX_Control(pDX, IDC_SLIDER3, m_sldNormGain);
 	DDX_Control(pDX, IDC_SLIDER4, m_sldNormRealeaseTime);
+
 	DDX_Control(pDX, IDC_CHECK4, m_chkTimeShift);
 	DDX_Text(pDX, IDC_EDIT2, m_iTimeShift);
 	DDX_Control(pDX, IDC_SPIN2, m_spnTimeShift);
@@ -175,16 +179,21 @@ BOOL CPPageAudio::OnInitDialog()
 	m_fPrioritizeExternalAudio = s.fPrioritizeExternalAudio;
 	m_sAudioPaths              = s.strAudioPaths;
 
+	m_sldGain.SetRange(-30, 100, TRUE);
+	m_sldGain.SetPos(s.fAudioGain_dB > 0 ? floor(s.fAudioGain_dB * 10 + 0.5f) : ceil(s.fAudioGain_dB * 10 - 0.5f));
+
 	m_chkAutoVolumeControl.SetCheck(s.bAudioAutoVolumeControl);
 	m_chkNormBoostAudio.SetCheck(s.bAudioNormBoost);
 	m_sldNormGain.SetRange(0, 100, TRUE);
 	m_sldNormGain.SetPos(s.iAudioNormGain);
 	m_sldNormRealeaseTime.SetRange(5, 10, TRUE);
 	m_sldNormRealeaseTime.SetPos(s.iAudioNormRealeaseTime);
-	m_chkTimeShift.SetCheck(s.fAudioTimeShift);
+
+	m_chkTimeShift.SetCheck(s.bAudioTimeShift);
 	m_iTimeShift = s.iAudioTimeShift;
 	m_spnTimeShift.SetRange32(-1000*60*60*24, 1000*60*60*24);
 
+	UpdateGainInfo();
 	UpdateNormGainInfo();
 	UpdateNormRealeaseTimeInfo();
 	OnAutoVolumeControlCheck();
@@ -210,16 +219,19 @@ BOOL CPPageAudio::OnApply()
 	s.fPrioritizeExternalAudio = !!m_fPrioritizeExternalAudio;
 	s.strAudioPaths = m_sAudioPaths;
 
+	s.fAudioGain_dB				= m_sldGain.GetPos() / 10.0f;
+
 	s.bAudioAutoVolumeControl	= !!m_chkAutoVolumeControl.GetCheck();
 	s.bAudioNormBoost			= !!m_chkNormBoostAudio.GetCheck();
 	s.iAudioNormGain			= m_sldNormGain.GetPos();
 	s.iAudioNormRealeaseTime	= m_sldNormRealeaseTime.GetPos();
-	s.fAudioTimeShift			= !!m_chkTimeShift.GetCheck();
+	s.bAudioTimeShift			= !!m_chkTimeShift.GetCheck();
 	s.iAudioTimeShift			= m_iTimeShift;
 
 	if (m_pASF) {
-		m_pASF->SetAudioTimeShift(s.fAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
+		m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
 		m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormGain, s.iAudioNormRealeaseTime);
+		m_pASF->SetAudioGain(s.fAudioGain_dB);
 	}
 
 	return __super::OnApply();
@@ -368,12 +380,18 @@ void CPPageAudio::OnBnClickedResetAudioPaths()
 void CPPageAudio::OnAutoVolumeControlCheck()
 {
 	if (m_chkAutoVolumeControl.GetCheck()) {
+		m_stcGain.EnableWindow(FALSE);
+		m_sldGain.EnableWindow(FALSE);
+
 		m_chkNormBoostAudio.EnableWindow();
 		m_stcNormGain.EnableWindow();
 		m_stcNormRealeaseTime.EnableWindow();
 		m_sldNormGain.EnableWindow();
 		m_sldNormRealeaseTime.EnableWindow();
 	} else {
+		m_stcGain.EnableWindow();
+		m_sldGain.EnableWindow();
+
 		m_chkNormBoostAudio.EnableWindow(FALSE);
 		m_stcNormGain.EnableWindow(FALSE);
 		m_stcNormRealeaseTime.EnableWindow(FALSE);
@@ -386,11 +404,13 @@ void CPPageAudio::OnAutoVolumeControlCheck()
 
 void CPPageAudio::OnBnClickedSoundProcessingDefault()
 {
+	m_sldGain.SetPos(0);
 	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);
 	m_chkNormBoostAudio.SetCheck(BST_CHECKED);
 	m_sldNormGain.SetPos(75);
 	m_sldNormRealeaseTime.SetPos(8);
 
+	UpdateGainInfo();
 	UpdateNormGainInfo();
 	UpdateNormRealeaseTimeInfo();
 	OnAutoVolumeControlCheck();
@@ -398,7 +418,9 @@ void CPPageAudio::OnBnClickedSoundProcessingDefault()
 
 void CPPageAudio::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	if (*pScrollBar == m_sldNormGain) {
+	if (*pScrollBar == m_sldGain) {
+		UpdateGainInfo();
+	} else if (*pScrollBar == m_sldNormGain) {
 		UpdateNormGainInfo();
 	} else if (*pScrollBar == m_sldNormRealeaseTime) {
 		UpdateNormRealeaseTimeInfo();
