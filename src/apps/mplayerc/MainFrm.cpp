@@ -9762,7 +9762,7 @@ void CMainFrame::OnAutoVolumeControl()
 		AppSettings& s = AfxGetAppSettings();
 		s.bAudioAutoVolumeControl = !s.bAudioAutoVolumeControl;
 		CString osdMessage = ResStr(s.bAudioAutoVolumeControl ? IDS_OSD_AUTOVOLUMECONTROL_ON : IDS_OSD_AUTOVOLUMECONTROL_OFF);
-		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormGain, s.iAudioNormRealeaseTime);
+		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
 	}
 }

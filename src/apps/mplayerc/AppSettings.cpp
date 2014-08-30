@@ -578,7 +578,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMGAIN, iAudioNormGain);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
 	CString strGain;
 	strGain.Format(L"%.1f", fAudioGain_dB);
@@ -1123,7 +1123,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
-	iAudioNormGain			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMGAIN, 75);
+	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
 	iAudioNormRealeaseTime	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, 8);
 	fAudioGain_dB			= min(max(-3.0f, (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, _T("0")))), 10.0f);
 

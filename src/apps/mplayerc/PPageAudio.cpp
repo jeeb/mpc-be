@@ -67,9 +67,9 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK5, m_chkAutoVolumeControl);
 	DDX_Control(pDX, IDC_CHECK6, m_chkNormBoostAudio);
-	DDX_Control(pDX, IDC_STATIC6, m_stcNormGain);
+	DDX_Control(pDX, IDC_STATIC6, m_stcNormLevel);
 	DDX_Control(pDX, IDC_STATIC7, m_stcNormRealeaseTime);
-	DDX_Control(pDX, IDC_SLIDER3, m_sldNormGain);
+	DDX_Control(pDX, IDC_SLIDER3, m_sldNormLevel);
 	DDX_Control(pDX, IDC_SLIDER4, m_sldNormRealeaseTime);
 
 	DDX_Control(pDX, IDC_CHECK4, m_chkTimeShift);
@@ -184,8 +184,8 @@ BOOL CPPageAudio::OnInitDialog()
 
 	m_chkAutoVolumeControl.SetCheck(s.bAudioAutoVolumeControl);
 	m_chkNormBoostAudio.SetCheck(s.bAudioNormBoost);
-	m_sldNormGain.SetRange(0, 100, TRUE);
-	m_sldNormGain.SetPos(s.iAudioNormGain);
+	m_sldNormLevel.SetRange(0, 100, TRUE);
+	m_sldNormLevel.SetPos(s.iAudioNormLevel);
 	m_sldNormRealeaseTime.SetRange(5, 10, TRUE);
 	m_sldNormRealeaseTime.SetPos(s.iAudioNormRealeaseTime);
 
@@ -194,7 +194,7 @@ BOOL CPPageAudio::OnInitDialog()
 	m_spnTimeShift.SetRange32(-1000*60*60*24, 1000*60*60*24);
 
 	UpdateGainInfo();
-	UpdateNormGainInfo();
+	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
 	OnAutoVolumeControlCheck();
 
@@ -223,14 +223,14 @@ BOOL CPPageAudio::OnApply()
 
 	s.bAudioAutoVolumeControl	= !!m_chkAutoVolumeControl.GetCheck();
 	s.bAudioNormBoost			= !!m_chkNormBoostAudio.GetCheck();
-	s.iAudioNormGain			= m_sldNormGain.GetPos();
+	s.iAudioNormLevel			= m_sldNormLevel.GetPos();
 	s.iAudioNormRealeaseTime	= m_sldNormRealeaseTime.GetPos();
 	s.bAudioTimeShift			= !!m_chkTimeShift.GetCheck();
 	s.iAudioTimeShift			= m_iTimeShift;
 
 	if (m_pASF) {
 		m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
-		m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormGain, s.iAudioNormRealeaseTime);
+		m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 		m_pASF->SetAudioGain(s.fAudioGain_dB);
 	}
 
@@ -384,18 +384,18 @@ void CPPageAudio::OnAutoVolumeControlCheck()
 		m_sldGain.EnableWindow(FALSE);
 
 		m_chkNormBoostAudio.EnableWindow();
-		m_stcNormGain.EnableWindow();
+		m_stcNormLevel.EnableWindow();
 		m_stcNormRealeaseTime.EnableWindow();
-		m_sldNormGain.EnableWindow();
+		m_sldNormLevel.EnableWindow();
 		m_sldNormRealeaseTime.EnableWindow();
 	} else {
 		m_stcGain.EnableWindow();
 		m_sldGain.EnableWindow();
 
 		m_chkNormBoostAudio.EnableWindow(FALSE);
-		m_stcNormGain.EnableWindow(FALSE);
+		m_stcNormLevel.EnableWindow(FALSE);
 		m_stcNormRealeaseTime.EnableWindow(FALSE);
-		m_sldNormGain.EnableWindow(FALSE);
+		m_sldNormLevel.EnableWindow(FALSE);
 		m_sldNormRealeaseTime.EnableWindow(FALSE);
 	}
 
@@ -407,11 +407,11 @@ void CPPageAudio::OnBnClickedSoundProcessingDefault()
 	m_sldGain.SetPos(0);
 	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);
 	m_chkNormBoostAudio.SetCheck(BST_CHECKED);
-	m_sldNormGain.SetPos(75);
+	m_sldNormLevel.SetPos(75);
 	m_sldNormRealeaseTime.SetPos(8);
 
 	UpdateGainInfo();
-	UpdateNormGainInfo();
+	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
 	OnAutoVolumeControlCheck();
 }
@@ -420,8 +420,8 @@ void CPPageAudio::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	if (*pScrollBar == m_sldGain) {
 		UpdateGainInfo();
-	} else if (*pScrollBar == m_sldNormGain) {
-		UpdateNormGainInfo();
+	} else if (*pScrollBar == m_sldNormLevel) {
+		UpdateNormLevelInfo();
 	} else if (*pScrollBar == m_sldNormRealeaseTime) {
 		UpdateNormRealeaseTimeInfo();
 	}

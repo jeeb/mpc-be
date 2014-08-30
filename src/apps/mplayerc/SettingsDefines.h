@@ -75,7 +75,7 @@
 
 #define IDS_RS_AUDIOAUTOVOLUMECONTROL		_T("AudioAutoVolumeControl")
 #define IDS_RS_AUDIONORMBOOST				_T("AudioNormBoost")
-#define IDS_RS_AUDIONORMGAIN				_T("AudioNormGain")
+#define IDS_RS_AUDIONORMLEVEL				_T("AudioNormLevel")
 #define IDS_RS_AUDIONORMREALEASETIME		_T("AudioNormRealeaseTime")
 #define IDS_RS_AUDIOGAIN					_T("AudioGain")
 

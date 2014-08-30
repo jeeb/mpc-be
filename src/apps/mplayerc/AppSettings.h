@@ -650,7 +650,7 @@ public:
 	// Audio Switcher
 	bool			bAudioAutoVolumeControl;
 	bool			bAudioNormBoost;
-	int				iAudioNormGain;
+	int				iAudioNormLevel;
 	int				iAudioNormRealeaseTime;
 	bool			bAudioTimeShift;
 	int				iAudioTimeShift;

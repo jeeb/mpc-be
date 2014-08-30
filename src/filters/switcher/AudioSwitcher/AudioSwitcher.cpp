@@ -83,14 +83,14 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtAudioTimeShift(0)
 	, m_rtNextStart(0)
 	, m_bAutoVolumeControl(false)
-	, m_iNormGain(75)
+	, m_iNormLevel(75)
 	, m_iNormRealeaseTime(8)
 	, m_buffer(NULL)
 	, m_buf_size(0)
 	, m_fGain_dB(0.0f)
 	, m_fGainFactor(1.0f)
 {
-	m_AudioNormalizer.SetParam(m_iNormGain, true, m_iNormRealeaseTime);
+	m_AudioNormalizer.SetParam(m_iNormLevel, true, m_iNormRealeaseTime);
 
 	if (phr) {
 		if (FAILED(*phr)) {
@@ -293,24 +293,24 @@ STDMETHODIMP CAudioSwitcherFilter::SetAudioTimeShift(REFERENCE_TIME rtAudioTimeS
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bNormBoost, int& iNormGain, int& iNormRealeaseTime)
+STDMETHODIMP CAudioSwitcherFilter::GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bNormBoost, int& iNormLevel, int& iNormRealeaseTime)
 {
 	bAutoVolumeControl	= m_bAutoVolumeControl;
 	bNormBoost			= m_bNormBoost;
-	iNormGain			= m_iNormGain;
+	iNormLevel			= m_iNormLevel;
 	iNormRealeaseTime	= m_iNormRealeaseTime;
 
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormGain, int iNormRealeaseTime)
+STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime)
 {
 	m_bAutoVolumeControl	= bAutoVolumeControl;
 	m_bNormBoost			= bNormBoost;
-	m_iNormGain				= min(max(0, iNormGain), 100);
+	m_iNormLevel				= min(max(0, iNormLevel), 100);
 	m_iNormRealeaseTime		= min(max(5, iNormRealeaseTime), 10);
 
-	m_AudioNormalizer.SetParam(m_iNormGain, bNormBoost, m_iNormRealeaseTime);
+	m_AudioNormalizer.SetParam(m_iNormLevel, bNormBoost, m_iNormRealeaseTime);
 
 	return S_OK;
 }

@@ -1247,9 +1247,9 @@
 #define IDS_AG_VIDEOFILES               33448
 #define IDS_VOLUME_OSD_MUTE             33449
 #define IDS_COPY_TO_CLIPBOARD           33450
-#define IDS_AUDIO_GAIN                  33451
+#define IDS_AUDIO_LEVEL                 33451
 #define IDS_AUDIO_RELEASETIME           33452
-#define IDS_AUDIO_GAIN_DB               33453
+#define IDS_AUDIO_GAIN                  33453
 // stereoscopic subtitles
 #define IDS_SUBTITLES_STEREO              34000
 #define IDS_SUBTITLES_STEREO_DONTUSE      34001
