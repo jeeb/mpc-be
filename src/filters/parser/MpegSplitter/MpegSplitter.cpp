@@ -685,7 +685,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
 				p->rtStop		= p->rtStart + 1;
 
-				__int64 nBytes = h.len - m_pFile->GetPos() - pos;
+				__int64 nBytes = h.len - (m_pFile->GetPos() - pos);
 				if (nBytes > 0) {
 					p->SetCount((size_t)nBytes);
 					m_pFile->ByteRead(p->GetData(), nBytes);
