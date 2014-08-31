@@ -492,14 +492,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"默认页: "
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 5		"首选格式"
-7		"选择源"
-8		"内置"
-9		"文件源"
-10		"初始缓冲大小"
-11		"源文件大小的百分比"
-12		"Mb"
+7		"Load playlist"
+8		"选择源"
+9		"内置"
+10		"文件源"
+11		"初始缓冲大小"
+12		"源文件大小的百分比"
+13		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

@@ -492,14 +492,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Начальная страница:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 5		"Предпочитаемый формат просмотра"
-7		"Выбрать механизм воспроизведения"
-8		"Встроенный"
-9		"Используя системный File Source (URL)"
-10		"Начальный размер буфера"
-11		"% от разм. исх. файла"
-12		"Мб"
+7		"Загружать плейлист"
+8		"Выбрать механизм воспроизведения"
+9		"Встроенный"
+10		"Используя системный File Source (URL)"
+11		"Начальный размер буфера"
+12		"% от разм. исх. файла"
+13		"Мб"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

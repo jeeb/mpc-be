@@ -492,14 +492,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Հիմնական էջը"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 5		"Preferred format"
-7		"Select Source"
-8		"Internal"
-9		"File Source"
-10		"Initial buffer size"
-11		"% of source file size"
-12		"Mb"
+7		"Load playlist"
+8		"Select Source"
+9		"Internal"
+10		"File Source (URL)"
+11		"Initial buffer size"
+12		"% of source file size"
+13		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

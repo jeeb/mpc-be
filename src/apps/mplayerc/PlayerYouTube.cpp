@@ -68,9 +68,6 @@ bool PlayerYouTubeCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
-	if (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && (tmp_fn.Find(_T("watch?")) < 0 || tmp_fn.Find(_T("playlist?")) != -1 || tmp_fn.Find(_T("&list=")) != -1)) {
-		return false;
-	}
 	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
 		return true;
 	}
@@ -145,7 +142,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 #if 0
 		BOOL bIsFullHD = FALSE;
-		if (sApp.iYoutubeTag == 37) {
+		if (sApp.laylisiYoutubeTag == 37) {
 			// Full HD resolution, format .MP4
 			match_itag	= FALSE;
 			bIsFullHD	= TRUE;

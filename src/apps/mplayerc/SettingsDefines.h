@@ -292,6 +292,7 @@
 #define IDS_RS_LAST_OPEN_FILTER_DIR			_T("LastOpenFilterDir")
 
 #define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
+#define IDS_RS_YOUTUBE_LOAD_PLAYLIST		_T("YoutubeLoadPlaylist")
 #define IDS_RS_YOUTUBE_SOURCE				_T("YoutubeSourceType")
 #define IDS_RS_YOUTUBE_MEMTYPE				_T("YoutubeMemoryType")
 #define IDS_RS_YOUTUBE_PERCENT_MEM			_T("YoutubePercentMemory")

@@ -32,6 +32,7 @@ class CPPageYoutube : public CPPageBase
 
 private:
 	CComboBox m_iYoutubeFormatCtrl;
+	CButton m_chkYoutubeLoadPlaylist;
 
 public:
 	CPPageYoutube();

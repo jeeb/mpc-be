@@ -233,10 +233,15 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 
 void COpenDlg::OnBnClickedOk()
 {
+	AppSettings& s = AfxGetAppSettings();
 	UpdateData();
 
 	m_fns.RemoveAll();
-	m_fns.AddTail(PlayerYouTubePlaylist(m_path, 0));
+	if (s.bYoutubeLoadPlaylist) {
+		m_fns.AddTail(PlayerYouTubePlaylist(m_path, 0));
+	} else {
+		m_fns.AddTail(m_path);
+	}
 
 	if (m_mrucombo2.IsWindowEnabled()) {
 		m_fns.AddTail(m_path2);

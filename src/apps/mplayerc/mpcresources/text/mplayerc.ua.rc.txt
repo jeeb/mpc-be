@@ -492,14 +492,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Початкова сторінка:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 5		"Вибір формату перегляду"
-7		"Вибір фільтра джерела"
-8		"Внутрішній"
-9		"Системний"
-10		"Початковий розмір буфера"
-11		"% від розміру файла джерела"
-12		"Мб"
+7		"Load playlist"
+8		"Вибір фільтра джерела"
+9		"Внутрішній"
+10		"Системний"
+11		"Початковий розмір буфера"
+12		"% від розміру файла джерела"
+13		"Мб"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

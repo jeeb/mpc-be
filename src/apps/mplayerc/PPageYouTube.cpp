@@ -40,6 +40,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_COMBO1, m_iYoutubeFormatCtrl);
+	DDX_Control(pDX, IDC_CHECK1, m_chkYoutubeLoadPlaylist);
 	DDX_Radio(pDX, IDC_RADIO1, m_iYoutubeSourceType);
 	DDX_Radio(pDX, IDC_RADIO3, m_iYoutubeMemoryType);
 	DDX_Control(pDX, IDC_SPIN1, m_nPercentMemoryCtrl);
@@ -116,6 +117,8 @@ BOOL CPPageYoutube::OnInitDialog()
 		m_iYoutubeFormatCtrl.SetCurSel(0);
 	}
 
+	m_chkYoutubeLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
+
 	m_nPercentMemoryCtrl.SetRange(1, 100);
 	m_nMbMemoryCtrl.SetRange(1, 128);
 
@@ -138,6 +141,7 @@ BOOL CPPageYoutube::OnApply()
 	AppSettings& s = AfxGetAppSettings();
 
 	s.iYoutubeTag			= m_iYoutubeFormatCtrl.GetItemData(m_iYoutubeFormatCtrl.GetCurSel());
+	s.bYoutubeLoadPlaylist	= !!m_chkYoutubeLoadPlaylist.GetCheck();
 	s.iYoutubeSource		= m_iYoutubeSourceType;
 	s.iYoutubeMemoryType	= m_iYoutubeMemoryType;
 	s.iYoutubePercentMemory	= m_iYoutubePercentMemory;

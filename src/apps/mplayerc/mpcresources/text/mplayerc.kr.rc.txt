@@ -492,14 +492,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"기본 페이지:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 5		"우선 포맷"
-7		"Source 선택"
-8		"Internal"
-9		"파일 Source"
-10		"Initial buffer size"
-11		"% of source file size"
-12		"Mb"
+7		"Load playlist"
+8		"Source 선택"
+9		"Internal"
+10		"파일 Source"
+11		"Initial buffer size"
+12		"% of source file size"
+13		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

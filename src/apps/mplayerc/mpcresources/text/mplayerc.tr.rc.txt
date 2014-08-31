@@ -492,14 +492,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Varsayılan sayfa:"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 17
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 5		"Tercih edilen biçim"
-7		"Kaynak Seç"
-8		"Dahili"
-9		"Dosya Kaynağı"
-10		"Initial buffer size"
-11		"% of source file size"
-12		"Mb"
+7		"Load playlist"
+8		"Kaynak Seç"
+9		"Dahili"
+10		"Dosya Kaynağı"
+11		"Initial buffer size"
+12		"% of source file size"
+13		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

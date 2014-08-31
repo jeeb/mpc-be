@@ -821,6 +821,7 @@ public:
 
 	// youtube
 	int				iYoutubeTag;
+	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeSource;
 	int				iYoutubeMemoryType;
 	DWORD			iYoutubePercentMemory;
