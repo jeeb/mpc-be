@@ -66,6 +66,7 @@ BEGIN_MESSAGE_MAP(COpenDlg, CResizableDialog)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC1, OnUpdateDub)
 	ON_UPDATE_COMMAND_UI(IDC_COMBO2, OnUpdateDub)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateDub)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK1, OnUpdateAppendToPlaylist)
 	ON_UPDATE_COMMAND_UI(IDOK, OnUpdateOk)
 END_MESSAGE_MAP()
 
@@ -121,8 +122,8 @@ BOOL COpenDlg::OnInitDialog()
 	}
 
 	m_fns.RemoveAll();
-	m_path = _T("");
-	m_path2 = _T("");
+	m_path.Empty();
+	m_path2.Empty();
 	m_fMultipleFiles = false;
 	m_fAppendPlaylist = FALSE;
 
@@ -237,11 +238,7 @@ void COpenDlg::OnBnClickedOk()
 	UpdateData();
 
 	m_fns.RemoveAll();
-	if (s.bYoutubeLoadPlaylist) {
-		m_fns.AddTail(PlayerYouTubePlaylist(m_path, 0));
-	} else {
-		m_fns.AddTail(m_path);
-	}
+	m_fns.AddTail(m_path);
 
 	if (m_mrucombo2.IsWindowEnabled()) {
 		m_fns.AddTail(m_path2);
@@ -262,6 +259,13 @@ void COpenDlg::OnUpdateDub(CCmdUI* pCmdUI)
 
 	pCmdUI->Enable(AfxGetAppSettings().GetRtspEngine(m_path) == DirectShow
 					&& ((CString(m_path).MakeLower().Find(_T("://"))) == -1));
+}
+
+void COpenDlg::OnUpdateAppendToPlaylist(CCmdUI* pCmdUI)
+{
+	UpdateData();
+
+	pCmdUI->Enable(!PlayerYouTubePlaylistCheck(m_path));
 }
 
 void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)

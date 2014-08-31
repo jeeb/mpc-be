@@ -213,7 +213,7 @@ public:
 
 	int GetCount();
 	int GetSelIdx();
-	void SetSelIdx(int i);
+	void SetSelIdx(int i, bool bUpdatePos = FALSE);
 	bool IsAtEnd();
 	bool GetCur(CPlaylistItem& pli);
 	CPlaylistItem* GetCur();

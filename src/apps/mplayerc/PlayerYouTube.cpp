@@ -29,7 +29,7 @@
 #define MATCH_HLSVP_START			"\"hlsvp\": \""
 #define MATCH_END					"\""
 
-#define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit \""
+#define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit "
 
 const YOUTUBE_PROFILES* getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)
@@ -183,16 +183,7 @@ bool PlayerYouTubePlaylistCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
-	tmp_fn.Replace(_T("https"), _T(""));
-	tmp_fn.Replace(_T("http"), _T(""));
-
-	if (tmp_fn == _T(YOUTUBE_MP_URL) || (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && tmp_fn.Find(_T("channel/")) != -1)) {
-		return false;
-	}
 	if (tmp_fn.Find(YOUTUBE_PL_URL) != -1 || (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1)) {
-		return true;
-	}
-	if (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && tmp_fn.Find(_T("watch?")) < 0) {
 		return true;
 	}
 
@@ -421,8 +412,9 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 	return fn;
 }
 
-CString PlayerYouTubePlaylist(CString fn, bool type)
+bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)
 {
+	idx_CurrentPlay = 0;
 	if (PlayerYouTubePlaylistCheck(fn)) {
 
 		char* data = NULL;
@@ -432,7 +424,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 		if (s) {
 			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
-				char buffer[4096];
+				char buffer[4096] = { 0 };
 				DWORD dwBytesRead = 0;
 
 				do {
@@ -456,10 +448,8 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 		}
 
 		if (!data || !f || !s) {
-			return fn;
+			return false;
 		}
-
-		CString Playlist = L"#EXTM3U\n\n";
 
 		char* block = data;
 		while ((block = strstr(block, MATCH_PLAYLIST_ITEM_START)) != NULL) {
@@ -470,7 +460,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 				char* tmp = DNew char[block_len + 1];
 				memcpy(tmp, block, block_len);
 				tmp[block_len] = 0;
-				CString item = UTF8ToString(CStringA(tmp));
+				CString item = UTF8ToString(tmp);
 				delete [] tmp;
 
 				CString data_video_id;
@@ -481,6 +471,8 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 				CAtlRegExp<> re;
 				CAtlREMatchContext<> mc;
 				REParseError pe = re.Parse(L" {[a-z-]+}=\"{[^\"]+}\"");
+
+				bool bCurrentPlay = (item.Find(L"currently-playing") != -1);
 
 				LPCTSTR szEnd = item.GetBuffer();
 				while (re.Match(szEnd, &mc)) {
@@ -506,51 +498,24 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 				}
 
 				if (data_video_id.GetLength() > 0) {
-					Playlist.AppendFormat(L"#EXTINF:-1,%s\n", data_video_title);
-					Playlist.AppendFormat(L"http://www.youtube.com/watch?v=%s\n\n", data_video_id);
+					CString url;
+					url.Format(L"http://www.youtube.com/watch?v=%s\n\n", data_video_id);
+					YoutubePlaylistItem item(url, data_video_title);
+					youtubePlaylist.AddTail(item);
+
+					if (bCurrentPlay) {
+						idx_CurrentPlay = youtubePlaylist.GetCount() - 1;
+					}
 				}
 			}
 		}
 
-		if (Playlist.GetLength() > 9) {
-			if (type) {
-				return Playlist;
-			}
+		free(data);
 
-			CStdioFile fout;
-			CString file = PlayerYouTubePlaylistCreate();
-
-			if (fout.Open(file, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
-				CStringA ptr(Playlist);
-				const char* pt = (LPCSTR)ptr;
-				fout.Write(pt, strlen(pt));
-				fout.Close();
-
-				return file;
-			}
+		if (!youtubePlaylist.IsEmpty()) {
+			return true;
 		}
 	}
 
-	return fn;
-}
-
-CString PlayerYouTubePlaylistCreate()
-{
-	TCHAR lpszTempPath[_MAX_PATH] = { 0 };
-
-	CString tmpPlaylist;
-	if (GetTempPath(_MAX_PATH, lpszTempPath)) {
-		tmpPlaylist.AppendFormat(L"%smpc_youtube.m3u", lpszTempPath);
-	}
-
-	return tmpPlaylist;
-}
-
-void PlayerYouTubePlaylistDelete()
-{
-	CString file = PlayerYouTubePlaylistCreate();
-
-	if (::PathFileExists(file)) {
-		::DeleteFile(file);
-	}
+	return false;
 }

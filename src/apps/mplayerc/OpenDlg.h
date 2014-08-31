@@ -58,6 +58,7 @@ public:
 	afx_msg void OnBnClickedBrowsebutton2();
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnUpdateDub(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateAppendToPlaylist(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateOk(CCmdUI* pCmdUI);
 };
 

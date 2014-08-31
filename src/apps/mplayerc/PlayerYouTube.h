@@ -98,6 +98,15 @@ static DWORD strpos(char* h, char* n)
 bool PlayerYouTubeCheck(CString fn);
 bool PlayerYouTubePlaylistCheck(CString fn);
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);
-CString PlayerYouTubePlaylist(CString fn, bool type);
-CString PlayerYouTubePlaylistCreate();
-void PlayerYouTubePlaylistDelete();
+
+struct YoutubePlaylistItem {
+	CString url, title;
+
+	YoutubePlaylistItem() {};
+	YoutubePlaylistItem(CString url, CString title)
+		: url(url)
+		, title(title) {};
+};
+typedef CAtlList<YoutubePlaylistItem> YoutubePlaylist;
+
+bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);

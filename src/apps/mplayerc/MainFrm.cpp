@@ -5205,17 +5205,35 @@ void CMainFrame::OnFileOpenMedia()
 		}
 	}
 
+	CString fn = dlg.m_fns.GetHead();
+	if (PlayerYouTubePlaylistCheck(fn) && AfxGetAppSettings().bYoutubeLoadPlaylist) {
+		YoutubePlaylist youtubePlaylist;
+		int idx_CurrentPlay = 0;
+		if (PlayerYouTubePlaylist(fn, youtubePlaylist, idx_CurrentPlay)) {
+			m_wndPlaylistBar.Empty();
+
+			POSITION pos = youtubePlaylist.GetHeadPosition();
+			while (pos) {
+				YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
+				CAtlList<CString> fns;
+				fns.AddHead(item.url);
+				m_wndPlaylistBar.Append(fns, false);
+				m_wndPlaylistBar.SetLast();
+				m_wndPlaylistBar.SetCurLabel(item.title);
+			}
+			m_wndPlaylistBar.SetSelIdx(idx_CurrentPlay, true);
+
+			OpenCurPlaylistItem();
+			return;
+		}
+	}
+
 	if (dlg.m_fAppendPlaylist) {
 		m_wndPlaylistBar.Append(dlg.m_fns, dlg.m_fMultipleFiles);
 		return;
 	}
 
 	m_wndPlaylistBar.Open(dlg.m_fns, dlg.m_fMultipleFiles);
-
-	if (m_wndPlaylistBar.GetCount() == 1 && m_wndPlaylistBar.IsWindowVisible() && !m_wndPlaylistBar.IsFloating()) {
-		//ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
-	}
-
 	OpenCurPlaylistItem();
 }
 
@@ -12802,7 +12820,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 								tmpName.Empty();
 							}
 						}
-						PlayerYouTubePlaylistDelete();
 					}
 
 					if (CString(tmpName).MakeLower().Find(L".m3u8") > 0) {
