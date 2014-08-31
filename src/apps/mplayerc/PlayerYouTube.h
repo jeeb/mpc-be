@@ -26,7 +26,6 @@
 #define YOUTUBE_PL_URL	_T("://www.youtube.com/playlist?")
 #define YOUTUBE_URL		_T("://www.youtube.com/watch?")
 #define YOUTU_BE_URL	_T("://youtu.be/")
-#define VIMEO_URL		_T("://vimeo.com/")
 
 #define ENABLE_YOUTUBE_3D	0
 #define ENABLE_YOUTUBE_DASH	0
@@ -102,6 +101,3 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);
 CString PlayerYouTubePlaylist(CString fn, bool type);
 CString PlayerYouTubePlaylistCreate();
 void PlayerYouTubePlaylistDelete();
-CString PlayerYouTubeGetTitle(CString fn);
-CString PlayerYouTubeSearchTitle(char* final);
-CString PlayerYouTubeReplaceTitle(char* title);

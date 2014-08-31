@@ -686,9 +686,6 @@
     <ClInclude Include="WinDebugMonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerVimeo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OSD.h">
       <Filter>Header Files</Filter>
     </ClInclude>

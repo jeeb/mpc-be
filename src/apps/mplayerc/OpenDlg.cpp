@@ -110,7 +110,7 @@ BOOL COpenDlg::OnInitDialog()
 			if (pText) {
 				if (AfxIsValidString(pText)) {
 					CString tmpData(CString(pText).MakeLower());
-					if (PlayerYouTubeCheck(tmpData) || PlayerYouTubePlaylistCheck(tmpData) || tmpData.Find(VIMEO_URL) != -1) {
+					if (PlayerYouTubeCheck(tmpData) || PlayerYouTubePlaylistCheck(tmpData)) {
 						m_mrucombo.SetWindowTextW(pText);
 					}
 				}

@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include "atl/atlrx.h"
 #include "PlayerYouTube.h"
-#include "PlayerVimeo.h"
 
 #define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\": \""
 #define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\": \""
@@ -62,6 +61,111 @@ bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, co
 	ext_final = '.' + CString(current->ext);
 
 	return true;
+}
+
+static CString FixYoutubeName(CString inStr)
+{
+	inStr.Replace(_T(":"), _T(" -"));
+	inStr.Replace(_T("/"), _T("-"));
+	inStr.Replace(_T("|"), _T("-"));
+	inStr.Replace(_T("—"), _T("-"));
+	inStr.Replace(_T("--"), _T("-"));
+	inStr.Replace(_T("  "), _T(" "));
+	inStr.Replace(_T("\""), _T(""));
+	inStr.Replace(_T("* "), _T(""));
+	inStr.Replace(_T("*"), _T(""));
+
+	inStr.Replace(_T("&quot;"), _T(""));
+	inStr.Replace(_T("&amp;"), _T("&"));
+	inStr.Replace(_T("&#39;"), _T("'"));
+	inStr.Replace(_T("&#039;"), _T("'"));
+
+	inStr.Replace(_T(" - YouTube"), _T(""));
+
+	return inStr;
+}
+
+static CString PlayerYouTubeGetTitle(char* title)
+{
+	CString Title = UTF8ToString(title);
+	Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
+
+	return FixYoutubeName(Title);
+}
+
+static CString PlayerYouTubeSearchTitle(char* final)
+{
+	CString Title;
+
+	int t_start = strpos(final, "<title>");
+	if (t_start > 0) {
+		t_start += 7;
+		int t_stop = strpos(final + t_start, "</title>");
+		if (t_stop > 0) {
+			char* title = DNew char[t_stop + 1];
+			memset(title, 0, t_stop + 1);
+			memcpy(title, final + t_start, t_stop);
+
+			Title = PlayerYouTubeGetTitle(title);
+
+			delete [] title;
+		}
+	}
+
+	if (Title.IsEmpty()) {
+		Title = _T("video");
+	}
+
+	return Title;
+}
+
+CString PlayerYouTubeGetTitle(CString fn)
+{
+	char* final = NULL;
+
+	HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
+	if (s) {
+		f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+		if (f) {
+			char *out			= NULL;
+			DWORD dwBytesRead	= 0;
+			DWORD dataSize		= 0;
+
+			do {
+				char buffer[4096];
+				if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
+					break;
+				}
+
+				char *tempData = DNew char[dataSize + dwBytesRead];
+				memcpy(tempData, out, dataSize);
+				memcpy(tempData + dataSize, buffer, dwBytesRead);
+				delete [] out;
+				out = tempData;
+				dataSize += dwBytesRead;
+
+				if (strstr(out, "</title>")) {
+					break;
+				}
+			} while (dwBytesRead);
+
+			final = DNew char[dataSize + 1];
+			memset(final, 0, dataSize + 1);
+			memcpy(final, out, dataSize);
+			delete [] out;
+
+			InternetCloseHandle(f);
+		}
+		InternetCloseHandle(s);
+	}
+
+	if (!final || !f || !s) {
+		return fn;
+	}
+
+	delete [] final;
+
+	return PlayerYouTubeSearchTitle(final) + _T(".mp4");
 }
 
 bool PlayerYouTubeCheck(CString fn)
@@ -105,13 +209,6 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 	}
 
 	CString tmp_fn(CString(fn).MakeLower());
-
-	if (tmp_fn.Find(VIMEO_URL) != -1) {
-		if (out_Title) {
-			*out_Title = PlayerYouTubeGetTitle(fn);
-		}
-		return PlayerVimeo(fn);
-	}
 
 	if (PlayerYouTubeCheck(fn)) {
 
@@ -404,7 +501,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 					} else if (propHeader == L"data-video-username") {
 						data_video_username = propValue;
 					} else if (propHeader == L"data-video-title") {
-						data_video_title = propValue;
+						data_video_title = FixYoutubeName(propValue);
 					}
 				}
 
@@ -456,105 +553,4 @@ void PlayerYouTubePlaylistDelete()
 	if (::PathFileExists(file)) {
 		::DeleteFile(file);
 	}
-}
-
-CString PlayerYouTubeGetTitle(CString fn)
-{
-	char* final = NULL;
-
-	HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
-	if (s) {
-		f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-		if (f) {
-			char *out			= NULL;
-			DWORD dwBytesRead	= 0;
-			DWORD dataSize		= 0;
-
-			do {
-				char buffer[4096];
-				if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
-					break;
-				}
-
-				char *tempData = DNew char[dataSize + dwBytesRead];
-				memcpy(tempData, out, dataSize);
-				memcpy(tempData + dataSize, buffer, dwBytesRead);
-				delete [] out;
-				out = tempData;
-				dataSize += dwBytesRead;
-
-				if (strstr(out, "</title>")) {
-					break;
-				}
-			} while (dwBytesRead);
-
-			final = DNew char[dataSize + 1];
-			memset(final, 0, dataSize + 1);
-			memcpy(final, out, dataSize);
-			delete [] out;
-
-			InternetCloseHandle(f);
-		}
-		InternetCloseHandle(s);
-	}
-
-	if (!final || !f || !s) {
-		return fn;
-	}
-
-	delete [] final;
-
-	return PlayerYouTubeSearchTitle(final) + _T(".mp4");
-}
-
-CString PlayerYouTubeSearchTitle(char* final)
-{
-	CString Title;
-
-	int t_start = strpos(final, "<title>");
-	if (t_start > 0) {
-		t_start += 7;
-		int t_stop = strpos(final + t_start, "</title>");
-		if (t_stop > 0) {
-			char* title = DNew char[t_stop + 1];
-			memset(title, 0, t_stop + 1);
-			memcpy(title, final + t_start, t_stop);
-
-			Title = PlayerYouTubeReplaceTitle(title);
-
-			delete [] title;
-		}
-	}
-
-	if (Title.IsEmpty()) {
-		Title = _T("video");
-	}
-
-	return Title;
-}
-
-CString PlayerYouTubeReplaceTitle(char* title)
-{
-	CString Title = UTF8ToString(title);
-	Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
-
-	Title.Replace(_T(":"), _T(" -"));
-	Title.Replace(_T("/"), _T("-"));
-	Title.Replace(_T("|"), _T("-"));
-	Title.Replace(_T("—"), _T("-"));
-	Title.Replace(_T("--"), _T("-"));
-	Title.Replace(_T("  "), _T(" "));
-	Title.Replace(_T("\""), _T(""));
-	Title.Replace(_T("* "), _T(""));
-	Title.Replace(_T("*"), _T(""));
-
-	Title.Replace(_T("&quot;"), _T(""));
-	Title.Replace(_T("&amp;"), _T("&"));
-	Title.Replace(_T("&#39;"), _T("'"));
-	Title.Replace(_T("&#039;"), _T("'"));
-
-	Title.Replace(_T(" - YouTube"), _T(""));
-	Title.Replace(_T(" on Vimeo"), _T(""));
-
-	return Title;
 }
