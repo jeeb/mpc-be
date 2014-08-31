@@ -1366,7 +1366,7 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_5		"Gebruik WASAPI, exclusieve modus, bitstroo
 STRING IDS_AT_TOGGLE_SHADER		"Pixel Shaders aan/uit"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Schakel tussen Screen Space Pixel Shaders"
 STRING IDS_AUDIO_GAIN		"Versterking (%+.1f dB):"
-STRING IDS_AUDIO_LEVEL		"Level (%d):"
+STRING IDS_AUDIO_LEVEL		"Niveau (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Vrijgavetijd (%d):"
 STRING IDS_AUDIO_STREAM		"Audio: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Audio-cd afspelen"
