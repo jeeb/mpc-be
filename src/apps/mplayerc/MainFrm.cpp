@@ -6452,8 +6452,16 @@ void CMainFrame::OnFileSaveImageAuto()
 		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
 	}
 
+	CString path(s.strSnapShotPath);
+	if (!::PathFileExists(path)) {
+		TCHAR szPath[MAX_PATH] = { 0 };
+		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYPICTURES, NULL, 0, szPath))) {
+			path = CString(szPath) + L"\\";
+		}
+	}
+
 	CString fn;
-	fn.Format(_T("%s\\%s"), s.strSnapShotPath, MakeSnapshotFileName(prefix));
+	fn.Format(_T("%s\\%s"), path, MakeSnapshotFileName(prefix));
 	SaveImage(fn);
 }
 

@@ -1334,19 +1334,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	strWebServerCGI = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI);
 
 	CString MyPictures;
-
-	CRegKey key;
-	// grrrrr
-	// if (!SHGetSpecialFolderPath(NULL, MyPictures.GetBufferSetLength(_MAX_PATH), CSIDL_MYPICTURES, TRUE)) MyPictures.Empty();
-	// else MyPictures.ReleaseBuffer();
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"), KEY_READ)) {
-		ULONG len = _MAX_PATH;
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("My Pictures"), MyPictures.GetBuffer(_MAX_PATH), &len)) {
-			MyPictures.ReleaseBufferSetLength(len);
-		} else {
-			MyPictures.Empty();
-		}
+	TCHAR szPath[MAX_PATH] = { 0 };
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYPICTURES, NULL, 0, szPath))) {
+		MyPictures = CString(szPath) + L"\\";
 	}
+
 	strSnapShotPath = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, MyPictures);
 	strSnapShotExt = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, _T(".jpg"));
 
