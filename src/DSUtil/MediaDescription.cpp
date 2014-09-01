@@ -32,7 +32,7 @@ CString GetMediaTypeDesc(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter*
 
 	CLSID clSID;
 	HRESULT hr = pFilter->GetClassID(&clSID);
-	if (clSID == GUIDFromCString(L"1365BE7A-C86A-473C-9A41-C0A6E82C9FA3") || clSID == GUIDFromCString(L"DC257063-045F-4BE2-BD5B-E12279C464F0")) {
+	if (clSID == GUIDFromCString(L"{1365BE7A-C86A-473C-9A41-C0A6E82C9FA3}") || clSID == GUIDFromCString(L"{DC257063-045F-4BE2-BD5B-E12279C464F0}")) {
 		// skip MPEGSource/Splitter ...
 		return pName;
 	}
