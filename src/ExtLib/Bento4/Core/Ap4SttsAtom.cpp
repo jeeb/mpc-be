@@ -116,22 +116,24 @@ AP4_SttsAtom::GetDts(AP4_Ordinal sample, AP4_TimeStamp& dts, AP4_Duration& durat
         AP4_SttsTableEntry& entry = m_Entries[i];
 
         // check if we have reached the sample
-        if (sample <= sample_start+entry.m_SampleCount) {
+        if (sample <= sample_start + entry.m_SampleCount) {
             // we are within the sample range for the current entry
-            dts = dts_start + (AP4_UI64)(sample-1 - sample_start) * (AP4_UI64)entry.m_SampleDuration;
+            dts = dts_start + (AP4_UI64)(sample - 1 - sample_start) * (AP4_UI64)entry.m_SampleDuration;
             duration = entry.m_SampleDuration;
             
             // update the lookup cache
-            m_LookupCache.entry_index = i;
-            m_LookupCache.sample      = sample_start;
-            m_LookupCache.dts         = dts_start;
+            if (sample_start > 1) {
+                m_LookupCache.entry_index = i;
+                m_LookupCache.sample      = sample_start;
+                m_LookupCache.dts         = dts_start;
+			}
             
             return AP4_SUCCESS;
         }
  
         // update the sample and dts bases
         sample_start += entry.m_SampleCount;
-        dts_start    += entry.m_SampleCount*entry.m_SampleDuration;
+        dts_start    += entry.m_SampleCount * entry.m_SampleDuration;
     }
 
     // sample is greater than the number of samples
