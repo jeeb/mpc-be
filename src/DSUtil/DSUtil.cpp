@@ -3220,28 +3220,28 @@ CStringA VobSubDefHeader(int w, int h, CStringA palette)
 	return hdr;
 }
 
-void CorrectWaveFormatEx(CMediaType *pmt)
+void CorrectWaveFormatEx(CMediaType& mt)
 {
-	if (pmt == NULL) {
-		return;
-	}
+	if (mt.majortype == MEDIATYPE_Audio && mt.formattype == FORMAT_WaveFormatEx) {
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+		WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
 
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)pmt->pbFormat;
-	if (wfe == NULL) {
-		return;
-	}
+		if (wfe->wFormatTag == WAVE_FORMAT_PCM && (wfe->nChannels > 2 || wfe->wBitsPerSample != 8 && wfe->wBitsPerSample != 16)
+			|| wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT && wfe->nChannels > 2) {
+			// convert incorrect WAVEFORMATEX to WAVEFORMATEXTENSIBLE
 
-	if (wfe->cbSize == 0 && wfe->nChannels > 2) {
-		wfe									= (WAVEFORMATEX*)pmt->ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
-		WAVEFORMATEXTENSIBLE* wfex			= (WAVEFORMATEXTENSIBLE*)pmt->pbFormat;
-		wfex->Format.cbSize					= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
-		wfex->Samples.wValidBitsPerSample	= wfe->wBitsPerSample;
-		wfex->SubFormat						= wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT ? KSDATAFORMAT_SUBTYPE_IEEE_FLOAT : KSDATAFORMAT_SUBTYPE_PCM;
-		wfex->dwChannelMask					= GetDefChannelMask(wfe->nChannels);
-		wfex->Format.wFormatTag				= WAVE_FORMAT_EXTENSIBLE;
-	} else if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && ((WAVEFORMATEXTENSIBLE*)wfe)->dwChannelMask == 0) {
-		// fix for DC-Bass Source Mod 1.5.2.0 bug
-		((WAVEFORMATEXTENSIBLE*)wfe)->dwChannelMask = GetDefChannelMask(wfe->nChannels);
+			wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
+			wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+
+			wfex->Format.wFormatTag				= WAVE_FORMAT_EXTENSIBLE;
+			wfex->Format.cbSize					= 22;
+			wfex->Samples.wValidBitsPerSample	= wfe->wBitsPerSample;
+			wfex->dwChannelMask					= GetDefChannelMask(wfe->nChannels);
+			wfex->SubFormat						= mt.subtype;
+		} else if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfex->dwChannelMask == 0) {
+			// fix empty dwChannelMask
+			wfex->dwChannelMask = GetDefChannelMask(wfe->nChannels);
+		}
 	}
 }
 

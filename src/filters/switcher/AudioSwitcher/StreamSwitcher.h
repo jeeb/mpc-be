@@ -225,6 +225,7 @@ public:
 	HRESULT BreakConnect();
 	HRESULT CompleteConnect(IPin* pReceivePin);
 
+	HRESULT SetMediaType(const CMediaType *);
 	HRESULT CheckMediaType(const CMediaType* pmt);
 	HRESULT GetMediaType(int iPosition, CMediaType* pmt);
 

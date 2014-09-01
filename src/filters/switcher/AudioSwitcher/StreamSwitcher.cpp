@@ -20,8 +20,8 @@
  */
 
 #include "stdafx.h"
-#include "StreamSwitcher.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "StreamSwitcher.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -1062,7 +1062,7 @@ HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 	CMediaType mt;
 	if (SUCCEEDED(hr) && pIn && pIn->IsConnected()
 			&& SUCCEEDED(pIn->GetConnected()->ConnectionMediaType(&mt))) {
-		CorrectWaveFormatEx(&mt);
+		CorrectWaveFormatEx(mt);
 		if (m_mt != mt) {
 			if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
 				hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
@@ -1073,6 +1073,18 @@ HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 	}
 
 	return hr;
+}
+
+HRESULT CStreamSwitcherOutputPin::SetMediaType(const CMediaType *pmt)
+{
+	HRESULT hr = m_mt.Set(*pmt);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	CorrectWaveFormatEx(m_mt);
+
+	return NOERROR;
 }
 
 HRESULT CStreamSwitcherOutputPin::CheckMediaType(const CMediaType* pmt)
@@ -1104,7 +1116,7 @@ HRESULT CStreamSwitcherOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 	CopyMediaType(pmt, tmp);
 	DeleteMediaType(tmp);
 
-	CorrectWaveFormatEx(pmt);
+	CorrectWaveFormatEx(*pmt);
 
 	/*
 		if(iPosition < 0) return E_INVALIDARG;

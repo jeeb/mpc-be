@@ -256,7 +256,7 @@ CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& c
 
 	WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
 
-	CorrectWaveFormatEx(&mt);
+	CorrectWaveFormatEx(mt);
 
 	return mt;
 }

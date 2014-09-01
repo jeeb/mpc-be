@@ -181,7 +181,7 @@ extern HRESULT			CreateAVCfromH264(CMediaType* mt);
 extern void				CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts, DWORD Channels, DWORD SamplesPerSec, DWORD BitsPerSample, const BYTE* pData, size_t Count);
 
 extern CStringA			VobSubDefHeader(int w, int h, CStringA palette = "");
-extern void				CorrectWaveFormatEx(CMediaType *pmt);
+extern void				CorrectWaveFormatEx(CMediaType& mt);
 
 extern void				ReduceDim(LONG& num, LONG& den);
 extern void				ReduceDim(SIZE &dim);
