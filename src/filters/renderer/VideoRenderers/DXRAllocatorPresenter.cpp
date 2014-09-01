@@ -122,7 +122,7 @@ HRESULT CDXRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(pD3DDev, size, GetRenderersSettings().fSPCPow2Tex, true);
+		m_pAllocator = DNew CDX9SubPicAllocator(pD3DDev, size, true);
 		if (!m_pAllocator) {
 			return E_FAIL;
 		}
@@ -131,7 +131,7 @@ HRESULT CDXRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	HRESULT hr = S_OK;
 
 	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().fSPCAllowAnimationWhenBuffering, m_pAllocator, &hr)
+					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr)
 					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(m_pAllocator, &hr);
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		return E_FAIL;

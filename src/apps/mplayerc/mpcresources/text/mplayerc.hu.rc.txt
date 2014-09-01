@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Elhelyezés felülbírálása"
 7		"Vízszintes:"
 11		"Függőleges:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Textúra beállítások (nyissa meg újra a videót, hogy láthassa a különbségeket)"
 19		"Előre olvasandó feliratképek száma:"
 22		"Legnagyobb textúra felbontás:"
-23		"DirectShow alatti feliratozás akkor érhető el, ha a ""VMR-7 (renderless)"" vagy a ""VMR-9 (renderless)"" videó átalakítót állítjuk be. A VMR-7-hez Windows XP, a VMR-9-hez DirectX9 szükséges. Mindkettőhöz hardveres gyorsítású D3D videokártya szükséges."
-24		"Mielőtt megkérdezné"
-25		"Ha felülbírálva engedélyezi a videokártyája beállításainál a teljes képernyős vonalsimítást, a feliratok akkor sem lesznek szebbek, viszont a processzorát teljesen leterheli vele."
-27		"Figyelmeztetés"
-28		"A RealMedia és QuickTime formátumokat úgy lehet feliratozni, ha beállítjuk a speciális DirectX 7 vagy DirectX 9 átalakítóikat."
-29		"Felkerekítés kettő hatványaira"
-30		"Animálás engedélyezése előre olvasáskor"
+23		"Ha felülbírálva engedélyezi a videokártyája beállításainál a teljes képernyős vonalsimítást, a feliratok akkor sem lesznek szebbek, viszont a processzorát teljesen leterheli vele."
+25		"Figyelmeztetés"
+26		"Animálás engedélyezése előre olvasáskor"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Miután rákattint erre a gombra, a formátumcsoport
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Az alapértelmezett pozíciót örökli a többi stílus, ahol ez még nincs meghatározva"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Lehetővé teszi a felirat animálását, ha az előreolvasott feliratképek száma nagyobb, mint nulla. A funkció tiltása csökkenti a CPU terheltségét. Akkor is tiltsa, ha villódzik a felirat."
-STRING IDC_CHECK_SPCPOW2TEX		"Ezt kikapcsolva felszabadít egy kis videomemóriát és sávszélességet takarít meg a lokális memória-videomemória közötti átvitelnél, de régebbi videokártyákkal lehet, hogy nem fog működni."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

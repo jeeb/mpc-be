@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Fijar ubicación"
 7		"Horizontal:"
 11		"Vertical:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Opciones de textura (es necesario re-abrir el archivo para notar los cambios)"
 19		"Numero de subtítulos para almacenar previamente:"
 22		"Resolución maxima de la textura:"
-23		"Los subtítulos para DirectShow estarán disponibles cuando se usen los métodos de renderización ""VMR-7 (sin render)"" o ""VMR-9 (sin render)"". VMR-7 req. Windows XP, VMR-9 req. DirectX 9, y ambos req. de una tarjeta grafica con D3D por HW."
-24		"Antes de preguntar"
-25		"Si activa el modo de antialiasing a pantalla completa en la configuración de su tarjeta gráfica, los subtítulos no lucirán mejor pero se tragarán su cpu."
-27		"Advertencia"
-28		"Los formatos de RealMedia y QuickTime pueden ofrecer subtítulos al configurar su renderización especial DirectX 7 o DirectX 9."
-29		"Redondear"
-30		"Permitir animación (uso mem. intermedia)"
+23		"Si activa el modo de antialiasing a pantalla completa en la configuración de su tarjeta gráfica, los subtítulos no lucirán mejor pero se tragarán su cpu."
+25		"Advertencia"
+26		"Permitir animación (uso mem. intermedia)"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Después de dar clic en este botón, el estado de co
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"El estado predeterminado se hereda a otros estilos donde aún esté indefinido"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permite subtítulos con animación al utilizar una memoria intermedia para sub-imágenes mayor que 0. Inhabilitando esta opción se minimiza el uso de CPU. Inhabilitar también si los subtítulos parpadean."
-STRING IDC_CHECK_SPCPOW2TEX		"Si desmarcas esto se libera una poca memoria de video y guardas ancho de banda en transferencias de memoria locales a memoria de video, pero puede no funcionar con tarjetas graficas antiguas."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

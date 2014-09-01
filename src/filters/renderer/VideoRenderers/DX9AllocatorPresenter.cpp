@@ -731,7 +731,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, size, GetRenderersSettings().fSPCPow2Tex, false);
+		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, size, false);
 	}
 	if (!m_pAllocator) {
 		_Error += L"CDX9SubPicAllocator failed\n";
@@ -741,7 +741,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	hr = S_OK;
 	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().fSPCAllowAnimationWhenBuffering, m_pAllocator, &hr)
+					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr)
 					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(m_pAllocator, &hr);
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		_Error += L"m_pSubPicQueue failed\n";

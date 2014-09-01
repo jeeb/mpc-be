@@ -337,13 +337,9 @@ BEGIN
     EDITTEXT        IDC_EDIT1,139,49,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,159,49,12,12
     LTEXT           "Maximum texture resolution:",IDC_STATIC,10,67,125,8
-    LTEXT           "The internal subtitle functionality is only available when a compatible video renderer is used. You can select the desired video renderer on the Output page under Playback options. Compatible renderers are marked with '**' behind their name.",IDC_STATIC,10,169,274,36
-    GROUPBOX        "Before you ask",IDC_STATIC,5,154,286,83
     LTEXT           "If you override and enable full-screen antialiasing somewhere at your videocard's settings, subtitles aren't going to look any better but it will surely eat your cpu.",IDC_STATIC,10,120,267,27
     COMBOBOX        IDC_COMBO1,139,65,59,45,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Warning",IDC_STATIC,5,108,286,43
-    LTEXT           "RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers.",IDC_STATIC,10,206,274,27
-    CONTROL         "Round up to power of two",IDC_CHECK_SPCPOW2TEX,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,93,277,8
     CONTROL         "Allow animation when buffering",IDC_CHECK_SPCANIMWITHBUFFER,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,81,277,8
 END
@@ -2471,7 +2467,6 @@ END
 STRINGTABLE
 BEGIN
     IDC_CHECK_RELATIVETO    "Default state gets inherited to other styles where it is still undefined"
-    IDC_CHECK_SPCPOW2TEX    "Unchecking this frees up a little video memory and saves bandwidth on local to video memory transfers, but it may not work with older video cards."
     IDC_CHECK_SPCANIMWITHBUFFER 
                             "Allows subtitle animation when using a subpicture buffer larger than 0. Disabling this option will lower CPU usage. Also disable if you experience flashing subtitles."
     IDC_BUTTON_EXT_SET      "After clicking this button, the checked state of the format group will reflect the actual file association for MPC-BE. A newly added extension will usually make it grayed, so don't forget to check it again before closing this dialog!"

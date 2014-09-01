@@ -33,8 +33,7 @@ CPPageSubRend::CPPageSubRend()
 	, m_nHorPos(0)
 	, m_nVerPos(0)
 	, m_nSPCSize(0)
-	, m_fSPCPow2Tex(FALSE)
-	, m_fSPCAllowAnimationWhenBuffering(TRUE)
+	, m_bSPCAllowAnimationWhenBuffering(TRUE)
 	, m_nSubDelayInterval(0)
 {
 }
@@ -57,8 +56,7 @@ void CPPageSubRend::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_spmaxres);
 	DDX_Control(pDX, IDC_EDIT2, m_nHorPosEdit);
 	DDX_Control(pDX, IDC_EDIT3, m_nVerPosEdit);
-	DDX_Check(pDX, IDC_CHECK_SPCPOW2TEX, m_fSPCPow2Tex);
-	DDX_Check(pDX, IDC_CHECK_SPCANIMWITHBUFFER, m_fSPCAllowAnimationWhenBuffering);
+	DDX_Check(pDX, IDC_CHECK_SPCANIMWITHBUFFER, m_bSPCAllowAnimationWhenBuffering);
 	DDX_Text(pDX, IDC_EDIT4, m_nSubDelayInterval);
 }
 
@@ -132,8 +130,7 @@ BOOL CPPageSubRend::OnInitDialog()
 		m_spmaxres.AddString(s_maxTexRes[i].name);
 	}
 	m_spmaxres.SetCurSel(TexWidth2Index(s.m_RenderersSettings.nSPMaxTexRes));
-	m_fSPCPow2Tex = s.m_RenderersSettings.fSPCPow2Tex;
-	m_fSPCAllowAnimationWhenBuffering = s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering;
+	m_bSPCAllowAnimationWhenBuffering = s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering;
 	m_nSubDelayInterval = s.nSubDelayInterval;
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK3));
@@ -157,16 +154,14 @@ BOOL CPPageSubRend::OnApply()
 			|| s.m_RenderersSettings.nSPCSize != m_nSPCSize
 			|| s.nSubDelayInterval != m_nSubDelayInterval
 			|| s.m_RenderersSettings.nSPMaxTexRes != TexIndex2Width(m_spmaxres.GetCurSel())
-			|| s.m_RenderersSettings.fSPCPow2Tex != !!m_fSPCPow2Tex
-			|| s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering != !!m_fSPCAllowAnimationWhenBuffering) {
+			|| s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering != !!m_bSPCAllowAnimationWhenBuffering) {
 		s.fOverridePlacement = !!m_fOverridePlacement;
 		s.nHorPos = m_nHorPos;
 		s.nVerPos = m_nVerPos;
 		s.m_RenderersSettings.nSPCSize = m_nSPCSize;
 		s.nSubDelayInterval = m_nSubDelayInterval;
 		s.m_RenderersSettings.nSPMaxTexRes = TexIndex2Width(m_spmaxres.GetCurSel());
-		s.m_RenderersSettings.fSPCPow2Tex = !!m_fSPCPow2Tex;
-		s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering = !!m_fSPCAllowAnimationWhenBuffering;
+		s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering = !!m_bSPCAllowAnimationWhenBuffering;
 
 		if (CMainFrame* pFrame = (CMainFrame*)GetParentFrame()) {
 			pFrame->UpdateSubtitle();

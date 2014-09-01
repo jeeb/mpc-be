@@ -346,8 +346,8 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 // CDX9SubPicAllocator
 //
 
-CDX9SubPicAllocator::CDX9SubPicAllocator(IDirect3DDevice9* pD3DDev, SIZE maxsize, bool fPow2Textures, bool bExternalRenderer)
-	: CSubPicAllocatorImpl(maxsize, true, fPow2Textures)
+CDX9SubPicAllocator::CDX9SubPicAllocator(IDirect3DDevice9* pD3DDev, SIZE maxsize, bool bExternalRenderer)
+	: CSubPicAllocatorImpl(maxsize, true)
 	, m_pD3DDev(pD3DDev)
 	, m_maxsize(maxsize)
 	, m_bExternalRenderer(bExternalRenderer)
@@ -422,18 +422,6 @@ bool CDX9SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	CComPtr<IDirect3DSurface9> pSurface;
 
-	int Width = m_maxsize.cx;
-	int Height = m_maxsize.cy;
-
-	if (m_fPow2Textures && Width < 1024 && Height < 1024) {
-		Width = Height = 1;
-		while (Width < m_maxsize.cx) {
-			Width <<= 1;
-		}
-		while (Height < m_maxsize.cy) {
-			Height <<= 1;
-		}
-	}
 	if (!fStatic) {
 		CAutoLock cAutoLock(&ms_SurfaceQueueLock);
 		POSITION FreeSurf = m_FreeSurfaces.GetHeadPosition();
@@ -445,7 +433,7 @@ bool CDX9SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	if (!pSurface) {
 		CComPtr<IDirect3DTexture9> pTexture;
-		if (FAILED(m_pD3DDev->CreateTexture(Width, Height, 1, 0, D3DFMT_A8R8G8B8, fStatic?D3DPOOL_SYSTEMMEM:D3DPOOL_DEFAULT, &pTexture, NULL))) {
+		if (FAILED(m_pD3DDev->CreateTexture(m_maxsize.cx, m_maxsize.cy, 1, 0, D3DFMT_A8R8G8B8, fStatic?D3DPOOL_SYSTEMMEM:D3DPOOL_DEFAULT, &pTexture, NULL))) {
 			return false;
 		}
 

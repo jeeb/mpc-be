@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Azken agiri zenbatekoa:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Ezeztatu kokapena"
 7		"Etzana:"
 11		"Zutia:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Egitura ezarpenak (ireki bideo berriro aldaketak ikusteko)"
 19		"Azp irudiak bufferrera:"
 22		"Gehienezko egitura bereizmena:"
-23		"Barneko azpidatzi eginkizuna erabilgarria da bakarrik bideo aurkezle bateragarri bat erabiltzen denean. Gogoko duzun bideo aurkezlea hautatu dezakezu Irteera orrialdean Irakurketa aukeren barnean. Aurkezle bateragarriek '**' ezaugarria dute."
-24		"Galdetu aurretik"
-25		"Ezeztatzen baduzu eta gaitu ikusleiho-osoko hertzlehunketa zure bideo-txartelaren ezarpenetan, azpidatziak ez dira hobeto ikusiko baina zure cpu-a jango dute."
-27		"Kontuz"
-28		"RealMedia eta QuickTime heuskarriak azpidatzituak izan daitezke beren DirectX 7 edo DirectX 9 aukezle bereziak ezarriz."
-29		"Borobildu biren indarrera"
-30		"Ahalbidetu animazioa bufferreratzean"
+23		"Ezeztatzen baduzu eta gaitu ikusleiho-osoko hertzlehunketa zure bideo-txartelaren ezarpenetan, azpidatziak ez dira hobeto ikusiko baina zure cpu-a jango dute."
+25		"Kontuz"
+26		"Ahalbidetu animazioa bufferreratzean"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Botoi hau sakatu ondoren, hautatutako multzo heuskar
 STRING IDC_CACH_SIZE		"Katxe neurria agiri eragiketarako (kilobyte-tan)"
 STRING IDC_CHECK_RELATIVETO		"Berezko egoera beste estilo batzuetatik lortzen da oraindik zehaztugabe dagoenean."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ahalbidetzen du azpidatzi animazioa 0 baino handiagoa den azpirudi buffer bat erabiltzerakoan. Aukera hau ezgaitzeak CPU erabilera gutxiago izango du. Ezgaitu ere azpidatziak keinuka ikusten badituzu."
-STRING IDC_CHECK_SPCPOW2TEX		"Hau ez-hautatzeak bideo oroimen apur bat askatu eta bandazabalera gordetzen du tokian bideo oroimen eskualdaketarako, baina badaiteke ez lan egitea bideo txartel zaharrekin."
 STRING IDC_CHECK_SUBRESYNC		"Azpidatziak ikustea eta editatzea (denbora-kodea barne) eta azpidatzi nabigazioa ahalbidetzen du. Azpidatzi gertaketa nabarmen astirotu dezake."
 STRING IDC_DSDXR		"VMR-9 (aurkezgabe)-ren berdina, baina egizko bi-pasaldi bikubiko birneurriratzaile bat erabiltzen du."
 STRING IDC_DSEVR		"Vista edo berriagoetan bakarrik eskuragarri edo XP-an gutxienez .NET Framework 3.5 ezarrita dagoela."

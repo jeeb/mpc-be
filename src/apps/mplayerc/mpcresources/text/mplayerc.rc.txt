@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Override placement"
 7		"Horizontal:"
 11		"Vertical:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Texture settings (open the video again to see the changes)"
 19		"Sub pictures to buffer:"
 22		"Maximum texture resolution:"
-23		"The internal subtitle functionality is only available when a compatible video renderer is used. You can select the desired video renderer on the Output page under Playback options. Compatible renderers are marked with '**' behind their name."
-24		"Before you ask"
-25		"If you override and enable full-screen antialiasing somewhere at your videocard's settings, subtitles aren't going to look any better but it will surely eat your cpu."
-27		"Warning"
-28		"RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers."
-29		"Round up to power of two"
-30		"Allow animation when buffering"
+23		"If you override and enable full-screen antialiasing somewhere at your videocard's settings, subtitles aren't going to look any better but it will surely eat your cpu."
+25		"Warning"
+26		"Allow animation when buffering"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -497,7 +493,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 7		"Load playlist"
 8		"Select Source"
 9		"Internal"
-10		"File Source"
+10		"File Source (URL)"
 11		"Initial buffer size"
 12		"% of source file size"
 13		"Mb"
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"After clicking this button, the checked state of the
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Default state gets inherited to other styles where it is still undefined"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Allows subtitle animation when using a subpicture buffer larger than 0. Disabling this option will lower CPU usage. Also disable if you experience flashing subtitles."
-STRING IDC_CHECK_SPCPOW2TEX		"Unchecking this frees up a little video memory and saves bandwidth on local to video memory transfers, but it may not work with older video cards."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

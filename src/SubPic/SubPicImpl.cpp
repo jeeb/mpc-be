@@ -186,11 +186,10 @@ STDMETHODIMP CSubPicImpl::SetVirtualTextureSize (const SIZE pSize, const POINT p
 // ISubPicAllocatorImpl
 //
 
-CSubPicAllocatorImpl::CSubPicAllocatorImpl(SIZE cursize, bool fDynamicWriteOnly, bool fPow2Textures)
+CSubPicAllocatorImpl::CSubPicAllocatorImpl(SIZE cursize, bool fDynamicWriteOnly)
 	: CUnknown(NAME("ISubPicAllocatorImpl"), NULL)
 	, m_cursize(cursize)
 	, m_fDynamicWriteOnly(fDynamicWriteOnly)
-	, m_fPow2Textures(fPow2Textures)
 {
 	m_curvidrect = CRect(CPoint(0,0), m_cursize);
 }

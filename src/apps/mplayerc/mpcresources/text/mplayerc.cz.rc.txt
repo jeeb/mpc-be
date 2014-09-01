@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Změnit polohu"
 7		"Horizontální:"
 11		"Vertikální:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Možnosti textury (změny se projeví až po znovuotevření videa)"
 19		"Počet snímků ve vyrovnávací paměti:"
 22		"Maximální rozlišení textury:"
-23		"Titulkovač pro DirectShow je dostupný pouze pokud je použit renderer ""VMR-7 (renderless)"" nebo ""VMR-9 (renderless)"". VMR-7 vyžaduje Windows XP, VMR-9 vyžaduje DirectX 9 a oba vyžadují grafické karty s HW akcelerací D3D."
-24		"Než se zeptáte"
-25		"Pokud změníte polohu titulků a zapnete full-screen antialiasing, titulky určitě nebudou vypadat lépe, zato však zaberou veškerý výkon vašeho procesoru."
-27		"Varování"
-28		"U formátů RealMedia a QuickTime můžete použít titulky pokud použijete jejich speciální DirectX 7 nebo DirectX 9 renderery."
-29		"Zaokrouhlovat na mocniny dvou"
-30		"Povolit animaci s využitím vyrovnávací paměti"
+23		"Pokud změníte polohu titulků a zapnete full-screen antialiasing, titulky určitě nebudou vypadat lépe, zato však zaberou veškerý výkon vašeho procesoru."
+25		"Varování"
+26		"Povolit animaci s využitím vyrovnávací paměti"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Stav zaškrtávacího políčka u skupin formátů u
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Výchozí stav bude převzat ostatními styly ve kterých ještě nebyla tato volba nastavena."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Povolí animaci titulků při použití titulkové vyrovnávací paměti větší než 0. Zakázání této volby sníží zatížení procesoru. Také ji zakažte pokud dochází k blikání titulků."
-STRING IDC_CHECK_SPCPOW2TEX		"Odškrtnutí této volby uvolní část video paměti a sníží nároky na přenosovou kapacitu mezi lokální a video pamětí, nemusí ale fungovat na starších video kartách."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

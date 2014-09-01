@@ -1661,8 +1661,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, r.nSPCSize);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, r.nSPMaxTexRes);
-		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_POW2TEX, r.fSPCPow2Tex);
-		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SPCAllowAnimationWhenBuffering"), r.fSPCAllowAnimationWhenBuffering);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, r.bSPCAllowAnimationWhenBuffering);
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, r.iEvrBuffers);
 
@@ -1726,10 +1725,9 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
 		r.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
 
-		r.nSPCSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, 10);
-		r.nSPMaxTexRes = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
-		r.fSPCPow2Tex = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_POW2TEX, TRUE);
-		r.fSPCAllowAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("SPCAllowAnimationWhenBuffering"), TRUE);
+		r.nSPCSize							= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, 10);
+		r.nSPMaxTexRes						= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
+		r.bSPCAllowAnimationWhenBuffering	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
 
 		r.iEvrBuffers		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, 5);
 		r.D3D9RenderDevice	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);

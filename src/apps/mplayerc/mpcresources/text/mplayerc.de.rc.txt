@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Anzahl der aufgelisteten Dateien:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Untertitelposition anpassen"
 7		"Horizontal:"
 11		"Vertikal:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Untertiteltextur (Neuladen des Videos notwendig)"
 19		"Bilderanzahl im Pufferspeicher:"
 22		"Maximale Texturauflösung:"
-23		"Untertitel sind in DirectShow verfügbar, wenn ""VMR-7 (Renderless)"" oder\n""VMR-9 (Renderless)"" als Video-Renderer ausgewählt wurde.\nVMR-7 benötigt Windows XP, VMR-9 DirectX 9.\nBeide benötigen eine Direct3D-Grafikkarte mit Hardware-Beschleunigung."
-24		"Hinweis"
-25		"Wenn Sie die Untertitel-Position anpassen und in den Einstellungen der Grafikkarte\nVollbild-Antialiasing auswählen, sehen die Untertitel zwar besser aus, aber die\nCPU-Belastung steigt extrem an."
-27		"Warnung"
-28		"Untertitel für RealMedia und QuickTime sind möglich, wenn Sie deren spezielle\nDirectX 7 oder DirectX 9 Renderer einstellen."
-29		"Auflösung auf Zweierpotenz aufrunden"
-30		"Animationen beim Puffern erlauben"
+23		"Wenn Sie die Untertitel-Position anpassen und in den Einstellungen der Grafikkarte\nVollbild-Antialiasing auswählen, sehen die Untertitel zwar besser aus, aber die\nCPU-Belastung steigt extrem an."
+25		"Warnung"
+26		"Animationen beim Puffern erlauben"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Dieser Button bewirkt die Anzeige der momentan im Sy
 STRING IDC_CACH_SIZE		"Cache-Größe für Datei-Operationen (in Kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Standardwert wird auch für andere Styles verwendet, für die noch nichts definiert wurde"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Erlaubt Untertitel-Animation bei einem Puffer größer als 0. Ein Deaktivieren dieser Option spart zudem ein wenig CPU-Zeit. Bei flimmernden Untertiteln diese Option ebenfalls deaktiveren."
-STRING IDC_CHECK_SPCPOW2TEX		"Bei entfernen dieses Hakens wird etwas Videospeicher frei gegeben und Bandbreite bei der Übertragung vom lokalen Speicher zum Videospeicher gespart. Funktioniert aber vermutlich nicht mit älteren Grafikkarten."
 STRING IDC_CHECK_SUBRESYNC		"Erlaubt Untertitel anzuzeigen und zu bearbeiten (einschließlich Timecode). Navigation durch Untertitel. Kann die Ladegeschwindigkeit der Untertitel deutlich verlangsamen."
 STRING IDC_DSDXR		"Genauso wie VMR-9 (Renderless), benutzt aber einen richtigen 2-Pass bikubischen Resizer."
 STRING IDC_DSEVR		"Nur unter Vista und höher verfügbar, oder auf Windows XP Systemen mit installierten .NET Framework 3.5."

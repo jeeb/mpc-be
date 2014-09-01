@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Özel yerleşim"
 7		"Yatay:"
 11		"Dikey:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Kaplama ayarları (değişiklikleri görmek için video'yu tekrar açınız)"
 19		"Tamponlanarak okunacak resim sayısı:"
 22		"En fazla doku çözünürlüğü:"
-23		"DirectShow için altyazılar video ayırıcısından ""VMR-7 (çevrilmeden)"" veya ""VMR-9 (çevrilmeden)"" seçenekleri işaretlenerek kullanılabilir. VMR-7 ===> Windows XP, VMR-9 ===> DirectX 9, ve ikisi de HW hızlandırmalı bir D3D ekran kartı gerektirir."
-24		"Bilgi"
-25		"Ekran kartınızın ayarlarından Tam ekran keskinlik yumuşatması seçeneğini açarsanız, altyazılar düzgün görülmeyecek ve daha fazla işlemci kullanımına neden olacaktır."
-27		"Uyarı"
-28		"RealMedia ve QuickTime biçimleri kendilerine özel DirectX 7 ve 9 çeviricileri ile altyazılı olarak görüntülenebilirler."
-29		"Dokuyu çiftli olarak topla"
-30		"Tamponlarken animasyonlara izin ver"
+23		"Ekran kartınızın ayarlarından Tam ekran keskinlik yumuşatması seçeneğini açarsanız, altyazılar düzgün görülmeyecek ve daha fazla işlemci kullanımına neden olacaktır."
+25		"Uyarı"
+26		"Tamponlarken animasyonlara izin ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Bu tuşa tıkladıktan sonra, seçili olan grup biç
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Varsayılan durum hala tanımsız olduğu için diğer biçimlerden etkileniyor"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"0'dan büyük bir görüntü tamponu kullanırken alt yazı animasyonlarına izin verir. Bu ayarı kapatmak işlemci kullanımını düşürecektir. Eğer alt yazılar parlak gösterilirse, yine ilgili ayarı kapatmanız önerilir."
-STRING IDC_CHECK_SPCPOW2TEX		"Bunu kapatmak yerel video hafızası bant genişliğini korur ve az bir miktar video hafızasını boşaltır, ancak eski ekran kartları ile çalışmayabilir."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

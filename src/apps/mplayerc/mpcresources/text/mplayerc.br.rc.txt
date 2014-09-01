@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Forçar posicionamento"
 7		"Horizontal:"
 11		"Vertical:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Opções de textura (é necessário re-abrir o arquivo para aplicar as alterações)"
 19		"Sub telas para armazenar em buffer:"
 22		"Resolução máxima da textura:"
-23		"As legendas para DirectShow estarão disponiveis quando se usar os métodos de renderização ""VMR-7 (sem render)"" ou ""VMR-9 (sem render)"". VMR-7 requer Windows XP, VMR-9 requer DirectX 9, e ambos requerem um placa de vídeo com D3D por Hardware."
-24		"Antes de perguntar"
-25		"Se voce forçar e habilitar o modo de antialiasing em tela cheia nas configurações da sua placa de vídeo, não irá melhorar a qualidade das legendas mas certamente irá consumir muito o trabalho da CPU"
-27		"Aviso"
-28		"Os formatos RealMedia e QuickTime pode oferecer legendas ao configurar sua renderização especial em DirectX 7 ou DirectX 9."
-29		"Elevar á potência de dois"
-30		"Permitir animação quando em carregamento (buffering)"
+23		"Se voce forçar e habilitar o modo de antialiasing em tela cheia nas configurações da sua placa de vídeo, não irá melhorar a qualidade das legendas mas certamente irá consumir muito o trabalho da CPU"
+25		"Aviso"
+26		"Permitir animação quando em carregamento (buffering)"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Depois de clicar neste botão, o estado de comprova�
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"O estado padrão se herda a outros estilos aonde este esteja indefinido"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permite animação de legendas quando usando uma subimagem com buffer maior que 0. Desabilitar esta opção irá reduzir o uso da CPU. Támbem desabilite caso experimente legendas piscantes."
-STRING IDC_CHECK_SPCPOW2TEX		"Desmarcando isto se libera um pouco de memória de vídeo e salva banda das transferências locais da memoria de vídeo, mas pode não funcionar com placas de vídeo antigas."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

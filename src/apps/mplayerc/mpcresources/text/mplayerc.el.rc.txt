@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Παράκαμψη τοποθέτησης"
 7		"Οριζόντια:"
 11		"Κάθετα:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Ρυθμίσεις υφής (ανοίξτε πάλι το βίντεο για να δείτε τις αλλαγές)"
 19		"Επιμ. εικόνες σε ενδιάμεση μνήμη:"
 22		"Μέγιστη ανάλυση υφής:"
-23		"The internal subtitle functionality is only available when a compatible video renderer is used. You can select the desired video renderer on the Output page under Playback options. Compatible renderers are marked with '**' behind their name."
-24		"Before you ask"
-25		"Εάν παρακάμψετε κι ενεργοποιήσετε την εξομάλυνση γραφικών πλήρους οθόνης κάπου στις ρυθμίσεις της κάρτας γραφικών σας, οι υπότιτλοι δεν πρόκειται να φανούν καλύτερα, αλλά σίγουρα θα τρώνε από τον επεξεργαστή σας."
-27		"Προειδοποίηση"
-28		"RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers."
-29		"Στρογγυλοποίηση σε δύναμη του δύο"
-30		"Επιτρέπεται η κίνηση κατά την προσωρινή αποθήκευση"
+23		"Εάν παρακάμψετε κι ενεργοποιήσετε την εξομάλυνση γραφικών πλήρους οθόνης κάπου στις ρυθμίσεις της κάρτας γραφικών σας, οι υπότιτλοι δεν πρόκειται να φανούν καλύτερα, αλλά σίγουρα θα τρώνε από τον επεξεργαστή σας."
+25		"Προειδοποίηση"
+26		"Επιτρέπεται η κίνηση κατά την προσωρινή αποθήκευση"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1121,7 +1117,6 @@ STRING IDC_BUTTON_EXT_SET		"Μετά το κλικ σε αυτό το κουμπ
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Η προεπιλεγμένη τιμή χρησιμοποιείται και σε άλλα στυλ, όπου δεν έχει καθοριστεί"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Επιτρέπετε η κίνηση του υπότιτλου όταν χρησιμοποιείται μια προσωρινή επιμέρους εικόνα μεγαλύτερη από 0. Η απενεργοποίηση αυτής της επιλογής θα μειώσει τη χρήση της CPU. Επίσης να το απενεργοποιήσετε εάν οι υπότιτλοι αναβοσβήνουν."
-STRING IDC_CHECK_SPCPOW2TEX		"Αν το αποεπιλέξετε αυτό, απελευθερώνετε λίγη μνήμη βίντεο και εξοικονομείται εύρος ζώνης μεταφοράς βίντεο στην τοπική μνήμη, αλλά μπορεί να μην λειτουργεί με παλαιότερες κάρτες γραφικών."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

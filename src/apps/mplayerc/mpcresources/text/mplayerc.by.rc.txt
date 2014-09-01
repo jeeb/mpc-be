@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Змяніць становішча"
 7		"Гарызант:"
 11		"Верт:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Налада тэкстуры (адкрыйце відэа зноў, каб убачыць змены)"
 19		"Лік старонак кэшыруемых наперад:"
 22		"Максімальная вырашальнасць тэкстуры:"
-23		"Адлюстраванне субтытраў уключаецца толькі пры ўсталяваным рэндэры ""VMR-7 (renderless)"" або ""VMR-9 (renderless)"". VMR-7 патрабуе Windows XP, VMR-9 патрабуе DirectX 9, і абодва патрабуюць наяўнасці апаратнага 3D паскаральніка."
-24		"Перад тым як спытаць"
-25		"Калі вы зменіце становішча і задзейнічаеце поўнаэкраннае згладжванне ў наладах відэакарты, субтытры не будуць выглядаць лепш, але будуць празмеру нагружаць працэсар."
-27		"Увага"
-28		"На RealMedia і QuickTime субтытры таксама могуць быць накладзены пры ўключэнні іх спецыяльных рэндэраў на старонцы ""Вывад"
-29		"Акругляць да кратнага 2"
-30		"Уключыць анімацыю"
+23		"Калі вы зменіце становішча і задзейнічаеце поўнаэкраннае згладжванне ў наладах відэакарты, субтытры не будуць выглядаць лепш, але будуць празмеру нагружаць працэсар."
+25		"Увага"
+26		"Уключыць анімацыю"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"Пасля націску гэтае кнопкі а
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Стандартны стан наследуецца іншымі стылямі там, дзе ён  яшчэ не вызначаны."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Дазваляе анімацыю субтытраў, калі выкарыстоўваецца буфер subpicture болей 0. Адключэнне гэтай опцыі знізіць нагрузку на працэсар. Таксама адключыце, калі выкарыстоўваеце флэш субтытры."
-STRING IDC_CHECK_SPCPOW2TEX		"Адключэнне гэтае опцыі вызваляе трохі відэапамяці і вызваляе паласу прапускання на перасоўваннях з лакальнай памяці ў відэапамяць, але можа не працаваць на старых відэакартах."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

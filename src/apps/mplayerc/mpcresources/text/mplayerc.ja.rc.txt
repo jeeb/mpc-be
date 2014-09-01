@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"配置を強制指定する"
 7		"水平位置:"
 11		"垂直位置:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"テクスチャ設定 (変更を有効にするにはビデオを開き直してください)"
 19		"先読みサブピクチャ数:"
 22		"テクスチャの最大解像度:"
-23		"DirectShow での字幕表示はビデオ レンダラに VMR-7 (レンダーレス) か VMR-9 (レンダーレス) が設定されている場合に有効です。VMR-7 には Windows XP、VMR-9 には DirectX 9 が必要で、どちらも Direct3D ハードウェア アクセラレーションに対応したビデオカードが必要です。"
-24		"質問する前に"
-25		"ビデオカードの設定でフルスクリーン時のアンチ エイリアシングを有効にした場合、CPU 負荷が大きくなるだけで字幕は少しも綺麗にならないでしょう。"
-27		"警告"
-28		"RealMedia と QuickTime 形式は、専用の DirectX 7 または DirectX 9 のレンダラに設定することで字幕を表示できます。"
-29		"2の累乗で切り上げる"
-30		"バッファリング中のアニメーションを許可する"
+23		"ビデオカードの設定でフルスクリーン時のアンチ エイリアシングを有効にした場合、CPU 負荷が大きくなるだけで字幕は少しも綺麗にならないでしょう。"
+25		"警告"
+26		"バッファリング中のアニメーションを許可する"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"このボタンをクリックすると MPC-BE の�
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"未設定のスタイルにはデフォルト状態の設定が適用される"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"サブピクチャーバッファを使用している時に字幕アニメーションを許可します。無効にすると CPU 使用率が下がります。字幕がチラつく場合も無効にしてください。"
-STRING IDC_CHECK_SPCPOW2TEX		"チェックを外すとビデオメモリの消費量とシステムメモリとビデオメモリ間の負荷を抑えられますが、古いビデオカードでは動作しない可能性があります。"
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

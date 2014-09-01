@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Suprascrie așezarea"
 7		"Orizontal:"
 11		"Vertical:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Setările texturei (deschideți fișierul video din nou pentru a vedea schimbările)"
 19		"Imagini subtitrare de preîncărcat:"
 22		"Rezoluție maximă pentru textură :"
-23		"The internal subtitle functionality is only available when a compatible video renderer is used. You can select the desired video renderer on the Output page under Playback options. Compatible renderers are marked with '**' behind their name."
-24		"Before you ask"
-25		"Dacă suprascrieţi și activați dezimțuire (antialiasing) pentru ecran complet în setările plăcii grafice, subtitrările nu o să arate mai bine, dar cu siguranță se va consuma din puterea procesorului."
-27		"Avertisment"
-28		"RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers."
-29		"Rotunjește la puteri ale lui 2"
-30		"Permite animații când se încarcă în avans"
+23		"Dacă suprascrieţi și activați dezimțuire (antialiasing) pentru ecran complet în setările plăcii grafice, subtitrările nu o să arate mai bine, dar cu siguranță se va consuma din puterea procesorului."
+25		"Avertisment"
+26		"Permite animații când se încarcă în avans"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1121,7 +1117,6 @@ STRING IDC_BUTTON_EXT_SET		"După ce dați clic pe acest buton, starea bifată a
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Starea implicită va fi moștenită și de celelalte stiluri unde ea încă nu este definită."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permite animarea subtitrării când este folosită o memorie tampon de subimagini mai mare decât 0. Dezactivând această opțiune va scădea și folosirea procesorului. De asemenea, dezactivați-o dacă se întâmplă ca subtitrările să pâlpâie."
-STRING IDC_CHECK_SPCPOW2TEX		"Debifând această opțiune mai eliberează puțin din memoria video și salvează din lățimea de bandă în transferurile locale către memoria video, dar s-ar putea să nu funcționeze cu plăci video mai vechi."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 6		"Överskugga placering"
 7		"Horisontal:"
 11		"Vertikal:"
@@ -384,13 +384,9 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Textur inställningar (öppna videon igen för att se förändringarna)"
 19		"Sub bilder att buffra:"
 22		"Högsta textur upplösningen:"
-23		"Undertextning för DirectShow är tillgängligt när video renderaren är inställd på ""VMR-7 (renderlös)"" eller ""VMR-9 (renderlös)"". VMR-7 kräver Windows XP, VMR-9 kräver DirectX 9, och båda kräver en HW accelererad D3D grafikkortet."
-24		"Innan du frågar"
-25		"Om du överskuggar och aktivera helskärms antialiasing någonstans på ditt grafikkorts inställningar, undertexter kommer inte att se något bättre ut men det kommer säkert att belasta din CPU."
-27		"Varning"
-28		"RealMedia och QuickTime format kan bli undertextade genom att ställa in deras särskilda DirectX 7 eller DirectX 9 renderare."
-29		"Runda upp till kraften av två"
-30		"Tillåt animering när buffrande"
+23		"Om du överskuggar och aktivera helskärms antialiasing någonstans på ditt grafikkorts inställningar, undertexter kommer inte att se något bättre ut men det kommer säkert att belasta din CPU."
+25		"Varning"
+26		"Tillåt animering när buffrande"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1117,7 +1113,6 @@ STRING IDC_BUTTON_EXT_SET		"När du klickat på denna knapp, den faktiska läget
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Standard läget blir ärvda till andra stilar där de fortfarande är odefinierade"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Tillåter undertext animering när man använder sub bild buffert större än 0. Inaktivering av detta alternativ sänker CPU användningen. Stäng också av om du upplever blinkande undertexter."
-STRING IDC_CHECK_SPCPOW2TEX		"Avmarker detta frigör lite grafikminne och sparar bandbredd på lokal till grafikminne överföringar, men det kanske inte fungerar med äldre grafikkort."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."

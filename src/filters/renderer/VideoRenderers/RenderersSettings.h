@@ -134,8 +134,7 @@ public:
 
 	int			nSPCSize;
 	int			nSPMaxTexRes;
-	bool		fSPCPow2Tex;
-	bool		fSPCAllowAnimationWhenBuffering;
+	bool		bSPCAllowAnimationWhenBuffering;
 
 	CString		D3D9RenderDevice;
 	void		UpdateData(bool fSave);

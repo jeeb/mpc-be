@@ -107,8 +107,11 @@
 #define IDS_RS_SPOVERRIDEPLACEMENT			_T("SPOverridePlacement")
 #define IDS_RS_SPHORPOS						_T("SPHorPos")
 #define IDS_RS_SPVERPOS						_T("SPVerPos")
+
 #define IDS_RS_SPCSIZE						_T("SPCSize")
 #define IDS_RS_SPMAXTEXRES					_T("SPMaxTexRes")
+#define IDS_RS_SPALLOWANIMATION				_T("SPCAllowAnimationWhenBuffering")
+
 #define IDS_RS_INTREALMEDIA					_T("IntRealMedia")
 #define IDS_RS_USEDARKTHEME					_T("UseDarkTheme")
 
@@ -210,7 +213,6 @@
 #define IDS_RS_MPABOOST						_T("MpaBoost")
 #define IDS_RS_AACSC						_T("AACSpeakerConfig")
 #define IDS_RS_ISDB							_T("ISDb")
-#define IDS_RS_POW2TEX						_T("SPCPow2Tex")
 #define IDS_RS_WEBROOT						_T("WebRoot")
 #define IDS_RS_WEBSERVERLOCALHOSTONLY		_T("WebServerLocalhostOnly")
 #define IDS_RS_ASPECTRATIO_X				_T("AspectRatioX")
