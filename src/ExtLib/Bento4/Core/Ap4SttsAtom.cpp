@@ -120,14 +120,12 @@ AP4_SttsAtom::GetDts(AP4_Ordinal sample, AP4_TimeStamp& dts, AP4_Duration& durat
             // we are within the sample range for the current entry
             dts = dts_start + (AP4_UI64)(sample - 1 - sample_start) * (AP4_UI64)entry.m_SampleDuration;
             duration = entry.m_SampleDuration;
-            
+
             // update the lookup cache
-            if (sample_start > 1) {
-                m_LookupCache.entry_index = i;
-                m_LookupCache.sample      = sample_start;
-                m_LookupCache.dts         = dts_start;
-			}
-            
+            m_LookupCache.entry_index = i;
+            m_LookupCache.sample      = sample_start;
+            m_LookupCache.dts         = dts_start;
+
             return AP4_SUCCESS;
         }
  
