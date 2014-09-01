@@ -2382,16 +2382,11 @@ int CSimpleTextSubtitle::TranslateSegmentEnd(int i, double fps)
 
 STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 {
-	CString def = _T("Default");
-
 	STSStyle* style = NULL;
 	m_styles.Lookup(GetAt(i).style, style);
 
-	STSStyle* defstyle = NULL;
-	m_styles.Lookup(def, defstyle);
-
 	if (!style) {
-		style = defstyle;
+		m_styles.Lookup(_T("Default"), style);
 	}
 
 	ASSERT(style);
@@ -2401,13 +2396,11 @@ STSStyle* CSimpleTextSubtitle::GetStyle(int i)
 
 bool CSimpleTextSubtitle::GetStyle(int i, STSStyle& stss)
 {
-	CString def = _T("Default");
-
 	STSStyle* style = NULL;
 	m_styles.Lookup(GetAt(i).style, style);
 
-	STSStyle* defstyle = NULL;
-	m_styles.Lookup(def, defstyle);
+	STSStyle* defstyle = nullptr;
+	m_styles.Lookup(_T("Default"), defstyle);
 
 	if (!style) {
 		if (!defstyle) {
@@ -2432,8 +2425,6 @@ bool CSimpleTextSubtitle::GetStyle(int i, STSStyle& stss)
 
 bool CSimpleTextSubtitle::GetStyle(CString styleName, STSStyle& stss)
 {
-	CString def = _T("Default");
-
 	STSStyle* style = NULL;
 	m_styles.Lookup(styleName, style);
 	if (!style) {
@@ -2442,8 +2433,8 @@ bool CSimpleTextSubtitle::GetStyle(CString styleName, STSStyle& stss)
 
 	stss = *style;
 
-	STSStyle* defstyle = NULL;
-	m_styles.Lookup(def, defstyle);
+	STSStyle* defstyle = nullptr;
+	m_styles.Lookup(_T("Default"), defstyle);
 	if (defstyle && stss.relativeTo == 2) {
 		stss.relativeTo = defstyle->relativeTo;
 	}
@@ -2453,9 +2444,8 @@ bool CSimpleTextSubtitle::GetStyle(CString styleName, STSStyle& stss)
 
 int CSimpleTextSubtitle::GetCharSet(int i)
 {
-	STSStyle stss;
-	GetStyle(i, stss);
-	return stss.charSet;
+	const STSStyle* stss = GetStyle(i);
+	return stss->charSet;
 }
 
 bool CSimpleTextSubtitle::IsEntryUnicode(int i)
@@ -2770,7 +2760,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 	ULONGLONG pos = f->GetPosition();
 
 	for (ptrdiff_t i = 0; i < nOpenFuncts; i++) {
-		if (!OpenFuncts[i].open(f, *this, CharSet) /*|| !GetCount()*/) {
+		if (!OpenFuncts[i].open(f, *this, CharSet)) {
 			if (!IsEmpty()) {
 				CString lastLine;
 				size_t n = CountLines(f, pos, f->GetPosition(), lastLine);
@@ -2815,8 +2805,8 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
 bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 {
-	TCHAR path[_MAX_PATH];
-	if (!GetTempPath(_MAX_PATH, path)) {
+	TCHAR path[MAX_PATH];
+	if (!GetTempPath(MAX_PATH, path)) {
 		return false;
 	}
 
@@ -3230,8 +3220,8 @@ STSStyle& operator <<= (STSStyle& s, const CString& style)
 
 	try {
 		CStringW str = TToW(style);
-        LPCWSTR pszBuff = str;
-        int nBuffLength = str.GetLength();
+		LPCWSTR pszBuff = str;
+		int nBuffLength = str.GetLength();
 		if (str.Find(';')>=0) {
 			s.marginRect.left = GetInt(pszBuff, nBuffLength, L';');
 			s.marginRect.right = GetInt(pszBuff, nBuffLength, L';');

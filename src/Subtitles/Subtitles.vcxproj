@@ -97,6 +97,7 @@
     <ClCompile Include="CCDecoder.cpp" />
     <ClCompile Include="CompositionObject.cpp" />
     <ClCompile Include="DVBSub.cpp" />
+    <ClCompile Include="Ellipse.cpp" />
     <ClCompile Include="GFN.cpp" />
     <ClCompile Include="HdmvSub.cpp" />
     <ClCompile Include="Rasterizer.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="CCDecoder.h" />
     <ClInclude Include="CompositionObject.h" />
     <ClInclude Include="DVBSub.h" />
+    <ClInclude Include="Ellipse.h" />
     <ClInclude Include="GFN.h" />
     <ClInclude Include="HdmvSub.h" />
     <ClInclude Include="Rasterizer.h" />

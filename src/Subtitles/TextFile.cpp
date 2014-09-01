@@ -164,13 +164,13 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 		switch (nFrom) {
 			default:
 			case begin:
-			    break;
+				break;
 			case current:
-			    lOff = pos + lOff;
-			    break;
+				lOff = pos + lOff;
+				break;
 			case end:
-			    lOff = len - lOff;
-			    break;
+				lOff = len - lOff;
+				break;
 		}
 
 		lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll);

@@ -68,4 +68,3 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 		BitBltFromRGBToRGBStretch(spd.w, spd.h, (BYTE*)spd.bits, spd.pitch, 32, m_spd.w, m_spd.h, (BYTE*)m_spd.bits, m_spd.pitch, 32);
 	}
 }
-
