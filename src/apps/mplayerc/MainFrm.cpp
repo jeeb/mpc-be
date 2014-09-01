@@ -6363,6 +6363,35 @@ CString CMainFrame::GetVidPos()
 	return posstr;
 }
 
+CString CMainFrame::CreateSnapShotFileName()
+{
+	CString path(AfxGetAppSettings().strSnapShotPath);
+	if (!::PathFileExists(path)) {
+		TCHAR szPath[MAX_PATH] = { 0 };
+		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYPICTURES, NULL, 0, szPath))) {
+			path = CString(szPath) + L"\\";
+		}
+	}
+
+	CString prefix = _T("snapshot");
+	if (GetPlaybackMode() == PM_FILE) {
+		CString filename = GetFileOnly(GetCurFileName());
+		FixFilename(filename); // need for URLs
+		if (!m_strTitleAlt.IsEmpty()) {
+			filename = GetAltFileName();
+		}
+
+		prefix.Format(_T("%s_snapshot_%s"), filename, GetVidPos());
+	} else if (GetPlaybackMode() == PM_DVD) {
+		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
+	}
+
+	CPath psrc;
+	psrc.Combine(path, MakeSnapshotFileName(prefix));
+
+	return CString(psrc);
+}
+
 void CMainFrame::OnFileSaveImage()
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -6372,24 +6401,9 @@ void CMainFrame::OnFileSaveImage()
 		return;
 	}
 
-	CPath psrc(s.strSnapShotPath);
-
-	CStringW prefix = _T("snapshot");
-	if (GetPlaybackMode() == PM_FILE) {
-		CString path = GetFileOnly(GetCurFileName());
-		if (!m_strTitleAlt.IsEmpty()) {
-			path = GetAltFileName();
-		}
-
-		prefix.Format(_T("%s_snapshot_%s"), path, GetVidPos());
-	} else if (GetPlaybackMode() == PM_DVD) {
-		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
-	}
-	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
-
 	CSaveImageDialog fd(
 		s.iThumbQuality, s.iThumbLevelPNG,
-		0, (LPCTSTR)psrc,
+		0, CreateSnapShotFileName(),
 		_T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|WebP - WebP-lossy Image (*.webp)|*.webp|WebPLL - WebP-lossless Image (*.webpll)|*.webpll|TIFF - Tagged Image File Format (*.tif)|*.tif||"), GetModalParent());
 
 	if (s.strSnapShotExt == _T(".bmp")) {
@@ -6445,28 +6459,7 @@ void CMainFrame::OnFileSaveImageAuto()
 		return;
 	}
 
-	CString path(s.strSnapShotPath);
-	if (!::PathFileExists(path)) {
-		TCHAR szPath[MAX_PATH] = { 0 };
-		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYPICTURES, NULL, 0, szPath))) {
-			path = CString(szPath) + L"\\";
-		}
-	}
-
-	CStringW filename;
-	if (GetPlaybackMode() == PM_FILE) {
-		filename = GetFileOnly(GetCurFileName()) + L"_snapshot_" + GetVidPos();
-		FixFilename(filename); // need for URLs
-		// TODO: make PM_URL
-	} else if (GetPlaybackMode() == PM_DVD) {
-		filename = L"snapshot_dvd_" + GetVidPos();
-	} else {
-		filename = L"snapshot";
-	}
-
-	path.Append(MakeSnapshotFileName(filename));
-
-	SaveImage(path);
+	SaveImage(CreateSnapShotFileName());
 }
 
 void CMainFrame::OnUpdateFileSaveImage(CCmdUI* pCmdUI)

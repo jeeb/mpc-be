@@ -1109,8 +1109,6 @@ public:
 	void		ShowOSDCustomMessageApi(MPC_OSDDATA *osdData);
 	void		JumpOfNSeconds(int seconds);
 
-	CString		GetVidPos();
-
 	// Win 7 TaskBar/Thumbnail support
 	ITaskbarList3* m_pTaskbarList;
 	HRESULT		CreateThumbnailToolbar();
@@ -1240,4 +1238,7 @@ protected:
 	BOOL		OpenIso(CString pathName);
 
 	void		AddRecent(CString pathName);
+
+	CString		GetVidPos();
+	CString		CreateSnapShotFileName();
 };
