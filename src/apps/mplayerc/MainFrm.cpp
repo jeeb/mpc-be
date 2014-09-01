@@ -6445,13 +6445,6 @@ void CMainFrame::OnFileSaveImageAuto()
 		return;
 	}
 
-	CStringW prefix = _T("snapshot");
-	if (GetPlaybackMode() == PM_FILE) {
-		prefix.Format(_T("%s_snapshot_%s"), GetFileOnly(GetCurFileName()), GetVidPos());
-	} else if (GetPlaybackMode() == PM_DVD) {
-		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
-	}
-
 	CString path(s.strSnapShotPath);
 	if (!::PathFileExists(path)) {
 		TCHAR szPath[MAX_PATH] = { 0 };
@@ -6460,9 +6453,20 @@ void CMainFrame::OnFileSaveImageAuto()
 		}
 	}
 
-	CString fn;
-	fn.Format(_T("%s\\%s"), path, MakeSnapshotFileName(prefix));
-	SaveImage(fn);
+	CStringW filename;
+	if (GetPlaybackMode() == PM_FILE) {
+		filename = GetFileOnly(GetCurFileName()) + L"_snapshot_" + GetVidPos();
+		FixFilename(filename); // need for URLs
+		// TODO: make PM_URL
+	} else if (GetPlaybackMode() == PM_DVD) {
+		filename = L"snapshot_dvd_" + GetVidPos();
+	} else {
+		filename = L"snapshot";
+	}
+
+	path.Append(MakeSnapshotFileName(filename));
+
+	SaveImage(path);
 }
 
 void CMainFrame::OnUpdateFileSaveImage(CCmdUI* pCmdUI)

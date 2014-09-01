@@ -79,7 +79,7 @@ using namespace MediaInfoLib;
 
 class CFullscreenWnd;
 
-enum {PM_NONE, PM_FILE, PM_DVD, PM_CAPTURE};
+enum {PM_NONE, PM_FILE, PM_DVD, PM_CAPTURE, };
 
 interface __declspec(uuid("6E8D4A21-310C-11d0-B79A-00AA003767A7")) // IID_IAMLine21Decoder
 IAMLine21Decoder_2 :
