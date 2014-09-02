@@ -378,9 +378,23 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<Packet> p)
 				m_bFlushed = false;
 			}
 
-			HRESULT hr = __super::DeliverPacket(p);
-			if (hr != S_OK) {
-				return hr;
+			BOOL bSliceExists = FALSE;
+			CH264Nalu Nalu;
+			Nalu.SetBuffer(p->GetData(), p->GetCount(), 4);
+			while (Nalu.ReadNext() && !bSliceExists) {
+				switch (Nalu.GetType()) {
+					case NALU_TYPE_SLICE:
+					case NALU_TYPE_IDR:
+						bSliceExists = TRUE;
+						break;
+				}
+			}
+
+			if (bSliceExists) {
+				HRESULT hr = __super::DeliverPacket(p);
+				if (hr != S_OK) {
+					return hr;
+				}
 			}
 		} else if (rtStart == INVALID_TIME) {
 			rtStart	= pPacket->rtStart;
