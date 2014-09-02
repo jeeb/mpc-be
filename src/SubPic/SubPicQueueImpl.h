@@ -21,19 +21,81 @@
 
 #pragma once
 
+#include <memory>
+#include <mutex>
+#include <condition_variable>
+
 #include "ISubPic.h"
 
 class CSubPicQueueImpl : public CUnknown, public ISubPicQueue
 {
+	static const double DEFAULT_FPS;
+
+protected:
+	struct SubPicProviderWithSharedLock {
+	private:
+		unsigned int m_nRef = 0;
+		std::mutex m_mutex;
+
+	public:
+		const CComPtr<ISubPicProvider> pSubPicProvider;
+
+		SubPicProviderWithSharedLock(const CComPtr<ISubPicProvider>& pSubPicProvider)
+			: pSubPicProvider(pSubPicProvider) {
+		}
+
+		HRESULT Lock() {
+			HRESULT hr;
+
+			if (pSubPicProvider) {
+				std::lock_guard<std::mutex> lock(m_mutex);
+
+				hr = S_OK;
+				if ((m_nRef == 0 && SUCCEEDED(hr = pSubPicProvider->Lock()))
+						|| m_nRef > 0) {
+					m_nRef++;
+				}
+			} else {
+				hr = E_POINTER;
+			}
+
+			return hr;
+		}
+
+		HRESULT Unlock() {
+			HRESULT hr;
+
+			if (pSubPicProvider) {
+				std::lock_guard<std::mutex> lock(m_mutex);
+
+				hr = S_OK;
+				if ((m_nRef == 1 && SUCCEEDED(hr = pSubPicProvider->Unlock()))
+						|| m_nRef > 1) {
+					m_nRef--;
+				}
+			} else {
+				hr = E_POINTER;
+			}
+
+			return hr;
+		}
+	};
+
+private:
 	CCritSec m_csSubPicProvider;
-	CComPtr<ISubPicProvider> m_pSubPicProvider;
+	std::shared_ptr<SubPicProviderWithSharedLock> m_pSubPicProviderWithSharedLock;
 
 protected:
 	double m_fps;
+	REFERENCE_TIME m_rtTimePerFrame;
 	REFERENCE_TIME m_rtNow;
-	REFERENCE_TIME m_rtNowLast;
 
 	CComPtr<ISubPicAllocator> m_pAllocator;
+
+	std::shared_ptr<SubPicProviderWithSharedLock> GetSubPicProviderWithSharedLock() {
+		CAutoLock cAutoLock(&m_csSubPicProvider);
+		return m_pSubPicProviderWithSharedLock;
+	}
 
 	HRESULT RenderTo(ISubPic* pSubPic, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, double fps, BOOL bIsAnimated);
 
@@ -51,40 +113,48 @@ public:
 
 	STDMETHODIMP SetFPS(double fps);
 	STDMETHODIMP SetTime(REFERENCE_TIME rtNow);
+	
 	/*
-		STDMETHODIMP Invalidate(REFERENCE_TIME rtInvalidate = -1) PURE;
-		STDMETHODIMP_(bool) LookupSubPic(REFERENCE_TIME rtNow, ISubPic** ppSubPic) PURE;
+	STDMETHODIMP Invalidate(REFERENCE_TIME rtInvalidate = -1) PURE;
+	STDMETHODIMP_(bool) LookupSubPic(REFERENCE_TIME rtNow, ISubPic** ppSubPic) PURE;
 
-		STDMETHODIMP GetStats(int& nSubPics, REFERENCE_TIME& rtNow, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop) PURE;
-		STDMETHODIMP GetStats(int nSubPics, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop) PURE;
+	STDMETHODIMP GetStats(int& nSubPics, REFERENCE_TIME& rtNow, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop) PURE;
+	STDMETHODIMP GetStats(int nSubPics, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop) PURE;
 	*/
 };
 
-class CSubPicQueue : public CSubPicQueueImpl, private CAMThread
+class CSubPicQueue : public CSubPicQueueImpl, protected CAMThread
 {
-	int m_nMaxSubPic;
-	BOOL m_bDisableAnim;
+protected:
+	int  m_nMaxSubPic;
+	bool m_bDisableAnim;
+	bool m_bAllowDropSubPic;
 
-	CInterfaceList<ISubPic> m_Queue;
+	bool m_bExitThread;
 
-	CCritSec m_csQueueLock; // for protecting CInterfaceList<ISubPic>
-	REFERENCE_TIME UpdateQueue();
-	void AppendQueue(ISubPic* pSubPic);
-	int GetQueueCount();
+	CComPtr<ISubPic> m_pSubPic;
+	CInterfaceList<ISubPic> m_queue;
 
-	REFERENCE_TIME m_rtQueueMin;
-	REFERENCE_TIME m_rtQueueMax;
+	std::mutex m_mutexSubpic; // to protect m_pSubPic
+	std::mutex m_mutexQueue; // to protect m_queue
+	std::condition_variable m_condQueueFull;
+	std::condition_variable m_condQueueReady;
+
+	CAMEvent m_runQueueEvent;
+
+	REFERENCE_TIME m_rtNowLast;
+
+	bool m_bInvalidate;
 	REFERENCE_TIME m_rtInvalidate;
 
-	// CAMThread
+	bool EnqueueSubPic(CComPtr<ISubPic>& pSubPic, bool bBlocking);
+	REFERENCE_TIME GetCurrentRenderingTime();
 
-	bool m_fBreakBuffering;
-	enum {EVENT_EXIT, EVENT_TIME, EVENT_COUNT}; // IMPORTANT: _EXIT must come before _TIME if we want to exit fast from the destructor
-	HANDLE m_ThreadEvents[EVENT_COUNT];
-	DWORD ThreadProc();
+	// CAMThread
+	virtual DWORD ThreadProc();
 
 public:
-	CSubPicQueue(int nMaxSubPic, BOOL bDisableAnim, ISubPicAllocator* pAllocator, HRESULT* phr);
+	CSubPicQueue(int nMaxSubPic, bool bDisableAnim, bool bAllowDropSubPic, ISubPicAllocator* pAllocator, HRESULT* phr);
 	virtual ~CSubPicQueue();
 
 	// ISubPicQueue
@@ -101,11 +171,14 @@ public:
 
 class CSubPicQueueNoThread : public CSubPicQueueImpl
 {
+protected:
+	bool m_bDisableAnim;
+
 	CCritSec m_csLock;
 	CComPtr<ISubPic> m_pSubPic;
 
 public:
-	CSubPicQueueNoThread(ISubPicAllocator* pAllocator, HRESULT* phr);
+	CSubPicQueueNoThread(bool bDisableAnim, ISubPicAllocator* pAllocator, HRESULT* phr);
 	virtual ~CSubPicQueueNoThread();
 
 	// ISubPicQueue

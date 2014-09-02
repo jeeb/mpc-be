@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Sobreescriure ubicació"
 7		"Horitzontal:"
 11		"Vertical:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Si actives l'antialiasing a pantalla completa en les opcions de la tarja gràfica, els subtítuls no es veuran millor i exigirant força cpu."
 25		"Advertència"
 26		"Permetre animació (mentre buffering) "
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Després de fer clic aquet botó, l'estat de comprobació del formato del grupo reflexarà las associacions d'arxiu actuale pel MPC. Una extensión recent agregada es motrarà en gris, no oblidis de maracar-la de nou abans de tencar aquet cuadre de diàleg"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"L'estat predeterminat s'hereda cap a altres estils encara indeterminats "
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permet subtítols amb animació al utilitzar una memoria intermitja per sub-imágenes més grans que 0. Inhabilitant auquesta opció es minimitza l'ús de CPU. Inhabilitar també si els subtítols pipillejent."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

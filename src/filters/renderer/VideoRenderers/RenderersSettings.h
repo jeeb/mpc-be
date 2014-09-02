@@ -135,6 +135,7 @@ public:
 	int			nSPCSize;
 	int			nSPMaxTexRes;
 	bool		bSPCAllowAnimationWhenBuffering;
+	bool		bSPAllowDropSubPic;
 
 	CString		D3D9RenderDevice;
 	void		UpdateData(bool fSave);

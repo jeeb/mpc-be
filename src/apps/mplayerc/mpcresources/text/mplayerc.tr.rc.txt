@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Özel yerleşim"
 7		"Yatay:"
 11		"Dikey:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Ekran kartınızın ayarlarından Tam ekran keskinlik yumuşatması seçeneğini açarsanız, altyazılar düzgün görülmeyecek ve daha fazla işlemci kullanımına neden olacaktır."
 25		"Uyarı"
 26		"Tamponlarken animasyonlara izin ver"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Bu tuşa tıkladıktan sonra, seçili olan grup biçimi MPC-BE'nin geçerli dosya ilişkilendirmesi seçeneği olarak ayarlanacaktır. Genellikle yeni eklenen uzantı gri renkle gösterilecektir, yani bu ekranı kapatmadan önce uzantıyı tekrar seçmeniz gerektiğini unutmayınız!"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Varsayılan durum hala tanımsız olduğu için diğer biçimlerden etkileniyor"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"0'dan büyük bir görüntü tamponu kullanırken alt yazı animasyonlarına izin verir. Bu ayarı kapatmak işlemci kullanımını düşürecektir. Eğer alt yazılar parlak gösterilirse, yine ilgili ayarı kapatmanız önerilir."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

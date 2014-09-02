@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Кількість останніх відкр. файлів:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Змінити положення"
 7		"Горизонт.:"
 11		"Вертик.:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Якщо Ви зміните положення та увімкнете повноекранне згладжування в налаштуваннях відеокарти, вигляд субтитрів не покращиться, але навантаження процесора збільшиться."
 25		"Увага"
 26		"Дозволити анімацію при буферизації"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Після натискання цієї кнопки, відмітки вибору групи форматів будуть встановлені відповідно до наявних асоціацій файлів для MPC-BE. Щойно додані роширення зазвичай будуть помічатися ""сірим"", тому не забувайте виділити їх знову перед закриттям вікна!"
 STRING IDC_CACH_SIZE		"Розмір кеша для операцій з файлами (у кілобайтах)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Стандартний стан успадковується іншими стилями, в яких він ще не визначений."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Дозволяє анімацію субтитрів при використанні буфера субзображень більшого за 0. Вимкнення цієї опції дозволить дещо зменшити завантаження ЦП. Використовуйте якщо помітне мигтіння субтитрів."
 STRING IDC_CHECK_SUBRESYNC		"Дозволяє відображати і редагувати субтитри(включаючи тайм-коди), здійснювати навігацію по субтитрам. Може значно сповільнити завантаження субтитрів."

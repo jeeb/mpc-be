@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Փոխել դիրքը"
 7		"Հորիզոնական."
 11		"Ուղղհ."
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Եթե փոխեք դիրքը և կարգավորեք տեսաքարտի էկրանային լղոզումը, ապա տողագրերը ավելի լավ չեն երևա, այլ փոխարենը կխլեն մեծ ռեսուրսներ։"
 25		"Ուշադրություն"
 26		"Միացնել շարժապատկերումը"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Այս կոճակը սեղմելուց հետո ցույց կտրվի MPC-BE-ի հետ ասոցացված տեսակների խմբերը։ Նոր ավելացումները երևում են մոխրագույն գույնով, ուստի մի մոռացեք նորից ստուգել դրանք պատուհանը փակելիս։"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Ծրագրային վիճակը որոշվում է այնտեղ, որտեղ այն դեռ չի որոշվել"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Հնարավորություն է տալիս շարժապատկերել տողագրերը։"
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

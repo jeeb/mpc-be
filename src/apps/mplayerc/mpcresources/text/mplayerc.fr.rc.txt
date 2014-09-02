@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Modifier la position"
 7		"Horizontale :"
 11		"Verticale :"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Attention : Si vous activez le positionnement manuel et activez l'anticrénelage en mode plein écran dans les paramètres de votre carte vidéo, cela n'améliorera pas l'affichage des sous-titres mais consommera davantage de ressources système."
 25		"Attention"
 26		"Permettre l'animation pendant la mise en cache"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Après avoir cliqué sur ce bouton, la case à cocher du groupe de format devra refléter l'actuelle association de fichier pour MPC-BE. Une extension nouvellement ajoutée est généralement grisée, il ne faut pas oublier de la sélectionner à nouveau avant de fermer cette boîte de dialogue !"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Etat par défaut devient héréditaire à d'autres styles où il est encore mal défini"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permet l'utilisation de sous-titres quand on utilise un tampon de subpicture supérieur à 0. La désactivation de cette option fera baisser l'utilisation du processeur. Aussi désactiver la si vous rencontrez des clignotements de sous-titres."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Posunúť umiestnenie"
 7		"Horizontálne"
 11		"Vertikálne:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Ak niekde v nastaveniach svojej grafickej karty zapnete antialiasing (vyhladzovanie hrán) v celoobrazovkovom móde, vzhľad titulkov sa o nič nezlepší, zvýši sa však zaťaženie procesora."
 25		"Varovanie"
 26		"Povoliť animáciu počas načítavanie do vyr. pamäti"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Po kliknutí na toto tlačidlo, sa zmenia asociácie vybraných koncoviek súborov a súbory sa budú otvárať v programe MPC-BE. Po pridaní nejakého ďalšieho rozšírenia programu sa však asociácie môžu opäť zmeniť. Preto si ich pred zatvorením tohto dialógového okna nezabudnite skontrolovať, prípadne nastaviť znova!"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Predvolené hodnoty sa nastavia aj v iných štýloch, ak užívateľ nastavenia nezmení"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ak je použitá vyrovnávacia pamäť pre podobrázky väčšia ako 0, môžu sa titulky animovať. Zablokovaním tejto voľby znížite vyťaženie procesora. Voľbu zablokujte aj v prípade, že titulky blikajú."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

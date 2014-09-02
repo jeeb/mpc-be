@@ -45,6 +45,7 @@ public:
 	CSpinButtonCtrl m_nSPCSizeCtrl;
 	CComboBox m_spmaxres;
 	BOOL m_bSPCAllowAnimationWhenBuffering;
+	BOOL m_bbSPAllowDropSubPic;
 	int m_nSubDelayInterval;
 
 	enum { IDD = IDD_PPAGESUBRENDERING };

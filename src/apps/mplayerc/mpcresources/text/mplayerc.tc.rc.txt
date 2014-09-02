@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"保留的記錄數量:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"覆寫放置位置"
 7		"水平:"
 11		"垂直:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"如果您覆寫並啟用在顯示卡裡的全螢幕反鋸齒 (FSAA) 設定，字幕不會變得比較好看，卻會吃更多的 CPU 資源。"
 25		"警告"
 26		"緩衝時允許動畫"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"按下此按鈕後，格式群組中已選取的狀態會反映 MPC-BE 實際的檔案關聯。新加入的副檔名通常呈現灰色，所以在關閉對話框之前別忘了再檢查一遍！"
 STRING IDC_CACH_SIZE		"檔案操作的緩衝大小 (KB)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"如果依舊沒定義，預設會繼承其他的樣式"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"當子畫面緩衝大於 0 時允許字幕動畫。停用這個選項會降低 CPU 使用量。如果您覺得字幕在閃爍時也請停用。"
 STRING IDC_CHECK_SUBRESYNC		"啟用此選項可檢視並編輯字幕檔案 (包括時間碼)，透過選取字幕導覽影片。啟用此選項會明顯減慢字幕的載入速度。"

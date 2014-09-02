@@ -624,8 +624,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 
 	m_pSubPicQueue = NULL;
 	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(m_pAllocator, &hr);
+					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, !GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		_Error += L"m_pSubPicQueue failed\n";
 		return E_FAIL;
@@ -887,8 +887,8 @@ HRESULT CBaseAP::ResetDXDevice(CString &_Error)
 
 	hr = S_OK;
 	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(m_pAllocator, &hr);
+					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, !GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		_Error += L"m_pSubPicQueue failed\n";
 

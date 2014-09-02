@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Överskugga placering"
 7		"Horisontal:"
 11		"Vertikal:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Om du överskuggar och aktivera helskärms antialiasing någonstans på ditt grafikkorts inställningar, undertexter kommer inte att se något bättre ut men det kommer säkert att belasta din CPU."
 25		"Varning"
 26		"Tillåt animering när buffrande"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"När du klickat på denna knapp, den faktiska läget av format gruppen kommer att återspegla de faktiska fil associationen för MPC-BE. En nyligen till lagt anknytning brukar göra den grå, så glöm inte att kolla upp det igen innan du stänger dialogrutan!"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Standard läget blir ärvda till andra stilar där de fortfarande är odefinierade"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Tillåter undertext animering när man använder sub bild buffert större än 0. Inaktivering av detta alternativ sänker CPU användningen. Stäng också av om du upplever blinkande undertexter."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

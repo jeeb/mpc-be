@@ -688,6 +688,7 @@
 #define IDC_DESC                        10617
 #define IDC_AUTHOR                      10618
 #define IDC_CHECK_RELATIVETO            10619
+#define IDC_CHECK_ALLOW_DROPPING_SUBPIC 10620
 #define IDC_HLINE                       10621
 #define IDC_CHECK_SPCANIMWITHBUFFER     10621
 #define IDC_STATICLINKGTS               10622

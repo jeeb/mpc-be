@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Modifica posizione"
 7		"Orizzontale:"
 11		"Verticale:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Se imposti l'antialiasing a schermo intero nella GPU, i sottotitoli NON si vedranno meglio, tuttavia la CPU avrà un carico maggiore."
 25		"Attenzione"
 26		"Abilita animazioni durante il buffering"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Cliccando questo pulsante, lo stato selezionato del gruppo rifletterà le attuali associazioni di file. Estensioni aggiunte successivamente lo renderanno grigio, quindi ricordati di riselezionarlo prima di chiudere questa finestra!"
 STRING IDC_CACH_SIZE		"Dimensione cache per le operazioni sui file"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Lo stato di default eredita da altri stili finché non viene definito"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Consente l'animazione dei sottotitoli utilizzando un subpicture buffer maggiore di 0. Disabilitando questa opzione, l'uso della CPU sarà inferiore. Disabilitare anche in caso di sottotitoli lampeggianti."
 STRING IDC_CHECK_SUBRESYNC		"Permette di visualizzare e modificare i sottotitoli (incluso il time code).Potrebbe rallentare il caricamento degli stessi sottotitoli."

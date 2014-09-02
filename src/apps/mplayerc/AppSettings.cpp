@@ -1661,6 +1661,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, r.nSPCSize);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, r.nSPMaxTexRes);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, r.bSPAllowDropSubPic);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, r.bSPCAllowAnimationWhenBuffering);
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, r.iEvrBuffers);
@@ -1727,6 +1728,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
 		r.nSPCSize							= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, 10);
 		r.nSPMaxTexRes						= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
+		r.bSPAllowDropSubPic				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, TRUE);
 		r.bSPCAllowAnimationWhenBuffering	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
 
 		r.iEvrBuffers		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, 5);

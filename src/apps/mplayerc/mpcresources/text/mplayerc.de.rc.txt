@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Anzahl der aufgelisteten Dateien:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Untertitelposition anpassen"
 7		"Horizontal:"
 11		"Vertikal:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Wenn Sie die Untertitel-Position anpassen und in den Einstellungen der Grafikkarte\nVollbild-Antialiasing auswählen, sehen die Untertitel zwar besser aus, aber die\nCPU-Belastung steigt extrem an."
 25		"Warnung"
 26		"Animationen beim Puffern erlauben"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Dieser Button bewirkt die Anzeige der momentan im System zugewiesenen Dateiendungen. Dies bedeutet, dass der Erweiterungen-Eintrag einen grauen Haken bekommt. Um die neu hinzugefügte Endung auch zu aktivieren, muss der graue Haken erneut angeklickt werden."
 STRING IDC_CACH_SIZE		"Cache-Größe für Datei-Operationen (in Kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Standardwert wird auch für andere Styles verwendet, für die noch nichts definiert wurde"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Erlaubt Untertitel-Animation bei einem Puffer größer als 0. Ein Deaktivieren dieser Option spart zudem ein wenig CPU-Zeit. Bei flimmernden Untertiteln diese Option ebenfalls deaktiveren."
 STRING IDC_CHECK_SUBRESYNC		"Erlaubt Untertitel anzuzeigen und zu bearbeiten (einschließlich Timecode). Navigation durch Untertitel. Kann die Ladegeschwindigkeit der Untertitel deutlich verlangsamen."

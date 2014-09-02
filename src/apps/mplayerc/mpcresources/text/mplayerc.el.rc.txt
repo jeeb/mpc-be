@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Παράκαμψη τοποθέτησης"
 7		"Οριζόντια:"
 11		"Κάθετα:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Εάν παρακάμψετε κι ενεργοποιήσετε την εξομάλυνση γραφικών πλήρους οθόνης κάπου στις ρυθμίσεις της κάρτας γραφικών σας, οι υπότιτλοι δεν πρόκειται να φανούν καλύτερα, αλλά σίγουρα θα τρώνε από τον επεξεργαστή σας."
 25		"Προειδοποίηση"
 26		"Επιτρέπεται η κίνηση κατά την προσωρινή αποθήκευση"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1115,6 +1116,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Μετά το κλικ σε αυτό το κουμπί, το επιλεγμένο μέλος της ομάδας μορφής, θα αντικατοπτρίζει την πραγματική συσχέτιση αρχείου για το MPC-BE. Μια επέκταση που προστέθηκε πρόσφατα, θα είναι συνήθως γκρι, ώστε να μην ξεχάσετε να το ελέγξτε ξανά πριν να κλείσετε αυτό το παράθυρο διαλόγου!"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Η προεπιλεγμένη τιμή χρησιμοποιείται και σε άλλα στυλ, όπου δεν έχει καθοριστεί"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Επιτρέπετε η κίνηση του υπότιτλου όταν χρησιμοποιείται μια προσωρινή επιμέρους εικόνα μεγαλύτερη από 0. Η απενεργοποίηση αυτής της επιλογής θα μειώσει τη χρήση της CPU. Επίσης να το απενεργοποιήσετε εάν οι υπότιτλοι αναβοσβήνουν."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

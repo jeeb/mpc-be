@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Azken agiri zenbatekoa:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Ezeztatu kokapena"
 7		"Etzana:"
 11		"Zutia:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Ezeztatzen baduzu eta gaitu ikusleiho-osoko hertzlehunketa zure bideo-txartelaren ezarpenetan, azpidatziak ez dira hobeto ikusiko baina zure cpu-a jango dute."
 25		"Kontuz"
 26		"Ahalbidetu animazioa bufferreratzean"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Botoi hau sakatu ondoren, hautatutako multzo heuskarri egoerak  MPC-BE-rentzat oraingo agiri elkarketa adieraziko du. Berriki gehitutako hedapen ba arrunt urdinabarrago ikusiko da, hortaz ez ahaztu hura berriro hautatzeaz elkarrizketa hau itxitakoan!"
 STRING IDC_CACH_SIZE		"Katxe neurria agiri eragiketarako (kilobyte-tan)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Berezko egoera beste estilo batzuetatik lortzen da oraindik zehaztugabe dagoenean."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ahalbidetzen du azpidatzi animazioa 0 baino handiagoa den azpirudi buffer bat erabiltzerakoan. Aukera hau ezgaitzeak CPU erabilera gutxiago izango du. Ezgaitu ere azpidatziak keinuka ikusten badituzu."
 STRING IDC_CHECK_SUBRESYNC		"Azpidatziak ikustea eta editatzea (denbora-kodea barne) eta azpidatzi nabigazioa ahalbidetzen du. Azpidatzi gertaketa nabarmen astirotu dezake."

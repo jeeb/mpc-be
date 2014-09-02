@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Suprascrie așezarea"
 7		"Orizontal:"
 11		"Vertical:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Dacă suprascrieţi și activați dezimțuire (antialiasing) pentru ecran complet în setările plăcii grafice, subtitrările nu o să arate mai bine, dar cu siguranță se va consuma din puterea procesorului."
 25		"Avertisment"
 26		"Permite animații când se încarcă în avans"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1115,6 +1116,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"După ce dați clic pe acest buton, starea bifată a grupului de formate va reflecta asocierea concretă a fișierelor pentru MPC-BE. O extensie nou adăugată va fi de obicei un gri deschis, așa că nu uitați să o bifați din nou înainte de a închide această casetă de dialog!"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Starea implicită va fi moștenită și de celelalte stiluri unde ea încă nu este definită."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permite animarea subtitrării când este folosită o memorie tampon de subimagini mai mare decât 0. Dezactivând această opțiune va scădea și folosirea procesorului. De asemenea, dezactivați-o dacă se întâmplă ca subtitrările să pâlpâie."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

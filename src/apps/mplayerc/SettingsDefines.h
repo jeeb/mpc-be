@@ -111,6 +111,7 @@
 #define IDS_RS_SPCSIZE						_T("SPCSize")
 #define IDS_RS_SPMAXTEXRES					_T("SPMaxTexRes")
 #define IDS_RS_SPALLOWANIMATION				_T("SPCAllowAnimationWhenBuffering")
+#define IDS_RS_SPALLOWDROPSUBPIC			_T("SPCAllowDropSubPic")
 
 #define IDS_RS_INTREALMEDIA					_T("IntRealMedia")
 #define IDS_RS_USEDARKTHEME					_T("UseDarkTheme")

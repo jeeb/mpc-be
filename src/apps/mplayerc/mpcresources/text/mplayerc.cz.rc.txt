@@ -375,7 +375,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 34		"Number of recent files:"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Změnit polohu"
 7		"Horizontální:"
 11		"Vertikální:"
@@ -387,6 +387,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 28
 23		"Pokud změníte polohu titulků a zapnete full-screen antialiasing, titulky určitě nebudou vypadat lépe, zato však zaberou veškerý výkon vašeho procesoru."
 25		"Varování"
 26		"Povolit animaci s využitím vyrovnávací paměti"
+28		"Allow dropping some subpictures if the queue is running late"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -1111,6 +1112,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Stav zaškrtávacího políčka u skupin formátů určuje aktuální asociace MPC-BE. Nově přidaná přípona většinou zruší zaškrtnutí dané skupiny, proto ji před zavřením tohoto dialogu nezapomeňte znovu zaškrtnout!"
 STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Výchozí stav bude převzat ostatními styly ve kterých ještě nebyla tato volba nastavena."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Povolí animaci titulků při použití titulkové vyrovnávací paměti větší než 0. Zakázání této volby sníží zatížení procesoru. Také ji zakažte pokud dochází k blikání titulků."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."

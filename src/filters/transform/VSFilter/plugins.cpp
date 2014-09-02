@@ -79,7 +79,7 @@ namespace Plugin
 				CComPtr<ISubPicAllocator> pAllocator = DNew CMemSubPicAllocator(dst.type, size);
 
 				HRESULT hr;
-				if (!(m_pSubPicQueue = DNew CSubPicQueueNoThread(pAllocator, &hr)) || FAILED(hr)) {
+				if (!(m_pSubPicQueue = DNew CSubPicQueueNoThread(false, pAllocator, &hr)) || FAILED(hr)) {
 					m_pSubPicQueue = NULL;
 					return false;
 				}
