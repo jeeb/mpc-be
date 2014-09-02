@@ -769,10 +769,13 @@ STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()
 
 STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 {
+	BOOL fTypeChanged = FALSE;
+
 	AM_MEDIA_TYPE* pmt = NULL;
 	if (SUCCEEDED(pSample->GetMediaType(&pmt)) && pmt) {
 		const CMediaType mt(*pmt);
 		DeleteMediaType(pmt), pmt = NULL;
+		fTypeChanged = (mt != m_mt);
 		SetMediaType(&mt);
 	}
 
@@ -824,13 +827,8 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 	long cbBuffer = pSample->GetActualDataLength();
 
-	CMediaType mtOut = m_mt;
-	mtOut = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->CreateNewOutputMediaType(mtOut, cbBuffer);
-
-	bool fTypeChanged = false;
-
-	if (mtOut != pOut->CurrentMediaType() || cbBuffer > actual.cbBuffer) {
-		fTypeChanged = true;
+	if (fTypeChanged || cbBuffer > actual.cbBuffer) {
+		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: %s", fTypeChanged ? L"input media type changed" :  L"cbBuffer > actual.cbBuffer"));
 
 		m_SampleProps.dwSampleFlags |= AM_SAMPLE_TYPECHANGED/*|AM_SAMPLE_DATADISCONTINUITY|AM_SAMPLE_TIMEDISCONTINUITY*/;
 
@@ -847,7 +845,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 				}
 		*/
 
-		if (props.cBuffers < 8 && mtOut.majortype == MEDIATYPE_Audio) {
+		if (props.cBuffers < 8 && m_mt.majortype == MEDIATYPE_Audio) {
 			props.cBuffers = 8;
 		}
 
@@ -879,9 +877,9 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 	}
 
 	if (fTypeChanged) {
-		pOut->SetMediaType(&mtOut);
-		(static_cast<CStreamSwitcherFilter*>(m_pFilter))->OnNewOutputMediaType(m_mt, mtOut);
-		pOutSample->SetMediaType(&mtOut);
+		pOut->SetMediaType(&m_mt);
+		pOutSample->SetMediaType(&pOut->CurrentMediaType());
+		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: output media type changed"));
 	}
 
 	// Transform
@@ -1392,11 +1390,6 @@ HRESULT CStreamSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	pOut->SetActualDataLength(min(len, size));
 
 	return S_OK;
-}
-
-CMediaType CStreamSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& cbBuffer)
-{
-	return mt;
 }
 
 HRESULT CStreamSwitcherFilter::DeliverEndOfStream()

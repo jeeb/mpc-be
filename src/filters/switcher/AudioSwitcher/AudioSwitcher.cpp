@@ -246,26 +246,6 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	return S_OK;
 }
 
-CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& cbBuffer)
-{
-	CStreamSwitcherInputPin* pInPin = GetInputPin();
-	CStreamSwitcherOutputPin* pOutPin = GetOutputPin();
-	if (!pInPin || !pOutPin || ((WAVEFORMATEX*)mt.pbFormat)->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
-		return __super::CreateNewOutputMediaType(mt, cbBuffer);
-	}
-
-	WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
-
-	CorrectWaveFormatEx(mt);
-
-	return mt;
-}
-
-void CAudioSwitcherFilter::OnNewOutputMediaType(const CMediaType& mtIn, const CMediaType& mtOut)
-{
-	DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::OnNewOutputMediaType()"));
-}
-
 HRESULT CAudioSwitcherFilter::DeliverEndFlush()
 {
 	DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::DeliverEndFlush()"));
