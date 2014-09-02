@@ -281,13 +281,13 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<Packet> p)
 		CH264Nalu Nalu;
 		Nalu.SetBuffer(start, size, 0);
 
-		CAutoPtr<Packet> p2;
+		CAutoPtr<CH264Packet> p2;
 
 		while (Nalu.ReadNext()) {
 			DWORD dwNalLength	= Nalu.GetDataLength();
 			dwNalLength			= _byteswap_ulong(dwNalLength);
 
-			CAutoPtr<Packet> p3(DNew Packet());
+			CAutoPtr<CH264Packet> p3(DNew CH264Packet());
 
 			p3->SetCount(Nalu.GetDataLength() + sizeof(dwNalLength));
 			memcpy(p3->GetData(), &dwNalLength, sizeof(dwNalLength));
@@ -297,6 +297,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<Packet> p)
 				p2 = p3;
 			} else {
 				p2->Append(*p3);
+			}
+
+			if (Nalu.GetType() == NALU_TYPE_SLICE
+					|| Nalu.GetType() == NALU_TYPE_IDR) {
+				p2->bSliceExist = TRUE;
 			}
 		}
 		start = next;
@@ -353,8 +358,8 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<Packet> p)
 			continue;
 		}
 
-		Packet* pPacket = m_pl.GetAt(pos);
-		BYTE* pData = pPacket->GetData();
+		CH264Packet* pPacket = m_pl.GetAt(pos);
+		const BYTE* pData = pPacket->GetData();
 
 		if ((pData[4] & 0x1f) == 0x09) {
 			m_fHasAccessUnitDelimiters = true;
@@ -366,32 +371,28 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<Packet> p)
 				pPacket->rtStop		= rtStop;
 			}
 
-			p = m_pl.RemoveHead();
-
-			while (pos != m_pl.GetHeadPosition()) {
-				CAutoPtr<Packet> p2 = m_pl.RemoveHead();
-				p->Append(*p2);
+			BOOL bSliceExist = FALSE;
+			CAutoPtr<CH264Packet> pl = m_pl.RemoveHead();
+			if (pl->bSliceExist) {
+				bSliceExist = TRUE;
 			}
 
-			if (!p->pmt && m_bFlushed) {
-				p->pmt = CreateMediaType(&m_mt);
+			while (pos != m_pl.GetHeadPosition()) {
+				CAutoPtr<CH264Packet> p2 = m_pl.RemoveHead();
+				if (p2->bSliceExist) {
+					bSliceExist = TRUE;
+				}
+
+				pl->Append(*p2);
+			}
+
+			if (!pl->pmt && m_bFlushed) {
+				pl->pmt = CreateMediaType(&m_mt);
 				m_bFlushed = false;
 			}
 
-			BOOL bSliceExists = FALSE;
-			CH264Nalu Nalu;
-			Nalu.SetBuffer(p->GetData(), p->GetCount(), 4);
-			while (Nalu.ReadNext() && !bSliceExists) {
-				switch (Nalu.GetType()) {
-					case NALU_TYPE_SLICE:
-					case NALU_TYPE_IDR:
-						bSliceExists = TRUE;
-						break;
-				}
-			}
-
-			if (bSliceExists) {
-				HRESULT hr = __super::DeliverPacket(p);
+			if (bSliceExist) {
+				HRESULT hr = __super::DeliverPacket(pl);
 				if (hr != S_OK) {
 					return hr;
 				}

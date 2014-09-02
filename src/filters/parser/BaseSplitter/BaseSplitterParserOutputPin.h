@@ -26,8 +26,14 @@
 
 class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CCritSec
 {
-	CAutoPtr<Packet>		m_p;
-	CAutoPtrList<Packet>	m_pl;
+	class CH264Packet : public Packet
+	{
+		public:
+			BOOL bSliceExist = FALSE;
+	};
+
+	CAutoPtr<Packet>			m_p;
+	CAutoPtrList<CH264Packet>	m_pl;
 	
 	bool	m_fHasAccessUnitDelimiters;
 	bool	m_bFlushed;
