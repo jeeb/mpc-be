@@ -71,6 +71,7 @@ BEGIN_MESSAGE_MAP(CPPageSubRend, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC2, OnUpdatePosOverride)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC3, OnUpdatePosOverride)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC4, OnUpdatePosOverride)
+    ON_UPDATE_COMMAND_UI(IDC_CHECK_ALLOW_DROPPING_SUBPIC, OnUpdateAllowDropSubPic)
 	ON_EN_CHANGE(IDC_EDIT4, OnSubDelayInterval)
 END_MESSAGE_MAP()
 
@@ -181,6 +182,13 @@ void CPPageSubRend::OnUpdatePosOverride(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(m_fOverridePlacement);
+}
+
+void CPPageSubRend::OnUpdateAllowDropSubPic(CCmdUI* pCmdUI)
+{
+	UpdateData();
+
+	pCmdUI->Enable(m_nSPCSize);
 }
 
 void CPPageSubRend::OnSubDelayInterval()

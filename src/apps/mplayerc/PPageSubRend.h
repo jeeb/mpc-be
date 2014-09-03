@@ -54,11 +54,11 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
-	void	OnSubDelayInterval();
 
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnBnClickedButton1();
 	afx_msg void OnUpdatePosOverride(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateAllowDropSubPic(CCmdUI* pCmdUI);
+	afx_msg void OnSubDelayInterval();
 };
