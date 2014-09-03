@@ -30,13 +30,6 @@
 
 CHdmvSub::CHdmvSub(void)
 	: CBaseSub(ST_HDMV)
-	, m_nColorNumber(0)
-	, m_nCurSegment(NO_SEGMENT)
-	, m_pSegBuffer(NULL)
-	, m_nTotalSegBuffer(0)
-	, m_nSegBufferPos(0)
-	, m_nSegSize(0)
-	, m_pCurrentWindow(NULL)
 {
 	memset(&m_VideoDescriptor, 0, sizeof(m_VideoDescriptor));
 }

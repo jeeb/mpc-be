@@ -23,15 +23,11 @@
 #include "Rasterizer.h"
 
 struct HDMV_PALETTE {
-	BYTE	entry_id;
-	BYTE	Y;
-	BYTE	Cr;
-	BYTE	Cb;
-	BYTE	T;		// HDMV rule : 0 transparent, 255 opaque (compatible DirectX)
-
-	HDMV_PALETTE() {
-		entry_id = Y = Cr = Cb = T = 0;
-	}
+	BYTE entry_id	= 0;
+	BYTE Y			= 0;
+	BYTE Cr			= 0;
+	BYTE Cb			= 0;
+	BYTE T			= 0; // HDMV rule : 0 transparent, 255 opaque (compatible DirectX)
 };
 
 class CGolombBuffer;
@@ -39,26 +35,26 @@ class CGolombBuffer;
 class CompositionObject : Rasterizer
 {
 public :
-	SHORT				m_object_id_ref;
-	SHORT				m_window_id_ref;
-	bool				m_object_cropped_flag;
-	bool				m_forced_on_flag;
-	BYTE				m_version_number;
+	SHORT			m_object_id_ref					= 0;
+	SHORT			m_window_id_ref					= 0;
+	bool			m_object_cropped_flag			= false;
+	bool			m_forced_on_flag				= false;
+	BYTE			m_version_number				= 0;
 
-	SHORT				m_horizontal_position;
-	SHORT				m_vertical_position;
-	SHORT				m_width;
-	SHORT				m_height;
+	SHORT			m_horizontal_position			= 0;
+	SHORT			m_vertical_position				= 0;
+	SHORT			m_width							= 0;
+	SHORT			m_height						= 0;
 
-	SHORT				m_cropping_horizontal_position;
-	SHORT				m_cropping_vertical_position;
-	SHORT				m_cropping_width;
-	SHORT				m_cropping_height;
+	SHORT			m_cropping_horizontal_position	= 0;
+	SHORT			m_cropping_vertical_position	= 0;
+	SHORT			m_cropping_width				= 0;
+	SHORT			m_cropping_height				= 0;
 
-	SHORT				m_compositionNumber;
+	SHORT			m_compositionNumber				= -1;
 
-	REFERENCE_TIME		m_rtStart;
-	REFERENCE_TIME		m_rtStop;
+	REFERENCE_TIME	m_rtStart						= INVALID_TIME;
+	REFERENCE_TIME	m_rtStop						= INVALID_TIME;
 
 	CompositionObject();
 	~CompositionObject();
@@ -72,10 +68,8 @@ public :
 	void				RenderHdmv(SubPicDesc& spd, SubPicDesc* spdResized);
 	void				RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY, SubPicDesc* spdResized);
 	void				RenderXSUB(SubPicDesc& spd);
-	void				WriteSeg (SubPicDesc& spd, SHORT nX, SHORT nY, SHORT nCount, SHORT nPaletteIndex);
 
-	void				SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD, bool bIsRGB = false);
-	void				SetPalette (int nNbEntry, DWORD* dwColors);
+	void				SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD, bool bIsRGB = false);
 	const bool			HavePalette() { return m_nColorNumber > 0; };
 
 	CompositionObject* Copy() {
@@ -89,14 +83,14 @@ public :
 	}
 
 private :
-	BYTE*		m_pRLEData;
-	int			m_nRLEDataSize;
-	int			m_nRLEPos;
-	int			m_nColorNumber;
-	DWORD		m_Colors[256];
+	BYTE*	m_pRLEData		= NULL;
+	int		m_nRLEDataSize	= 0;
+	int		m_nRLEPos		= 0;
+	int		m_nColorNumber	= 0;
+	DWORD	m_Colors[256];
 
-	void		DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT nXStart, SHORT nYStart, SHORT nLength);
-	void		Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY);
-	void		Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY);
-	void		Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY);
+	void	DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT nXStart, SHORT nYStart, SHORT nLength);
+	void	Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY);
+	void	Dvb4PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY);
+	void	Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY);
 };

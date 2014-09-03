@@ -26,14 +26,12 @@
 class HDMV_WindowDefinition
 {
 public:
-	SHORT					m_compositionNumber;
-	SHORT					m_palette_id_ref;
-	BYTE					m_nObjectNumber;
-	CompositionObject*		Objects[MAX_WINDOWS];
+	SHORT				m_compositionNumber	= -1;
+	SHORT				m_palette_id_ref	= -1;
+	BYTE				m_nObjectNumber		= 0;
+	CompositionObject*	Objects[MAX_WINDOWS];
 
 	HDMV_WindowDefinition() {
-		Reset();
-
 		for (int i = 0; i < MAX_WINDOWS; i++) {
 			Objects[i] = NULL;
 		}
@@ -70,20 +68,14 @@ public:
 	};
 
 	struct VIDEO_DESCRIPTOR {
-		SHORT		nVideoWidth;
-		SHORT		nVideoHeight;
-		BYTE		bFrameRate;
+		SHORT	nVideoWidth		= 0;
+		SHORT	nVideoHeight	= 0;
+		BYTE	bFrameRate		= 0;
 	};
 
 	struct COMPOSITION_DESCRIPTOR {
-		SHORT		nNumber;
-		BYTE		bState;
-	};
-
-	struct SEQUENCE_DESCRIPTOR {
-		BYTE		bFirstIn  : 1;
-		BYTE		bLastIn	  : 1;
-		BYTE		bReserved : 8;
+		SHORT	nNumber	= 0;
+		BYTE	bState	= 0;
 	};
 
 	struct HDMV_CLUT {
@@ -110,22 +102,23 @@ public:
 	virtual HRESULT			EndOfStream() { return S_OK; }
 
 private :
-	HDMV_SEGMENT_TYPE				m_nCurSegment;
-	BYTE*							m_pSegBuffer;
-	int								m_nTotalSegBuffer;
-	int								m_nSegBufferPos;
-	int								m_nSegSize;
+
+	HDMV_SEGMENT_TYPE				m_nCurSegment		= NO_SEGMENT;
+	BYTE*							m_pSegBuffer		= NULL;
+	int								m_nTotalSegBuffer	= 0;
+	int								m_nSegBufferPos		= 0;
+	int								m_nSegSize			= 0;
+
+	int								m_nColorNumber		= 0;
 
 	VIDEO_DESCRIPTOR				m_VideoDescriptor;
 
 	CAtlList<CompositionObject*>	m_pObjects;
-	HDMV_WindowDefinition*			m_pCurrentWindow;
+	HDMV_WindowDefinition*			m_pCurrentWindow	= 0;
 	CompositionObject				m_ParsedObjects[MAX_WINDOWS];
 	
 	HDMV_CLUT						m_CLUT[256];
 	HDMV_CLUT						m_DefaultCLUT;
-
-	int								m_nColorNumber;
 
 	void				ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME rtTime);
 	void				ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize);

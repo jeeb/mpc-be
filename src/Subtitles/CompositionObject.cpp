@@ -24,26 +24,6 @@
 #include <d3d9types.h>
 
 CompositionObject::CompositionObject()
-	: m_pRLEData(NULL)
-	, m_nRLEDataSize(0)
-	, m_nRLEPos(0)
-	, m_nColorNumber(0)
-	, m_object_id_ref(0)
-	, m_window_id_ref(0)
-	, m_object_cropped_flag(false)
-	, m_forced_on_flag(false)
-	, m_version_number(0)
-	, m_horizontal_position(0)
-	, m_vertical_position(0)
-	, m_width(0)
-	, m_height(0)
-	, m_cropping_horizontal_position(0)
-	, m_cropping_vertical_position(0)
-	, m_cropping_width(0)
-	, m_cropping_height(0)
-	, m_compositionNumber(-1)
-	, m_rtStart(INVALID_TIME)
-	, m_rtStop(INVALID_TIME)
 {
 	memsetd(m_Colors, 0xFF000000, sizeof(m_Colors));
 }
@@ -53,7 +33,7 @@ CompositionObject::~CompositionObject()
 	SAFE_DELETE_ARRAY(m_pRLEData);
 }
 
-void CompositionObject::SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD, bool bIsRGB)
+void CompositionObject::SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD, bool bIsRGB)
 {
 	m_nColorNumber = nNbEntry;
 	for (int i = 0; i < nNbEntry; i++) {
