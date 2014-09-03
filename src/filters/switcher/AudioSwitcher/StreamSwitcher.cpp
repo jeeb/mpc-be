@@ -1060,7 +1060,7 @@ HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 	CMediaType mt;
 	if (SUCCEEDED(hr) && pIn && pIn->IsConnected()
 			&& SUCCEEDED(pIn->GetConnected()->ConnectionMediaType(&mt))) {
-		CorrectWaveFormatEx(mt);
+		(static_cast<CStreamSwitcherFilter*>(m_pFilter))->TransformMediaType(mt);
 		if (m_mt != mt) {
 			if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
 				hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
@@ -1080,7 +1080,7 @@ HRESULT CStreamSwitcherOutputPin::SetMediaType(const CMediaType *pmt)
 		return hr;
 	}
 
-	CorrectWaveFormatEx(m_mt);
+	(static_cast<CStreamSwitcherFilter*>(m_pFilter))->TransformMediaType(m_mt);
 
 	return NOERROR;
 }
@@ -1114,7 +1114,7 @@ HRESULT CStreamSwitcherOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 	CopyMediaType(pmt, tmp);
 	DeleteMediaType(tmp);
 
-	CorrectWaveFormatEx(*pmt);
+	(static_cast<CStreamSwitcherFilter*>(m_pFilter))->TransformMediaType(*pmt);
 
 	/*
 		if(iPosition < 0) return E_INVALIDARG;

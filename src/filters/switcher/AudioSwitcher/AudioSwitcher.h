@@ -62,6 +62,7 @@ public:
 
 	HRESULT CheckMediaType(const CMediaType* pmt);
 	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
+	void TransformMediaType(CMediaType& mt);
 
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);

@@ -280,6 +280,7 @@ public:
 	// override these
 	virtual HRESULT CheckMediaType(const CMediaType* pmt) PURE;
 	virtual HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
+	virtual void TransformMediaType(CMediaType& mt) PURE;;
 
 	// and maybe these
 	virtual HRESULT DeliverEndOfStream();

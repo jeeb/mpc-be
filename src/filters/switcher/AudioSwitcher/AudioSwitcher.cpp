@@ -145,7 +145,6 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	const unsigned in_bytespersample = wfe->wBitsPerSample / 8;
 	const unsigned in_samples        = pIn->GetActualDataLength() / (wfe->nChannels * in_bytespersample);
 	const unsigned in_allsamples     = in_samples * wfe->nChannels;
-	const size_t   in_size           = in_allsamples * in_bytespersample;
 
 	REFERENCE_TIME rtDur = 10000000i64 * in_samples / wfe->nSamplesPerSec;
 
@@ -244,6 +243,13 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	pOut->SetTime(&rtStart, &rtStop);
 
 	return S_OK;
+}
+
+void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
+{
+	CorrectWaveFormatEx(mt); // fix incorrect WAVEFORMATEX structure
+
+	// TODO: add change mediatype after transform (channel mixer and other).
 }
 
 HRESULT CAudioSwitcherFilter::DeliverEndFlush()
