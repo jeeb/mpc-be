@@ -87,36 +87,20 @@ public:
 	};
 
 	struct HDMV_CLUT {
-		int				pSize;
-		HDMV_PALETTE*	Palette;
-
-		HDMV_CLUT() {
-			pSize	= 0;
-			Palette	= NULL;
-		}
+		int				pSize	= 0;
+		HDMV_PALETTE*	Palette	= NULL;
 	};
 
 	CHdmvSub();
 	~CHdmvSub();
 
-	virtual HRESULT			ParseSample (IMediaSample* pSample);
-	HRESULT					ParseSample (BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-
 	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
-	virtual POSITION		GetNext(POSITION pos) {
-		m_pObjects.GetNext(pos);
-		return pos;
-	};
+	virtual POSITION		GetNext(POSITION pos);
+	virtual REFERENCE_TIME	GetStart(POSITION nPos);
+	virtual REFERENCE_TIME	GetStop(POSITION nPos);
 
-	virtual REFERENCE_TIME	GetStart(POSITION nPos) {
-		CompositionObject* pObject = m_pObjects.GetAt(nPos);
-		return pObject != NULL ? pObject->m_rtStart : INVALID_TIME;
-	};
-
-	virtual REFERENCE_TIME	GetStop(POSITION nPos) {
-		CompositionObject* pObject = m_pObjects.GetAt(nPos);
-		return pObject != NULL ? pObject->m_rtStop : INVALID_TIME;
-	};
+	virtual HRESULT			ParseSample(IMediaSample* pSample);
+	HRESULT					ParseSample(BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);
@@ -152,6 +136,4 @@ private :
 	void				ParseCompositionObject(CGolombBuffer* pGBuffer, CompositionObject* pCompositionObject);
 
 	void				AllocSegment(int nSize);
-
-	CompositionObject*	FindObject(REFERENCE_TIME rt);
 };
