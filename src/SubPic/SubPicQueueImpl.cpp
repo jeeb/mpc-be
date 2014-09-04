@@ -27,12 +27,10 @@
 
 #define SUBPIC_TRACE_LEVEL 0
 
-
 //
 // CSubPicQueueImpl
 //
 const double CSubPicQueueImpl::DEFAULT_FPS = 25.0;
-
 
 CSubPicQueueImpl::CSubPicQueueImpl(ISubPicAllocator* pAllocator, HRESULT* phr)
 	: CUnknown(NAME("CSubPicQueueImpl"), NULL)

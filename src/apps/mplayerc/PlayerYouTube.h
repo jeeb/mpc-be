@@ -45,12 +45,12 @@ enum ytype {
 	y_dash_webm_audio,
 };
 
-typedef struct {
+struct YOUTUBE_PROFILES {
 	const int	iTag;
 	const ytype	type;
 	const int	quality;
 	LPCTSTR		ext;
-} YOUTUBE_PROFILES;
+};
 
 static const YOUTUBE_PROFILES youtubeProfiles[] = {
 	{22,	y_mp4,				 720,	_T("mp4") },
@@ -84,6 +84,25 @@ static const YOUTUBE_PROFILES youtubeProfiles[] = {
 
 static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, y_unknown, 0, NULL};
 
+struct YOUTUBE_FIELDS {
+	CString		author;
+	CString		title;
+	CString		content;
+	CString		fname;
+	SYSTEMTIME	dtime;
+
+	YOUTUBE_FIELDS() {
+		dtime = { 0 };
+	}
+	void Empty() {
+		author.Empty();
+		title.Empty();
+		content.Empty();
+		fname.Empty();
+		dtime = { 0 };
+	}
+};
+
 static DWORD strpos(char* h, char* n)
 {
 	char* p = strstr(h, n);
@@ -97,7 +116,7 @@ static DWORD strpos(char* h, char* n)
 
 bool PlayerYouTubeCheck(CString fn);
 bool PlayerYouTubePlaylistCheck(CString fn);
-CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);
+CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields);
 
 struct YoutubePlaylistItem {
 	CString url, title;

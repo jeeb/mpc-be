@@ -1069,10 +1069,10 @@ public:
 	CString		m_strCurPlaybackLabel;
 	CString		m_strFnFull;
 	CString		m_strUrl;
-	CString		m_strTitleAlt;
-	CString		GetStrForTitle();
-	CString		GetAltFileName();
-	CString		m_strAuthorAlt;
+	
+	YOUTUBE_FIELDS	m_youtubeFields;
+	CString			GetStrForTitle();
+	CString			GetAltFileName();
 
 	bool		m_bToggleShader;
 	bool		m_bToggleShaderScreenSpace;

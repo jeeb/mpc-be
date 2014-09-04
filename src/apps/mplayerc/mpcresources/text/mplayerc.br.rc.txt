@@ -1834,6 +1834,7 @@ STRING IDS_PPSDB_BADURL		"URL ruim, não foi encontrada a base de dados de legen
 STRING IDS_PPSDB_PROTOCOLERR		"Versão do protocolo não compativel, atualize seu tocador ou escolha outro endereço."
 STRING IDS_PPSDB_URLCORRECT		"A URL parece estar correta !!!!"
 STRING IDS_PROPSHEET_PROPERTIES		"Propriedades"
+STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
 STRING IDS_REALVIDEO_INCOMPATIBLE		"O nome contém caracteres não suportados (utilizar só A-Z, 0-9)"
 STRING IDS_RECENT_FILES		"Arquivos recentes"
 STRING IDS_RECENT_FILES_CLEAR		"Lista apagada"

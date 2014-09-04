@@ -1834,6 +1834,7 @@ STRING IDS_PPSDB_BADURL		"כתובת URL לא תקינה, לא מצליח למצ
 STRING IDS_PPSDB_PROTOCOLERR		"גרסה פרוטוקול לא תואמת, אנא שדרג את הנגן שלך או בחר כתובת אחרת!"
 STRING IDS_PPSDB_URLCORRECT		"כתובת ה-URL נראית תקינה!"
 STRING IDS_PROPSHEET_PROPERTIES		"מאפיינים"
+STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
 STRING IDS_REALVIDEO_INCOMPATIBLE		"שם הקובץ מכיל תווים לא נתמכים (השתמש רק ב: A-Z, 0-9)"
 STRING IDS_RECENT_FILES		"קבצים אחרונים"
 STRING IDS_RECENT_FILES_CLEAR		"נקה רשימה"

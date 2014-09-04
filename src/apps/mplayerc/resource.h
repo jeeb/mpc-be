@@ -1261,6 +1261,8 @@
 #define IDS_SUB_POS_LEFT                34012
 #define IDS_SUB_POS_RIGHT               34013
 #define IDS_SUB_POS_RESTORE             34014
+// youtube
+#define IDS_PUBLISHED                   34100
 // video files
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002

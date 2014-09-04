@@ -163,18 +163,31 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 	}
 
+	const CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
+	if (pMainFrame) {
+		if (!pMainFrame->m_youtubeFields.title.IsEmpty()) {
+			m_clip = pMainFrame->m_youtubeFields.title;
+		}
+
+		if (!pMainFrame->m_youtubeFields.author.IsEmpty()) {
+			m_author = pMainFrame->m_youtubeFields.author;
+		}
+
+		if (pMainFrame->m_youtubeFields.dtime.wYear) {
+			m_descText.Format(ResStr(IDS_PUBLISHED) + L"\r\n\r\n",
+							  pMainFrame->m_youtubeFields.dtime.wYear,
+							  pMainFrame->m_youtubeFields.dtime.wMonth,
+							  pMainFrame->m_youtubeFields.dtime.wDay);
+		}
+
+		if (!pMainFrame->m_youtubeFields.content.IsEmpty()) {
+			m_descText += pMainFrame->m_youtubeFields.content;
+
+		}
+	}
+
 	m_location.SetWindowText(m_location_str);
 	m_desc.SetWindowText(m_descText);
-
-	CString strTitleAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strTitleAlt;
-	if (!strTitleAlt.IsEmpty()) {
-		m_clip = strTitleAlt.Left(strTitleAlt.GetLength() - 4);
-	}
-
-	CString strAuthorAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strAuthorAlt;
-	if (!strAuthorAlt.IsEmpty()) {
-		m_author = strAuthorAlt;
-	}
 
 	UpdateData(FALSE);
 

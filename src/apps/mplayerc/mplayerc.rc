@@ -3549,6 +3549,11 @@ BEGIN
     IDS_OSD_TEST                        "OSD Test"
 END
 
+STRINGTABLE
+BEGIN
+    IDS_PUBLISHED                       "Published : %04d-%02d-%02d"
+END
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 

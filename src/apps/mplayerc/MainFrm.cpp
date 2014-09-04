@@ -4189,10 +4189,10 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	m_wndPlaylistBar.SetCurValid(true);
-	if (!m_strTitleAlt.IsEmpty()) {
+	if (!m_youtubeFields.title.IsEmpty()) {
 		CPlaylistItem pli;
 		if (m_wndPlaylistBar.GetCur(pli)) {
-			m_wndPlaylistBar.SetCurLabel(m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
+			m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 		}
 	}
 
@@ -5723,7 +5723,7 @@ void CMainFrame::OnFileSaveAs()
 
 	CString ext, ext_list, in = m_strUrl, out = in;
 
-	if (!m_strTitleAlt.IsEmpty()) {
+	if (!m_youtubeFields.fname.IsEmpty()) {
 		out = GetAltFileName();
 		ext = GetFileExt(out).MakeLower();
 	} else {
@@ -5812,8 +5812,8 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	CString name = in;
-	if (!m_strTitleAlt.IsEmpty()) {
-		name = m_strTitleAlt;
+	if (!m_youtubeFields.fname.IsEmpty()) {
+		name = GetAltFileName();
 	}
 
 	if (CTaskDialog::IsSupported()) {
@@ -6247,7 +6247,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rtDur);
 
 		CStringW fn = GetFileOnly(GetCurFileName());
-		if (!m_strTitleAlt.IsEmpty()) {
+		if (!m_youtubeFields.fname.IsEmpty()) {
 			fn = GetAltFileName();
 		}
 
@@ -6377,7 +6377,7 @@ CString CMainFrame::CreateSnapShotFileName()
 	if (GetPlaybackMode() == PM_FILE) {
 		CString filename = GetFileOnly(GetCurFileName());
 		FixFilename(filename); // need for URLs
-		if (!m_strTitleAlt.IsEmpty()) {
+		if (!m_youtubeFields.fname.IsEmpty()) {
 			filename = GetAltFileName();
 		}
 
@@ -6481,7 +6481,7 @@ void CMainFrame::OnFileSaveThumbnails()
 	CStringW prefix = _T("thumbs");
 	if (GetPlaybackMode() == PM_FILE) {
 		CString path = GetFileOnly(GetCurFileName());
-		if (!m_strTitleAlt.IsEmpty()) {
+		if (!m_youtubeFields.fname.IsEmpty()) {
 			path = GetAltFileName();
 		}
 
@@ -8430,8 +8430,8 @@ void CMainFrame::OnPlayPlay()
 	if (m_bfirstPlay) {
 		m_bfirstPlay = false;
 
-		if (!m_strTitleAlt.IsEmpty()) {
-			strOSD = m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+		if (!m_youtubeFields.title.IsEmpty()) {
+			strOSD = m_youtubeFields.title;
 		}
 
 		if (strOSD.IsEmpty()) {
@@ -12749,8 +12749,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		m_strUrl.Empty();
-		m_strTitleAlt.Empty();
-		m_strAuthorAlt.Empty();
+		m_youtubeFields.Empty();
 
 		HRESULT hr = S_OK;
 		bool extimage = false;
@@ -12803,11 +12802,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (PlayerYouTubeCheck(fn)) {
 					CString fn_https = fn;
 					fn_https.Replace(L"http://", L"https://");
-					tmpName = PlayerYouTube(fn_https, &m_strTitleAlt, &m_strAuthorAlt);
+					tmpName = PlayerYouTube(fn_https, &m_youtubeFields);
 					m_strUrl = tmpName;
 
 					if (s.iYoutubeSource == 0 && CString(tmpName).MakeLower().Find(L".m3u8") == -1) {
-						if (!m_strTitleAlt.IsEmpty() && ::PathIsURL(tmpName)) {
+						if (!m_youtubeFields.fname.IsEmpty() && ::PathIsURL(tmpName)) {
 							m_fYoutubeThreadWork = TH_START;
 							m_YoutubeFile = tmpName;
 							m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
@@ -12968,7 +12967,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		if (fFirst) {
-			pOFD->title = (m_strTitleAlt.IsEmpty() ? m_strUrl : m_strTitleAlt);
+			pOFD->title = (m_youtubeFields.fname.IsEmpty() ? m_strUrl : m_youtubeFields.fname);
 			{
 				BeginEnumFilters(m_pGB, pEF, pBF);
 				if (m_pMainFSF = pBF) {
@@ -13770,8 +13769,8 @@ void CMainFrame::OpenSetupInfoBar()
 		}
 		EndEnumFilters;
 
-		if (!m_strTitleAlt.IsEmpty()) {
-			m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
+		if (!m_youtubeFields.title.IsEmpty()) {
+			m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_youtubeFields.title);
 		}
 	} else if (GetPlaybackMode() == PM_DVD) {
 		CString info('-');
@@ -13905,8 +13904,8 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 	if (i == 1) {
 		if (s.fTitleBarTextTitle) {
-			if (!m_strTitleAlt.IsEmpty()) {
-				fn = m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+			if (!m_youtubeFields.title.IsEmpty()) {
+				fn = m_youtubeFields.title;
 			}
 
 			BeginEnumFilters(m_pGB, pEF, pBF) {
@@ -15042,8 +15041,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_strCurPlaybackLabel.Empty();
 	m_strFnFull.Empty();
 	m_strUrl.Empty();
-	m_strTitleAlt.Empty();
-	m_strAuthorAlt.Empty();
+	m_youtubeFields.Empty();
 
 	m_OSD.Stop();
 	OnPlayStop();
@@ -20037,8 +20035,8 @@ CString CMainFrame::GetStrForTitle()
 
 	if (s.iTitleBarTextStyle == 1) {
 		if (s.fTitleBarTextTitle) {
-			if (!m_strTitleAlt.IsEmpty()) {
-				return m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+			if (!m_youtubeFields.title.IsEmpty()) {
+				return m_youtubeFields.title;
 			} else if (m_bIsBDPlay || GetPlaybackMode() == PM_DVD) {
 				return m_strCurPlaybackLabel;
 			} else {
@@ -20075,8 +20073,8 @@ CString CMainFrame::GetStrForTitle()
 CString CMainFrame::GetAltFileName()
 {
 	CString ret;
-	if (!m_strTitleAlt.IsEmpty()) {
-		ret = m_strTitleAlt;
+	if (!m_youtubeFields.fname.IsEmpty()) {
+		ret = m_youtubeFields.fname;
 		FixFilename(ret);
 	}
 

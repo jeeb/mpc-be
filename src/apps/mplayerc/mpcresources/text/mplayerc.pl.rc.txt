@@ -1833,6 +1833,7 @@ STRING IDS_PPSDB_BADURL		"Niepoprawny adres internetowy. Nie można odnaleźć b
 STRING IDS_PPSDB_PROTOCOLERR		"Niezgodna wersja protokołu. Proszę zaktualizować program lub wybrać inny adres."
 STRING IDS_PPSDB_URLCORRECT		"Adres internetowy jest poprawny."
 STRING IDS_PROPSHEET_PROPERTIES		"Właściwości"
+STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
 STRING IDS_REALVIDEO_INCOMPATIBLE		"Nazwa pliku zawiera niewłaściwe znaki. Proszę zmienić nazwę pliku, używając znaków z zakresu A-Z, 0-9."
 STRING IDS_RECENT_FILES		"Ostatnio otwarte"
 STRING IDS_RECENT_FILES_CLEAR		"&Wyczyść listę"
