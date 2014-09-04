@@ -43,7 +43,7 @@ protected:
 	CDVSBasePPage(TCHAR* pName, LPUNKNOWN lpunk, int DialogId, int TitleId);
 	HRESULT OnApplyChanges();
 
-	bool m_fDisableInstantUpdate;
+	bool m_bDisableInstantUpdate;
 
 private:
 	BOOL m_bIsInitialized;
@@ -52,7 +52,7 @@ private:
 	INT_PTR OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-	bool m_fAttached;
+	bool m_bAttached;
 	void AttachControls(), DetachControls();
 
 	CMap<UINT, UINT&, CWnd*, CWnd*> m_controls;
@@ -69,10 +69,10 @@ class __declspec(uuid("60765CF5-01C2-4ee7-A44B-C791CF25FEA0"))
 	WCHAR m_fn[MAX_PATH];
 	int m_iSelectedLanguage, m_nLangs;
 	WCHAR** m_ppLangs;
-	bool m_fOverridePlacement;
+	bool m_bOverridePlacement;
 	int	m_PlacementXperc, m_PlacementYperc;
 	STSStyle m_defStyle;
-	bool m_fOnlyShowForcedVobSubs;
+	bool m_bOnlyShowForcedVobSubs;
 	CSimpleTextSubtitle::EPARCompensationType m_ePARCompensationType;
 
 	CEdit m_fnedit;
@@ -98,7 +98,7 @@ class __declspec(uuid("0180E49C-13BF-46db-9AFD-9F52292E1C22"))
 {
 	int m_HorExt, m_VerExt, m_ResX2, m_ResX2minw, m_ResX2minh;
 	int m_LoadLevel;
-	bool m_fExternalLoad, m_fWebLoad, m_fEmbeddedLoad;
+	bool m_bExternalLoad, m_bWebLoad, m_bEmbeddedLoad;
 
 	CComboBox m_verext;
 	CButton m_mod32fix;
@@ -119,10 +119,10 @@ public:
 class __declspec(uuid("A8B25C0E-0894-4531-B668-AB1599FAF7F6"))
 	CDVSMiscPPage : public CDVSBasePPage
 {
-	bool m_fFlipPicture, m_fFlipSubtitles, m_fHideSubtitles, m_fOSD, m_fAnimWhenBuffering, m_fReloaderDisabled, m_fSaveFullPath, m_fApplyImmediatly;
+	bool m_bFlipPicture, m_bFlipSubtitles, m_bHideSubtitles, m_bOSD, m_bAnimWhenBuffering, m_bAllowDropSubPic, m_bReloaderDisabled, m_bSaveFullPath, m_bApplyImmediatly;
 	unsigned int m_uSubPictToBuffer;
 
-	CButton m_flippic, m_flipsub, m_hidesub, m_showosd, m_animwhenbuff, m_autoreload, m_savefullpath, m_instupd;
+	CButton m_flippic, m_flipsub, m_hidesub, m_showosd, m_animwhenbuff, m_allowdropsubpic, m_autoreload, m_savefullpath, m_instupd;
 	CSpinButtonCtrl m_subpicttobuff;
 
 protected:
@@ -138,7 +138,7 @@ class __declspec(uuid("ACE4747B-35BD-4e97-9DD7-1D4245B0695C"))
 	CDVSTimingPPage : public CDVSBasePPage
 {
 	int m_SubtitleSpeedMul, m_SubtitleSpeedDiv, m_SubtitleDelay;
-	bool m_fMediaFPSEnabled;
+	bool m_bMediaFPSEnabled;
 	double m_MediaFPS;
 
 	CButton m_modfps;

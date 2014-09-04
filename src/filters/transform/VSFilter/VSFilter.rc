@@ -137,12 +137,14 @@ BEGIN
     EDITTEXT        IDC_EDIT1,97,93,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
     CONTROL         "",IDC_PREBUFFERING,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,129,93,12,12
     CONTROL         "Allow animation when buffering",IDC_ANIMWHENBUFFERING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,111,120,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,111,117,10
     CONTROL         "&Auto-reload subtitle files after detecting modification",IDC_AUTORELOAD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,128,185,10
     LTEXT           " (reloading is disabled while showing the property pages)",IDC_STATIC,26,139,182,8
     CONTROL         "&Save full path into .grf",IDC_SAVEFULLPATH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,154,91,10
     CONTROL         "Appl&y changes immediately",IDC_INSTANTUPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,171,104,10
+    CONTROL         "Allow drop some subpictures",IDC_CHECK_ALLOW_DROPPING_SUBPIC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,134,111,102,10
 END
 
 IDD_DVSPATHSPAGE DIALOGEX 0, 0, 247, 188
@@ -468,7 +470,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_RG_ANIMWHENBUFFERING "AnimWhenBuffering"
+    IDS_RG_ANIMWHENBUFFERING     "AnimWhenBuffering"
+    IDS_RG_ALLOW_DROPPING_SUBPIC "AllowDropSubPic"
 END
 
 STRINGTABLE

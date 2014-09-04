@@ -38,28 +38,29 @@ protected:
 
 	CString m_FileName;
 	int m_iSelectedLanguage;
-	bool m_fHideSubtitles;
+	bool m_bHideSubtitles;
 	unsigned int m_uSubPictToBuffer;
-	bool m_fAnimWhenBuffering;
-	bool m_fOverridePlacement;
+	bool m_bAnimWhenBuffering;
+	bool m_bAllowDropSubPic;
+	bool m_bOverridePlacement;
 	int	m_PlacementXperc, m_PlacementYperc;
-	bool m_fBufferVobSub, m_fOnlyShowForcedVobSubs, m_fPolygonize;
+	bool m_bBufferVobSub, m_bOnlyShowForcedVobSubs, m_bPolygonize;
 	CSimpleTextSubtitle::EPARCompensationType m_ePARCompensationType;
 
 	STSStyle m_defStyle;
 
-	bool m_fAdvancedRenderer;
-	bool m_fFlipPicture, m_fFlipSubtitles;
-	bool m_fOSD;
+	bool m_bAdvancedRenderer;
+	bool m_bFlipPicture, m_bFlipSubtitles;
+	bool m_bOSD;
 	int m_nReloaderDisableCount;
 	int m_SubtitleDelay, m_SubtitleSpeedMul, m_SubtitleSpeedDiv;
-	bool m_fMediaFPSEnabled;
+	bool m_bMediaFPSEnabled;
 	double m_MediaFPS;
-	bool m_fSaveFullPath;
+	bool m_bSaveFullPath;
 	NORMALIZEDRECT m_ZoomRect;
 
 	CComPtr<ISubClock> m_pSubClock;
-	bool m_fForced;
+	bool m_bForced;
 
 public:
 
@@ -79,6 +80,8 @@ public:
 	STDMETHODIMP put_SubPictToBuffer(unsigned int uSubPictToBuffer);
 	STDMETHODIMP get_AnimWhenBuffering(bool* fAnimWhenBuffering);
 	STDMETHODIMP put_AnimWhenBuffering(bool fAnimWhenBuffering);
+	STDMETHODIMP get_AllowDropSubPic(bool* fAllowDropSubPic);
+	STDMETHODIMP put_AllowDropSubPic(bool fAllowDropSubPic);
 	STDMETHODIMP get_Placement(bool* fOverridePlacement, int* xperc, int* yperc);
 	STDMETHODIMP put_Placement(bool fOverridePlacement, int xperc, int yperc);
 	STDMETHODIMP get_VobSubSettings(bool* fBuffer, bool* fOnlyShowForcedSubs, bool* fPolygonize);

@@ -121,6 +121,7 @@ public:
 	STDMETHODIMP put_PreBuffering(bool fDoPreBuffering); // deprecated
 	STDMETHODIMP put_SubPictToBuffer(unsigned int uSubPictToBuffer);
 	STDMETHODIMP put_AnimWhenBuffering(bool fAnimWhenBuffering);
+	STDMETHODIMP put_AllowDropSubPic(bool fAllowDropSubPic);
 	STDMETHODIMP put_Placement(bool fOverridePlacement, int xperc, int yperc);
 	STDMETHODIMP put_VobSubSettings(bool fBuffer, bool fOnlyShowForcedSubs, bool fPolygonize);
 	STDMETHODIMP put_TextSettings(void* lf, int lflen, COLORREF color, bool fShadow, bool fOutline, bool fAdvancedRenderer);
@@ -170,10 +171,10 @@ protected:
 	double m_fps;
 
 	// 3.x- versions of microsoft's mpeg4 codec output flipped image
-	bool m_fMSMpeg4Fix;
+	bool m_bMSMpeg4Fix;
 
 	// don't set the "hide subtitles" stream until we are finished with loading
-	bool m_fLoading;
+	bool m_bLoading;
 
 	bool Open();
 

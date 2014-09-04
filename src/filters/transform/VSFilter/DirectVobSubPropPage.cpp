@@ -118,8 +118,8 @@ STDMETHODIMP CDVSBasePPage::Activate(HWND hwndParent, LPCRECT pRect, BOOL fModal
 CDVSBasePPage::CDVSBasePPage(TCHAR* pName, LPUNKNOWN lpunk, int DialogId, int TitleId) :
 	CBasePropertyPage(pName, lpunk, DialogId, TitleId),
 	m_bIsInitialized(FALSE),
-	m_fAttached(false),
-	m_fDisableInstantUpdate(false)
+	m_bAttached(false),
+	m_bDisableInstantUpdate(false)
 {
 }
 
@@ -139,10 +139,12 @@ INT_PTR CDVSBasePPage::OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 							m_pPageSite->OnStatusChange(PROPPAGESTATUS_DIRTY);
 						}
 
-						if (!m_fDisableInstantUpdate
+						if (!m_bDisableInstantUpdate
 								&& !(HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_INSTANTUPDATE)
 								&& !(HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDC_FONT)
-								&& LOWORD(wParam) != IDC_EDIT1 && LOWORD(wParam) != IDC_ANIMWHENBUFFERING
+								&& LOWORD(wParam) != IDC_EDIT1
+								&& LOWORD(wParam) != IDC_ANIMWHENBUFFERING
+								&& LOWORD(wParam) != IDC_CHECK_ALLOW_DROPPING_SUBPIC
 								&& !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1)) {
 							OnApplyChanges();
 						}
@@ -262,12 +264,12 @@ void CDVSBasePPage::AttachControls()
 		}
 	}
 
-	m_fAttached = true;
+	m_bAttached = true;
 }
 
 void CDVSBasePPage::DetachControls()
 {
-	if (!m_fAttached) {
+	if (!m_bAttached) {
 		return;
 	}
 
@@ -283,7 +285,7 @@ void CDVSBasePPage::DetachControls()
 		}
 	}
 
-	m_fAttached = false;
+	m_bAttached = false;
 }
 
 void CDVSBasePPage::BindControl(UINT id, CWnd& control)
@@ -374,7 +376,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 									m_pPageSite->OnStatusChange(PROPPAGESTATUS_DIRTY);
 								}
 
-								if (!m_fDisableInstantUpdate
+								if (!m_bDisableInstantUpdate
 										&& !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1)) {
 									OnApplyChanges();
 								}
@@ -407,8 +409,8 @@ void CDVSMainPPage::UpdateObjectData(bool fSave)
 		}
 
 		m_pDirectVobSub->put_SelectedLanguage(m_iSelectedLanguage);
-		m_pDirectVobSub->put_Placement(m_fOverridePlacement, m_PlacementXperc, m_PlacementYperc);
-		m_pDirectVobSub->put_VobSubSettings(true, m_fOnlyShowForcedVobSubs, false);
+		m_pDirectVobSub->put_Placement(m_bOverridePlacement, m_PlacementXperc, m_PlacementYperc);
+		m_pDirectVobSub->put_VobSubSettings(true, m_bOnlyShowForcedVobSubs, false);
 		m_pDirectVobSub->put_TextSettings(&m_defStyle);
 		m_pDirectVobSub->put_AspectRatioSettings(&m_ePARCompensationType);
 	} else {
@@ -420,8 +422,8 @@ void CDVSMainPPage::UpdateObjectData(bool fSave)
 			m_pDirectVobSub->get_LanguageName(i, &m_ppLangs[i]);
 		}
 		m_pDirectVobSub->get_SelectedLanguage(&m_iSelectedLanguage);
-		m_pDirectVobSub->get_Placement(&m_fOverridePlacement, &m_PlacementXperc, &m_PlacementYperc);
-		m_pDirectVobSub->get_VobSubSettings(NULL, &m_fOnlyShowForcedVobSubs, NULL);
+		m_pDirectVobSub->get_Placement(&m_bOverridePlacement, &m_PlacementXperc, &m_PlacementYperc);
+		m_pDirectVobSub->get_VobSubSettings(NULL, &m_bOnlyShowForcedVobSubs, NULL);
 		m_pDirectVobSub->get_TextSettings(&m_defStyle);
 		m_pDirectVobSub->get_AspectRatioSettings(&m_ePARCompensationType);
 	}
@@ -435,10 +437,10 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 		wcscpy_s(m_fn, fn);
 
 		m_iSelectedLanguage = m_langs.GetCurSel();
-		m_fOverridePlacement = !!m_oplacement.GetCheck();
+		m_bOverridePlacement = !!m_oplacement.GetCheck();
 		m_PlacementXperc = m_subposx.GetPos();
 		m_PlacementYperc = m_subposy.GetPos();
-		m_fOnlyShowForcedVobSubs = !!m_forcedsubs.GetCheck();
+		m_bOnlyShowForcedVobSubs = !!m_forcedsubs.GetCheck();
 		if (m_PARCombo.GetCurSel() != CB_ERR) {
 			m_ePARCompensationType = static_cast<CSimpleTextSubtitle::EPARCompensationType>(m_PARCombo.GetItemData(m_PARCombo.GetCurSel()));
 		} else {
@@ -446,15 +448,15 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 		}
 	} else {
 		m_fnedit.SetWindowText(CString(m_fn));
-		m_oplacement.SetCheck(m_fOverridePlacement);
+		m_oplacement.SetCheck(m_bOverridePlacement);
 		m_subposx.SetRange(-20, 120);
 		m_subposx.SetPos(m_PlacementXperc);
-		m_subposx.EnableWindow(m_fOverridePlacement);
+		m_subposx.EnableWindow(m_bOverridePlacement);
 		m_subposy.SetRange(-20, 120);
 		m_subposy.SetPos(m_PlacementYperc);
-		m_subposy.EnableWindow(m_fOverridePlacement);
+		m_subposy.EnableWindow(m_bOverridePlacement);
 		m_font.SetWindowText(m_defStyle.fontName);
-		m_forcedsubs.SetCheck(m_fOnlyShowForcedVobSubs);
+		m_forcedsubs.SetCheck(m_bOnlyShowForcedVobSubs);
 		m_langs.ResetContent();
 		m_langs.EnableWindow(m_nLangs > 0);
 		for (ptrdiff_t i = 0; i < m_nLangs; i++) {
@@ -537,10 +539,10 @@ void CDVSGeneralPPage::UpdateObjectData(bool fSave)
 {
 	if (fSave) {
 		m_pDirectVobSub->put_ExtendPicture(m_HorExt, m_VerExt, m_ResX2, m_ResX2minw, m_ResX2minh);
-		m_pDirectVobSub->put_LoadSettings(m_LoadLevel, m_fExternalLoad, m_fWebLoad, m_fEmbeddedLoad);
+		m_pDirectVobSub->put_LoadSettings(m_LoadLevel, m_bExternalLoad, m_bWebLoad, m_bEmbeddedLoad);
 	} else {
 		m_pDirectVobSub->get_ExtendPicture(&m_HorExt, &m_VerExt, &m_ResX2, &m_ResX2minw, &m_ResX2minh);
-		m_pDirectVobSub->get_LoadSettings(&m_LoadLevel, &m_fExternalLoad, &m_fWebLoad, &m_fEmbeddedLoad);
+		m_pDirectVobSub->get_LoadSettings(&m_LoadLevel, &m_bExternalLoad, &m_bWebLoad, &m_bEmbeddedLoad);
 	}
 }
 
@@ -559,9 +561,9 @@ void CDVSGeneralPPage::UpdateControlData(bool fSave)
 		if (m_load.GetCurSel() >= 0) {
 			m_LoadLevel = m_load.GetItemData(m_load.GetCurSel());
 		}
-		m_fExternalLoad = !!m_extload.GetCheck();
-		m_fWebLoad = !!m_webload.GetCheck();
-		m_fEmbeddedLoad = !!m_embload.GetCheck();
+		m_bExternalLoad = !!m_extload.GetCheck();
+		m_bWebLoad = !!m_webload.GetCheck();
+		m_bEmbeddedLoad = !!m_embload.GetCheck();
 	} else {
 		m_verext.ResetContent();
 		m_verext.AddString(ResStr(IDS_ORGHEIGHT));
@@ -602,9 +604,9 @@ void CDVSGeneralPPage::UpdateControlData(bool fSave)
 		m_load.AddString(ResStr(IDS_ALWAYSLOAD));
 		m_load.SetItemData(2, 1);
 		m_load.SetCurSel(!m_LoadLevel?1:m_LoadLevel==1?2:0);
-		m_extload.SetCheck(m_fExternalLoad);
-		m_webload.SetCheck(m_fWebLoad);
-		m_embload.SetCheck(m_fEmbeddedLoad);
+		m_extload.SetCheck(m_bExternalLoad);
+		m_webload.SetCheck(m_bWebLoad);
+		m_embload.SetCheck(m_bEmbeddedLoad);
 		m_extload.EnableWindow(m_load.GetCurSel() == 1);
 		m_webload.EnableWindow(m_load.GetCurSel() == 1);
 		m_embload.EnableWindow(m_load.GetCurSel() == 1);
@@ -622,6 +624,7 @@ CDVSMiscPPage::CDVSMiscPPage(LPUNKNOWN pUnk, HRESULT* phr) :
 	BindControl(IDC_SHOWOSDSTATS, m_showosd);
 	BindControl(IDC_PREBUFFERING, m_subpicttobuff);
 	BindControl(IDC_ANIMWHENBUFFERING, m_animwhenbuff);
+	BindControl(IDC_CHECK_ALLOW_DROPPING_SUBPIC, m_allowdropsubpic);
 	BindControl(IDC_AUTORELOAD, m_autoreload);
 	BindControl(IDC_SAVEFULLPATH, m_savefullpath);
 	BindControl(IDC_INSTANTUPDATE, m_instupd);
@@ -635,12 +638,20 @@ bool CDVSMiscPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case BN_CLICKED: {
 					if (LOWORD(wParam) == IDC_INSTANTUPDATE) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						m_fApplyImmediatly = !!m_instupd.GetCheck();
-						theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), m_fApplyImmediatly);
+						m_bApplyImmediatly = !!m_instupd.GetCheck();
+						theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), m_bApplyImmediatly);
 						return true;
 					}
 				}
 				break;
+			}
+		}
+		break;
+		case WM_VSCROLL: {
+			if (LOWORD(wParam) == SB_THUMBPOSITION) {
+				AFX_MANAGE_STATE(AfxGetStaticModuleState());
+				m_allowdropsubpic.EnableWindow(HIWORD(wParam) > 0);
+				return true;
 			}
 		}
 		break;
@@ -652,50 +663,56 @@ bool CDVSMiscPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CDVSMiscPPage::UpdateObjectData(bool fSave)
 {
 	if (fSave) {
-		m_pDirectVobSub->put_Flip(m_fFlipPicture, m_fFlipSubtitles);
-		m_pDirectVobSub->put_HideSubtitles(m_fHideSubtitles);
-		m_pDirectVobSub->put_OSD(m_fOSD);
+		m_pDirectVobSub->put_Flip(m_bFlipPicture, m_bFlipSubtitles);
+		m_pDirectVobSub->put_HideSubtitles(m_bHideSubtitles);
+		m_pDirectVobSub->put_OSD(m_bOSD);
 		m_pDirectVobSub->put_SubPictToBuffer(m_uSubPictToBuffer);
-		m_pDirectVobSub->put_AnimWhenBuffering(m_fAnimWhenBuffering);
-		m_pDirectVobSub->put_SubtitleReloader(m_fReloaderDisabled);
-		m_pDirectVobSub->put_SaveFullPath(m_fSaveFullPath);
+		m_pDirectVobSub->put_AnimWhenBuffering(m_bAnimWhenBuffering);
+		m_pDirectVobSub->put_AllowDropSubPic(m_bAllowDropSubPic);
+		m_pDirectVobSub->put_SubtitleReloader(m_bReloaderDisabled);
+		m_pDirectVobSub->put_SaveFullPath(m_bSaveFullPath);
 
-		theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), m_fApplyImmediatly);
+		theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), m_bApplyImmediatly);
 	} else {
-		m_pDirectVobSub->get_Flip(&m_fFlipPicture, &m_fFlipSubtitles);
-		m_pDirectVobSub->get_HideSubtitles(&m_fHideSubtitles);
-		m_pDirectVobSub->get_OSD(&m_fOSD);
+		m_pDirectVobSub->get_Flip(&m_bFlipPicture, &m_bFlipSubtitles);
+		m_pDirectVobSub->get_HideSubtitles(&m_bHideSubtitles);
+		m_pDirectVobSub->get_OSD(&m_bOSD);
 		m_pDirectVobSub->get_SubPictToBuffer(&m_uSubPictToBuffer);
-		m_pDirectVobSub->get_AnimWhenBuffering(&m_fAnimWhenBuffering);
-		m_pDirectVobSub->get_SubtitleReloader(&m_fReloaderDisabled);
-		m_pDirectVobSub->get_SaveFullPath(&m_fSaveFullPath);
+		m_pDirectVobSub->get_AnimWhenBuffering(&m_bAnimWhenBuffering);
+		m_pDirectVobSub->get_AllowDropSubPic(&m_bAllowDropSubPic);
+		m_pDirectVobSub->get_SubtitleReloader(&m_bReloaderDisabled);
+		m_pDirectVobSub->get_SaveFullPath(&m_bSaveFullPath);
 
-		m_fApplyImmediatly = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1);
+		m_bApplyImmediatly = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_INSTANTUPDATE), 1);
 	}
 }
 
 void CDVSMiscPPage::UpdateControlData(bool fSave)
 {
 	if (fSave) {
-		m_fFlipPicture = !!m_flippic.GetCheck();
-		m_fFlipSubtitles = !!m_flipsub.GetCheck();
-		m_fHideSubtitles = !!m_hidesub.GetCheck();
-		m_fSaveFullPath = !!m_savefullpath.GetCheck();
+		m_bFlipPicture = !!m_flippic.GetCheck();
+		m_bFlipSubtitles = !!m_flipsub.GetCheck();
+		m_bHideSubtitles = !!m_hidesub.GetCheck();
+		m_bSaveFullPath = !!m_savefullpath.GetCheck();
 		m_uSubPictToBuffer = m_subpicttobuff.GetPos();
-		m_fAnimWhenBuffering = !!m_animwhenbuff.GetCheck();
-		m_fOSD = !!m_showosd.GetCheck();
-		m_fReloaderDisabled = !m_autoreload.GetCheck();
+		m_bAnimWhenBuffering = !!m_animwhenbuff.GetCheck();
+		m_bAllowDropSubPic = !!m_allowdropsubpic.GetCheck();
+		m_bOSD = !!m_showosd.GetCheck();
+		m_bReloaderDisabled = !m_autoreload.GetCheck();
 	} else {
-		m_flippic.SetCheck(m_fFlipPicture);
-		m_flipsub.SetCheck(m_fFlipSubtitles);
-		m_hidesub.SetCheck(m_fHideSubtitles);
-		m_savefullpath.SetCheck(m_fSaveFullPath);
+		m_flippic.SetCheck(m_bFlipPicture);
+		m_flipsub.SetCheck(m_bFlipSubtitles);
+		m_hidesub.SetCheck(m_bHideSubtitles);
+		m_savefullpath.SetCheck(m_bSaveFullPath);
 		m_subpicttobuff.SetPos(m_uSubPictToBuffer);
 		m_subpicttobuff.SetRange(0, 60);
-		m_animwhenbuff.SetCheck(m_fAnimWhenBuffering);
-		m_showosd.SetCheck(m_fOSD);
-		m_autoreload.SetCheck(!m_fReloaderDisabled);
-		m_instupd.SetCheck(m_fApplyImmediatly);
+		m_animwhenbuff.SetCheck(m_bAnimWhenBuffering);
+		m_allowdropsubpic.SetCheck(m_bAllowDropSubPic);
+		m_showosd.SetCheck(m_bOSD);
+		m_autoreload.SetCheck(!m_bReloaderDisabled);
+		m_instupd.SetCheck(m_bApplyImmediatly);
+
+		m_allowdropsubpic.EnableWindow(m_uSubPictToBuffer > 0);
 	}
 }
 
@@ -736,17 +753,17 @@ void CDVSTimingPPage::UpdateObjectData(bool fSave)
 {
 	if (fSave) {
 		m_pDirectVobSub->put_SubtitleTiming(m_SubtitleDelay, m_SubtitleSpeedMul, m_SubtitleSpeedDiv);
-		m_pDirectVobSub->put_MediaFPS(m_fMediaFPSEnabled, m_MediaFPS);
+		m_pDirectVobSub->put_MediaFPS(m_bMediaFPSEnabled, m_MediaFPS);
 	} else {
 		m_pDirectVobSub->get_SubtitleTiming(&m_SubtitleDelay, &m_SubtitleSpeedMul, &m_SubtitleSpeedDiv);
-		m_pDirectVobSub->get_MediaFPS(&m_fMediaFPSEnabled, &m_MediaFPS);
+		m_pDirectVobSub->get_MediaFPS(&m_bMediaFPSEnabled, &m_MediaFPS);
 	}
 }
 
 void CDVSTimingPPage::UpdateControlData(bool fSave)
 {
 	if (fSave) {
-		m_fMediaFPSEnabled = !!m_modfps.GetCheck();
+		m_bMediaFPSEnabled = !!m_modfps.GetCheck();
 		CString fpsstr;
 		m_fps.GetWindowText(fpsstr);
 		float fps;
@@ -757,11 +774,11 @@ void CDVSTimingPPage::UpdateControlData(bool fSave)
 		m_SubtitleSpeedMul = m_subspeedmul.GetPos32();
 		m_SubtitleSpeedDiv = m_subspeeddiv.GetPos32();
 	} else {
-		m_modfps.SetCheck(m_fMediaFPSEnabled);
+		m_modfps.SetCheck(m_bMediaFPSEnabled);
 		CString fpsstr;
 		fpsstr.Format(_T("%.4f"), m_MediaFPS);
 		m_fps.SetWindowText(fpsstr);
-		m_fps.EnableWindow(m_fMediaFPSEnabled);
+		m_fps.EnableWindow(m_bMediaFPSEnabled);
 		m_subdelay.SetRange32(-180*60*1000, 180*60*1000);
 		m_subspeedmul.SetRange32(0, 1000000);
 		m_subspeeddiv.SetRange32(1, 1000000);
@@ -783,7 +800,7 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 		case WM_INITDIALOG: {
-			SetDlgItemText(m_Dlg, IDC_VERSION, _T("DirectVobSub 2.44.") _T(MAKE_STR(MPC_VERSION_REV)) _T(" ") _T(MPC_VERSION_ARCH) _T("\nCopyright 2001-2014 MPC-BE Team"));
+			SetDlgItemText(m_Dlg, IDC_VERSION, _T("DirectVobSub 2.45.") _T(MAKE_STR(MPC_VERSION_REV)) _T(" ") _T(MPC_VERSION_ARCH) _T("\nCopyright 2001-2014 MPC-BE Team"));
 		}
 		break;
 		case WM_COMMAND: {
@@ -882,7 +899,7 @@ CDVSColorPPage::CDVSColorPPage(LPUNKNOWN pUnk, HRESULT* phr) :
 	BindControl(IDC_DYNCHGLIST, m_dynchglist);
 	BindControl(IDC_FORCERGBCHK, m_forcergb);
 
-	m_fDisableInstantUpdate = true;
+	m_bDisableInstantUpdate = true;
 }
 
 bool CDVSColorPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1036,7 +1053,7 @@ CDVSPathsPPage::CDVSPathsPPage(LPUNKNOWN pUnk, HRESULT* phr) :
 	BindControl(IDC_REMOVE, m_remove);
 	BindControl(IDC_ADD, m_add);
 
-	m_fDisableInstantUpdate = true;
+	m_bDisableInstantUpdate = true;
 }
 
 bool CDVSPathsPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -192,7 +192,7 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 
 	CString msg, tmp;
 
-	if (m_fOSD) {
+	if (m_bOSD) {
 		CString input = GetGUIDString(m_pInput->CurrentMediaType().subtype);
 		if (!input.Left(13).CompareNoCase(_T("MEDIASUBTYPE_"))) {
 			input = input.Mid(13);
@@ -210,7 +210,7 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 		msg += tmp;
 
 		tmp.Format(_T("real fps: %.3f, current fps: %.3f\nmedia time: %d, subtitle time: %d [ms]\nframe number: %d (calculated)\nrate: %.4f\n"),
-				   m_fps, m_fMediaFPSEnabled?m_MediaFPS:fabs(m_fps),
+				   m_fps, m_bMediaFPSEnabled?m_MediaFPS:fabs(m_fps),
 				   (int)m_tPrev.Millisecs(), (int)(CalcCurrentTime()/10000),
 				   (int)(m_tPrev.m_time * m_fps / 10000000),
 				   m_pInput->CurrentRate());

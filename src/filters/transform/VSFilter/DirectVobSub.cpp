@@ -31,25 +31,26 @@ CDirectVobSub::CDirectVobSub()
 	UINT nSize;
 
 	m_iSelectedLanguage = 0;
-	m_fHideSubtitles = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_HIDE), 0);
+	m_bHideSubtitles = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_HIDE), 0);
 	m_uSubPictToBuffer = theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SUBPICTTOBUFFER), 10);
-	m_fAnimWhenBuffering = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ANIMWHENBUFFERING), 1);
-	m_fOverridePlacement = !!theApp.GetProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_OVERRIDEPLACEMENT), 0);
+	m_bAnimWhenBuffering = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ANIMWHENBUFFERING), 1);
+	m_bAllowDropSubPic = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ALLOW_DROPPING_SUBPIC), 1);
+	m_bOverridePlacement = !!theApp.GetProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_OVERRIDEPLACEMENT), 0);
 	m_PlacementXperc = theApp.GetProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_XPERC), 50);
 	m_PlacementYperc = theApp.GetProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_YPERC), 90);
-	m_fBufferVobSub = !!theApp.GetProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_BUFFER), 1);
-	m_fOnlyShowForcedVobSubs = !!theApp.GetProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_ONLYSHOWFORCEDSUBS), 0);
-	m_fPolygonize = !!theApp.GetProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_POLYGONIZE), 0);
+	m_bBufferVobSub = !!theApp.GetProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_BUFFER), 1);
+	m_bOnlyShowForcedVobSubs = !!theApp.GetProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_ONLYSHOWFORCEDSUBS), 0);
+	m_bPolygonize = !!theApp.GetProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_POLYGONIZE), 0);
 	m_defStyle <<= theApp.GetProfileString(ResStr(IDS_R_TEXT), ResStr(IDS_RT_STYLE), _T(""));
-	m_fFlipPicture = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPPICTURE), 0);
-	m_fFlipSubtitles = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPSUBTITLES), 0);
-	m_fOSD = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SHOWOSDSTATS), 0);
-	m_fSaveFullPath = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SAVEFULLPATH), 0);
+	m_bFlipPicture = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPPICTURE), 0);
+	m_bFlipSubtitles = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPSUBTITLES), 0);
+	m_bOSD = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SHOWOSDSTATS), 0);
+	m_bSaveFullPath = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SAVEFULLPATH), 0);
 	m_nReloaderDisableCount = !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_DISABLERELOADER), 0) ? 1 : 0;
 	m_SubtitleDelay = theApp.GetProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_SUBTITLEDELAY), 0);
 	m_SubtitleSpeedMul = theApp.GetProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_SUBTITLESPEEDMUL), 1000);
 	m_SubtitleSpeedDiv = theApp.GetProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_SUBTITLESPEEDDIV), 1000);
-	m_fMediaFPSEnabled = !!theApp.GetProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_MEDIAFPSENABLED), 0);
+	m_bMediaFPSEnabled = !!theApp.GetProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_MEDIAFPSENABLED), 0);
 	m_ePARCompensationType = static_cast<CSimpleTextSubtitle::EPARCompensationType>(theApp.GetProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_AUTOPARCOMPENSATION), 0));
 	pData = NULL;
 	if (theApp.GetProfileBinary(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_MEDIAFPS), &pData, &nSize) && pData) {
@@ -63,7 +64,7 @@ CDirectVobSub::CDirectVobSub()
 	m_ZoomRect.left = m_ZoomRect.top = 0;
 	m_ZoomRect.right = m_ZoomRect.bottom = 1;
 
-	m_fForced = false;
+	m_bForced = false;
 }
 
 CDirectVobSub::~CDirectVobSub()
@@ -145,18 +146,18 @@ STDMETHODIMP CDirectVobSub::get_HideSubtitles(bool* fHideSubtitles)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	return fHideSubtitles ? *fHideSubtitles = m_fHideSubtitles, S_OK : E_POINTER;
+	return fHideSubtitles ? *fHideSubtitles = m_bHideSubtitles, S_OK : E_POINTER;
 }
 
 STDMETHODIMP CDirectVobSub::put_HideSubtitles(bool fHideSubtitles)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fHideSubtitles == fHideSubtitles) {
+	if (m_bHideSubtitles == fHideSubtitles) {
 		return S_FALSE;
 	}
 
-	m_fHideSubtitles = fHideSubtitles;
+	m_bHideSubtitles = fHideSubtitles;
 
 	return S_OK;
 }
@@ -207,18 +208,38 @@ STDMETHODIMP CDirectVobSub::get_AnimWhenBuffering(bool* fAnimWhenBuffering)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	return fAnimWhenBuffering ? *fAnimWhenBuffering = m_fAnimWhenBuffering, S_OK : E_POINTER;
+	return fAnimWhenBuffering ? *fAnimWhenBuffering = m_bAnimWhenBuffering, S_OK : E_POINTER;
 }
 
 STDMETHODIMP CDirectVobSub::put_AnimWhenBuffering(bool fAnimWhenBuffering)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fAnimWhenBuffering == fAnimWhenBuffering) {
+	if (m_bAnimWhenBuffering == fAnimWhenBuffering) {
 		return S_FALSE;
 	}
 
-	m_fAnimWhenBuffering = fAnimWhenBuffering;
+	m_bAnimWhenBuffering = fAnimWhenBuffering;
+
+	return S_OK;
+}
+
+STDMETHODIMP CDirectVobSub::get_AllowDropSubPic(bool* fAllowDropSubPic)
+{
+	CAutoLock cAutoLock(&m_propsLock);
+
+	return fAllowDropSubPic ? *fAllowDropSubPic = m_bAllowDropSubPic, S_OK : E_POINTER;
+}
+
+STDMETHODIMP CDirectVobSub::put_AllowDropSubPic(bool fAllowDropSubPic)
+{
+	CAutoLock cAutoLock(&m_propsLock);
+
+	if (m_bAllowDropSubPic == fAllowDropSubPic) {
+		return S_FALSE;
+	}
+
+	m_bAllowDropSubPic = fAllowDropSubPic;
 
 	return S_OK;
 }
@@ -228,7 +249,7 @@ STDMETHODIMP CDirectVobSub::get_Placement(bool* fOverridePlacement, int* xperc, 
 	CAutoLock cAutoLock(&m_propsLock);
 
 	if (fOverridePlacement) {
-		*fOverridePlacement = m_fOverridePlacement;
+		*fOverridePlacement = m_bOverridePlacement;
 	}
 	if (xperc) {
 		*xperc = m_PlacementXperc;
@@ -244,11 +265,11 @@ STDMETHODIMP CDirectVobSub::put_Placement(bool fOverridePlacement, int xperc, in
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fOverridePlacement == fOverridePlacement && m_PlacementXperc == xperc && m_PlacementYperc == yperc) {
+	if (m_bOverridePlacement == fOverridePlacement && m_PlacementXperc == xperc && m_PlacementYperc == yperc) {
 		return S_FALSE;
 	}
 
-	m_fOverridePlacement = fOverridePlacement;
+	m_bOverridePlacement = fOverridePlacement;
 	m_PlacementXperc = xperc;
 	m_PlacementYperc = yperc;
 
@@ -260,13 +281,13 @@ STDMETHODIMP CDirectVobSub::get_VobSubSettings(bool* fBuffer, bool* fOnlyShowFor
 	CAutoLock cAutoLock(&m_propsLock);
 
 	if (fBuffer) {
-		*fBuffer = m_fBufferVobSub;
+		*fBuffer = m_bBufferVobSub;
 	}
 	if (fOnlyShowForcedSubs) {
-		*fOnlyShowForcedSubs = m_fOnlyShowForcedVobSubs;
+		*fOnlyShowForcedSubs = m_bOnlyShowForcedVobSubs;
 	}
 	if (fPolygonize) {
-		*fPolygonize = m_fPolygonize;
+		*fPolygonize = m_bPolygonize;
 	}
 
 	return S_OK;
@@ -276,13 +297,13 @@ STDMETHODIMP CDirectVobSub::put_VobSubSettings(bool fBuffer, bool fOnlyShowForce
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fBufferVobSub == fBuffer && m_fOnlyShowForcedVobSubs == fOnlyShowForcedSubs && m_fPolygonize == fPolygonize) {
+	if (m_bBufferVobSub == fBuffer && m_bOnlyShowForcedVobSubs == fOnlyShowForcedSubs && m_bPolygonize == fPolygonize) {
 		return S_FALSE;
 	}
 
-	m_fBufferVobSub = fBuffer;
-	m_fOnlyShowForcedVobSubs = fOnlyShowForcedSubs;
-	m_fPolygonize = fPolygonize;
+	m_bBufferVobSub = fBuffer;
+	m_bOnlyShowForcedVobSubs = fOnlyShowForcedSubs;
+	m_bPolygonize = fPolygonize;
 
 	return S_OK;
 }
@@ -318,7 +339,7 @@ STDMETHODIMP CDirectVobSub::get_TextSettings(void* lf, int lflen, COLORREF* colo
 		*fOutline = (m_defStyle.outlineWidthX+m_defStyle.outlineWidthY)>0;
 	}
 	if (fAdvancedRenderer) {
-		*fAdvancedRenderer = m_fAdvancedRenderer;
+		*fAdvancedRenderer = m_bAdvancedRenderer;
 	}
 
 	return S_OK;
@@ -365,10 +386,10 @@ STDMETHODIMP CDirectVobSub::get_Flip(bool* fPicture, bool* fSubtitles)
 	CAutoLock cAutoLock(&m_propsLock);
 
 	if (fPicture) {
-		*fPicture = m_fFlipPicture;
+		*fPicture = m_bFlipPicture;
 	}
 	if (fSubtitles) {
-		*fSubtitles = m_fFlipSubtitles;
+		*fSubtitles = m_bFlipSubtitles;
 	}
 
 	return S_OK;
@@ -378,12 +399,12 @@ STDMETHODIMP CDirectVobSub::put_Flip(bool fPicture, bool fSubtitles)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fFlipPicture == fPicture && m_fFlipSubtitles == fSubtitles) {
+	if (m_bFlipPicture == fPicture && m_bFlipSubtitles == fSubtitles) {
 		return S_FALSE;
 	}
 
-	m_fFlipPicture = fPicture;
-	m_fFlipSubtitles = fSubtitles;
+	m_bFlipPicture = fPicture;
+	m_bFlipSubtitles = fSubtitles;
 
 	return S_OK;
 }
@@ -392,18 +413,18 @@ STDMETHODIMP CDirectVobSub::get_OSD(bool* fOSD)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	return fOSD ? *fOSD = m_fOSD, S_OK : E_POINTER;
+	return fOSD ? *fOSD = m_bOSD, S_OK : E_POINTER;
 }
 
 STDMETHODIMP CDirectVobSub::put_OSD(bool fOSD)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fOSD == fOSD) {
+	if (m_bOSD == fOSD) {
 		return S_FALSE;
 	}
 
-	m_fOSD = fOSD;
+	m_bOSD = fOSD;
 
 	return S_OK;
 }
@@ -412,18 +433,18 @@ STDMETHODIMP CDirectVobSub::get_SaveFullPath(bool* fSaveFullPath)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	return fSaveFullPath ? *fSaveFullPath = m_fSaveFullPath, S_OK : E_POINTER;
+	return fSaveFullPath ? *fSaveFullPath = m_bSaveFullPath, S_OK : E_POINTER;
 }
 
 STDMETHODIMP CDirectVobSub::put_SaveFullPath(bool fSaveFullPath)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fSaveFullPath == fSaveFullPath) {
+	if (m_bSaveFullPath == fSaveFullPath) {
 		return S_FALSE;
 	}
 
-	m_fSaveFullPath = fSaveFullPath;
+	m_bSaveFullPath = fSaveFullPath;
 
 	return S_OK;
 }
@@ -467,7 +488,7 @@ STDMETHODIMP CDirectVobSub::get_MediaFPS(bool* fEnabled, double* fps)
 	CAutoLock cAutoLock(&m_propsLock);
 
 	if (fEnabled) {
-		*fEnabled = m_fMediaFPSEnabled;
+		*fEnabled = m_bMediaFPSEnabled;
 	}
 	if (fps) {
 		*fps = m_MediaFPS;
@@ -480,11 +501,11 @@ STDMETHODIMP CDirectVobSub::put_MediaFPS(bool fEnabled, double fps)
 {
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (m_fMediaFPSEnabled == fEnabled && m_MediaFPS == fps) {
+	if (m_bMediaFPSEnabled == fEnabled && m_MediaFPS == fps) {
 		return S_FALSE;
 	}
 
-	m_fMediaFPSEnabled = fEnabled;
+	m_bMediaFPSEnabled = fEnabled;
 	if (fps > 0) {
 		m_MediaFPS = fps;
 	}
@@ -528,25 +549,26 @@ STDMETHODIMP CDirectVobSub::UpdateRegistry()
 
 	CAutoLock cAutoLock(&m_propsLock);
 
-	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_HIDE), m_fHideSubtitles);
+	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_HIDE), m_bHideSubtitles);
 	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SUBPICTTOBUFFER), m_uSubPictToBuffer);
-	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ANIMWHENBUFFERING), m_fAnimWhenBuffering);
-	theApp.WriteProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_OVERRIDEPLACEMENT), m_fOverridePlacement);
+	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ANIMWHENBUFFERING), m_bAnimWhenBuffering);
+	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ALLOW_DROPPING_SUBPIC), m_bAllowDropSubPic);
+	theApp.WriteProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_OVERRIDEPLACEMENT), m_bOverridePlacement);
 	theApp.WriteProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_XPERC), m_PlacementXperc);
 	theApp.WriteProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_YPERC), m_PlacementYperc);
-	theApp.WriteProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_BUFFER), m_fBufferVobSub);
-	theApp.WriteProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_ONLYSHOWFORCEDSUBS), m_fOnlyShowForcedVobSubs);
-	theApp.WriteProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_POLYGONIZE), m_fPolygonize);
+	theApp.WriteProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_BUFFER), m_bBufferVobSub);
+	theApp.WriteProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_ONLYSHOWFORCEDSUBS), m_bOnlyShowForcedVobSubs);
+	theApp.WriteProfileInt(ResStr(IDS_R_VOBSUB), ResStr(IDS_RV_POLYGONIZE), m_bPolygonize);
 	CString style;
 	theApp.WriteProfileString(ResStr(IDS_R_TEXT), ResStr(IDS_RT_STYLE), style <<= m_defStyle);
-	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPPICTURE), m_fFlipPicture);
-	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPSUBTITLES), m_fFlipSubtitles);
-	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SHOWOSDSTATS), m_fOSD);
-	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SAVEFULLPATH), m_fSaveFullPath);
+	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPPICTURE), m_bFlipPicture);
+	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_FLIPSUBTITLES), m_bFlipSubtitles);
+	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SHOWOSDSTATS), m_bOSD);
+	theApp.WriteProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_SAVEFULLPATH), m_bSaveFullPath);
 	theApp.WriteProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_SUBTITLEDELAY), m_SubtitleDelay);
 	theApp.WriteProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_SUBTITLESPEEDMUL), m_SubtitleSpeedMul);
 	theApp.WriteProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_SUBTITLESPEEDDIV), m_SubtitleSpeedDiv);
-	theApp.WriteProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_MEDIAFPSENABLED), m_fMediaFPSEnabled);
+	theApp.WriteProfileInt(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_MEDIAFPSENABLED), m_bMediaFPSEnabled);
 	theApp.WriteProfileBinary(ResStr(IDS_R_TIMING), ResStr(IDS_RTM_MEDIAFPS), (BYTE*)&m_MediaFPS, sizeof(m_MediaFPS));
 	theApp.WriteProfileInt(ResStr(IDS_R_TEXT), ResStr(IDS_RT_AUTOPARCOMPENSATION), m_ePARCompensationType);
 
@@ -726,12 +748,12 @@ STDMETHODIMP CDirectVobSub::AdviseSubClock(ISubClock* pSubClock)
 
 STDMETHODIMP_(bool) CDirectVobSub::get_Forced()
 {
-	return m_fForced;
+	return m_bForced;
 }
 
 STDMETHODIMP CDirectVobSub::put_Forced(bool fForced)
 {
-	m_fForced = fForced;
+	m_bForced = fForced;
 	return S_OK;
 }
 

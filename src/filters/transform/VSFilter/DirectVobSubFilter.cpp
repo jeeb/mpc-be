@@ -48,7 +48,7 @@ bool g_RegOK = true;//false; // doesn't work with the dvd graph builder
 CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUID& clsid)
 	: CBaseVideoFilter(NAME("CDirectVobSubFilter"), punk, phr, clsid)
 	, m_nSubtitleId((DWORD_PTR)-1)
-	, m_fMSMpeg4Fix(false)
+	, m_bMSMpeg4Fix(false)
 	, m_fps(25)
 	, m_pVideoOutputFormat(NULL)
 	, m_nVideoOutputCount(0)
@@ -80,7 +80,7 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), _T("Path1"), _T("c:\\subtitles"));
 	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), _T("Path2"), _T(".\\subtitles"));
 
-	m_fLoading = true;
+	m_bLoading = true;
 
 	m_hSystrayThread = 0;
 	m_tbid.hSystrayWnd = NULL;
@@ -298,15 +298,15 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 	bool fOutputFlipped = bihOut.biHeight >= 0 && bihOut.biCompression <= 3;
 
 	bool fFlip = fInputFlipped != fOutputFlipped;
-	if (m_fFlipPicture) {
+	if (m_bFlipPicture) {
 		fFlip = !fFlip;
 	}
-	if (m_fMSMpeg4Fix) {
+	if (m_bMSMpeg4Fix) {
 		fFlip = !fFlip;
 	}
 
 	bool fFlipSub = fOutputFlipped;
-	if (m_fFlipSubtitles) {
+	if (m_bFlipSubtitles) {
 		fFlipSub = !fFlipSub;
 	}
 
@@ -499,7 +499,7 @@ HRESULT CDirectVobSubFilter::CompleteConnect(PIN_DIRECTION dir, IPin* pReceivePi
 				|| SUCCEEDED(m_pGraph->FindFilterByName(L"Microcrap MPEG-4 Video Decompressor", &pFilter))
 				|| SUCCEEDED(m_pGraph->FindFilterByName(L"Microsoft MPEG-4 Video Decompressor", &pFilter))
 				&& (CFileVersionInfo::GetFileVersion(L"mpg4ds32.ax") >> 48) <= 3) {
-			m_fMSMpeg4Fix = true;
+			m_bMSMpeg4Fix = true;
 		}
 	} else if (dir == PINDIR_OUTPUT) {
 		const CMediaType* mtIn	= &m_pInput->CurrentMediaType();
@@ -597,13 +597,13 @@ HRESULT CDirectVobSubFilter::StartStreaming()
 	// WARNING : calls to m_pGraph member functions from here will generate deadlock with Haali Renderer
 	// within MPC-BE (reason is CAutoLock's variables in IFilterGraph functions overriden by CFGManager class)
 
-	m_fLoading = false;
+	m_bLoading = false;
 
 	InitSubPicQueue();
 
 	m_tbid.fRunOnce = true;
 
-	put_MediaFPS(m_fMediaFPSEnabled, m_MediaFPS);
+	put_MediaFPS(m_bMediaFPSEnabled, m_MediaFPS);
 
 	return __super::StartStreaming();
 }
@@ -791,8 +791,8 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	HRESULT hr = S_OK;
 
 	m_pSubPicQueue = m_uSubPictToBuffer > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(m_uSubPictToBuffer, !m_fAnimWhenBuffering, true, pSubPicAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_fAnimWhenBuffering, pSubPicAllocator, &hr);
+					 ? (ISubPicQueue*)DNew CSubPicQueue(m_uSubPictToBuffer, !m_bAnimWhenBuffering, m_bAllowDropSubPic, pSubPicAllocator, &hr)
+					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!m_bAnimWhenBuffering, pSubPicAllocator, &hr);
 
 	if (FAILED(hr)) {
 		m_pSubPicQueue = NULL;
@@ -1010,7 +1010,7 @@ STDMETHODIMP CDirectVobSubFilter::Enable(long lIndex, DWORD dwFlags)
 
 	int i = lIndex-1;
 
-	if (i == -1 && !m_fLoading) { // we need this because when loading something stupid media player pushes the first stream it founds, which is "enable" in our case
+	if (i == -1 && !m_bLoading) { // we need this because when loading something stupid media player pushes the first stream it founds, which is "enable" in our case
 		put_HideSubtitles(false);
 	} else if (i >= 0 && i < nLangs) {
 		put_HideSubtitles(false);
@@ -1023,10 +1023,10 @@ STDMETHODIMP CDirectVobSubFilter::Enable(long lIndex, DWORD dwFlags)
 				CoTaskMemFree(pName);
 			}
 		}
-	} else if (i == nLangs && !m_fLoading) {
+	} else if (i == nLangs && !m_bLoading) {
 		put_HideSubtitles(true);
-	} else if ((i == nLangs+1 || i == nLangs+2) && !m_fLoading) {
-		put_Flip(i == nLangs+2, m_fFlipSubtitles);
+	} else if ((i == nLangs+1 || i == nLangs+2) && !m_bLoading) {
+		put_Flip(i == nLangs+2, m_bFlipSubtitles);
 	}
 
 	return S_OK;
@@ -1052,11 +1052,11 @@ STDMETHODIMP CDirectVobSubFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 	if (pdwFlags) {
 		*pdwFlags = 0;
 
-		if (i == -1 && !m_fHideSubtitles
+		if (i == -1 && !m_bHideSubtitles
 				|| i >= 0 && i < nLangs && i == m_iSelectedLanguage
-				|| i == nLangs && m_fHideSubtitles
-				|| i == nLangs+1 && !m_fFlipPicture
-				|| i == nLangs+2 && m_fFlipPicture) {
+				|| i == nLangs && m_bHideSubtitles
+				|| i == nLangs+1 && !m_bFlipPicture
+				|| i == nLangs+2 && m_bFlipPicture) {
 			*pdwFlags |= AMSTREAMSELECTINFO_ENABLED;
 		}
 	}
@@ -1262,6 +1262,17 @@ STDMETHODIMP CDirectVobSubFilter::put_AnimWhenBuffering(bool fAnimWhenBuffering)
 	return hr;
 }
 
+STDMETHODIMP CDirectVobSubFilter::put_AllowDropSubPic(bool fAllowDropSubPic)
+{
+	HRESULT hr = CDirectVobSub::put_AllowDropSubPic(fAllowDropSubPic);
+
+	if (hr == NOERROR && m_pInput && m_pInput->IsConnected()) {
+		InitSubPicQueue();
+	}
+
+	return hr;
+}
+
 STDMETHODIMP CDirectVobSubFilter::put_Placement(bool fOverridePlacement, int xperc, int yperc)
 {
 	HRESULT hr = CDirectVobSub::put_Placement(fOverridePlacement, xperc, yperc);
@@ -1331,7 +1342,7 @@ STDMETHODIMP CDirectVobSubFilter::put_MediaFPS(bool fEnabled, double fps)
 	CComQIPtr<IMediaSeeking> pMS = m_pGraph;
 	if (pMS) {
 		if (hr == NOERROR) {
-			hr = pMS->SetRate(m_fMediaFPSEnabled ? m_MediaFPS / m_fps : 1.0);
+			hr = pMS->SetRate(m_bMediaFPSEnabled ? m_MediaFPS / m_fps : 1.0);
 		}
 
 		double dRate;
@@ -1590,8 +1601,8 @@ bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 	}
 
 	int level;
-	bool m_fExternalLoad, m_fWebLoad, m_fEmbeddedLoad;
-	get_LoadSettings(&level, &m_fExternalLoad, &m_fWebLoad, &m_fEmbeddedLoad);
+	bool m_bExternalLoad, m_bWebLoad, m_bEmbeddedLoad;
+	get_LoadSettings(&level, &m_bExternalLoad, &m_bWebLoad, &m_bEmbeddedLoad);
 
 	if (level < 0 || level >= 2) {
 		return false;
@@ -1600,12 +1611,12 @@ bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 	bool fRet = false;
 
 	if (level == 1) {
-		fRet = m_fExternalLoad = m_fWebLoad = m_fEmbeddedLoad = true;
+		fRet = m_bExternalLoad = m_bWebLoad = m_bEmbeddedLoad = true;
 	}
 
 	// find text stream on known splitters
 
-	if (!fRet && m_fEmbeddedLoad) {
+	if (!fRet && m_bEmbeddedLoad) {
 		CComPtr<IBaseFilter> pBF;
 		if ((pBF = FindFilter(CLSID_OggSplitter, pGraph)) || (pBF = FindFilter(CLSID_AviSplitter, pGraph))
 				|| (pBF = FindFilter(L"{34293064-02F2-41D5-9D75-CC5967ACA1AB}", pGraph)) // matroska demux
@@ -1661,13 +1672,13 @@ bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 	}
 	EndEnumFilters
 
-	if ((m_fExternalLoad || m_fWebLoad) && (m_fWebLoad || !(wcsstr(fn, L"http://") || wcsstr(fn, L"mms://")))) {
-		bool fTemp = m_fHideSubtitles;
+	if ((m_bExternalLoad || m_bWebLoad) && (m_bWebLoad || !(wcsstr(fn, L"http://") || wcsstr(fn, L"mms://")))) {
+		bool fTemp = m_bHideSubtitles;
 		fRet = !fn.IsEmpty() && SUCCEEDED(put_FileName((LPWSTR)(LPCWSTR)fn))
 			   || SUCCEEDED(put_FileName(L"c:\\tmp.srt"))
 			   || fRet;
 		if (fTemp) {
-			m_fHideSubtitles = true;
+			m_bHideSubtitles = true;
 		}
 	}
 
@@ -1790,7 +1801,7 @@ void CDirectVobSubFilter::UpdateSubtitle(bool fApplyDefStyle)
 
 	CComPtr<ISubStream> pSubStream;
 
-	if (!m_fHideSubtitles) {
+	if (!m_bHideSubtitles) {
 		int i = m_iSelectedLanguage;
 
 		for (POSITION pos = m_pSubStreams.GetHeadPosition(); i >= 0 && pos; pSubStream = NULL) {
@@ -1823,15 +1834,15 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
 			CVobSubSettings* pVSS = (CVobSubFile*)(ISubStream*)pSubStream;
 
 			if (fApplyDefStyle) {
-				pVSS->SetAlignment(m_fOverridePlacement, m_PlacementXperc, m_PlacementYperc, 1, 1);
-				pVSS->m_fOnlyShowForcedSubs = m_fOnlyShowForcedVobSubs;
+				pVSS->SetAlignment(m_bOverridePlacement, m_PlacementXperc, m_PlacementYperc, 1, 1);
+				pVSS->m_fOnlyShowForcedSubs = m_bOnlyShowForcedVobSubs;
 			}
 		} else if (clsid == __uuidof(CVobSubStream)) {
 			CVobSubSettings* pVSS = (CVobSubStream*)(ISubStream*)pSubStream;
 
 			if (fApplyDefStyle) {
-				pVSS->SetAlignment(m_fOverridePlacement, m_PlacementXperc, m_PlacementYperc, 1, 1);
-				pVSS->m_fOnlyShowForcedSubs = m_fOnlyShowForcedVobSubs;
+				pVSS->SetAlignment(m_bOverridePlacement, m_PlacementXperc, m_PlacementYperc, 1, 1);
+				pVSS->m_fOnlyShowForcedSubs = m_bOnlyShowForcedVobSubs;
 			}
 		} else if (clsid == __uuidof(CRenderedTextSubtitle)) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)pSubStream;
@@ -1839,7 +1850,7 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
 			if (fApplyDefStyle || pRTS->m_fUsingAutoGeneratedDefaultStyle) {
 				STSStyle s = m_defStyle;
 
-				if (m_fOverridePlacement) {
+				if (m_bOverridePlacement) {
 					s.scrAlignment = 2;
 					int w = pRTS->m_dstScreenSize.cx;
 					int h = pRTS->m_dstScreenSize.cy;
