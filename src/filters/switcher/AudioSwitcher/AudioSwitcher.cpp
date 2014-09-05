@@ -134,19 +134,18 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return __super::Transform(pIn, pOut);
 	}
 
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
-	WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+	WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
 
-	SampleFormat sample_format = GetSampleFormat(wfe);
-	if (sample_format == SAMPLE_FMT_NONE) {
+	SampleFormat in_sampleformat = GetSampleFormat(in_wfe);
+	if (in_sampleformat == SAMPLE_FMT_NONE) {
 		return __super::Transform(pIn, pOut);
 	}
 
-	const unsigned in_bytespersample = wfe->wBitsPerSample / 8;
-	const unsigned in_samples        = pIn->GetActualDataLength() / (wfe->nChannels * in_bytespersample);
-	const unsigned in_allsamples     = in_samples * wfe->nChannels;
+	const unsigned in_bytespersample = in_wfe->wBitsPerSample / 8;
+	const unsigned in_samples        = pIn->GetActualDataLength() / (in_wfe->nChannels * in_bytespersample);
+	const unsigned in_allsamples     = in_samples * in_wfe->nChannels;
 
-	REFERENCE_TIME rtDur = 10000000i64 * in_samples / wfe->nSamplesPerSec;
+	REFERENCE_TIME rtDur = 10000000i64 * in_samples / in_wfe->nSamplesPerSec;
 
 	REFERENCE_TIME rtStart, rtStop;
 	if (FAILED(pIn->GetTime(&rtStart, &rtStop))) {
@@ -178,12 +177,12 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		int out_samples = 0;
 		long out_size = 0;
 
-		if (sample_format == SAMPLE_FMT_FLT) {
+		if (in_sampleformat == SAMPLE_FMT_FLT) {
 			if (S_OK != (hr = __super::Transform(pIn, pOut))) {
 				return hr;
 			}
-			out_samples = m_AudioNormalizer.MSteadyHQ32((float*)pDataOut, in_samples, wfe->nChannels);
-			out_size = out_samples * wfe->nChannels * get_bytes_per_sample(sample_format);
+			out_samples = m_AudioNormalizer.MSteadyHQ32((float*)pDataOut, in_samples, in_wfe->nChannels);
+			out_size = out_samples * in_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
 		} else {
 			if (in_allsamples > m_buf_size) {
 				if (m_buffer) {
@@ -193,16 +192,16 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 				m_buffer = DNew float[m_buf_size];
 			}
 
-			convert_to_float(sample_format, wfe->nChannels, in_samples, pDataIn, m_buffer);
-			out_samples = m_AudioNormalizer.MSteadyHQ32(m_buffer, in_samples, wfe->nChannels);
-			out_size = out_samples * wfe->nChannels * get_bytes_per_sample(sample_format);
+			convert_to_float(in_sampleformat, in_wfe->nChannels, in_samples, pDataIn, m_buffer);
+			out_samples = m_AudioNormalizer.MSteadyHQ32(m_buffer, in_samples, in_wfe->nChannels);
+			out_size = out_samples * in_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
 
 			if (out_size > pOut->GetSize()) {
 				ASSERT(0);
 				return E_FAIL;
 			}
 
-			convert_float_to(sample_format, wfe->nChannels, in_samples, m_buffer, pDataOut);
+			convert_float_to(in_sampleformat, in_wfe->nChannels, in_samples, m_buffer, pDataOut);
 		}
 
 		pOut->SetActualDataLength(out_size);
@@ -213,9 +212,9 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 
 		if (m_fGainFactor != 1.0f) {
-			size_t out_allsamples = pOut->GetActualDataLength() / get_bytes_per_sample(sample_format);
+			size_t out_allsamples = pOut->GetActualDataLength() / get_bytes_per_sample(in_sampleformat);
 
-			switch (sample_format) {
+			switch (in_sampleformat) {
 			case SAMPLE_FMT_U8:
 				gain_uint8(m_fGainFactor, out_allsamples, (uint8_t*)pDataOut);
 				break;
