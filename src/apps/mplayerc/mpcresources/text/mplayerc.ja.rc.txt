@@ -1834,7 +1834,7 @@ STRING IDS_PPSDB_BADURL		"不正な URL です。字幕データベースがあ�
 STRING IDS_PPSDB_PROTOCOLERR		"プロトコルのバージョンが一致しません。プレーヤーのアップグレードか違うアドレスを選択してください！"
 STRING IDS_PPSDB_URLCORRECT		"URL は正しいと思われます！"
 STRING IDS_PROPSHEET_PROPERTIES		"プロパティ"
-STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
+STRING IDS_PUBLISHED		"Published : "
 STRING IDS_REALVIDEO_INCOMPATIBLE		"ファイル名にサポートされていない文字が使われています (A-Z、0-9 のみ使用可)"
 STRING IDS_RECENT_FILES		"最近使ったファイル"
 STRING IDS_RECENT_FILES_CLEAR		"リストの消去"

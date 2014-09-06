@@ -174,10 +174,13 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 
 		if (pMainFrame->m_youtubeFields.dtime.wYear) {
-			m_descText.Format(ResStr(IDS_PUBLISHED) + L"\r\n\r\n",
+			m_descText.Format(ResStr(IDS_PUBLISHED) + L"%04hu-%02hu-%02hu %02hu:%02hu:%02hu\r\n\r\n",
 							  pMainFrame->m_youtubeFields.dtime.wYear,
 							  pMainFrame->m_youtubeFields.dtime.wMonth,
-							  pMainFrame->m_youtubeFields.dtime.wDay);
+							  pMainFrame->m_youtubeFields.dtime.wDay,
+							  pMainFrame->m_youtubeFields.dtime.wHour,
+							  pMainFrame->m_youtubeFields.dtime.wMinute,
+							  pMainFrame->m_youtubeFields.dtime.wSecond);
 		}
 
 		if (!pMainFrame->m_youtubeFields.content.IsEmpty()) {

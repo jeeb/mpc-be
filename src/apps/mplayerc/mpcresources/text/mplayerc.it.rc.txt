@@ -1834,7 +1834,7 @@ STRING IDS_PPSDB_BADURL		"URL non corretto, impossibile trovare il database di s
 STRING IDS_PPSDB_PROTOCOLERR		"Incompatibilità versioni del protocollo, aggiorna il lettore o scegli un indirizzo diverso!"
 STRING IDS_PPSDB_URLCORRECT		"L'URL sembra corretto!"
 STRING IDS_PROPSHEET_PROPERTIES		"Proprietà"
-STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
+STRING IDS_PUBLISHED		"Published : "
 STRING IDS_REALVIDEO_INCOMPATIBLE		"Il nome del file contiene caratteri non consentiti (usa solo A-Z, 0-9)"
 STRING IDS_RECENT_FILES		"File recenti"
 STRING IDS_RECENT_FILES_CLEAR		"Pulisci lista"

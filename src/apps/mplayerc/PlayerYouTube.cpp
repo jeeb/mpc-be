@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "atl/atlrx.h"
 #include "PlayerYouTube.h"
+#include "../../DSUtil/text.h"
 
 #define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\": \""
 #define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\": \""
@@ -63,20 +64,8 @@ bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, co
 	return true;
 }
 
-static CString FixYoutubeName(CString inStr, bool OnlySpecChar)
+static CString FixHtmlSymbols(CString inStr)
 {
-	if (!OnlySpecChar) {
-		inStr.Replace(_T(":"), _T(" -"));
-		inStr.Replace(_T("/"), _T("-"));
-		inStr.Replace(_T("|"), _T("-"));
-		inStr.Replace(_T("—"), _T("-"));
-		inStr.Replace(_T("--"), _T("-"));
-		inStr.Replace(_T("  "), _T(" "));
-		inStr.Replace(_T("\""), _T(""));
-		inStr.Replace(_T("* "), _T(""));
-		inStr.Replace(_T("*"), _T(""));
-	}
-
 	inStr.Replace(_T("&quot;"), _T("\""));
 	inStr.Replace(_T("&amp;"), _T("&"));
 	inStr.Replace(_T("&#39;"), _T("'"));
@@ -84,8 +73,6 @@ static CString FixYoutubeName(CString inStr, bool OnlySpecChar)
 	inStr.Replace(_T("\\n"), _T("\r\n"));
 	inStr.Replace(_T("\n"), _T("\r\n"));
 	inStr.Replace(_T("\\"), _T(""));
-
-	inStr = inStr.TrimLeft(L". ").TrimRight(L". ");
 
 	return inStr;
 }
@@ -103,16 +90,6 @@ static CStringA GetEntry(LPCSTR pszBuff, LPCSTR pszMatchStart, LPCSTR pszMatchEn
 	}
 
 	return "";
-}
-
-static CString PlayerYouTubeGetTitle(char* final)
-{
-	CStringA Title = GetEntry(final, "<title>", "</title>");
-	if (Title.IsEmpty()) {
-		Title = "Video";
-	}
-
-	return FixYoutubeName(UTF8ToString(Title), false);
 }
 
 bool PlayerYouTubeCheck(CString fn)
@@ -280,7 +257,7 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields)
 			return fn;
 		}
 
-		CString Title = PlayerYouTubeGetTitle(data);
+		CString Title = UTF8ToString(GetEntry(data, "<title>", "</title>"));
 
 		if (hlsvp_len) {
 			char *tmp = DNew char[hlsvp_len + 1];
@@ -354,9 +331,9 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields)
 		}
 
 		if (y_fields) {
-			Title.Replace(final_ext, L"");
-			y_fields->title = Title;
-			y_fields->fname = Title + final_ext;
+			y_fields->title = FixHtmlSymbols(Title);
+			y_fields->fname = y_fields->title + final_ext;
+			FixFilename(y_fields->fname);
 		}
 
 		if (!final_url.IsEmpty()) {
@@ -369,33 +346,54 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields)
 					link.Format(L"https://gdata.youtube.com/feeds/api/videos/%s?alt=json&fields=published,title,author/name,content", videoId);
 					f = InternetOpenUrl(s, link, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 					if (f) {
-						char buffer[16 * KILOBYTE] = { 0 };
+						char* data = NULL;
+						DWORD dataSize = 0;
+
+						char buffer[4096] = { 0 };
 						DWORD dwBytesRead = 0;
-						if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == TRUE) {
-							CStringA sTitle = GetEntry(buffer, "\"title\":{\"$t\":\"", "\",\"type\"");
-							if (!sTitle.IsEmpty()) {
-								y_fields->title = FixYoutubeName(UTF8ToString(sTitle), false);
-								y_fields->fname = y_fields->title + final_ext;
+						do {
+							if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
+								break;
 							}
-							CStringA sAuthor = GetEntry(buffer, "\"author\":[{\"name\":{\"$t\":\"", "\"}");
+
+							data = (char*)realloc(data, dataSize + dwBytesRead + 1);
+							memcpy(data + dataSize, buffer, dwBytesRead);
+							dataSize += dwBytesRead;
+							data[dataSize] = 0;
+						} while (dwBytesRead);
+						InternetCloseHandle(f);
+
+						if (dataSize) {
+							CStringA sTitle = GetEntry(data, "\"title\":{\"$t\":\"", "\",\"type\"");
+							if (!sTitle.IsEmpty()) {
+								y_fields->title = FixHtmlSymbols(UTF8ToString(sTitle));
+								y_fields->fname = y_fields->title + final_ext;
+								FixFilename(y_fields->fname);
+							}
+							CStringA sAuthor = GetEntry(data, "\"author\":[{\"name\":{\"$t\":\"", "\"}");
 							if (!sAuthor.IsEmpty()) {
 								y_fields->author = UTF8ToString(sAuthor);
 							}
-							CStringA sContent = GetEntry(buffer, "\"content\":{\"$t\":\"", "\",\"type\"");
+							CStringA sContent = GetEntry(data, "\"content\":{\"$t\":\"", "\",\"type\"");
 							if (!sContent.IsEmpty()) {
-								y_fields->content = FixYoutubeName(UTF8ToString(sContent), true);
+								y_fields->content = FixHtmlSymbols(UTF8ToString(sContent));
 							}
-							CStringA sDate = GetEntry(buffer, "\"published\":{\"$t\":\"", "\"},");
+							CStringA sDate = GetEntry(data, "\"published\":{\"$t\":\"", "\"},");
 							if (!sDate.IsEmpty()) {
-								int y, m, d;
-								if (sscanf_s(sDate, "%04d-%02d-%02d", &y, &m, &d) == 3) {
+								WORD y, m, d;
+								WORD hh, mm, ss;
+								if (sscanf_s(sDate, "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
 									y_fields->dtime.wYear = y;
 									y_fields->dtime.wMonth = m;
 									y_fields->dtime.wDay = d;
+									y_fields->dtime.wHour = hh;
+									y_fields->dtime.wMinute = mm;
+									y_fields->dtime.wSecond = ss;
 								}
 							}
+
+							free(data);
 						}
-						InternetCloseHandle(f);
 					}
 					InternetCloseHandle(s);
 				}			
@@ -489,7 +487,7 @@ bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& id
 					} else if (propHeader == L"data-video-username") {
 						data_video_username = propValue;
 					} else if (propHeader == L"data-video-title") {
-						data_video_title = FixYoutubeName(propValue, false);
+						data_video_title = FixHtmlSymbols(propValue);
 					}
 				}
 

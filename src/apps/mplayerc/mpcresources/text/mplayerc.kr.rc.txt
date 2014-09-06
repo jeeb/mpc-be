@@ -1834,7 +1834,7 @@ STRING IDS_PPSDB_BADURL		"부정확한 URL, 자막 데이터베이스를 찾을�
 STRING IDS_PPSDB_PROTOCOLERR		"프로토콜 버전이 다릅니다. 플레이어를 업그레이드하거나 다른 주소를 선택하세요!"
 STRING IDS_PPSDB_URLCORRECT		"올바른 URL입니다!"
 STRING IDS_PROPSHEET_PROPERTIES		"등록정보"
-STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
+STRING IDS_PUBLISHED		"Published : "
 STRING IDS_REALVIDEO_INCOMPATIBLE		"파일이름에 지원되지않는 문자가 포함되어있습니다.(A-Z, 0-9 만 가능)"
 STRING IDS_RECENT_FILES		"최근 파일"
 STRING IDS_RECENT_FILES_CLEAR		"목록 지우기"

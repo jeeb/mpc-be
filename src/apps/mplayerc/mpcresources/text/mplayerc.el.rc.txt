@@ -1838,7 +1838,7 @@ STRING IDS_PPSDB_BADURL		"Εσφαλμένη διεύθυνση. Δεν υπάρ
 STRING IDS_PPSDB_PROTOCOLERR		"Ασυμφωνία έκδοσης πρωτοκόλλου. Παρακαλώ να αναβαθμίσετε το πρόγραμμα αναπαραγωγής ή να επιλέξετε μια διαφορετική διεύθυνση!"
 STRING IDS_PPSDB_URLCORRECT		"Η διεύθυνση URL φαίνεται να είναι σωστή!"
 STRING IDS_PROPSHEET_PROPERTIES		"Ιδιότητες"
-STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
+STRING IDS_PUBLISHED		"Published : "
 STRING IDS_REALVIDEO_INCOMPATIBLE		"Το όνομα αρχείου περιέχει μη υποστηριζόμενους χαρακτήρες (χρήση μόνο A-Z, 0-9)"
 STRING IDS_RECENT_FILES		"Πρόσφατα αρχεία"
 STRING IDS_RECENT_FILES_CLEAR		"Εκκαθάριση λίστας"

@@ -1834,7 +1834,7 @@ STRING IDS_PPSDB_BADURL		"Adresse du site incorrect, impossible de contacter la 
 STRING IDS_PPSDB_PROTOCOLERR		"Protocole de communication incorrect, veuillez mettre à jour MPC-BE ou bien sélectionner une autre adresse"
 STRING IDS_PPSDB_URLCORRECT		"Adresse du site correcte"
 STRING IDS_PROPSHEET_PROPERTIES		"Propriétés"
-STRING IDS_PUBLISHED		"Published : %04d-%02d-%02d"
+STRING IDS_PUBLISHED		"Published : "
 STRING IDS_REALVIDEO_INCOMPATIBLE		"Le nom du fichier contiens des caractères interdits (n'utilisez que A-Z, 0-9)"
 STRING IDS_RECENT_FILES		"Fichiers récents"
 STRING IDS_RECENT_FILES_CLEAR		"Vider la liste"

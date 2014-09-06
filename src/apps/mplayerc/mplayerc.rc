@@ -3551,7 +3551,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED                       "Published : %04d-%02d-%02d"
+    IDS_PUBLISHED                       "Published : "
 END
 
 #endif    // English (United States) resources
