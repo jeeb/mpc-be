@@ -1543,11 +1543,10 @@ void CEVRAllocatorPresenter::GetMixerThread()
 	bool		bQuit	= false;
 	TIMECAPS	tc;
 	DWORD		dwResolution;
-	DWORD		dwUser	= 0;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution	= min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
-	dwUser			= timeBeginPeriod(dwResolution);
+	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
 		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
@@ -1596,7 +1595,7 @@ void CEVRAllocatorPresenter::GetMixerThread()
 		}
 	}
 
-	timeEndPeriod (dwResolution);
+	timeEndPeriod(dwResolution);
 }
 
 void ModerateFloat(double& Value, double Target, double& ValuePrim, double ChangeSpeed)
@@ -1872,15 +1871,14 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
 void CEVRAllocatorPresenter::RenderThread()
 {
 	HANDLE		hEvts[]		= { m_hEvtQuit, m_hEvtFlush };
-	bool		bQuit		= false;
+	bool		bQuit		= false, bForcePaint = false;
 	TIMECAPS	tc;
 	DWORD		dwResolution;
 	MFTIME		nsSampleTime;
 	LONGLONG	llClockTime;
-	DWORD		dwUser = 0;
 	DWORD		dwObject;
 
-	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
+	// Tell Multimedia Class Scheduler we are a playback thread (increase priority)
 	HANDLE hAvrt = 0;
 	if (pfAvSetMmThreadCharacteristicsW) {
 		DWORD dwTaskIndex	= 0;
@@ -1892,7 +1890,7 @@ void CEVRAllocatorPresenter::RenderThread()
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
 	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
-	dwUser		= timeBeginPeriod(dwResolution);
+	timeBeginPeriod(dwResolution);
 	CRenderersSettings& s = GetRenderersSettings();
 
 	int NextSleepTime = 1;
@@ -1923,6 +1921,7 @@ void CEVRAllocatorPresenter::RenderThread()
 				FlushSamples();
 				m_bEvtFlush = false;
 				ResetEvent(m_hEvtFlush);
+				bForcePaint = true;
 				TRACE_EVR ("EVR: Flush done!\n");
 				break;
 
@@ -1932,6 +1931,7 @@ void CEVRAllocatorPresenter::RenderThread()
 					{
 						CAutoLock Lock(&m_csExternalMixerLock);
 						CAutoLock cRenderLock(&m_RenderLock);
+						FlushSamples();
 						RenegotiateMediaType();
 					}
 				}
@@ -1974,18 +1974,18 @@ void CEVRAllocatorPresenter::RenderThread()
 							bStepForward = true;
 							m_nStepCount = 0;
 							/*
-													} else if (m_nStepCount > 0) {
-														pMFSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32 *)&m_nCurSurface);
-														++m_OrderedPaint;
-														if (!g_bExternalSubtitleTime) {
-															__super::SetTime (g_tSegmentStart + nsSampleTime);
-														}
-														Paint(true);
-														m_nDroppedUpdate = 0;
-														CompleteFrameStep (false);
-														bStepForward = true;
+							} else if (m_nStepCount > 0) {
+								pMFSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32 *)&m_nCurSurface);
+								++m_OrderedPaint;
+								if (!g_bExternalSubtitleTime) {
+									__super::SetTime (g_tSegmentStart + nsSampleTime);
+								}
+								Paint(true);
+								m_nDroppedUpdate = 0;
+								CompleteFrameStep (false);
+								bStepForward = true;
 							*/
-						} else if ((m_nRenderState == Started)) {
+						} else if (m_nRenderState == Started) {
 							LONGLONG CurrentCounter = GetRenderersData()->GetPerfCounter();
 							// Calculate wake up timer
 							if (!m_bSignaledStarvation) {
@@ -2191,7 +2191,17 @@ void CEVRAllocatorPresenter::RenderThread()
 									}
 								}
 							}
-						}
+							} else if (m_nRenderState == Paused) {
+								if (bForcePaint) {
+									bStepForward = true;
+									// Ensure that the renderer is properly updated after seeking when paused
+									if (!g_bExternalSubtitleTime) {
+										__super::SetTime(g_tSegmentStart + nsSampleTime);
+									}
+									Paint(false);
+								}
+								NextSleepTime = int(SampleDuration / 10000 - 2);
+							}
 
 						m_pCurrentDisplaydSample = NULL;
 						if (bStepForward) {
@@ -2201,6 +2211,8 @@ void CEVRAllocatorPresenter::RenderThread()
 						} else {
 							MoveToScheduledList(pMFSample, true);
 						}
+
+						bForcePaint = false;
 					} else if (m_bLastSampleOffsetValid && m_LastSampleOffset < -10000000) { // Only starve if we are 1 seconds behind
 						if (m_nRenderState == Started && !g_bNoDuration) {
 							m_pSink->Notify(EC_STARVATION, 0, 0);
@@ -2218,9 +2230,9 @@ void CEVRAllocatorPresenter::RenderThread()
 		}
 	}
 
-	timeEndPeriod (dwResolution);
+	timeEndPeriod(dwResolution);
 	if (pfAvRevertMmThreadCharacteristics) {
-		pfAvRevertMmThreadCharacteristics (hAvrt);
+		pfAvRevertMmThreadCharacteristics(hAvrt);
 	}
 }
 
@@ -2229,11 +2241,10 @@ void CEVRAllocatorPresenter::VSyncThread()
 	bool		bQuit	= false;
 	TIMECAPS	tc;
 	DWORD		dwResolution;
-	DWORD		dwUser	= 0;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution	= min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
-	dwUser			= timeBeginPeriod(dwResolution);
+	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	timeBeginPeriod(dwResolution);
 
 	CRenderersData *pApp	= GetRenderersData();
 	CRenderersSettings& s	= GetRenderersSettings();
@@ -2340,8 +2351,12 @@ void CEVRAllocatorPresenter::VSyncThread()
 									m_DetectedRefreshTime = ThisValue;
 									m_DetectedRefreshTimePrim = 0;
 								}
-								if (_isnan(m_DetectedRefreshTime)) {m_DetectedRefreshTime = 0.0;}
-								if (_isnan(m_DetectedRefreshTimePrim)) {m_DetectedRefreshTimePrim = 0.0;}
+								if (_isnan(m_DetectedRefreshTime)) {
+									m_DetectedRefreshTime = 0.0;
+								}
+								if (_isnan(m_DetectedRefreshTimePrim)) {
+									m_DetectedRefreshTimePrim = 0.0;
+								}
 
 								ModerateFloat(m_DetectedRefreshTime, ThisValue, m_DetectedRefreshTimePrim, 1.5);
 								if (m_DetectedRefreshTime > 0.0) {
@@ -2372,7 +2387,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 		}
 	}
 
-	timeEndPeriod (dwResolution);
+	timeEndPeriod(dwResolution);
 }
 
 DWORD WINAPI CEVRAllocatorPresenter::VSyncThreadStatic(LPVOID lpParam)
@@ -2699,7 +2714,7 @@ void CEVRAllocatorPresenter::FlushSamplesInternal()
 {
 	CAutoLock Lock(&m_csExternalMixerLock);
 
-	while (m_ScheduledSamples.GetCount() > 0) {
+	while (!m_ScheduledSamples.IsEmpty()) {
 		CComPtr<IMFSample> pMFSample;
 
 		pMFSample = m_ScheduledSamples.RemoveHead();
