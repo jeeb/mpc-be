@@ -28,6 +28,44 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// ==> Start patch MPC
+struct SAOParams;
+
+///////////////////////////////////////////////////////////////////////////////
+// SAO functions
+///////////////////////////////////////////////////////////////////////////////
+void ff_hevc_sao_edge_filter_0_8_sse(uint8_t *_dst, uint8_t *_src,
+                                     ptrdiff_t _stride_dst, ptrdiff_t _stride_src, struct SAOParams *sao,
+                                     int *borders, int _width, int _height, int c_idx,
+                                     uint8_t *vert_edge, uint8_t *horiz_edge, uint8_t *diag_edge);
+void ff_hevc_sao_edge_filter_1_8_sse(uint8_t *_dst, uint8_t *_src,
+                                     ptrdiff_t _stride_dst, ptrdiff_t _stride_src, struct SAOParams *sao,
+                                     int *borders, int _width, int _height, int c_idx,
+                                     uint8_t *vert_edge, uint8_t *horiz_edge, uint8_t *diag_edge);
+void ff_hevc_sao_edge_filter_0_10_sse(uint8_t *_dst, uint8_t *_src,
+                                      ptrdiff_t _stride_dst, ptrdiff_t _stride_src, struct SAOParams *sao,
+                                      int *borders, int _width, int _height, int c_idx,
+                                      uint8_t *vert_edge, uint8_t *horiz_edge, uint8_t *diag_edge);
+void ff_hevc_sao_edge_filter_1_10_sse(uint8_t *_dst, uint8_t *_src,
+                                      ptrdiff_t _stride_dst, ptrdiff_t _stride_src, struct SAOParams *sao,
+                                      int *borders, int _width, int _height, int c_idx,
+                                      uint8_t *vert_edge, uint8_t *horiz_edge, uint8_t *diag_edge);
+void ff_hevc_sao_edge_filter_0_12_sse(uint8_t *_dst, uint8_t *_src,
+                                      ptrdiff_t _stride_dst, ptrdiff_t _stride_src, struct SAOParams *sao,
+                                      int *borders, int _width, int _height, int c_idx,
+                                      uint8_t *vert_edge, uint8_t *horiz_edge, uint8_t *diag_edge);
+void ff_hevc_sao_edge_filter_1_12_sse(uint8_t *_dst, uint8_t *_src,
+                                      ptrdiff_t _stride_dst, ptrdiff_t _stride_src, struct SAOParams *sao,
+                                      int *borders, int _width, int _height, int c_idx,
+                                      uint8_t *vert_edge, uint8_t *horiz_edge, uint8_t *diag_edge);
+
+void ff_hevc_sao_band_filter_0_8_sse(uint8_t *_dst, uint8_t *_src, ptrdiff_t _stride_dst, ptrdiff_t _stride_src,
+                                     struct SAOParams *sao, int *borders, int width, int height, int c_idx);
+void ff_hevc_sao_band_filter_0_10_sse(uint8_t *_dst, uint8_t *_src, ptrdiff_t _stride_dst, ptrdiff_t _stride_src,
+                                      struct SAOParams *sao, int *borders, int width, int height, int c_idx);
+void ff_hevc_sao_band_filter_0_12_sse(uint8_t *_dst, uint8_t *_src, ptrdiff_t _stride_dst, ptrdiff_t _stride_src,
+                                      struct SAOParams *sao, int *borders, int width, int height, int c_idx);
+// ==> End patch MPC
 
 #define idct_dc_proto(size, bitd, opt) \
                 void ff_hevc_idct##size##_dc_add_##bitd##_##opt(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride)
@@ -150,5 +188,29 @@ void ff_hevc_transform_add32_10_sse2(uint8_t *dst, int16_t *coeffs, ptrdiff_t st
 
 void ff_hevc_transform_add16_10_avx2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
 void ff_hevc_transform_add32_10_avx2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
+
+// ==> Start patch MPC
+void ff_hevc_transform_skip_8_sse(uint8_t *_dst, int16_t *coeffs, ptrdiff_t _stride);
+
+void ff_hevc_transform_4x4_luma_8_sse2(int16_t *coeffs);
+void ff_hevc_transform_4x4_luma_10_sse2(int16_t *coeffs);
+void ff_hevc_transform_4x4_luma_12_sse2(int16_t *coeffs);
+
+#define IDCT_FUNC(s, b) void ff_hevc_transform_ ## s ## x ## s ##_## b ##_sse2\
+            (int16_t *coeffs, int col_limit);
+
+IDCT_FUNC(4, 8)
+IDCT_FUNC(4, 10)
+IDCT_FUNC(4, 12)
+IDCT_FUNC(8, 8)
+IDCT_FUNC(8, 10)
+IDCT_FUNC(8, 12)
+IDCT_FUNC(16, 8)
+IDCT_FUNC(16, 10)
+IDCT_FUNC(16, 12)
+IDCT_FUNC(32, 8)
+IDCT_FUNC(32, 10)
+IDCT_FUNC(32, 12)
+// ==> End patch MPC
 
 #endif // AVCODEC_X86_HEVCDSP_H

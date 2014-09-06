@@ -435,6 +435,9 @@ SRCS_LC = \
 	libavcodec/x86/h264_intrapred_init.c \
 	libavcodec/x86/h264chroma_init.c \
 	libavcodec/x86/h264dsp_init.c \
+	libavcodec/x86/hevc_idct_intrinsic.c \
+	libavcodec/x86/hevc_intra_intrinsic.c \
+	libavcodec/x86/hevc_sao_intrinsic.c \
 	libavcodec/x86/hevcdsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \

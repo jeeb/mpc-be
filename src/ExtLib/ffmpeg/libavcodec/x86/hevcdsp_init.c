@@ -524,11 +524,27 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
             c->transform_add[1]    = ff_hevc_transform_add8_8_sse2;
             c->transform_add[2]    = ff_hevc_transform_add16_8_sse2;
             c->transform_add[3]    = ff_hevc_transform_add32_8_sse2;
+
+// ==> Start patch MPC
+            c->idct_4x4_luma = ff_hevc_transform_4x4_luma_8_sse2;
+            c->idct[0] = ff_hevc_transform_4x4_8_sse2;
+            c->idct[1] = ff_hevc_transform_8x8_8_sse2;
+            c->idct[2] = ff_hevc_transform_16x16_8_sse2;
+            c->idct[3] = ff_hevc_transform_32x32_8_sse2;
         }
-        if (EXTERNAL_SSSE3(cpu_flags) && ARCH_X86_64) {
-            c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_8_ssse3;
-            c->hevc_h_loop_filter_luma = ff_hevc_h_loop_filter_luma_8_ssse3;
+        if (EXTERNAL_SSSE3(cpu_flags)) {
+            if (ARCH_X86_64) {
+                c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_8_ssse3;
+                c->hevc_h_loop_filter_luma = ff_hevc_h_loop_filter_luma_8_ssse3;
+            }
+
+            if (HAVE_SSSE3) {
+                c->sao_band_filter    = ff_hevc_sao_band_filter_0_8_sse;
+                c->sao_edge_filter[0] = ff_hevc_sao_edge_filter_0_8_sse;
+                c->sao_edge_filter[1] = ff_hevc_sao_edge_filter_1_8_sse;
+            }
         }
+// ==> End patch MPC
         if (EXTERNAL_SSE4(cpu_flags) && ARCH_X86_64) {
 
             EPEL_LINKS(c->put_hevc_epel, 0, 0, pel_pixels,  8, sse4);
@@ -577,11 +593,27 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
             c->transform_add[1]    = ff_hevc_transform_add8_10_sse2;
             c->transform_add[2]    = ff_hevc_transform_add16_10_sse2;
             c->transform_add[3]    = ff_hevc_transform_add32_10_sse2;
+
+// ==> Start patch MPC
+            c->idct_4x4_luma = ff_hevc_transform_4x4_luma_10_sse2;
+            c->idct[0] = ff_hevc_transform_4x4_10_sse2;
+            c->idct[1] = ff_hevc_transform_8x8_10_sse2;
+            c->idct[2] = ff_hevc_transform_16x16_10_sse2;
+            c->idct[3] = ff_hevc_transform_32x32_10_sse2;
         }
-        if (EXTERNAL_SSSE3(cpu_flags) && ARCH_X86_64) {
-            c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_10_ssse3;
-            c->hevc_h_loop_filter_luma = ff_hevc_h_loop_filter_luma_10_ssse3;
+        if (EXTERNAL_SSSE3(cpu_flags)) {
+            if (ARCH_X86_64) {
+                c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_10_ssse3;
+                c->hevc_h_loop_filter_luma = ff_hevc_h_loop_filter_luma_10_ssse3;
+            }
+
+            if (HAVE_SSSE3) {
+                c->sao_band_filter    = ff_hevc_sao_band_filter_0_10_sse;
+                c->sao_edge_filter[0] = ff_hevc_sao_edge_filter_0_10_sse;
+                c->sao_edge_filter[1] = ff_hevc_sao_edge_filter_1_10_sse;
+            }
         }
+// ==> End patch MPC
         if (EXTERNAL_SSE4(cpu_flags) && ARCH_X86_64) {
             EPEL_LINKS(c->put_hevc_epel, 0, 0, pel_pixels, 10, sse4);
             EPEL_LINKS(c->put_hevc_epel, 0, 1, epel_h,     10, sse4);
@@ -626,11 +658,27 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
             c->idct_dc[1] = ff_hevc_idct8x8_dc_12_sse2;
             c->idct_dc[2] = ff_hevc_idct16x16_dc_12_sse2;
             c->idct_dc[3] = ff_hevc_idct32x32_dc_12_sse2;
+
+// ==> Start patch MPC
+            c->idct_4x4_luma = ff_hevc_transform_4x4_luma_12_sse2;
+            c->idct[0] = ff_hevc_transform_4x4_12_sse2;
+            c->idct[1] = ff_hevc_transform_8x8_12_sse2;
+            c->idct[2] = ff_hevc_transform_16x16_12_sse2;
+            c->idct[3] = ff_hevc_transform_32x32_12_sse2;
         }
-        if (EXTERNAL_SSSE3(cpu_flags) && ARCH_X86_64) {
-            c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_12_ssse3;
-            c->hevc_h_loop_filter_luma = ff_hevc_h_loop_filter_luma_12_ssse3;
+        if (EXTERNAL_SSSE3(cpu_flags)) {
+            if (ARCH_X86_64) {
+                c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_12_ssse3;
+                c->hevc_h_loop_filter_luma = ff_hevc_h_loop_filter_luma_12_ssse3;
+            }
+
+            if (HAVE_SSSE3) {
+                c->sao_band_filter    = ff_hevc_sao_band_filter_0_12_sse;
+                c->sao_edge_filter[0] = ff_hevc_sao_edge_filter_0_12_sse;
+                c->sao_edge_filter[1] = ff_hevc_sao_edge_filter_1_12_sse;
+            }
         }
+// ==> End patch MPC
         if (EXTERNAL_SSE4(cpu_flags) && ARCH_X86_64) {
             EPEL_LINKS(c->put_hevc_epel, 0, 0, pel_pixels, 12, sse4);
             EPEL_LINKS(c->put_hevc_epel, 0, 1, epel_h,     12, sse4);
@@ -656,3 +704,37 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
         }
     }
 }
+
+// ==> Start patch MPC
+#include "libavcodec/hevcpred.h"
+#include "libavcodec/x86/hevcpred.h"
+
+#undef FUNC
+#define FUNC(a, depth) a ## _ ## depth ## _sse
+
+#define HEVC_PRED(depth)                      \
+    hpc->pred_planar[0]  = FUNC(pred_planar_0, depth);  \
+    hpc->pred_planar[1]  = FUNC(pred_planar_1, depth);  \
+    hpc->pred_planar[2]  = FUNC(pred_planar_2, depth);  \
+    hpc->pred_planar[3]  = FUNC(pred_planar_3, depth);  \
+    hpc->pred_angular[0] = FUNC(pred_angular_0, depth); \
+    hpc->pred_angular[1] = FUNC(pred_angular_1, depth); \
+    hpc->pred_angular[2] = FUNC(pred_angular_2, depth); \
+    hpc->pred_angular[3] = FUNC(pred_angular_3, depth)
+
+void ff_hevc_pred_init_x86(HEVCPredContext *hpc, int bit_depth)
+{
+    int mm_flags = av_get_cpu_flags();
+
+    if (bit_depth == 8) {
+        if (HAVE_SSE42 && EXTERNAL_SSE42(mm_flags)) {
+            HEVC_PRED(8);
+        }
+    }
+    if (bit_depth == 10) {
+        if (HAVE_SSE42 && EXTERNAL_SSE42(mm_flags)) {
+            HEVC_PRED(10);
+        }
+    }
+}
+// ==> End patch MPC
