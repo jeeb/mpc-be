@@ -72,22 +72,6 @@ public:
 
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
 
-	// IMediaSeeking
-
-	STDMETHODIMP GetDuration(LONGLONG* pDuration);
-
-	// TODO: this is too ugly, integrate this with the baseclass somehow
-	GUID m_timeformat;
-	STDMETHODIMP IsFormatSupported(const GUID* pFormat);
-	STDMETHODIMP GetTimeFormat(GUID* pFormat);
-	STDMETHODIMP IsUsingTimeFormat(const GUID* pFormat);
-	STDMETHODIMP SetTimeFormat(const GUID* pFormat);
-	STDMETHODIMP GetStopPosition(LONGLONG* pStop);
-	STDMETHODIMP ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat);
-	STDMETHODIMP GetPositions(LONGLONG* pCurrent, LONGLONG* pStop);
-
-	HRESULT SetPositionsInternal(void* id, LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
-
 	// IKeyFrameInfo
 
 	STDMETHODIMP GetKeyFrameCount(UINT& nKFs);
