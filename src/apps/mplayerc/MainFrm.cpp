@@ -480,8 +480,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_NAVIGATE_SUBTITLES, OnUpdateMenuNavSubtitle)
 	ON_UPDATE_COMMAND_UI(ID_NAVIGATE_AUDIO, OnUpdateMenuNavAudio)
 
-	ON_COMMAND_RANGE(ID_PLAY_FRAMESTEP, ID_PLAY_FRAMESTEPCANCEL, OnPlayFramestep)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_FRAMESTEP, ID_PLAY_FRAMESTEPCANCEL, OnUpdatePlayFramestep)
+	ON_COMMAND_RANGE(ID_PLAY_FRAMESTEP, ID_PLAY_FRAMESTEPCANCEL, OnPlayFrameStep)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_FRAMESTEP, ID_PLAY_FRAMESTEPCANCEL, OnUpdatePlayFrameStep)
 	ON_COMMAND_RANGE(ID_PLAY_SEEKBACKWARDSMALL, ID_PLAY_SEEKFORWARDLARGE, OnPlaySeek)
 	ON_COMMAND_RANGE(ID_PLAY_SEEKKEYBACKWARD, ID_PLAY_SEEKKEYFORWARD, OnPlaySeekKey)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_SEEKBACKWARDSMALL, ID_PLAY_SEEKFORWARDLARGE, OnUpdatePlaySeek)
@@ -2929,7 +2929,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				if (m_fFrameSteppingActive) {
 					m_nStepForwardCount++;
 					m_fFrameSteppingActive = false;
-					m_pBA->put_Volume(m_VolumeBeforeFrameStepping);
+					m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 				}
 				break;
 			case EC_DEVICE_LOST:
@@ -6114,7 +6114,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 		SeekTo(rt);
 
-		m_VolumeBeforeFrameStepping = m_wndToolBar.Volume;
+		m_nVolumeBeforeFrameStepping = m_wndToolBar.Volume;
 		m_pBA->put_Volume(-10000);
 
 		// Number of steps you need to do more than one for some decoders.
@@ -6122,7 +6122,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		HRESULT hr = m_pFS ? m_pFS->Step(2, NULL) : E_FAIL;
 
 		if (FAILED(hr)) {
-			m_pBA->put_Volume(m_VolumeBeforeFrameStepping);
+			m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 			AfxMessageBox(ResStr(IDS_FRAME_STEP_ERROR_RENDERER), MB_ICONEXCLAMATION | MB_OK);
 			return;
 		}
@@ -6141,7 +6141,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 			}
 		}
 
-		m_pBA->put_Volume(m_VolumeBeforeFrameStepping);
+		m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 
 		int col = (i-1)%cols;
 		int row = (i-1)/cols;
@@ -8410,7 +8410,7 @@ void CMainFrame::OnPlayPlay()
 		SetTimersPlay();
 		if (m_fFrameSteppingActive) { // FIXME
 			m_fFrameSteppingActive = false;
-			m_pBA->put_Volume(m_VolumeBeforeFrameStepping);
+			m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 		} else {
 			m_pBA->put_Volume(m_wndToolBar.Volume);
 		}
@@ -8577,7 +8577,7 @@ void CMainFrame::OnPlayStop()
 
 		if (m_fFrameSteppingActive) { // FIXME
 			m_fFrameSteppingActive = false;
-			m_pBA->put_Volume(m_VolumeBeforeFrameStepping);
+			m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 		}
 	}
 
@@ -8652,9 +8652,9 @@ void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
 	pCmdUI->Enable(fEnable);
 }
 
-void CMainFrame::OnPlayFramestep(UINT nID)
+void CMainFrame::OnPlayFrameStep(UINT nID)
 {
-	REFERENCE_TIME rt;
+	m_OSD.EnableShowMessage(false);
 
 	if (m_pFS && m_fQuicktimeGraph) {
 		if (GetMediaState() != State_Paused) {
@@ -8663,8 +8663,6 @@ void CMainFrame::OnPlayFramestep(UINT nID)
 
 		m_pFS->Step(nID == ID_PLAY_FRAMESTEP ? 1 : -1, NULL);
 	} else if (m_pFS && nID == ID_PLAY_FRAMESTEP) {
-		m_OSD.EnableShowMessage(false);
-
 		if (GetMediaState() != State_Paused && !queue_ffdshow_support) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
@@ -8672,86 +8670,78 @@ void CMainFrame::OnPlayFramestep(UINT nID)
 		// To support framestep back, store the initial position when
 		// stepping forward
 		if (m_nStepForwardCount == 0) {
-			m_pMS->GetCurrentPosition(&m_rtStepForwardStart);
+			if (GetPlaybackMode() == PM_DVD) {
+				OnTimer(TIMER_STREAMPOSPOLLER);
+				m_rtStepForwardStart = m_wndSeekBar.GetPos();
+			} else {
+				m_pMS->GetCurrentPosition(&m_rtStepForwardStart);
+			}
 		}
 
 		m_fFrameSteppingActive = true;
 
-		m_VolumeBeforeFrameStepping = m_wndToolBar.Volume;
+		m_nVolumeBeforeFrameStepping = m_wndToolBar.Volume;
 		m_pBA->put_Volume(-10000);
 
 		m_pFS->Step(1, NULL);
-
-		m_OSD.EnableShowMessage();
-
 	} else if (S_OK == m_pMS->IsFormatSupported(&TIME_FORMAT_FRAME)) {
 		if (GetMediaState() != State_Paused) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
 
-		m_pMS->SetTimeFormat(&TIME_FORMAT_FRAME);
-		m_pMS->GetCurrentPosition(&rt);
-		if (nID == ID_PLAY_FRAMESTEP) {
-			rt++;
-		} else if (nID == ID_PLAY_FRAMESTEPCANCEL) {
-			rt--;
+		if (SUCCEEDED(m_pMS->SetTimeFormat(&TIME_FORMAT_FRAME))) {
+			REFERENCE_TIME rtCurPos;
+
+			if (SUCCEEDED(m_pMS->GetCurrentPosition(&rtCurPos))) {
+				rtCurPos += (nID == ID_PLAY_FRAMESTEP) ? 1 : -1;
+
+				m_pMS->SetPositions(&rtCurPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+			}
+			m_pMS->SetTimeFormat(&TIME_FORMAT_MEDIA_TIME);
 		}
-		m_pMS->SetPositions(&rt, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
-		m_pMS->SetTimeFormat(&TIME_FORMAT_MEDIA_TIME);
-	} else { //if (s.iDSVideoRendererType != VIDRNDT_DS_VMR9WINDOWED && s.iDSVideoRendererType != VIDRNDT_DS_VMR9RENDERLESS)
+	} else {
 		if (GetMediaState() != State_Paused) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
 
-		REFERENCE_TIME		rtAvgTime = 0;
-		BeginEnumFilters(m_pGB, pEF, pBF) {
-			BeginEnumPins(pBF, pEP, pPin) {
-				AM_MEDIA_TYPE mt;
-				pPin->ConnectionMediaType(&mt);
-
-				if (mt.majortype == MEDIATYPE_Video && mt.formattype == FORMAT_VideoInfo) {
-					rtAvgTime = ((VIDEOINFOHEADER*)mt.pbFormat)->AvgTimePerFrame;
-				} else if (mt.majortype == MEDIATYPE_Video && mt.formattype == FORMAT_VideoInfo2) {
-					rtAvgTime = ((VIDEOINFOHEADER2*)mt.pbFormat)->AvgTimePerFrame;
-				}
-			}
-			EndEnumPins;
-		}
-		EndEnumFilters;
+		const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame() * 10000000i64);
+		REFERENCE_TIME rtCurPos = 0;
 
 		// Exit of framestep forward : calculate the initial position
-		if (m_nStepForwardCount != 0) {
+		if (m_nStepForwardCount) {
 			m_pFS->CancelStep();
-			rt = m_rtStepForwardStart + m_nStepForwardCount*rtAvgTime;
+			rtCurPos = m_rtStepForwardStart + m_nStepForwardCount * rtAvgTimePerFrame;
 			m_nStepForwardCount = 0;
+		} else if (GetPlaybackMode() == PM_DVD) {
+			// IMediaSeeking doesn't work well with DVD Navigator
+			OnTimer(TIMER_STREAMPOSPOLLER);
+			rtCurPos = m_wndSeekBar.GetPos();
 		} else {
-			m_pMS->GetCurrentPosition(&rt);
+			m_pMS->GetCurrentPosition(&rtCurPos);
 		}
-		if (nID == ID_PLAY_FRAMESTEP) {
-			rt += rtAvgTime;
-		} else if (nID == ID_PLAY_FRAMESTEPCANCEL) {
-			rt -= rtAvgTime;
-		}
-		m_pMS->SetPositions(&rt, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+		
+		rtCurPos += (nID == ID_PLAY_FRAMESTEP) ? rtAvgTimePerFrame : -rtAvgTimePerFrame;
+		SeekTo(rtCurPos);
 	}
+	m_OSD.EnableShowMessage();
 }
 
-void CMainFrame::OnUpdatePlayFramestep(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdatePlayFrameStep(CCmdUI* pCmdUI)
 {
-	bool fEnable = false;
+	BOOL fEnable = FALSE;
 
 	if (m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly &&
 			(GetPlaybackMode() != PM_DVD || m_iDVDDomain == DVD_DOMAIN_Title) &&
 			GetPlaybackMode() != PM_CAPTURE &&
 			!m_fLiveWM) {
 		if (S_OK == m_pMS->IsFormatSupported(&TIME_FORMAT_FRAME)) {
-			fEnable = true;
+			fEnable = TRUE;
 		} else if (pCmdUI->m_nID == ID_PLAY_FRAMESTEP) {
-			fEnable = true;
+			fEnable = TRUE;
 		} else if (pCmdUI->m_nID == ID_PLAY_FRAMESTEPCANCEL && m_pFS && m_pFS->CanStep(0, NULL) == S_OK) {
-			fEnable = true;
+			fEnable = TRUE;
 		} else if (m_fQuicktimeGraph && m_pFS) {
-			fEnable = true;
+			fEnable = TRUE;
 		}
 	}
 
@@ -20397,6 +20387,66 @@ void CMainFrame::CheckMenuRadioItem(UINT first, UINT last, UINT check)
 	m_popupMenu.CheckMenuRadioItem(first, last, check, MF_BYCOMMAND);
 	m_popupMainMenu.CheckMenuRadioItem(first, last, check, MF_BYCOMMAND);
 	::CheckMenuRadioItem(m_hMenuDefault, first, last, check, MF_BYCOMMAND);
+}
+
+template<typename T>
+bool NEARLY_EQ(T a, T b, T tol)
+{
+	return (abs(a - b) < tol);
+}
+
+REFTIME CMainFrame::GetAvgTimePerFrame() const
+{
+	REFTIME refAvgTimePerFrame = 0.0;
+
+	if (FAILED(m_pBV->get_AvgTimePerFrame(&refAvgTimePerFrame))) {
+		if (m_pCAP) {
+			refAvgTimePerFrame = 1.0 / m_pCAP->GetFPS();
+		}
+
+		BeginEnumFilters(m_pGB, pEF, pBF) {
+			if (refAvgTimePerFrame > 0.0) {
+				break;
+			}
+
+			BeginEnumPins(pBF, pEP, pPin) {
+				AM_MEDIA_TYPE mt;
+				if (SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
+					if (mt.majortype == MEDIATYPE_Video && mt.formattype == FORMAT_VideoInfo) {
+						refAvgTimePerFrame = (REFTIME)((VIDEOINFOHEADER*)mt.pbFormat)->AvgTimePerFrame / 10000000i64;
+						break;
+					} else if (mt.majortype == MEDIATYPE_Video && mt.formattype == FORMAT_VideoInfo2) {
+						refAvgTimePerFrame = (REFTIME)((VIDEOINFOHEADER2*)mt.pbFormat)->AvgTimePerFrame / 10000000i64;
+						break;
+					}
+				}
+			}
+			EndEnumPins;
+		}
+		EndEnumFilters;
+	}
+
+	// Double-check that the detection is correct for DVDs
+	DVD_VideoAttributes VATR;
+	if (m_pDVDI && SUCCEEDED(m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
+		double ratio;
+		if (VATR.ulFrameRate == 50) {
+			ratio = 25.0 * refAvgTimePerFrame;
+			// Accept 25 or 50 fps
+			if (!NEARLY_EQ(ratio, 1.0, 1e-2) && !NEARLY_EQ(ratio, 2.0, 1e-2)) {
+				refAvgTimePerFrame = 1.0 / 25.0;
+			}
+		} else {
+			ratio = 29.97 * refAvgTimePerFrame;
+			// Accept 29,97, 59.94, 23.976 or 47.952 fps
+			if (!NEARLY_EQ(ratio, 1.0, 1e-2) && !NEARLY_EQ(ratio, 2.0, 1e-2)
+					&& !NEARLY_EQ(ratio, 1.25, 1e-2) && !NEARLY_EQ(ratio, 2.5, 1e-2)) {
+				refAvgTimePerFrame = 1.0 / 29.97;
+			}
+		}
+	}
+
+	return refAvgTimePerFrame;
 }
 
 #pragma region GraphThread

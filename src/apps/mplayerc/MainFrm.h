@@ -379,7 +379,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	int m_fFrameSteppingActive;
 	int m_nStepForwardCount;
 	REFERENCE_TIME m_rtStepForwardStart;
-	int m_VolumeBeforeFrameStepping;
+	int m_nVolumeBeforeFrameStepping;
 
 	bool m_fEndOfStream;
 
@@ -945,8 +945,8 @@ public:
 	afx_msg void OnPlayPlaypause();
 	afx_msg void OnPlayStop();
 	afx_msg void OnUpdatePlayPauseStop(CCmdUI* pCmdUI);
-	afx_msg void OnPlayFramestep(UINT nID);
-	afx_msg void OnUpdatePlayFramestep(CCmdUI* pCmdUI);
+	afx_msg void OnPlayFrameStep(UINT nID);
+	afx_msg void OnUpdatePlayFrameStep(CCmdUI* pCmdUI);
 	afx_msg void OnPlaySeek(UINT nID);
 	afx_msg void OnPlaySeekKey(UINT nID); // no menu item
 	afx_msg void OnUpdatePlaySeek(CCmdUI* pCmdUI);
@@ -1241,4 +1241,6 @@ protected:
 
 	CString		GetVidPos();
 	CString		CreateSnapShotFileName();
+
+	REFTIME		GetAvgTimePerFrame() const;
 };
