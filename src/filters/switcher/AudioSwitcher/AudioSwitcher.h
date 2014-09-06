@@ -39,13 +39,15 @@ public IUnknown {
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
 {
+	float*	m_buffer;
+	size_t	m_buf_size;
+	void UpdateBufferSize(size_t allsamples);
+
 	CAudioNormalizer m_AudioNormalizer;
 	bool	m_bAutoVolumeControl;
 	bool	m_bNormBoost;
 	int		m_iNormLevel;
 	int		m_iNormRealeaseTime;
-	float*	m_buffer;
-	size_t	m_buf_size;
 
 	float	m_fGain_dB;
 	float	m_fGainFactor;
@@ -56,6 +58,7 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 
 public:
 	CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr);
+	~CAudioSwitcherFilter();
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

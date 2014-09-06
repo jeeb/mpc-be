@@ -101,6 +101,24 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 }
 
+CAudioSwitcherFilter::~CAudioSwitcherFilter()
+{
+	if (m_buffer) {
+		delete[] m_buffer;
+	}
+}
+
+void CAudioSwitcherFilter::UpdateBufferSize(size_t allsamples)
+{
+	if (allsamples > m_buf_size) {
+		if (m_buffer) {
+			delete[] m_buffer;
+		}
+		m_buf_size = allsamples;
+		m_buffer = DNew float[m_buf_size];
+	}
+}
+
 STDMETHODIMP CAudioSwitcherFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
@@ -184,23 +202,15 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			out_samples = m_AudioNormalizer.MSteadyHQ32((float*)pDataOut, in_samples, in_wfe->nChannels);
 			out_size = out_samples * in_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
 		} else {
-			if (in_allsamples > m_buf_size) {
-				if (m_buffer) {
-					delete[] m_buffer;
-				}
-				m_buf_size = in_allsamples;
-				m_buffer = DNew float[m_buf_size];
-			}
-
+			UpdateBufferSize(in_allsamples);
 			convert_to_float(in_sampleformat, in_wfe->nChannels, in_samples, pDataIn, m_buffer);
 			out_samples = m_AudioNormalizer.MSteadyHQ32(m_buffer, in_samples, in_wfe->nChannels);
-			out_size = out_samples * in_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
 
+			out_size = out_samples * in_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
 			if (out_size > pOut->GetSize()) {
 				ASSERT(0);
 				return E_FAIL;
 			}
-
 			convert_float_to(in_sampleformat, in_wfe->nChannels, in_samples, m_buffer, pDataOut);
 		}
 
