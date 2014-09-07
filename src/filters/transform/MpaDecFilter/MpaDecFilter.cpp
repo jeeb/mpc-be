@@ -50,8 +50,6 @@
 #define OPTION_SFormat_i24  _T("SampleFormat_int24")
 #define OPTION_SFormat_i32  _T("SampleFormat_int32")
 #define OPTION_SFormat_flt  _T("SampleFormat_float")
-#define OPTION_Mixer        _T("Mixer")
-#define OPTION_MixerLayout  _T("MixerLayout")
 #define OPTION_DRC          _T("DRC")
 #define OPTION_SPDIF_ac3    _T("SPDIF_ac3")
 #define OPTION_SPDIF_eac3   _T("HDMI_eac3")
@@ -383,8 +381,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fSampleFmt[SF_PCM24] = false;
 	m_fSampleFmt[SF_PCM32] = false;
 	m_fSampleFmt[SF_FLOAT] = false;
-	m_fMixer               = false;
-	m_iMixerLayout         = SPK_STEREO;
 	m_fDRC                 = false;
 	m_fSPDIF[ac3]          = false;
 	m_fSPDIF[eac3]         = false;
@@ -413,12 +409,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SFormat_flt, dw)) {
 			m_fSampleFmt[SF_FLOAT] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_Mixer, dw)) {
-			m_fMixer = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryStringValue(OPTION_MixerLayout, layout_str.GetBuffer(8), &len)) {
-			layout_str.ReleaseBufferSetLength(len);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_DRC, dw)) {
 			m_fDRC = !!dw;
@@ -449,8 +439,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fSampleFmt[SF_PCM24] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i24, m_fSampleFmt[SF_PCM24]);
 	m_fSampleFmt[SF_PCM32] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i32, m_fSampleFmt[SF_PCM32]);
 	m_fSampleFmt[SF_FLOAT] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_flt, m_fSampleFmt[SF_FLOAT]);
-	m_fMixer               = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_Mixer, m_fMixer);
-	layout_str             = AfxGetApp()->GetProfileString(OPT_SECTION_MpaDec, OPTION_MixerLayout, channel_mode[m_iMixerLayout].op_value);
 	m_fDRC                 = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	m_fSPDIF[ac3]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	m_fSPDIF[eac3]         = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
@@ -463,13 +451,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 #endif
 	if (!(m_fSampleFmt[SF_PCM16] || m_fSampleFmt[SF_PCM24] || m_fSampleFmt[SF_PCM32] || m_fSampleFmt[SF_FLOAT])) {
 		m_fSampleFmt[SF_PCM16] = true;
-	}
-
-	for (int i = SPK_MONO; i <= SPK_7_1; i++) {
-		if (layout_str == channel_mode[i].op_value) {
-			m_iMixerLayout = i;
-			break;
-		}
 	}
 }
 
@@ -509,8 +490,8 @@ HRESULT CMpaDecFilter::EndFlush()
 	CAutoLock cAutoLock(&m_csReceive);
 	m_buff.RemoveAll();
 	m_FFAudioDec.FlushBuffers();
-	m_Mixer.FlushBuffers();
 #if ENABLE_AC3_ENCODER
+	m_Mixer.FlushBuffers();
 	m_encbuff.RemoveAll();
 #endif
 	return __super::EndFlush();
@@ -1584,27 +1565,6 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 	BYTE*  pDataIn  = pBuff;
 	CAtlArray<float> mixData;
 
-	if (GetMixer()) {
-		int sc = GetMixerLayout();
-		WORD  mixed_channels = channel_mode[sc].channels;
-		DWORD mixed_mask     = channel_mode[sc].ch_layout;
-
-		if (dwChannelMask != mixed_mask) {
-			mixData.SetCount(nSamples * mixed_channels);
-
-			m_Mixer.UpdateInput(sfmt, dwChannelMask);
-			m_Mixer.UpdateOutput(out_sf, mixed_mask);
-
-			if (m_Mixer.Mixing((BYTE*)mixData.GetData(), nSamples, pDataIn, nSamples) > 0) {
-				pDataIn       = (BYTE*)mixData.GetData();
-				size          = nSamples * mixed_channels * sizeof(float);
-				sfmt          = out_sf;
-				nChannels     = mixed_channels;
-				dwChannelMask = mixed_mask;
-			}
-		}
-	}
-
 	CMediaType mt = CreateMediaType(out_mpcsf, nSamplesPerSec, nChannels, dwChannelMask);
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 
@@ -2116,14 +2076,6 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		out_layout     = GetDefChannelMask(wfe->nChannels);
 	}
 
-	if (GetMixer()) {
-		int sc = GetMixerLayout();
-		if (out_layout != channel_mode[sc].ch_layout) {
-			out_channels = channel_mode[sc].channels;
-			out_layout   = channel_mode[sc].ch_layout;
-		}
-	}
-
 	*pmt = CreateMediaType(out_mpcsf, out_samplerate, out_channels, out_layout);
 
 	return S_OK;
@@ -2259,39 +2211,6 @@ STDMETHODIMP_(MPCSampleFormat) CMpaDecFilter::SelectSampleFormat(MPCSampleFormat
 	return SF_PCM16;
 }
 
-STDMETHODIMP CMpaDecFilter::SetMixer(bool fMixer)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_fMixer = fMixer;
-
-	return S_OK;
-}
-
-STDMETHODIMP_(bool) CMpaDecFilter::GetMixer()
-{
-	CAutoLock cAutoLock(&m_csProps);
-
-	return m_fMixer;
-}
-
-STDMETHODIMP CMpaDecFilter::SetMixerLayout(int sc)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	if (sc < SPK_MONO || sc > SPK_7_1) {
-		return E_INVALIDARG;
-	}
-	m_iMixerLayout = sc;
-
-	return S_OK;
-}
-
-STDMETHODIMP_(int) CMpaDecFilter::GetMixerLayout()
-{
-	CAutoLock cAutoLock(&m_csProps);
-
-	return m_iMixerLayout;
-}
-
 STDMETHODIMP CMpaDecFilter::SetDynamicRangeControl(bool fDRC)
 {
 	CAutoLock cAutoLock(&m_csProps);
@@ -2344,8 +2263,6 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 		key.SetDWORDValue(OPTION_SFormat_i24, m_fSampleFmt[SF_PCM24]);
 		key.SetDWORDValue(OPTION_SFormat_i32, m_fSampleFmt[SF_PCM32]);
 		key.SetDWORDValue(OPTION_SFormat_flt, m_fSampleFmt[SF_FLOAT]);
-		key.SetDWORDValue(OPTION_Mixer, m_fMixer);
-		key.SetStringValue(OPTION_MixerLayout, channel_mode[m_iMixerLayout].op_value);
 		key.SetDWORDValue(OPTION_DRC, m_fDRC);
 		key.SetDWORDValue(OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 		key.SetDWORDValue(OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
@@ -2361,8 +2278,6 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i24, m_fSampleFmt[SF_PCM24]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i32, m_fSampleFmt[SF_PCM32]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_flt, m_fSampleFmt[SF_FLOAT]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_Mixer, m_fMixer);
-	AfxGetApp()->WriteProfileString(OPT_SECTION_MpaDec, OPTION_MixerLayout, channel_mode[m_iMixerLayout].op_value);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);

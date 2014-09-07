@@ -46,10 +46,6 @@ public IUnknown {
 	STDMETHOD(SetSampleFormat(MPCSampleFormat sf, bool enable)) PURE;
 	STDMETHOD_(bool, GetSampleFormat(MPCSampleFormat sf)) PURE;
 	STDMETHOD_(MPCSampleFormat, SelectSampleFormat(MPCSampleFormat sf)) PURE;
-	STDMETHOD(SetMixer(bool fMixer)) PURE;
-	STDMETHOD_(bool, GetMixer()) PURE;
-	STDMETHOD(SetMixerLayout(int sc)) PURE;
-	STDMETHOD_(int, GetMixerLayout()) PURE;
 	STDMETHOD(SetDynamicRangeControl(bool fDRC)) PURE;
 	STDMETHOD_(bool, GetDynamicRangeControl()) PURE;
 	STDMETHOD(SetSPDIF(enctype et, bool fSPDIF)) PURE;

@@ -87,8 +87,6 @@ protected:
 	// settings
 	CCritSec        m_csProps;
 	bool            m_fSampleFmt[sfcount];
-	bool            m_fMixer;
-	int             m_iMixerLayout;
 	bool            m_fDRC;
 	bool            m_fSPDIF[etcount];
 
@@ -97,9 +95,6 @@ protected:
 	REFERENCE_TIME  m_rtStart;
 	bool            m_fDiscontinuity;
 	bool            m_bResync;
-
-	// Mixer
-	CMixer          m_Mixer;
 
 	ps2_state_t     m_ps2_state;
 //	DD_stats_t      m_DDstats;
@@ -125,6 +120,7 @@ protected:
 	BOOL			m_bBitstreamSupported[BTCOUNT];
 
 #if ENABLE_AC3_ENCODER
+	CMixer m_Mixer;
 	CAC3Encoder m_AC3Enc;
 	CAtlArray<float> m_encbuff;
 	HRESULT AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
@@ -189,10 +185,6 @@ public:
 	STDMETHODIMP SetSampleFormat(MPCSampleFormat sf, bool enable);
 	STDMETHODIMP_(bool) GetSampleFormat(MPCSampleFormat sf);
 	STDMETHODIMP_(MPCSampleFormat) SelectSampleFormat(MPCSampleFormat sf);
-	STDMETHODIMP SetMixer(bool fMixer);
-	STDMETHODIMP_(bool) GetMixer();
-	STDMETHODIMP SetMixerLayout(int sc);
-	STDMETHODIMP_(int) GetMixerLayout();
 	STDMETHODIMP SetDynamicRangeControl(bool fDRC);
 	STDMETHODIMP_(bool) GetDynamicRangeControl();
 	STDMETHODIMP SetSPDIF(enctype et, bool fSPDIF);
