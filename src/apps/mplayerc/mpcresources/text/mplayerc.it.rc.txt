@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Reimposta selezionati"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 5		"Audio renderer"
 7		"Proprietà"
 8		"Dual output"
@@ -147,10 +147,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
 13		"Apri impostazioni audio"
 14		"Preferisci tracce audio esterne rispetto a quelle incorporate"
 16		"Sound processing"
-17		"Spostamento audio (ms):"
-20		"Auto volume control"
-23		"Boost audio"
-28		"Default"
+17		"Mix channels to:"
+19		"Spostamento audio (ms):"
+22		"Auto volume control"
+25		"Boost audio"
+30		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

@@ -26,6 +26,25 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
+enum {
+	AS_SPK_MONO = 0,
+	AS_SPK_STEREO,
+	AS_SPK_4_0,
+	AS_SPK_5_0,
+	AS_SPK_5_1,
+	AS_SPK_7_1
+};
+
+const LPCTSTR channel_mode_sets[] = {
+	//            ID          Name
+	_T("1.0"), // SPK_MONO   "Mono"
+	_T("2.0"), // SPK_STEREO "Stereo"
+	_T("4.0"), // SPK_4_0    "4.0"
+	_T("5.0"), // SPK_5_0    "5.0"
+	_T("5.1"), // SPK_5_1    "5.1"
+	_T("7.1"), // SPK_7_1    "7.1"
+};
+
 CAppSettings::CAppSettings()
 	: fInitialized(false)
 	, fKeepHistory(true)
@@ -574,15 +593,17 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
+	CString strGain;
+	strGain.Format(L"%.1f", fAudioGain_dB);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, strGain);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
-	CString strGain;
-	strGain.Format(L"%.1f", fAudioGain_dB);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, strGain);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 
 	// Multi-monitor code
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
@@ -1122,11 +1143,21 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bAudioTimeShift					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, 0);
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
 
+	bAudioMixer				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, FALSE);
+	nAudioMixerLayout		= AS_SPK_STEREO;
+	str						= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
+	str.Trim();
+	for (int i = AS_SPK_MONO; i <= AS_SPK_7_1; i++) {
+		if (str == channel_mode_sets[i]) {
+			nAudioMixerLayout = i;
+			break;
+		}
+	}
+	fAudioGain_dB			= min(max(-3.0f, (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, _T("0")))), 10.0f);
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
 	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
 	iAudioNormRealeaseTime	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, 8);
-	fAudioGain_dB			= min(max(-3.0f, (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, _T("0")))), 10.0f);
 
 	{
 		for (unsigned int i = 0; ; i++) {

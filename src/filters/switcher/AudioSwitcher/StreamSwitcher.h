@@ -256,6 +256,7 @@ class CStreamSwitcherFilter : public CBaseFilter, public IAMStreamSelect
 
 protected:
 	void SelectInput(CStreamSwitcherInputPin* pInput);
+	bool	m_bOutputFormatChanged;
 
 public:
 	CStreamSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid);
@@ -271,11 +272,6 @@ public:
 	CStreamSwitcherInputPin* GetConnectedInputPin(int n);
 	CStreamSwitcherInputPin* GetInputPin();
 	CStreamSwitcherOutputPin* GetOutputPin();
-
-	bool m_fResetOutputMediaType;
-	void ResetOutputMediaType() {
-		m_fResetOutputMediaType = true;
-	}
 
 	// override these
 	virtual HRESULT CheckMediaType(const CMediaType* pmt) PURE;

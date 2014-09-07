@@ -62,6 +62,9 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT4, m_sAudioPaths);
 	DDX_Check(pDX, IDC_CHECK3, m_fPrioritizeExternalAudio);
 
+	DDX_Control(pDX, IDC_CHECK7, m_chkMixer);
+	DDX_Control(pDX, IDC_COMBO2, m_cmbMixerLayout);
+
 	DDX_Control(pDX, IDC_SLIDER1, m_sldGain);
 	DDX_Control(pDX, IDC_STATIC4, m_stcGain);
 
@@ -83,6 +86,7 @@ BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON1, OnAudioRenderPropClick)
 	ON_BN_CLICKED(IDC_CHECK1, OnDualAudioOutputCheck)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedResetAudioPaths)
+	ON_BN_CLICKED(IDC_CHECK7, OnMixerCheck)
 	ON_BN_CLICKED(IDC_CHECK5, OnAutoVolumeControlCheck)
 	ON_BN_CLICKED(IDC_CHECK4, OnTimeShiftCheck)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedSoundProcessingDefault)
@@ -181,6 +185,20 @@ BOOL CPPageAudio::OnInitDialog()
 	m_fPrioritizeExternalAudio = s.fPrioritizeExternalAudio;
 	m_sAudioPaths              = s.strAudioPaths;
 
+	m_chkMixer.SetCheck(s.bAudioMixer);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(ResStr(IDS_MPADEC_MONO)),   AS_SPK_MONO);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(ResStr(IDS_MPADEC_STEREO)), AS_SPK_STEREO);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("4.0")), AS_SPK_4_0);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.0")), AS_SPK_5_0);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.1")), AS_SPK_5_1);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("7.1")), AS_SPK_7_1);
+	for (int i = 0; i < m_cmbMixerLayout.GetCount(); i++) {
+		if ((int)m_cmbMixerLayout.GetItemData(i) == s.nAudioMixerLayout) {
+			m_cmbMixerLayout.SetCurSel(i);
+			break;
+		}
+	}
+
 	m_sldGain.SetRange(-30, 100, TRUE);
 	m_sldGain.SetPos(s.fAudioGain_dB > 0 ? floor(s.fAudioGain_dB * 10 + 0.5f) : ceil(s.fAudioGain_dB * 10 - 0.5f));
 
@@ -198,6 +216,7 @@ BOOL CPPageAudio::OnInitDialog()
 	UpdateGainInfo();
 	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
+	OnMixerCheck();
 	OnAutoVolumeControlCheck();
 	OnTimeShiftCheck();
 
@@ -222,6 +241,10 @@ BOOL CPPageAudio::OnApply()
 	s.fPrioritizeExternalAudio = !!m_fPrioritizeExternalAudio;
 	s.strAudioPaths = m_sAudioPaths;
 
+
+	s.bAudioMixer				= !!m_chkMixer.GetCheck();
+	s.nAudioMixerLayout			= (int)m_cmbMixerLayout.GetItemData(m_cmbMixerLayout.GetCurSel());
+
 	s.fAudioGain_dB				= m_sldGain.GetPos() / 10.0f;
 
 	s.bAudioAutoVolumeControl	= !!m_chkAutoVolumeControl.GetCheck();
@@ -232,9 +255,10 @@ BOOL CPPageAudio::OnApply()
 	s.iAudioTimeShift			= m_iTimeShift;
 
 	if (m_pASF) {
-		m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
-		m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+		m_pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 		m_pASF->SetAudioGain(s.fAudioGain_dB);
+		m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+		m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
 	}
 
 	return __super::OnApply();
@@ -380,6 +404,17 @@ void CPPageAudio::OnBnClickedResetAudioPaths()
 	SetModified();
 }
 
+void CPPageAudio::OnMixerCheck()
+{
+	if (m_chkMixer.GetCheck()) {
+		m_cmbMixerLayout.EnableWindow();
+	} else {
+		m_cmbMixerLayout.EnableWindow(FALSE);
+	}
+
+	SetModified();
+}
+
 void CPPageAudio::OnAutoVolumeControlCheck()
 {
 	if (m_chkAutoVolumeControl.GetCheck()) {
@@ -418,6 +453,13 @@ void CPPageAudio::OnTimeShiftCheck()
 
 void CPPageAudio::OnBnClickedSoundProcessingDefault()
 {
+	m_chkMixer.SetCheck(BST_UNCHECKED);
+	for (int i = 0; i < m_cmbMixerLayout.GetCount(); i++) {
+		if ((int)m_cmbMixerLayout.GetItemData(i) == AS_SPK_STEREO) {
+			m_cmbMixerLayout.SetCurSel(i);
+			break;
+		}
+	}
 	m_sldGain.SetPos(0);
 	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);
 	m_chkNormBoostAudio.SetCheck(BST_CHECKED);
@@ -428,6 +470,7 @@ void CPPageAudio::OnBnClickedSoundProcessingDefault()
 	UpdateGainInfo();
 	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
+	OnMixerCheck();
 	OnAutoVolumeControlCheck();
 	OnTimeShiftCheck();
 }

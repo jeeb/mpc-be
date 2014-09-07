@@ -2689,9 +2689,10 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 	}
 
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
-		pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64 * s.iAudioTimeShift : 0);
-		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+		pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 		pASF->SetAudioGain(s.fAudioGain_dB);
+		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+		pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64 * s.iAudioTimeShift : 0);
 	}
 
 	return hr;

@@ -54,6 +54,9 @@ public:
 	CString		m_sAudioPaths;
 	BOOL		m_fPrioritizeExternalAudio;
 
+	CButton		m_chkMixer;
+	CComboBox	m_cmbMixerLayout;
+
 	CStatic		m_stcGain;
 	CSliderCtrl	m_sldGain;
 
@@ -89,6 +92,7 @@ public:
 	afx_msg void OnAudioRenderPropClick();
 	afx_msg void OnDualAudioOutputCheck();
 	afx_msg void OnBnClickedResetAudioPaths();
+	afx_msg void OnMixerCheck();
 	afx_msg void OnAutoVolumeControlCheck();
 	afx_msg void OnTimeShiftCheck();
 	afx_msg void OnBnClickedSoundProcessingDefault();

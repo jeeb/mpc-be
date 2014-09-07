@@ -648,13 +648,15 @@ public:
 	bool			AudioFilters[ADEC_LAST];
 
 	// Audio Switcher
+	bool			bAudioMixer;
+	int				nAudioMixerLayout;
+	float			fAudioGain_dB;
 	bool			bAudioAutoVolumeControl;
 	bool			bAudioNormBoost;
 	int				iAudioNormLevel;
 	int				iAudioNormRealeaseTime;
 	bool			bAudioTimeShift;
 	int				iAudioTimeShift;
-	float			fAudioGain_dB;
 
 	// External Filters
 	CAutoPtrList<FilterOverride> m_filters;

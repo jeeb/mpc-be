@@ -876,10 +876,11 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		ASSERT(0);
 	}
 
-	if (fTypeChanged) {
+	if (fTypeChanged || (static_cast<CStreamSwitcherFilter*>(m_pFilter))->m_bOutputFormatChanged) {
 		pOut->SetMediaType(&m_mt);
 		pOutSample->SetMediaType(&pOut->CurrentMediaType());
 		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: output media type changed"));
+		(static_cast<CStreamSwitcherFilter*>(m_pFilter))->m_bOutputFormatChanged = false;
 	}
 
 	// Transform
@@ -1177,6 +1178,7 @@ STDMETHODIMP CStreamSwitcherOutputPin::Backout(IPin* ppinOut, IGraphBuilder* pGr
 
 CStreamSwitcherFilter::CStreamSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid)
 	: CBaseFilter(NAME("CStreamSwitcherFilter"), lpunk, &m_csState, clsid)
+	, m_bOutputFormatChanged(false)
 {
 	if (phr) {
 		*phr = S_OK;

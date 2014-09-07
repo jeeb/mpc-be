@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"重設已選項目"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 5		"音訊譜製器"
 7		"選項"
 8		"多重輸出"
@@ -147,10 +147,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
 13		"音訊載入設定"
 14		"外部音訊檔案優先於內部音軌"
 16		"音訊處理"
-17		"平移音訊時間 (ms):"
-20		"自動音量控制"
-23		"音訊增強"
-28		"預設值"
+17		"Mix channels to:"
+19		"平移音訊時間 (ms):"
+22		"自動音量控制"
+25		"音訊增強"
+30		"預設值"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

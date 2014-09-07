@@ -138,7 +138,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"重置已选项"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 5		"音频渲染器"
 7		"属性"
 8		"多重输出"
@@ -147,10 +147,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 29
 13		"音频打开设定"
 14		"选择外部音频文件替代内嵌音轨。"
 16		"Sound processing"
-17		"音频延迟时间(毫秒): "
-20		"Auto volume control"
-23		"Boost audio"
-28		"Default"
+17		"Mix channels to:"
+19		"音频延迟时间(毫秒): "
+22		"Auto volume control"
+25		"Boost audio"
+30		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

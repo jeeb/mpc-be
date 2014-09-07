@@ -21,11 +21,13 @@
 
 #include "stdafx.h"
 #include <MMReg.h>
-#include "AudioSwitcher.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioTools.h"
+#include "../../../DSUtil/AudioParser.h"
 #include "../../../AudioTools/AudioHelper.h"
 #include <math.h>
+#include <ffmpeg/libavutil/channel_layout.h>
+#include "AudioSwitcher.h"
 
 #ifdef REGISTER_FILTER
 
@@ -74,14 +76,45 @@ CFilterApp theApp;
 
 #endif
 
+static struct channel_mode_t {
+	const WORD channels;
+	const DWORD ch_layout;
+	//const LPCTSTR op_value;
+}
+channel_mode[] = {
+	//n  libavcodec                               ID          Name
+	{1, AV_CH_LAYOUT_MONO   , /*_T("1.0")*/ }, // SPK_MONO   "Mono"
+	{2, AV_CH_LAYOUT_STEREO , /*_T("2.0")*/ }, // SPK_STEREO "Stereo"
+	{4, AV_CH_LAYOUT_QUAD   , /*_T("4.0")*/ }, // SPK_4_0    "4.0"
+	{5, AV_CH_LAYOUT_5POINT0, /*_T("5.0")*/ }, // SPK_5_0    "5.0"
+	{6, AV_CH_LAYOUT_5POINT1, /*_T("5.1")*/ }, // SPK_5_1    "5.1"
+	{8, AV_CH_LAYOUT_7POINT1, /*_T("7.1")*/ }, // SPK_7_1    "7.1"
+};
+
+
+DWORD GetChannelLayout(WAVEFORMATEX* wfe)
+{
+	DWORD channel_layout = 0;
+
+	if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+		channel_layout = ((WAVEFORMATEXTENSIBLE*)wfe)->dwChannelMask;
+	}
+
+	if (channel_layout == 0) {
+		channel_layout = GetDefChannelMask(wfe->nChannels);
+	}
+
+	return channel_layout;
+}
+
 //
 // CAudioSwitcherFilter
 //
 
 CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CStreamSwitcherFilter(lpunk, phr, __uuidof(this))
-	, m_rtAudioTimeShift(0)
-	, m_rtNextStart(0)
+	, m_bMixer(false)
+	, m_nMixerLayout(AS_SPK_STEREO)
 	, m_bAutoVolumeControl(false)
 	, m_iNormLevel(75)
 	, m_iNormRealeaseTime(8)
@@ -89,6 +122,8 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_buf_size(0)
 	, m_fGain_dB(0.0f)
 	, m_fGainFactor(1.0f)
+	, m_rtAudioTimeShift(0)
+	, m_rtNextStart(0)
 {
 	m_AudioNormalizer.SetParam(m_iNormLevel, true, m_iNormRealeaseTime);
 
@@ -154,14 +189,15 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
 
-	SampleFormat in_sampleformat = GetSampleFormat(in_wfe);
+	const SampleFormat in_sampleformat = GetSampleFormat(in_wfe);
 	if (in_sampleformat == SAMPLE_FMT_NONE) {
 		return __super::Transform(pIn, pOut);
 	}
 
 	const unsigned in_bytespersample = in_wfe->wBitsPerSample / 8;
-	const unsigned in_samples        = pIn->GetActualDataLength() / (in_wfe->nChannels * in_bytespersample);
-	const unsigned in_allsamples     = in_samples * in_wfe->nChannels;
+	unsigned in_channels       = in_wfe->nChannels;
+	unsigned in_samples        = pIn->GetActualDataLength() / (in_channels * in_bytespersample);
+	unsigned in_allsamples     = in_samples * in_channels;
 
 	REFERENCE_TIME rtDur = 10000000i64 * in_samples / in_wfe->nSamplesPerSec;
 
@@ -191,61 +227,74 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return S_OK;
 	}
 
-	if (m_bAutoVolumeControl) {
-		int out_samples = 0;
-		long out_size = 0;
+	BYTE* data = pDataIn;
 
+	// Mixer
+	DWORD in_layout = GetChannelLayout(in_wfe);
+	DWORD out_layout = GetChannelLayout((WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat);
+	if (in_layout != out_layout) {
+		BYTE* out;
 		if (in_sampleformat == SAMPLE_FMT_FLT) {
-			if (S_OK != (hr = __super::Transform(pIn, pOut))) {
-				return hr;
-			}
-			out_samples = m_AudioNormalizer.MSteadyHQ32((float*)pDataOut, in_samples, in_wfe->nChannels);
-			out_size = out_samples * in_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
+			out = pDataOut;
 		} else {
 			UpdateBufferSize(in_allsamples);
-			convert_to_float(in_sampleformat, in_wfe->nChannels, in_samples, pDataIn, m_buffer);
-			out_samples = m_AudioNormalizer.MSteadyHQ32(m_buffer, in_samples, in_wfe->nChannels);
-
-			out_size = out_samples * in_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
-			if (out_size > pOut->GetSize()) {
-				ASSERT(0);
-				return E_FAIL;
-			}
-			convert_float_to(in_sampleformat, in_wfe->nChannels, in_samples, m_buffer, pDataOut);
+			out = (BYTE*)m_buffer;
 		}
 
-		pOut->SetActualDataLength(out_size);
-	} else {
-		// copy input data to output and SetActualDataLength for output
-		if (S_OK != (hr = __super::Transform(pIn, pOut))) {
-			return hr;
+		m_Mixer.UpdateInput(in_sampleformat, in_layout);
+		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, out_layout);
+
+		in_samples		= m_Mixer.Mixing(out, in_samples, data, in_samples);
+		data			= out;
+		in_channels		= CountBits(out_layout);
+		in_allsamples	= in_samples * in_channels;
+	}
+	else if (in_sampleformat == SAMPLE_FMT_FLT) {
+		memcpy(pDataOut, data, in_allsamples * sizeof(float));
+		data = pDataOut;
+	}
+
+	// Auto volume control
+	if (m_bAutoVolumeControl) {
+		if (data == pDataIn) {
+			UpdateBufferSize(in_allsamples);
+			convert_to_float(in_sampleformat, in_channels, in_samples, data, m_buffer);
+			data = (BYTE*)m_buffer;
 		}
+		in_samples		= m_AudioNormalizer.MSteadyHQ32((float*)data, in_samples, in_channels);
+		in_allsamples	= in_samples * in_channels;
+	}
 
-		if (m_fGainFactor != 1.0f) {
-			size_t out_allsamples = pOut->GetActualDataLength() / get_bytes_per_sample(in_sampleformat);
+	// Copy or convert to output
+	if (data == pDataIn) {
+		memcpy(pDataOut, data, in_allsamples * sizeof(float));
+	}
+	else if (data == (BYTE*)m_buffer) {
+		convert_float_to(in_sampleformat, in_channels, in_samples, m_buffer, pDataOut);
+	}
 
-			switch (in_sampleformat) {
-			case SAMPLE_FMT_U8:
-				gain_uint8(m_fGainFactor, out_allsamples, (uint8_t*)pDataOut);
-				break;
-			case SAMPLE_FMT_S16:
-				gain_int16(m_fGainFactor, out_allsamples, (int16_t*)pDataOut);
-				break;
-			case SAMPLE_FMT_S24:
-				gain_int24(m_fGainFactor, out_allsamples, pDataOut);
-				break;
-			case SAMPLE_FMT_S32:
-				gain_int32(m_fGainFactor, out_allsamples, (int32_t*)pDataOut);
-				break;
-			case SAMPLE_FMT_FLT:
-				gain_float(m_fGainFactor, out_allsamples, (float*)pDataOut);
-				break;
-			case SAMPLE_FMT_DBL:
-				gain_double(m_fGainFactor, out_allsamples, (double*)pDataOut);
-				break;
-			}
+	// Gain
+	if (!m_bAutoVolumeControl && m_fGainFactor != 1.0f) {
+		switch (in_sampleformat) {
+		case SAMPLE_FMT_U8:
+			gain_uint8(m_fGainFactor, in_allsamples, (uint8_t*)pDataOut);
+			break;
+		case SAMPLE_FMT_S16:
+			gain_int16(m_fGainFactor, in_allsamples, (int16_t*)pDataOut);
+			break;
+		case SAMPLE_FMT_S24:
+			gain_int24(m_fGainFactor, in_allsamples, pDataOut);
+			break;
+		case SAMPLE_FMT_S32:
+			gain_int32(m_fGainFactor, in_allsamples, (int32_t*)pDataOut);
+			break;
+		case SAMPLE_FMT_FLT:
+			gain_float(m_fGainFactor, in_allsamples, (float*)pDataOut);
+			break;
 		}
 	}
+
+	pOut->SetActualDataLength(in_allsamples * get_bytes_per_sample(in_sampleformat));
 
 	rtStart += m_rtAudioTimeShift;
 	rtStop  += m_rtAudioTimeShift;
@@ -256,9 +305,58 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 {
-	CorrectWaveFormatEx(mt); // fix incorrect WAVEFORMATEX structure
+	if (mt.majortype == MEDIATYPE_Audio && mt.formattype == FORMAT_WaveFormatEx) {
+		WORD formattag;
+		if (mt.subtype == MEDIASUBTYPE_PCM) {
+			formattag = WAVE_FORMAT_PCM;
+		} else if (mt.subtype == MEDIASUBTYPE_IEEE_FLOAT) {
+			formattag = WAVE_FORMAT_IEEE_FLOAT;
+		} else {
+			return;
+		}
 
-	// TODO: add change mediatype after transform (channel mixer and other).
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+		WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+		WORD  channels;
+		DWORD layout;
+		if (m_bMixer) {
+			channels = channel_mode[m_nMixerLayout].channels;
+			layout   = channel_mode[m_nMixerLayout].ch_layout;
+		} else {
+			channels = wfe->nChannels;
+			if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfex->dwChannelMask == CountBits(wfex->dwChannelMask)) {
+				layout = wfex->dwChannelMask;
+			} else {
+				layout = GetDefChannelMask(wfe->nChannels);
+			}
+		}
+
+		if (channels <= 2
+				&& (formattag == WAVE_FORMAT_PCM && (wfe->wBitsPerSample == 8 || wfe->wBitsPerSample == 16)
+				|| formattag == WAVE_FORMAT_IEEE_FLOAT && wfe->wBitsPerSample == 32)) {
+
+			if (mt.cbFormat != sizeof(WAVEFORMATEX)) {
+				wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX));
+			}
+			wfe->wFormatTag			= formattag;
+			wfe->nChannels			= channels;
+			wfe->nBlockAlign		= channels * wfe->wBitsPerSample / 8;
+			wfe->nAvgBytesPerSec	= wfe->nBlockAlign * wfe->nSamplesPerSec;
+			wfe->cbSize = 0;
+		} else {
+			if (mt.cbFormat != sizeof(WAVEFORMATEXTENSIBLE)) {
+				wfex = (WAVEFORMATEXTENSIBLE*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
+				wfex->Samples.wValidBitsPerSample = wfex->Format.wBitsPerSample;
+			}
+			wfex->Format.wFormatTag			= WAVE_FORMAT_EXTENSIBLE;
+			wfex->Format.nChannels			= channels;
+			wfex->Format.nBlockAlign		= channels * wfex->Format.wBitsPerSample / 8;
+			wfex->Format.nAvgBytesPerSec	= wfex->Format.nBlockAlign * wfex->Format.nSamplesPerSec;
+			wfex->Format.cbSize				= 22;
+			wfex->dwChannelMask				= layout;
+			wfex->SubFormat					= mt.subtype;
+		}
+	}
 }
 
 HRESULT CAudioSwitcherFilter::DeliverEndFlush()
@@ -306,6 +404,20 @@ STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl,
 	m_iNormRealeaseTime		= min(max(5, iNormRealeaseTime), 10);
 
 	m_AudioNormalizer.SetParam(m_iNormLevel, bNormBoost, m_iNormRealeaseTime);
+
+	return S_OK;
+}
+
+STDMETHODIMP CAudioSwitcherFilter::SetChannelMixer(bool bMixer, int nLayout)
+{
+	if (bMixer != m_bMixer || bMixer && nLayout != m_nMixerLayout) {
+		m_bOutputFormatChanged = true;
+	}
+
+	m_bMixer = bMixer;
+	if (nLayout >= AS_SPK_MONO && nLayout <= AS_SPK_7_1) {
+		m_nMixerLayout = nLayout;
+	}
 
 	return S_OK;
 }
