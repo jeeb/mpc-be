@@ -23,7 +23,6 @@
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
-#include "../../filters/ffmpeg_fix.cpp"
 #endif
 #include <math.h>
 #include <MMReg.h>
@@ -33,9 +32,14 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../AudioTools/AudioHelper.h"
 #include "../../../ffmpeg/libavutil/channel_layout.h"
+
 #include "AudioSwitcher.h"
 
+
+
 #ifdef REGISTER_FILTER
+
+#include "../../filters/ffmpeg_fix.cpp"
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_NULL}
