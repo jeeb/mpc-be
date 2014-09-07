@@ -137,7 +137,7 @@ public:
 		BYTE	_8_bit_pixel_code		= 0;
 		BYTE	_4_bit_pixel_code		= 0;
 		BYTE	_2_bit_pixel_code		= 0;
-		CAtlList<DVB_OBJECT> objects	= 0;
+		CAtlList<DVB_OBJECT> objects;
 
 		DVB_REGION() {}
 

@@ -31,7 +31,7 @@
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../AudioTools/AudioHelper.h"
-#include "../../../ffmpeg/libavutil/channel_layout.h"
+#include "../../../ExtLib/ffmpeg/libavutil/channel_layout.h"
 
 #include "AudioSwitcher.h"
 
