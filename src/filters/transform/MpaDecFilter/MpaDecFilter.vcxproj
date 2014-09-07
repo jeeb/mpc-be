@@ -245,14 +245,6 @@
     <ProjectReference Include="..\..\..\ExtLib\openjpeg\openjpeg.vcxproj">
       <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\VirtualDub\Kasumi\Kasumi.vcxproj">
-      <Project>{0d252872-7542-4232-8d02-53f9182aee15}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\VirtualDub\system\system.vcxproj">
-      <Project>{c2082189-3ecb-4079-91fa-89d3c8a305c0}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\zlib\zlib.vcxproj">
       <Project>{2fcd4b66-9cf9-4c8f-bc70-37cd20002d49}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
