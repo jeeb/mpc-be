@@ -20,20 +20,20 @@
  */
 
 #include "stdafx.h"
+
+#ifdef REGISTER_FILTER
+#include <InitGuid.h>
+#include "../../filters/ffmpeg_fix.cpp"
+#endif
+#include <math.h>
 #include <MMReg.h>
+#include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../AudioTools/AudioHelper.h"
-#include <math.h>
-#include <ffmpeg/libavutil/channel_layout.h>
+#include "../../../ffmpeg/libavutil/channel_layout.h"
 #include "AudioSwitcher.h"
-
-#ifdef REGISTER_FILTER
-
-#include <InitGuid.h>
-#endif
-#include <moreuuids.h>
 
 #ifdef REGISTER_FILTER
 
@@ -90,7 +90,6 @@ channel_mode[] = {
 	{6, AV_CH_LAYOUT_5POINT1, /*_T("5.1")*/ }, // SPK_5_1    "5.1"
 	{8, AV_CH_LAYOUT_7POINT1, /*_T("7.1")*/ }, // SPK_7_1    "7.1"
 };
-
 
 DWORD GetChannelLayout(WAVEFORMATEX* wfe)
 {
