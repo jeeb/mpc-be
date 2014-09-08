@@ -26,6 +26,8 @@
 #endif
 #include <math.h>
 #include <MMReg.h>
+#include <Ks.h>
+#include <KsMedia.h>
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioTools.h"
@@ -320,6 +322,18 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
 		WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+
+		// exclude spdif/bitstream formats
+		if (wfe->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+			return;
+		}
+		if (IsWaveFormatExtensible(wfe)
+				&& (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
+					|| wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP
+					|| wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD)) {
+			return;
+		}
+
 		WORD  channels;
 		DWORD layout;
 		if (m_bMixer) {
