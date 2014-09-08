@@ -253,10 +253,11 @@ class CStreamSwitcherFilter : public CBaseFilter, public IAMStreamSelect
 	CCritSec m_csState, m_csPins;
 
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin, IPin* pReceivePin);
+	bool m_bInputPinChanged;
 
 protected:
 	void SelectInput(CStreamSwitcherInputPin* pInput);
-	bool	m_bOutputFormatChanged;
+	bool m_bOutputFormatChanged;
 
 public:
 	CStreamSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid);

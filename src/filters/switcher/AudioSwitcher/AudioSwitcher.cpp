@@ -38,7 +38,6 @@
 #include "AudioSwitcher.h"
 
 
-
 #ifdef REGISTER_FILTER
 
 #include "../../filters/ffmpeg_fix.cpp"

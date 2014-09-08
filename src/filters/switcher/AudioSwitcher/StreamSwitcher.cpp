@@ -769,13 +769,14 @@ STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()
 
 STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 {
-	BOOL fTypeChanged = FALSE;
+	CStreamSwitcherFilter* pStreamSwitcher = (static_cast<CStreamSwitcherFilter*>(m_pFilter));
+	bool bInputChanged = pStreamSwitcher->m_bInputPinChanged;
 
 	AM_MEDIA_TYPE* pmt = NULL;
 	if (SUCCEEDED(pSample->GetMediaType(&pmt)) && pmt) {
 		const CMediaType mt(*pmt);
 		DeleteMediaType(pmt), pmt = NULL;
-		fTypeChanged = (mt != m_mt);
+		bInputChanged |= (bool)(mt != m_mt);
 		SetMediaType(&mt);
 	}
 
@@ -802,7 +803,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 	CAutoLock cAutoLock(&m_csReceive);
 
-	CStreamSwitcherOutputPin* pOut = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetOutputPin();
+	CStreamSwitcherOutputPin* pOut = pStreamSwitcher->GetOutputPin();
 	ASSERT(pOut->GetConnected());
 
 	HRESULT hr = __super::Receive(pSample);
@@ -827,12 +828,8 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 	long cbBuffer = pSample->GetActualDataLength();
 
-	if (!fTypeChanged) {
-		fTypeChanged = (m_mt != pOut->CurrentMediaType());
-	}
-
-	if (fTypeChanged || cbBuffer > actual.cbBuffer) {
-		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: %s", fTypeChanged ? L"input media type changed" :  L"cbBuffer > actual.cbBuffer"));
+	if (bInputChanged || cbBuffer > actual.cbBuffer) {
+		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: %s", bInputChanged ? L"input media type changed" :  L"cbBuffer > actual.cbBuffer"));
 
 		m_SampleProps.dwSampleFlags |= AM_SAMPLE_TYPECHANGED/*|AM_SAMPLE_DATADISCONTINUITY|AM_SAMPLE_TIMEDISCONTINUITY*/;
 
@@ -865,6 +862,8 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 			hr = pOut->CurrentAllocator()->SetProperties(&props, &actual);
 			hr = pOut->CurrentAllocator()->Commit();
 		}
+
+		pStreamSwitcher->m_bInputPinChanged = false;
 	}
 
 	CComPtr<IMediaSample> pOutSample;
@@ -880,15 +879,15 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		ASSERT(0);
 	}
 
-	if (fTypeChanged || (static_cast<CStreamSwitcherFilter*>(m_pFilter))->m_bOutputFormatChanged) {
+	if (bInputChanged || pStreamSwitcher->m_bOutputFormatChanged) {
 		pOut->SetMediaType(&m_mt);
 		pOutSample->SetMediaType(&pOut->CurrentMediaType());
 		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: output media type changed"));
-		(static_cast<CStreamSwitcherFilter*>(m_pFilter))->m_bOutputFormatChanged = false;
+		pStreamSwitcher->m_bOutputFormatChanged = false;
 	}
 
 	// Transform
-	hr = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->Transform(pSample, pOutSample);
+	hr = pStreamSwitcher->Transform(pSample, pOutSample);
 	//
 
 	if (S_OK == hr) {
@@ -1179,6 +1178,7 @@ STDMETHODIMP CStreamSwitcherOutputPin::Backout(IPin* ppinOut, IGraphBuilder* pGr
 
 CStreamSwitcherFilter::CStreamSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid)
 	: CBaseFilter(NAME("CStreamSwitcherFilter"), lpunk, &m_csState, clsid)
+	, m_bInputPinChanged(false)
 	, m_bOutputFormatChanged(false)
 {
 	if (phr) {
@@ -1362,6 +1362,7 @@ void CStreamSwitcherFilter::SelectInput(CStreamSwitcherInputPin* pInput)
 
 	// set new input
 	m_pInput = pInput;
+	m_bInputPinChanged = true;
 
 	// let it go
 	m_pInput->Block(false);
