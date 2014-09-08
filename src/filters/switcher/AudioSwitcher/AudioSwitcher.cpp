@@ -192,6 +192,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
+	WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
 
 	const SampleFormat in_sampleformat = GetSampleFormat(in_wfe);
 	if (in_sampleformat == SAMPLE_FMT_NONE) {
@@ -235,8 +236,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	// Mixer
 	DWORD in_layout = GetChannelLayout(in_wfe);
-	DWORD out_layout = GetChannelLayout((WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat);
-	if (in_layout != out_layout) {
+	DWORD out_layout = GetChannelLayout(out_wfe);
+	if (in_layout != out_layout && in_samples * out_wfe->nChannels * sizeof(float) <= pOut->GetSize()) {
 		BYTE* out;
 		if (in_sampleformat == SAMPLE_FMT_FLT) {
 			out = pDataOut;
