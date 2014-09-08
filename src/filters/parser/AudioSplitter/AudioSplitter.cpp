@@ -181,7 +181,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CStringA cuetextA;
 			cuefile.Read(cuetextA.GetBufferSetLength(size), size);
 
-			CStringW cuetextW = UTF8ToString(cuetextA);
+			CStringW cuetextW = UTF8To16(cuetextA);
 			CAtlList<Chapters> ChaptersList;
 			CString sTitle, sPerformer;
 

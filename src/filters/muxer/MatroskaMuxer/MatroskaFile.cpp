@@ -119,7 +119,7 @@ QWORD CUTF8::Size(bool fWithHeader)
 	}
 
 	QWORD len = 0;
-	len += StringToUTF8(*this).GetLength();
+	len += UTF16To8(*this).GetLength();
 	if (fWithHeader) {
 		len += HeaderSize(len);
 	}
@@ -133,7 +133,7 @@ HRESULT CUTF8::Write(IStream* pStream)
 	}
 
 	HeaderWrite(pStream);
-	CStringA str = StringToUTF8(*this);
+	CStringA str = UTF16To8(*this);
 	return pStream->Write((BYTE*)(LPCSTR)str, str.GetLength(), NULL);
 }
 

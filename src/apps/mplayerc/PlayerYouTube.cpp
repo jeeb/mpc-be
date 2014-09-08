@@ -257,7 +257,7 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields)
 			return fn;
 		}
 
-		CString Title = UTF8ToString(GetEntry(data, "<title>", "</title>"));
+		CString Title = UTF8To16(GetEntry(data, "<title>", "</title>"));
 
 		if (hlsvp_len) {
 			char *tmp = DNew char[hlsvp_len + 1];
@@ -366,17 +366,17 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields)
 						if (dataSize) {
 							CStringA sTitle = GetEntry(data, "\"title\":{\"$t\":\"", "\",\"type\"");
 							if (!sTitle.IsEmpty()) {
-								y_fields->title = FixHtmlSymbols(UTF8ToString(sTitle));
+								y_fields->title = FixHtmlSymbols(UTF8To16(sTitle));
 								y_fields->fname = y_fields->title + final_ext;
 								FixFilename(y_fields->fname);
 							}
 							CStringA sAuthor = GetEntry(data, "\"author\":[{\"name\":{\"$t\":\"", "\"}");
 							if (!sAuthor.IsEmpty()) {
-								y_fields->author = UTF8ToString(sAuthor);
+								y_fields->author = UTF8To16(sAuthor);
 							}
 							CStringA sContent = GetEntry(data, "\"content\":{\"$t\":\"", "\",\"type\"");
 							if (!sContent.IsEmpty()) {
-								y_fields->content = FixHtmlSymbols(UTF8ToString(sContent));
+								y_fields->content = FixHtmlSymbols(UTF8To16(sContent));
 							}
 							CStringA sDate = GetEntry(data, "\"published\":{\"$t\":\"", "\"},");
 							if (!sDate.IsEmpty()) {
@@ -454,7 +454,7 @@ bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& id
 				char* tmp = DNew char[block_len + 1];
 				memcpy(tmp, block, block_len);
 				tmp[block_len] = 0;
-				CString item = UTF8ToString(tmp);
+				CString item = UTF8To16(tmp);
 				delete [] tmp;
 
 				CString data_video_id;

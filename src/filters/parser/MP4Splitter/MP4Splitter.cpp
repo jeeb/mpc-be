@@ -187,9 +187,9 @@ static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, 
 
 static CString ConvertStr(const char* S)
 {
-	CString str = AltUTF8ToStringW(S);
+	CString str = AltUTF8To16(S);
 	if (str.IsEmpty()) {
-		str = LocalToString(S); //Trying Local...
+		str = ConvertToUTF16(S, CP_ACP); //Trying Local...
 	}
 
 	return str;
@@ -721,7 +721,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						memcpy(buff, &fourcc, 4);
 						buff[4] = 0;
 
-						CString tname = UTF8ToString(vse->GetCompressorName());
+						CString tname = UTF8To16(vse->GetCompressorName());
 						if ((buff[0] == 'x' || buff[0] == 'h') && buff[1] == 'd') {
 							// Apple HDV/XDCAM
 							FormatTrackName(_T("HDV/XDV MPEG2"), 0);
@@ -1154,7 +1154,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 						} else {
-							CStringW str = UTF8ToString(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
+							CStringW str = UTF8To16(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
 
 							switch (atom->GetType()) {
 								case AP4_ATOM_TYPE_NAM:
@@ -1432,7 +1432,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 							for (int i = 0; i < wstr.GetLength(); ++i) {
 								wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
 							}
-							str = StringToUTF8(wstr);
+							str = UTF16To8(wstr);
 						} else {
 							str = CStringA((LPCSTR)&ptr[2], size);
 						}

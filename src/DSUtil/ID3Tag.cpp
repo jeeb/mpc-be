@@ -99,7 +99,7 @@ CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 		return wstr.Trim();
 	} else {
 		gb.ReadBuffer((BYTE*)str.GetBufferSetLength(size), size);
-		return (encoding > 0 ? UTF8ToString(str) : CStringW(str)).Trim();
+		return (encoding > 0 ? UTF8To16(str) : CStringW(str)).Trim();
 	}
 }
 

@@ -1588,7 +1588,7 @@ CString CStringFromGUID(const GUID& guid)
 	return CString(StringFromGUID2(guid, buff, 127) > 0 ? buff : null);
 }
 
-CString ConvertStr(LPCSTR lpMultiByteStr, UINT CodePage)
+CString ConvertToUTF16(LPCSTR lpMultiByteStr, UINT CodePage)
 {
 	CString str;
 	int len = MultiByteToWideChar(CodePage, 0, lpMultiByteStr, -1, NULL, 0) - 1;
@@ -1599,12 +1599,12 @@ CString ConvertStr(LPCSTR lpMultiByteStr, UINT CodePage)
 	return str;
 }
 
-CString UTF8ToString(LPCSTR lpMultiByteStr)
+CString UTF8To16(LPCSTR lpMultiByteStr)
 {
-	return ConvertStr(lpMultiByteStr, CP_UTF8);
+	return ConvertToUTF16(lpMultiByteStr, CP_UTF8);
 }
 
-CStringA StringToUTF8(LPCWSTR lpWideCharStr)
+CStringA UTF16To8(LPCWSTR lpWideCharStr)
 {
 	CStringA str;
 	int len = WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, NULL, 0, NULL, NULL) - 1;
@@ -1615,76 +1615,49 @@ CStringA StringToUTF8(LPCWSTR lpWideCharStr)
 	return str;
 }
 
-CString LocalToString(LPCSTR lpMultiByteStr)
+CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() function does not work.
 {
-	return ConvertStr(lpMultiByteStr, CP_ACP);
-}
-
-CString AltUTF8ToStringW(const char* S) // Use if MultiByteToWideChar() function does not work.
-{
-	CString str;
-	if (S==NULL) {
-		return str;
+	if (lpMultiByteStr) {
+		return L"";
 	}
 
+	CString str;
 	// Don't use MultiByteToWideChar(), some characters are not well decoded
-	const unsigned char* Z = (const unsigned char*)S;
-	while (*Z) //0 is end
-	{
+	const unsigned char* Z = (const unsigned char*)lpMultiByteStr;
+	while (*Z) { //0 is end
 		//1 byte
-		if (*Z<0x80)
-		{
+		if (*Z < 0x80) {
 			str += (wchar_t)(*Z);
 			Z++;
-		}
+		} else if ((*Z & 0xE0) == 0xC0) {
 		//2 bytes
-		else if ((*Z&0xE0)==0xC0)
-		{
-			if ((*(Z+1)&0xC0)==0x80)
-			{
-				str += (wchar_t)((((wchar_t)(*Z&0x1F))<<6)|(*(Z+1)&0x3F));
+			if ((*(Z + 1) & 0xC0) == 0x80) {
+				str += (wchar_t)((((wchar_t)(*Z & 0x1F)) << 6) | (*(Z + 1) & 0x3F));
 				Z+=2;
+			} else {
+				return L""; //Bad character
 			}
-			else
-			{
-				str.Empty();
-				return str; //Bad character
-			}
-		}
+		} else if ((*Z & 0xF0) == 0xE0) {
 		//3 bytes
-		else if ((*Z&0xF0)==0xE0)
-		{
-			if ((*(Z+1)&0xC0)==0x80 && (*(Z+2)&0xC0)==0x80)
-			{
-				str += (wchar_t)((((wchar_t)(*Z&0x0F))<<12)|((*(Z+1)&0x3F)<<6)|(*(Z+2)&0x3F));
+			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80) {
+				str += (wchar_t)((((wchar_t)(*Z & 0x0F)) << 12) | ((*(Z + 1) & 0x3F) << 6) | (*(Z + 2) & 0x3F));
 				Z+=3;
+			} else {
+				return L""; //Bad character
 			}
-			else
-			{
-				str.Empty();
-				return str; //Bad character
-			}
-		}
+		} else if ((*Z & 0xF8) == 0xF0) {
 		//4 bytes
-		else if ((*Z&0xF8)==0xF0)
-		{
-			if ((*(Z+1)&0xC0)==0x80 && (*(Z+2)&0xC0)==0x80 && (*(Z+3)&0xC0)==0x80)
-			{
-				str += (wchar_t)((((wchar_t)(*Z&0x0F))<<18)|((*(Z+1)&0x3F)<<12)||((*(Z+2)&0x3F)<<6)|(*(Z+3)&0x3F));
+			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80 && (*(Z + 3) & 0xC0) == 0x80) {
+				str += (wchar_t)((((wchar_t)(*Z & 0x0F)) << 18) | ((*(Z + 1) & 0x3F) << 12) || ((*(Z + 2) & 0x3F) << 6) | (*(Z + 3) & 0x3F));
 				Z+=4;
+			} else {
+				return L""; //Bad character
 			}
-			else
-			{
-				str.Empty();
-				return str; //Bad character
-			}
-		}
-		else
-		{
-			str.Empty();
-			return str; //Bad character
+		} else {
+			return L""; //Bad character
 		}
 	}
+
 	return str;
 }
 
