@@ -827,6 +827,10 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 	long cbBuffer = pSample->GetActualDataLength();
 
+	if (!fTypeChanged) {
+		fTypeChanged = (m_mt != pOut->CurrentMediaType());
+	}
+
 	if (fTypeChanged || cbBuffer > actual.cbBuffer) {
 		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: %s", fTypeChanged ? L"input media type changed" :  L"cbBuffer > actual.cbBuffer"));
 
@@ -884,19 +888,16 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 	}
 
 	// Transform
-
 	hr = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->Transform(pSample, pOutSample);
-
 	//
 
 	if (S_OK == hr) {
 		hr = pOut->Deliver(pOutSample);
 		m_bSampleSkipped = FALSE;
 		/*
-				if(FAILED(hr))
-				{
-					ASSERT(0);
-				}
+		if (FAILED(hr)) {
+			ASSERT(0);
+		}
 		*/
 	} else if (S_FALSE == hr) {
 		hr = S_OK;
