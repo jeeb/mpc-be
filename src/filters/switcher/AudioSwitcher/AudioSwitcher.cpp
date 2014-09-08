@@ -341,7 +341,7 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 			layout   = channel_mode[m_nMixerLayout].ch_layout;
 		} else {
 			channels = wfe->nChannels;
-			if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfex->dwChannelMask/* == CountBits(wfex->dwChannelMask)*/) {
+			if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfex->dwChannelMask == CountBits(wfe->nChannels)) {
 				layout = wfex->dwChannelMask;
 			} else {
 				layout = GetDefChannelMask(wfe->nChannels);
