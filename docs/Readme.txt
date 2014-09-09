@@ -60,6 +60,7 @@ CLineNumberEdit     -                          -
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
+jsoncpp             MIT License                https://github.com/open-source-parsers/jsoncpp
 libflac             GPLv2 / BSD License        http://sourceforge.net/projects/flac/
 libpng              zlib / libpng License      http://sourceforge.net/projects/libpng/
 libwebp             BSD License                http://code.google.com/p/webp/
