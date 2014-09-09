@@ -142,17 +142,13 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 CAudioSwitcherFilter::~CAudioSwitcherFilter()
 {
-	if (m_buffer) {
-		delete[] m_buffer;
-	}
+	SAFE_DELETE_ARRAY(m_buffer);
 }
 
 void CAudioSwitcherFilter::UpdateBufferSize(size_t allsamples)
 {
 	if (allsamples > m_buf_size) {
-		if (m_buffer) {
-			delete[] m_buffer;
-		}
+		SAFE_DELETE_ARRAY(m_buffer);
 		m_buf_size = allsamples;
 		m_buffer = DNew float[m_buf_size];
 	}
@@ -203,6 +199,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	unsigned in_channels       = in_wfe->nChannels;
 	unsigned in_samples        = pIn->GetActualDataLength() / (in_channels * in_bytespersample);
 	unsigned in_allsamples     = in_samples * in_channels;
+	unsigned out_allsamples    = in_samples * out_wfe->nChannels;
 
 	REFERENCE_TIME rtDur = 10000000i64 * in_samples / in_wfe->nSamplesPerSec;
 
@@ -234,15 +231,17 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	BYTE* data = pDataIn;
 
+	LONG pOutSize = pOut->GetSize();
+
 	// Mixer
 	DWORD in_layout = GetChannelLayout(in_wfe);
 	DWORD out_layout = GetChannelLayout(out_wfe);
-	if (in_layout != out_layout && in_samples * out_wfe->nChannels * sizeof(float) <= pOut->GetSize()) {
+	if (in_layout != out_layout && out_allsamples * sizeof(float) <= (unsigned)pOut->GetSize()) {
 		BYTE* out;
 		if (in_sampleformat == SAMPLE_FMT_FLT) {
 			out = pDataOut;
 		} else {
-			UpdateBufferSize(in_allsamples);
+			UpdateBufferSize(out_allsamples);
 			out = (BYTE*)m_buffer;
 		}
 
@@ -253,8 +252,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		data			= out;
 		in_channels		= CountBits(out_layout);
 		in_allsamples	= in_samples * in_channels;
-	}
-	else if (in_sampleformat == SAMPLE_FMT_FLT) {
+	} else if (in_sampleformat == SAMPLE_FMT_FLT) {
 		memcpy(pDataOut, data, in_allsamples * sizeof(float));
 		data = pDataOut;
 	}
@@ -273,8 +271,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	// Copy or convert to output
 	if (data == pDataIn) {
 		memcpy(pDataOut, data, in_allsamples * sizeof(float));
-	}
-	else if (data == (BYTE*)m_buffer) {
+	} else if (data == (BYTE*)m_buffer) {
 		convert_float_to(in_sampleformat, in_channels, in_samples, m_buffer, pDataOut);
 	}
 

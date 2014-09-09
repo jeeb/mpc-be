@@ -776,7 +776,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 	if (SUCCEEDED(pSample->GetMediaType(&pmt)) && pmt) {
 		const CMediaType mt(*pmt);
 		DeleteMediaType(pmt), pmt = NULL;
-		bInputChanged |= (bool)(mt != m_mt);
+		bInputChanged |= !!(mt != m_mt);
 		SetMediaType(&mt);
 	}
 
@@ -834,16 +834,15 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		m_SampleProps.dwSampleFlags |= AM_SAMPLE_TYPECHANGED/*|AM_SAMPLE_DATADISCONTINUITY|AM_SAMPLE_TIMEDISCONTINUITY*/;
 
 		/*
-				if(CComQIPtr<IPinConnection> pPC = pOut->CurrentPinConnection())
-				{
-					HANDLE hEOS = CreateEvent(NULL, FALSE, FALSE, NULL);
-					hr = pPC->NotifyEndOfStream(hEOS);
-					hr = pOut->DeliverEndOfStream();
-					WaitForSingleObject(hEOS, 3000);
-					CloseHandle(hEOS);
-					hr = pOut->DeliverBeginFlush();
-					hr = pOut->DeliverEndFlush();
-				}
+		if (CComQIPtr<IPinConnection> pPC = pOut->CurrentPinConnection()) {
+			HANDLE hEOS = CreateEvent(NULL, FALSE, FALSE, NULL);
+			hr = pPC->NotifyEndOfStream(hEOS);
+			hr = pOut->DeliverEndOfStream();
+			WaitForSingleObject(hEOS, 3000);
+			CloseHandle(hEOS);
+			hr = pOut->DeliverBeginFlush();
+			hr = pOut->DeliverEndFlush();
+		}
 		*/
 
 		if (props.cBuffers < 8 && m_mt.majortype == MEDIATYPE_Audio) {
