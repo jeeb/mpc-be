@@ -742,6 +742,16 @@ HRESULT CShoutcastStream::SetName(LPCWSTR pName)
 
 //
 
+static CString ConvertStr(LPCSTR S)
+{
+	CString str = AltUTF8To16(S);
+	if (str.IsEmpty()) {
+		str = ConvertToUTF16(S, CP_ACP); //Trying Local...
+	}
+
+	return str;
+}
+
 int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nFlags)
 {
 	if (nFlags&MSG_PEEK) {
@@ -763,7 +773,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		static BYTE buff[255*16], b = 0;
 		memset(buff, 0, sizeof(buff));
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
-			CString str = UTF8To16((LPCSTR)buff);
+			CString str = ConvertStr((LPCSTR)buff);
 
 			DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): Metainfo: %s", str));
 
@@ -868,7 +878,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		BYTE cur = 0, prev = 0;
 
 		CStringA hdr = GetHeader();
-		DbgLog((LOG_TRACE, 3, L"\nCShoutcastSocket::Connect() - HTTP hdr:\n%s", UTF8To16(hdr)));
+		DbgLog((LOG_TRACE, 3, L"\nCShoutcastSocket::Connect() - HTTP hdr:\n%s", ConvertStr(hdr)));
 
 		CAtlList<CStringA> sl;
 		Explode(hdr, sl, '\n');
@@ -897,7 +907,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			} else if (1 == sscanf_s(hdrline, "icy-metaint:%d", &metaint)) {
 				metaint = metaint;
 			} else if (hdrline.Left(9) == "icy-name:") {
-				m_title = UTF8To16(dup.Mid(9).Trim());
+				m_title = ConvertStr(dup.Mid(9).Trim());
 			} else if (hdrline.Left(8) == "icy-url:") {
 				m_url = dup.Mid(8).Trim();
 			} else if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
@@ -908,7 +918,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				int pos = hdrline.Find("filename=");
 				redirectUrl = _T("/") + CString(hdrline.Mid(pos + 9).Trim());
 			} else if (hdrline.Left(16) == "icy-description:") {
-				m_Description = UTF8To16(dup.Mid(16).Trim());
+				m_Description = ConvertStr(dup.Mid(16).Trim());
 			}
 		}
 

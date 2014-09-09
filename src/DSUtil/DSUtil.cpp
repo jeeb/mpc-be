@@ -1617,7 +1617,7 @@ CStringA UTF16To8(LPCWSTR lpWideCharStr)
 
 CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() function does not work.
 {
-	if (lpMultiByteStr) {
+	if (!lpMultiByteStr) {
 		return L"";
 	}
 
