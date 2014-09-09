@@ -763,16 +763,16 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		static BYTE buff[255*16], b = 0;
 		memset(buff, 0, sizeof(buff));
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
-			CStringA str = (LPCSTR)buff;
+			CString str = UTF8To16((LPCSTR)buff);
 
-			DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): Metainfo: %s", CString(str)));
+			DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): Metainfo: %s", str));
 
-			CStringA title("StreamTitle='"), url("StreamUrl='");
+			CString title("StreamTitle='"), url("StreamUrl='");
 
 			int i = str.Find(title);
 			if (i >= 0) {
 				i += title.GetLength();
-				int j = str.Find("\';", i);
+				int j = str.Find(L"\';", i);
 				if (!j) {
 					j = str.ReverseFind('\'');
 				}
@@ -780,13 +780,13 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 					m_title = str.Mid(i, j - i);
 				}
 			} else {
-				TRACE(_T("CShoutcastStream(): StreamTitle is missing\n"));
+				DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): StreamTitle is missing"));
 			}
 
 			i = str.Find(url);
 			if (i >= 0) {
 				i += url.GetLength();
-				int j = str.Find("\';", i);
+				int j = str.Find(L"\';", i);
 				if (!j) {
 					j = str.ReverseFind('\'');
 				}
@@ -868,7 +868,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		BYTE cur = 0, prev = 0;
 
 		CStringA hdr = GetHeader();
-		DbgLog((LOG_TRACE, 3, "\nCShoutcastSocket::Connect() - HTTP hdr:\n%s", hdr));
+		DbgLog((LOG_TRACE, 3, "\nCShoutcastSocket::Connect() - HTTP hdr:\n%s", UTF8To16(hdr)));
 
 		CAtlList<CStringA> sl;
 		Explode(hdr, sl, '\n');
@@ -897,7 +897,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			} else if (1 == sscanf_s(hdrline, "icy-metaint:%d", &metaint)) {
 				metaint = metaint;
 			} else if (hdrline.Left(9) == "icy-name:") {
-				m_title = dup.Mid(9).Trim();
+				m_title = UTF8To16(dup.Mid(9).Trim());
 			} else if (hdrline.Left(8) == "icy-url:") {
 				m_url = dup.Mid(8).Trim();
 			} else if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
@@ -908,7 +908,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				int pos = hdrline.Find("filename=");
 				redirectUrl = _T("/") + CString(hdrline.Mid(pos + 9).Trim());
 			} else if (hdrline.Left(16) == "icy-description:") {
-				m_Description = dup.Mid(16).Trim();
+				m_Description = UTF8To16(dup.Mid(16).Trim());
 			}
 		}
 
