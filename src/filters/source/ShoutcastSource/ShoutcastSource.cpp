@@ -868,7 +868,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		BYTE cur = 0, prev = 0;
 
 		CStringA hdr = GetHeader();
-		DbgLog((LOG_TRACE, 3, "\nCShoutcastSocket::Connect() - HTTP hdr:\n%s", UTF8To16(hdr)));
+		DbgLog((LOG_TRACE, 3, L"\nCShoutcastSocket::Connect() - HTTP hdr:\n%s", UTF8To16(hdr)));
 
 		CAtlList<CStringA> sl;
 		Explode(hdr, sl, '\n');
