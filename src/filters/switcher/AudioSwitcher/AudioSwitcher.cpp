@@ -199,7 +199,6 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	unsigned in_channels       = in_wfe->nChannels;
 	unsigned in_samples        = pIn->GetActualDataLength() / (in_channels * in_bytespersample);
 	unsigned in_allsamples     = in_samples * in_channels;
-	unsigned out_allsamples    = in_samples * out_wfe->nChannels;
 
 	REFERENCE_TIME rtDur = 10000000i64 * in_samples / in_wfe->nSamplesPerSec;
 
@@ -231,17 +230,23 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	BYTE* data = pDataIn;
 
-	LONG pOutSize = pOut->GetSize();
+	long out_buffersize = pOut->GetSize();
+	long out_size = in_allsamples *  out_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
+	if (out_size > out_buffersize) {
+		DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::Transform: %d > %d"), out_size, out_buffersize);
+		//pOut->SetActualDataLength(0);
+		//return S_OK;
+	}
 
 	// Mixer
 	DWORD in_layout = GetChannelLayout(in_wfe);
 	DWORD out_layout = GetChannelLayout(out_wfe);
-	if (in_layout != out_layout && out_allsamples * sizeof(float) <= (unsigned)pOut->GetSize()) {
+	if (in_layout != out_layout && out_size <= out_buffersize) {
 		BYTE* out;
 		if (in_sampleformat == SAMPLE_FMT_FLT) {
 			out = pDataOut;
 		} else {
-			UpdateBufferSize(out_allsamples);
+			UpdateBufferSize(in_allsamples * out_wfe->nChannels);
 			out = (BYTE*)m_buffer;
 		}
 
@@ -250,7 +255,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 		in_samples		= m_Mixer.Mixing(out, in_samples, data, in_samples);
 		data			= out;
-		in_channels		= CountBits(out_layout);
+		in_channels		= out_wfe->nChannels;
 		in_allsamples	= in_samples * in_channels;
 	} else if (in_sampleformat == SAMPLE_FMT_FLT) {
 		memcpy(pDataOut, data, in_allsamples * sizeof(float));
