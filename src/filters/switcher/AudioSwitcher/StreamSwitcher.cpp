@@ -770,13 +770,13 @@ STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()
 STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 {
 	CStreamSwitcherFilter* pStreamSwitcher = (static_cast<CStreamSwitcherFilter*>(m_pFilter));
-	bool bInputChanged = pStreamSwitcher->m_bInputPinChanged;
+	bool bFormatChanged = pStreamSwitcher->m_bInputPinChanged | pStreamSwitcher->m_bOutputFormatChanged;
 
 	AM_MEDIA_TYPE* pmt = NULL;
 	if (SUCCEEDED(pSample->GetMediaType(&pmt)) && pmt) {
 		const CMediaType mt(*pmt);
 		DeleteMediaType(pmt), pmt = NULL;
-		bInputChanged |= !!(mt != m_mt);
+		bFormatChanged |= !!(mt != m_mt);
 		SetMediaType(&mt);
 	}
 
@@ -827,9 +827,23 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 	}
 
 	long cbBuffer = pSample->GetActualDataLength();
+	
+	if (bFormatChanged) {
+		pOut->SetMediaType(&m_mt);
 
-	if (bInputChanged || cbBuffer > actual.cbBuffer) {
-		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: %s", bInputChanged ? L"input media type changed" :  L"cbBuffer > actual.cbBuffer"));
+		CMediaType& out_mt = pOut->CurrentMediaType();
+		if (*out_mt.FormatType() == FORMAT_WaveFormatEx) {
+			cbBuffer *= ((WAVEFORMATEX*)out_mt.Format())->nChannels;
+			cbBuffer /= ((WAVEFORMATEX*)m_mt.Format())->nChannels;
+		}
+
+		pStreamSwitcher->m_bInputPinChanged = false;
+		pStreamSwitcher->m_bOutputFormatChanged = false;
+	}
+
+
+	if (bFormatChanged || cbBuffer > actual.cbBuffer) {
+		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: %s", bFormatChanged ? L"input or output media type changed" :  L"cbBuffer > actual.cbBuffer"));
 
 		m_SampleProps.dwSampleFlags |= AM_SAMPLE_TYPECHANGED/*|AM_SAMPLE_DATADISCONTINUITY|AM_SAMPLE_TIMEDISCONTINUITY*/;
 
@@ -861,8 +875,6 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 			hr = pOut->CurrentAllocator()->SetProperties(&props, &actual);
 			hr = pOut->CurrentAllocator()->Commit();
 		}
-
-		pStreamSwitcher->m_bInputPinChanged = false;
 	}
 
 	CComPtr<IMediaSample> pOutSample;
@@ -870,6 +882,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		return E_FAIL;
 	}
 
+	/*
 	pmt = NULL;
 	if (SUCCEEDED(pOutSample->GetMediaType(&pmt)) && pmt) {
 		const CMediaType mt(*pmt);
@@ -877,12 +890,11 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		// TODO
 		ASSERT(0);
 	}
+	*/
 
-	if (bInputChanged || pStreamSwitcher->m_bOutputFormatChanged) {
-		pOut->SetMediaType(&m_mt);
+	if (bFormatChanged) {
 		pOutSample->SetMediaType(&pOut->CurrentMediaType());
 		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: output media type changed"));
-		pStreamSwitcher->m_bOutputFormatChanged = false;
 	}
 
 	// Transform
@@ -1011,6 +1023,11 @@ HRESULT CStreamSwitcherOutputPin::DecideBufferSize(IMemAllocator* pAllocator, AL
 
 	if (pProperties->cBuffers < 8 && pIn->CurrentMediaType().majortype == MEDIATYPE_Audio) {
 		pProperties->cBuffers = 8;
+	}
+
+	if (*m_mt.FormatType() == FORMAT_WaveFormatEx) {
+		pProperties->cbBuffer *= ((WAVEFORMATEX*)m_mt.Format())->nChannels;
+		pProperties->cbBuffer /= ((WAVEFORMATEX*)pIn->CurrentMediaType().Format())->nChannels;
 	}
 
 	ALLOCATOR_PROPERTIES Actual;

@@ -228,20 +228,18 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return S_OK;
 	}
 
-	BYTE* data = pDataIn;
-
-	long out_buffersize = pOut->GetSize();
-	long out_size = in_allsamples *  out_wfe->nChannels * get_bytes_per_sample(in_sampleformat);
-	if (out_size > out_buffersize) {
-		DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::Transform: %d > %d"), out_size, out_buffersize);
-		//pOut->SetActualDataLength(0);
-		//return S_OK;
+	if (long(in_samples * out_wfe->nChannels * in_bytespersample) > pOut->GetSize()) {
+		DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::Transform: %d > %d"), in_samples * out_wfe->nChannels * in_bytespersample, pOut->GetSize());
+		pOut->SetActualDataLength(0);
+		return S_OK;
 	}
+
+	BYTE* data = pDataIn;
 
 	// Mixer
 	DWORD in_layout = GetChannelLayout(in_wfe);
 	DWORD out_layout = GetChannelLayout(out_wfe);
-	if (in_layout != out_layout && out_size <= out_buffersize) {
+	if (in_layout != out_layout) {
 		BYTE* out;
 		if (in_sampleformat == SAMPLE_FMT_FLT) {
 			out = pDataOut;
