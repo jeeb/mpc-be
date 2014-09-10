@@ -875,17 +875,8 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		return E_FAIL;
 	}
 
-	/*
 	pmt = NULL;
-	if (SUCCEEDED(pOutSample->GetMediaType(&pmt)) && pmt) {
-		const CMediaType mt(*pmt);
-		DeleteMediaType(pmt), pmt = NULL;
-		// TODO
-		ASSERT(0);
-	}
-	*/
-
-	if (bFormatChanged) {
+	if (bFormatChanged || S_OK == pOutSample->GetMediaType(&pmt)) {
 		pOutSample->SetMediaType(&pOut->CurrentMediaType());
 		DbgLog((LOG_TRACE, 3, L"CStreamSwitcherInputPin::Receive: output media type changed"));
 	}
