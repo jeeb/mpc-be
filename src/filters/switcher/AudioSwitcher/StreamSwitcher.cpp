@@ -815,16 +815,9 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		return pOut->Deliver(pSample);
 	}
 
-	//
-
 	ALLOCATOR_PROPERTIES props, actual;
 	hr = m_pAllocator->GetProperties(&props);
 	hr = pOut->CurrentAllocator()->GetProperties(&actual);
-
-	REFERENCE_TIME rtStart = 0, rtStop = 0;
-	if (S_OK == pSample->GetTime(&rtStart, &rtStop)) {
-		//
-	}
 
 	long cbBuffer = pSample->GetActualDataLength();
 	
@@ -1026,8 +1019,12 @@ HRESULT CStreamSwitcherOutputPin::DecideBufferSize(IMemAllocator* pAllocator, AL
 	}
 
 	if (*m_mt.FormatType() == FORMAT_WaveFormatEx) {
-		pProperties->cbBuffer *= ((WAVEFORMATEX*)m_mt.Format())->nChannels;
-		pProperties->cbBuffer /= ((WAVEFORMATEX*)pIn->CurrentMediaType().Format())->nChannels;
+		long cbBuffer = pProperties->cbBuffer;
+		cbBuffer *= ((WAVEFORMATEX*)m_mt.Format())->nChannels;
+		cbBuffer /= ((WAVEFORMATEX*)pIn->CurrentMediaType().Format())->nChannels;
+		if (cbBuffer > pProperties->cbBuffer) {
+			pProperties->cbBuffer = cbBuffer;
+		}
 	}
 
 	ALLOCATOR_PROPERTIES Actual;
