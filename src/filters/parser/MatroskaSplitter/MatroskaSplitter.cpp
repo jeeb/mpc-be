@@ -1016,7 +1016,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.formattype = FORMAT_SubtitleInfo;
 					SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + pTE->CodecPrivate.GetCount());
 					memset(psi, 0, mt.FormatLength());
-					strncpy_s(psi->IsoLang, pTE->Language, _countof(psi->IsoLang)-1);
+					strncpy_s(psi->IsoLang, pTE->Language, _countof(psi->IsoLang) - 1);
 					CString subtitle_Name = pTE->Name;
 					if (pTE->FlagForced && pTE->FlagDefault) {
 						subtitle_Name += L" [Default, Forced]";
@@ -1027,7 +1027,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					subtitle_Name = subtitle_Name.Trim();
 
-					wcsncpy_s(psi->TrackName, subtitle_Name, _countof(psi->TrackName)-1);
+					wcsncpy_s(psi->TrackName, subtitle_Name, _countof(psi->TrackName) - 1);
 					memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					mt.subtype =

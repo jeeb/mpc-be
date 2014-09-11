@@ -789,9 +789,9 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(_T("SUBTITLEINFO:"));
 		str.Format(_T("dwOffset: %u"), si.dwOffset);
 		sl.AddTail(str);
-		str.Format(_T("IsoLang: %s"), CString(CStringA(si.IsoLang, sizeof(si.IsoLang)-1)));
+		str.Format(_T("IsoLang: %s"), CString(CStringA(si.IsoLang, _countof(si.IsoLang) - 1)));
 		sl.AddTail(str);
-		str.Format(_T("TrackName: %s"), CString(CStringW(si.TrackName, sizeof(si.TrackName)-1)));
+		str.Format(_T("TrackName: %s"), CString(si.TrackName, _countof(si.TrackName) - 1));
 		sl.AddTail(str);
 
 		sl.AddTail(_T(""));

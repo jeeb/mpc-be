@@ -596,12 +596,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								mt.subtype		= MEDIASUBTYPE_VOBSUB;
 								mt.formattype	= FORMAT_SubtitleInfo;
 
-								SUBTITLEINFO* si	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
-								memset(si, 0, mt.FormatLength());
-								si->dwOffset		= sizeof(SUBTITLEINFO);
-								strcpy_s(si->IsoLang, _countof(si->IsoLang), CStringA(TrackLanguage));
-								wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
-								memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
+								SUBTITLEINFO* psi	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
+								memset(psi, 0, mt.FormatLength());
+								psi->dwOffset		= sizeof(SUBTITLEINFO);
+								strncpy_s(psi->IsoLang, TrackLanguage, _countof(psi->IsoLang) - 1);
+								wcsncpy_s(psi->TrackName, TrackName, _countof(psi->TrackName) - 1);
+								memcpy(psi + 1, (LPCSTR)hdr, hdr.GetLength());
 								mts.Add(mt);
 							}
 							break;
