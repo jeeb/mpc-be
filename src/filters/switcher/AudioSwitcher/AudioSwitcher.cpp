@@ -273,7 +273,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	// Copy or convert to output
 	if (data == pDataIn) {
-		memcpy(pDataOut, data, in_allsamples * sizeof(float));
+		memcpy(pDataOut, data, in_allsamples * in_bytespersample);
 	} else if (data == (BYTE*)m_buffer) {
 		convert_float_to(in_sampleformat, in_channels, in_samples, m_buffer, pDataOut);
 	}
