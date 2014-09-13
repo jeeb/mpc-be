@@ -45,15 +45,6 @@
 
 #define MPCAudioDecName L"MPC Audio Decoder"
 
-enum {
-	SPK_MONO = 0,
-	SPK_STEREO,
-	SPK_4_0,
-	SPK_5_0,
-	SPK_5_1,
-	SPK_7_1
-};
-
 struct ps2_state_t {
 	bool sync;
 	int a[2], b[2];
