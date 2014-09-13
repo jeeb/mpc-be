@@ -28,12 +28,12 @@
 #define AudioSwitcherName L"MPC AudioSwitcher"
 
 enum {
-	AS_SPK_MONO = 0,
-	AS_SPK_STEREO,
-	AS_SPK_4_0,
-	AS_SPK_5_0,
-	AS_SPK_5_1,
-	AS_SPK_7_1
+	SPK_MONO = 0,
+	SPK_STEREO,
+	SPK_4_0,
+	SPK_5_0,
+	SPK_5_1,
+	SPK_7_1
 };
 
 interface __declspec(uuid("CEDB2890-53AE-4231-91A3-B0AAFCD1DBDE"))

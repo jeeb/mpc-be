@@ -118,7 +118,7 @@ DWORD GetChannelLayout(WAVEFORMATEX* wfe)
 CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CStreamSwitcherFilter(lpunk, phr, __uuidof(this))
 	, m_bMixer(false)
-	, m_nMixerLayout(AS_SPK_STEREO)
+	, m_nMixerLayout(SPK_STEREO)
 	, m_bAutoVolumeControl(false)
 	, m_iNormLevel(75)
 	, m_iNormRealeaseTime(8)
@@ -432,7 +432,7 @@ STDMETHODIMP CAudioSwitcherFilter::SetChannelMixer(bool bMixer, int nLayout)
 	}
 
 	m_bMixer = bMixer;
-	if (nLayout >= AS_SPK_MONO && nLayout <= AS_SPK_7_1) {
+	if (nLayout >= SPK_MONO && nLayout <= SPK_7_1) {
 		m_nMixerLayout = nLayout;
 	}
 

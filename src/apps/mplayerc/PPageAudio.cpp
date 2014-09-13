@@ -186,12 +186,12 @@ BOOL CPPageAudio::OnInitDialog()
 	m_sAudioPaths              = s.strAudioPaths;
 
 	m_chkMixer.SetCheck(s.bAudioMixer);
-	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(ResStr(IDS_MPADEC_MONO)),   AS_SPK_MONO);
-	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(ResStr(IDS_MPADEC_STEREO)), AS_SPK_STEREO);
-	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("4.0")), AS_SPK_4_0);
-	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.0")), AS_SPK_5_0);
-	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.1")), AS_SPK_5_1);
-	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("7.1")), AS_SPK_7_1);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(ResStr(IDS_MPADEC_MONO)),   SPK_MONO);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(ResStr(IDS_MPADEC_STEREO)), SPK_STEREO);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("4.0")), SPK_4_0);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.0")), SPK_5_0);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.1")), SPK_5_1);
+	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("7.1")), SPK_7_1);
 	for (int i = 0; i < m_cmbMixerLayout.GetCount(); i++) {
 		if ((int)m_cmbMixerLayout.GetItemData(i) == s.nAudioMixerLayout) {
 			m_cmbMixerLayout.SetCurSel(i);
@@ -455,7 +455,7 @@ void CPPageAudio::OnBnClickedSoundProcessingDefault()
 {
 	m_chkMixer.SetCheck(BST_UNCHECKED);
 	for (int i = 0; i < m_cmbMixerLayout.GetCount(); i++) {
-		if ((int)m_cmbMixerLayout.GetItemData(i) == AS_SPK_STEREO) {
+		if ((int)m_cmbMixerLayout.GetItemData(i) == SPK_STEREO) {
 			m_cmbMixerLayout.SetCurSel(i);
 			break;
 		}

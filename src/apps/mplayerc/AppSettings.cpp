@@ -27,12 +27,12 @@
 #include "../../DSUtil/WinAPIUtils.h"
 
 enum {
-	AS_SPK_MONO = 0,
-	AS_SPK_STEREO,
-	AS_SPK_4_0,
-	AS_SPK_5_0,
-	AS_SPK_5_1,
-	AS_SPK_7_1
+	SPK_MONO = 0,
+	SPK_STEREO,
+	SPK_4_0,
+	SPK_5_0,
+	SPK_5_1,
+	SPK_7_1
 };
 
 const LPCTSTR channel_mode_sets[] = {
@@ -1144,10 +1144,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
 
 	bAudioMixer				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, FALSE);
-	nAudioMixerLayout		= AS_SPK_STEREO;
+	nAudioMixerLayout		= SPK_STEREO;
 	str						= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
 	str.Trim();
-	for (int i = AS_SPK_MONO; i <= AS_SPK_7_1; i++) {
+	for (int i = SPK_MONO; i <= SPK_7_1; i++) {
 		if (str == channel_mode_sets[i]) {
 			nAudioMixerLayout = i;
 			break;
