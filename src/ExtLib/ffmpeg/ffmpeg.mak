@@ -406,6 +406,7 @@ SRCS_LC = \
 	libavcodec/wavpack.c \
 	libavcodec/wma.c \
 	libavcodec/wma_common.c \
+	libavcodec/wma_freqs.c \
 	libavcodec/wmadec.c \
 	libavcodec/wmalosslessdec.c \
 	libavcodec/wmaprodec.c \
@@ -414,7 +415,6 @@ SRCS_LC = \
 	libavcodec/wmv2dec.c \
 	libavcodec/wmv2dsp.c \
 	libavcodec/xiph.c \
-	libavcodec/xvid_c_idct.c \
 	libavcodec/xvididct.c \
 	\
 	libavcodec/x86/ac3dsp_init.c \
@@ -442,8 +442,6 @@ SRCS_LC = \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
-	libavcodec/x86/idct_mmx_xvid.c \
-	libavcodec/x86/idct_sse2_xvid.c \
 	libavcodec/x86/idctdsp_init.c \
 	libavcodec/x86/idctdsp_mmx.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
@@ -473,7 +471,9 @@ SRCS_LC = \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
 	libavcodec/x86/vp9dsp_init.c \
-	libavcodec/x86/xvididct_init.c
+	libavcodec/x86/xvididct_init.c \
+	libavcodec/x86/xvididct_mmx.c \
+	libavcodec/x86/xvididct_sse2.c
 
 SRCS_LF = \
 	libavfilter/af_atempo.c \
