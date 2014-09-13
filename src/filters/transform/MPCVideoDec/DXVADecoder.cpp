@@ -660,40 +660,41 @@ void CDXVADecoder::EndOfStream()
 {
 	CComPtr<IMediaSample> pSampleToDeliver;
 
-	int nPicIndex = FindOldestFrame();
-	while (nPicIndex != -1) {
-		if (m_pPictureStore[nPicIndex].rtStart >= 0) {
-			switch (m_nEngine) {
-				case ENGINE_DXVA1 :
-					// TODO - need check under WinXP on DXVA1
-					/*
-					HRESULT hr = GetDeliveryBuffer (m_pPictureStore[nPicIndex].rtStart, m_pPictureStore[nPicIndex].rtStop, &pSampleToDeliver);
-					SetTypeSpecificFlags(&m_pPictureStore[nPicIndex], pSampleToDeliver);
-					if (SUCCEEDED(hr)) {
-						hr = m_pAMVideoAccelerator->DisplayFrame(nPicIndex, pSampleToDeliver);
-					}
-					*/
-					break;
-				case ENGINE_DXVA2 :
-					SetTypeSpecificFlags(&m_pPictureStore[nPicIndex], m_pPictureStore[nPicIndex].pSample);
-					if (FAILED(m_pFilter->GetOutputPin()->Deliver(m_pPictureStore[nPicIndex].pSample))) {
-						return;
-					}
-					break;
-			}
-		}
+	if (m_pPictureStore) {
+		for (int nPicIndex = 0; nPicIndex < m_nPicEntryNumber; nPicIndex++) {
+			if (m_pPictureStore[nPicIndex].pSample && m_pPictureStore[nPicIndex].bInUse) {
+				m_pFilter->ReorderBFrames(m_pPictureStore[nPicIndex].rtStart, m_pPictureStore[nPicIndex].rtStop);
+				m_pFilter->UpdateFrameTime(m_pPictureStore[nPicIndex].rtStart, m_pPictureStore[nPicIndex].rtStop);
+				switch (m_nEngine) {
+					case ENGINE_DXVA1 :
+						// TODO - need check under WinXP on DXVA1
+						/*
+						HRESULT hr = GetDeliveryBuffer (m_pPictureStore[nPicIndex].rtStart, m_pPictureStore[nPicIndex].rtStop, &pSampleToDeliver);
+						SetTypeSpecificFlags(&m_pPictureStore[nPicIndex], pSampleToDeliver);
+						if (SUCCEEDED(hr)) {
+							hr = m_pAMVideoAccelerator->DisplayFrame(nPicIndex, pSampleToDeliver);
+						}
+						*/
+						break;
+					case ENGINE_DXVA2 :
+						SetTypeSpecificFlags(&m_pPictureStore[nPicIndex], m_pPictureStore[nPicIndex].pSample);
+						if (FAILED(m_pFilter->GetOutputPin()->Deliver(m_pPictureStore[nPicIndex].pSample))) {
+							return;
+						}
+						break;
+				}
 
 #if defined(_DEBUG) && 0
-			TRACE ("CDXVADecoder::EndOfStream() : %10I64d - %10I64d, (Dur = %10I64d), Ind = %02d\n",
-					m_pPictureStore[nPicIndex].rtStart,
-					m_pPictureStore[nPicIndex].rtStop,
-					m_pPictureStore[nPicIndex].rtStop - m_pPictureStore[nPicIndex].rtStart,
-					nPicIndex);
+				TRACE("CDXVADecoder::EndOfStream() : %10I64d - %10I64d, (Dur = %10I64d), Ind = %02d\n",
+					  m_pPictureStore[nPicIndex].rtStart,
+					  m_pPictureStore[nPicIndex].rtStop,
+					  m_pPictureStore[nPicIndex].rtStop - m_pPictureStore[nPicIndex].rtStart,
+					  nPicIndex);
 #endif
 
-		FreePictureSlot(nPicIndex);
-	
-		nPicIndex = FindOldestFrame();
+				FreePictureSlot(nPicIndex);
+			}
+		}
 	}
 }
 
