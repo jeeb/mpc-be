@@ -135,7 +135,7 @@ HRESULT CMpaSplitterFile::Init()
 		searchlen = (int)min(endDataPos - GetPos(), 512);
 
 		// Check for a valid MPA header
-		if (Read(m_mpahdr, searchlen, &m_mt, true)) {
+		if (Read(m_mpahdr, searchlen, &m_mt, true, true)) {
 			// check multiple frame to ensure that the data is correct
 			__int64 savepos = GetPos() - MPA_HEADER_SIZE;
 			Seek(savepos + m_mpahdr.FrameSize);
@@ -244,7 +244,7 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 		while (GetPos() <= endpos - MPA_HEADER_SIZE) {
 			mpahdr h;
 
-			if (Read(h, (int)(endpos - GetPos()), NULL, true)) {
+			if (Read(h, (int)(endpos - GetPos()), NULL, true, true)) {
 				Seek(GetPos() - MPA_HEADER_SIZE);
 				if (bExtraCheck) {
 					__int64 pos = GetPos();

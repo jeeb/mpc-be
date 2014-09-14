@@ -451,7 +451,7 @@ public:
 	bool Read(peshdr& h, BYTE code);
 	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt = NULL, bool find_sync = true);
-	bool Read(mpahdr& h, int len, CMediaType* pmt = NULL, bool fAllowV25 = false);
+	bool Read(mpahdr& h, int len, CMediaType* pmt = NULL, bool fAllowV25 = false, bool find_sync = false);
 	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(ac3hdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true, bool AC3CoreOnly = true);
