@@ -701,7 +701,6 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 	return true;
 }
 
-#define AGAIN Seek(pos); BitRead(8); continue;
 bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt, bool fAllowV25)
 {
 	memset(&h, 0, sizeof(h));
@@ -709,78 +708,74 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt, bool fAllowV
 	int syncbits = fAllowV25 ? 11 : 12;
 	int bitrate = 0;
 
-	for (;;) {
-		for (; len >= 4 && BitRead(syncbits, true) != (1 << syncbits) - 1; len--) {
-			BitRead(8);
-		}
+	if (len < 4) {
+		return false;
+	}
 
-		if (len < 4) {
-			return false;
-		}
+	if (BitRead(syncbits, true) != (1 << syncbits) - 1) {
+		return false;
+	}
 
-		__int64 pos = GetPos();
+	__int64 pos = GetPos();
 
-		h.sync = BitRead(11);
-		h.version = BitRead(2);
-		h.layer = BitRead(2);
-		h.crc = BitRead(1);
-		h.bitrate = BitRead(4);
-		h.freq = BitRead(2);
-		h.padding = BitRead(1);
-		h.privatebit = BitRead(1);
-		h.channels = BitRead(2);
-		h.modeext = BitRead(2);
-		h.copyright = BitRead(1);
-		h.original = BitRead(1);
-		h.emphasis = BitRead(2);
+	h.sync = BitRead(11);
+	h.version = BitRead(2);
+	h.layer = BitRead(2);
+	h.crc = BitRead(1);
+	h.bitrate = BitRead(4);
+	h.freq = BitRead(2);
+	h.padding = BitRead(1);
+	h.privatebit = BitRead(1);
+	h.channels = BitRead(2);
+	h.modeext = BitRead(2);
+	h.copyright = BitRead(1);
+	h.original = BitRead(1);
+	h.emphasis = BitRead(2);
 
-		if (h.version == 1 || h.layer == 0 || h.freq == 3 || h.bitrate == 15 || h.emphasis == 2) {
-			AGAIN
-		}
+	if (h.version == 1 || h.layer == 0 || h.freq == 3 || h.bitrate == 15 || h.emphasis == 2) {
+		return false;
+	}
 
-		if (h.version == 3 && h.layer == 2) {
-			if (h.channels == 3) {
-				if (h.bitrate >= 11 && h.bitrate <= 14) {
-					AGAIN
-				}
-			} else {
-				if (h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) {
-					AGAIN
-				}
+	if (h.version == 3 && h.layer == 2) {
+		if (h.channels == 3) {
+			if (h.bitrate >= 11 && h.bitrate <= 14) {
+				return false;
+			}
+		} else {
+			if (h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) {
+				return false;
 			}
 		}
+	}
 
-		h.layer = 4 - h.layer;
+	h.layer = 4 - h.layer;
 
-		static int brtbl[][5] = {
-			{  0,   0,   0,   0,   0},
-			{ 32,  32,  32,  32,   8},
-			{ 64,  48,  40,  48,  16},
-			{ 96,  56,  48,  56,  24},
-			{128,  64,  56,  64,  32},
-			{160,  80,  64,  80,  40},
-			{192,  96,  80,  96,  48},
-			{224, 112,  96, 112,  56},
-			{256, 128, 112, 128,  64},
-			{288, 160, 128, 144,  80},
-			{320, 192, 160, 160,  96},
-			{352, 224, 192, 176, 112},
-			{384, 256, 224, 192, 128},
-			{416, 320, 256, 224, 144},
-			{448, 384, 320, 256, 160},
-			{  0,   0,   0,   0,   0},
-		};
+	static int brtbl[][5] = {
+		{  0,   0,   0,   0,   0},
+		{ 32,  32,  32,  32,   8},
+		{ 64,  48,  40,  48,  16},
+		{ 96,  56,  48,  56,  24},
+		{128,  64,  56,  64,  32},
+		{160,  80,  64,  80,  40},
+		{192,  96,  80,  96,  48},
+		{224, 112,  96, 112,  56},
+		{256, 128, 112, 128,  64},
+		{288, 160, 128, 144,  80},
+		{320, 192, 160, 160,  96},
+		{352, 224, 192, 176, 112},
+		{384, 256, 224, 192, 128},
+		{416, 320, 256, 224, 144},
+		{448, 384, 320, 256, 160},
+		{  0,   0,   0,   0,   0},
+	};
 
-		static int brtblcol[][4] = {
-			{0, 3, 4, 4},
-			{0, 0, 1, 2}
-		};
-		bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version&1][h.layer]];
-		if (bitrate == 0) {
-			AGAIN
-		}
-
-		break;
+	static int brtblcol[][4] = {
+		{0, 3, 4, 4},
+		{0, 0, 1, 2}
+	};
+	bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version&1][h.layer]];
+	if (bitrate == 0) {
+		return false;
 	}
 
 	static int freq[][4] = {

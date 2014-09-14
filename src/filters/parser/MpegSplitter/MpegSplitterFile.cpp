@@ -760,11 +760,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 				if (!m_streams[stream_type::audio].Find(s)) {
 					if (Read(h, len, &s.mt)) {
-						if (m_mpaValid[s].IsValid()) {
-							type = stream_type::audio;
-						} else {
-							m_mpaValid[s].Handle(h);
-						}
+						type = stream_type::audio;
 					}
 				}
 			}

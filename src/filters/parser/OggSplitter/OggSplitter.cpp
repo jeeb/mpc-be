@@ -31,17 +31,6 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 
-#define MAKE32BITS(x)	(x[0]<<24 | x[1]<<16 | x[2]<<8 | x[3])
-#define MAKE24BITS(x)	(x[0]<<16 | x[1]<<8  | x[2])
-#define MAKE16BITS(x)	(x[0]<<8  | x[1])
-
-# define TH_VERSION_CHECK(version_major,version_minor,version_subminor,_maj,_min,_sub) \
-						 (version_major>(_maj)||version_major==(_maj)&& \
-						 (version_minor>(_min)||version_minor==(_min)&& \
-						  version_subminor>=(_sub)))
-
-#define MAX_PTS_SHIFT 10*UNITS
-
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -393,7 +382,7 @@ start:
 			}
 			REFERENCE_TIME rt = pOggPin->GetRefTime(page2.m_hdr.granule_position);
 			if (rt > 0) {
-				if ((rt - rtMin) > MAX_PTS_SHIFT) {
+				if ((rt - rtMin) > 10 * UNITS) {
 					rtMin = rt;
 				} else {
 					break;

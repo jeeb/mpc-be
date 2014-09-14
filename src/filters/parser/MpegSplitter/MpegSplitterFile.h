@@ -61,7 +61,6 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 	CAtlMap<DWORD, CValidStream<latm_aachdr, 3>>	m_aaclatmValid;
 	CAtlMap<DWORD, CValidStream<aachdr>>			m_aacValid;
-	CAtlMap<DWORD, CValidStream<mpahdr>>			m_mpaValid;
 	CAtlMap<DWORD, CValidStream<ac3hdr>>			m_ac3Valid;
 
 	BOOL m_bOpeningCompleted;
