@@ -231,6 +231,7 @@ protected:
 	bool DemuxLoop();
 
 	DWORD m_bitstream_serial_number_start, m_bitstream_serial_number_last;
+	DWORD m_bitstream_serial_number_Video = DWORD_MAX;
 
 	BOOL bIsTheoraPresent;
 

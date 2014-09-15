@@ -236,6 +236,7 @@ start:
 					} else if (!memcmp(p, "video", 5)) {
 						name.Format(L"Video %d", streamId++);
 						pPinOut.Attach(DNew COggVideoOutputPin((OggStreamHeader*)p, name, this, this, &hr));
+						m_bitstream_serial_number_Video = page.m_hdr.bitstream_serial_number;
 					} else if (!memcmp(p, "audio", 5)) {
 						name.Format(L"Audio %d", streamId++);
 						pPinOut.Attach(DNew COggAudioOutputPin((OggStreamHeader*)p, name, this, this, &hr));
@@ -244,7 +245,11 @@ start:
 						pPinOut.Attach(DNew COggTextOutputPin((OggStreamHeader*)p, name, this, this, &hr));
 					} else if (!memcmp(p, "Direct Show Samples embedded in Ogg", 35)) {
 						name.Format(L"DirectShow %d", streamId++);
-						pPinOut.Attach(DNew COggDirectShowOutputPin((AM_MEDIA_TYPE*)(p + 35 + sizeof(GUID)), name, this, this, &hr));
+						AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)(p + 35 + sizeof(GUID));
+						pPinOut.Attach(DNew COggDirectShowOutputPin(pmt, name, this, this, &hr));
+						if (pmt->majortype == MEDIATYPE_Video) {
+							m_bitstream_serial_number_Video = page.m_hdr.bitstream_serial_number;
+						}
 					}
 
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
@@ -473,6 +478,8 @@ bool COggSplitterFilter::DemuxInit()
 	return true;
 }
 
+#define CalcPos(rt) (__int64)(1.0 * rt / m_rtDuration * len)
+
 void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	if (rt <= 0) {
@@ -480,10 +487,10 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	} else if (m_rtDuration > 0) {
 
 		__int64 len			= m_pFile->GetLength();
-		__int64 seekpos		= (__int64)(1.0*rt/m_rtDuration*len);
+		__int64 seekpos		= CalcPos(rt);
 		__int64 minseekpos	= _I64_MIN;
 
-		REFERENCE_TIME rtmax = rt - UNITS * (bIsTheoraPresent ? 2 : 0);
+		REFERENCE_TIME rtmax = rt - UNITS * (bIsTheoraPresent || (m_bitstream_serial_number_Video != DWORD_MAX) ? 2 : 0);
 		REFERENCE_TIME rtmin = rtmax - UNITS / 2;
 
 		__int64 curpos = seekpos;
@@ -509,10 +516,14 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						continue;
 					}
 
+					if (m_bitstream_serial_number_Video != DWORD_MAX
+							&& m_bitstream_serial_number_Video != page.m_hdr.bitstream_serial_number) {
+						continue;
+					}
+
 					rt2 = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
 					break;
 				}
-			
 			}
 
 			if (rt2 == INVALID_TIME) {
@@ -535,7 +546,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				break;
 			}
 
-			curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+			curpos -= CalcPos(dt);
 			m_pFile->Seek(curpos);
 		}
 
@@ -701,8 +712,8 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 				// ASSERT(m_lastpacket);
 				if (m_lastpacket) {
 					int size = m_lastpacket->GetCount();
-					m_lastpacket->SetCount(size + j-i);
-					memcpy(m_lastpacket->GetData() + size, pData + i, j-i);
+					m_lastpacket->SetCount(size + j - i);
+					memcpy(m_lastpacket->GetData() + size, pData + i, j - i);
 
 					CAutoLock csAutoLock(&m_csPackets);
 
@@ -727,7 +738,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 
 				p->TrackNumber = page.m_hdr.bitstream_serial_number;
 
-				if (S_OK == UnpackPacket(p, pData + i, j-i)) {
+				if (S_OK == UnpackPacket(p, pData + i, j - i)) {
 					/*
 					TRACE(_T("COggSplitterOutputPin::UnpackPage() : [%d]: %d, %I64d -> %I64d (disc=%d, sync=%d)\n"),
 							(int)p->TrackNumber, p->GetCount(), p->rtStart, p->rtStop,
@@ -792,8 +803,8 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
 {
 	m_audio_sample_rate = h->audio_sample_rate;
-	m_blocksize[0] = 1<<h->blocksize_0;
-	m_blocksize[1] = 1<<h->blocksize_1;
+	m_blocksize[0] = 1 << h->blocksize_0;
+	m_blocksize[1] = 1 << h->blocksize_1;
 	m_lastblocksize = 0;
 
 	CMediaType mt;
@@ -864,7 +875,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 		}
 
 		int cnt = m_initpackets.GetCount();
-		if (cnt < 3 && (p->GetCount() >= 6 && p->GetAt(0) == 1+cnt*2)) {
+		if (cnt < 3 && (p->GetCount() >= 6 && p->GetAt(0) == 1 + cnt * 2)) {
 			VORBISFORMAT2* vf2		= (VORBISFORMAT2*)m_mts[0].Format();
 			vf2->HeaderSize[cnt]	= p->GetCount();
 			int len					= m_mts[0].FormatLength();
@@ -885,7 +896,7 @@ REFERENCE_TIME COggVorbisOutputPin::GetRefTime(__int64 granule_position)
 
 HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len)
 {
-	if (len >= 7 && !memcmp(pData+1, "vorbis", 6)) {
+	if (len >= 7 && !memcmp(pData + 1, "vorbis", 6)) {
 		if (IsInitialized()) {
 			return E_FAIL; // skip Vorbis header packets ...
 		}
@@ -894,12 +905,12 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 	if (len > 0 && m_blockflags.GetCount()) {
 		bitstream bs(pData, len);
 		if (bs.getbits(1) == 0) {
-			int x = m_blockflags.GetCount()-1, n = 0;
+			int x = m_blockflags.GetCount() - 1, n = 0;
 			while (x) {
 				n++;
 				x >>= 1;
 			}
-			DWORD blocksize = m_blocksize[m_blockflags[bs.getbits(n)]?1:0];
+			DWORD blocksize = m_blocksize[m_blockflags[bs.getbits(n)] ? 1 : 0];
 			if (m_lastblocksize) {
 				m_rtLast += GetRefTime((m_lastblocksize + blocksize) >> 2);
 			}
@@ -1046,7 +1057,7 @@ COggDirectShowOutputPin::COggDirectShowOutputPin(AM_MEDIA_TYPE* pmt, LPCWSTR pNa
 {
 	CMediaType mt;
 	memcpy((AM_MEDIA_TYPE*)&mt, pmt, FIELD_OFFSET(AM_MEDIA_TYPE, pUnk));
-	mt.SetFormat((BYTE*)(pmt+1), pmt->cbFormat);
+	mt.SetFormat((BYTE*)(pmt + 1), pmt->cbFormat);
 	mt.SetSampleSize(1);
 	if (mt.majortype == MEDIATYPE_Video) { // TODO: find samples for audio and find out what to return in GetRefTime...
 		m_mts.Add(mt);
@@ -1074,9 +1085,9 @@ HRESULT COggDirectShowOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, 
 
 	BYTE hdr = pData[i++];
 
-	if (!(hdr&1)) {
+	if (!(hdr & 1)) {
 		// TODO: verify if this was still present in the old format (haven't found one sample yet)
-		BYTE nLenBytes = (hdr>>6)|((hdr&2)<<1);
+		BYTE nLenBytes = (hdr >> 6) | ((hdr & 2) << 1);
 		__int64 Length = 0;
 		for (int j = 0; j < nLenBytes; j++) {
 			Length |= (__int64)pData[i++] << (j << 3);
@@ -1087,7 +1098,19 @@ HRESULT COggDirectShowOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, 
 			return E_FAIL;
 		}
 
-		p->bSyncPoint	= !!(hdr&8);
+		bool bKeyFrame = !!(hdr & 8);
+		if (!m_fSetKeyFrame) {
+			m_fSetKeyFrame = bKeyFrame;
+		}
+
+		if (m_mt.majortype == MEDIATYPE_Video) {
+			if (!m_fSetKeyFrame) {
+				DbgLog((LOG_TRACE, 3, L"COggDirectShowOutputPin::UnpackPacket() : KeyFrame not found !!!"));
+				return E_FAIL; // waiting for a key frame after seeking
+			}
+		}
+
+		p->bSyncPoint	= bKeyFrame;
 		p->rtStart		= m_rtLast;
 		p->rtStop		= m_rtLast + (nLenBytes ? GetRefTime(Length) : GetRefTime(1));
 		p->SetData(&pData[i], len - i);
@@ -1122,7 +1145,7 @@ HRESULT COggStreamOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 	BYTE hdr = pData[i++];
 
 	if (!(hdr&1)) {
-		BYTE nLenBytes = (hdr>>6)|((hdr&2)<<1);
+		BYTE nLenBytes = (hdr >> 6) | ((hdr & 2) << 1);
 		__int64 Length = 0;
 		for (int j = 0; j < nLenBytes; j++) {
 			Length |= (__int64)pData[i++] << (j << 3);
@@ -1133,7 +1156,19 @@ HRESULT COggStreamOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 			return E_FAIL;
 		}
 
-		p->bSyncPoint	= !!(hdr&8);
+		bool bKeyFrame = !!(hdr & 8);
+		if (!m_fSetKeyFrame) {
+			m_fSetKeyFrame = bKeyFrame;
+		}
+
+		if (COggVideoOutputPin* pOggPinVideo = dynamic_cast<COggVideoOutputPin*>(this)) {
+			if (!m_fSetKeyFrame) {
+				DbgLog((LOG_TRACE, 3, L"COggStreamOutputPin::UnpackPacket() : KeyFrame not found !!!"));
+				return E_FAIL; // waiting for a key frame after seeking
+			}
+		}
+
+		p->bSyncPoint	= bKeyFrame;
 		p->rtStart		= m_rtLast;
 		p->rtStop		= m_rtLast + (nLenBytes ? GetRefTime(Length) : GetRefTime(m_default_len));
 		p->SetData(&pData[i], len - i);
@@ -1156,12 +1191,12 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 
 	CMediaType mt;
 	mt.majortype	= MEDIATYPE_Video;
-	mt.subtype		= FOURCCMap(MAKEFOURCC(h->subtype[0],h->subtype[1],h->subtype[2],h->subtype[3]));
+	mt.subtype		= FOURCCMap(MAKEFOURCC(h->subtype[0], h->subtype[1], h->subtype[2], h->subtype[3]));
 	mt.formattype	= FORMAT_VideoInfo;
 	
 	VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
-	memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), h+1, extra);
+	memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), h + 1, extra);
 	
 	pvih->AvgTimePerFrame			= h->time_unit / h->samples_per_unit;
 	pvih->bmiHeader.biWidth			= h->v.w;
@@ -1210,7 +1245,7 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
-	memcpy(mt.Format() + sizeof(WAVEFORMATEX), h+1, extra);
+	memcpy(mt.Format() + sizeof(WAVEFORMATEX), h + 1, extra);
 	
 	wfe->cbSize				= extra;
 	wfe->wFormatTag			= (WORD)mt.subtype.Data1;
@@ -1348,7 +1383,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 								   FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) +
 								   ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader +
 								   2 + size);
-			*(WORD*)((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader) = (size>>8)|(size<<8);
+			*(WORD*)((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader) = (size >> 8) | (size << 8);
 			memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->GetData(), size);
 			vih->cbSequenceHeader += 2 + size;
 
@@ -1395,10 +1430,9 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 		m_fSetKeyFrame = bKeyFrame;
 	}
 	if (!m_fSetKeyFrame && IsInitialized()) {
-		TRACE(_T("COggTheoraOutputPin::UnpackPacket() : KeyFrame not found !!!\n"));
+		DbgLog((LOG_TRACE, 3, L"COggTheoraOutputPin::UnpackPacket() : KeyFrame not found !!!"));
 		return E_FAIL; // waiting for a key frame after seeking
 	}
-
 
 	p->bSyncPoint	= bKeyFrame;
 	p->rtStart		= m_rtLast;
