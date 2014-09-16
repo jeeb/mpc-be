@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2014 vedi file Authors.txt"
@@ -149,7 +149,7 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 16		"Sound processing"
 17		"Mix channels to:"
 19		"Spostamento audio (ms):"
-22		"Auto volume control"
+22		"Controllo volume automatico"
 25		"Boost audio"
 30		"Default"
 END
@@ -373,7 +373,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 31		"Cronologia"
 32		"Ricorda l'ultimo zoom Pan&&Scan"
 33		"Ricorda l'ultima playlist"
-34		"Number of recent files:"
+34		"Numero di file recenti:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -388,7 +388,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 23		"Se imposti l'antialiasing a schermo intero nella GPU, i sottotitoli NON si vedranno meglio, tuttavia la CPU avrà un carico maggiore."
 25		"Attenzione"
 26		"Abilita animazioni durante il buffering"
-28		"Allow dropping some subpictures if the queue is running late"
+28		"Permette il dropping di alcune subpictures se la coda è in ritardo"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -492,12 +492,12 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
 5		"Formato preferito"
-7		"Load playlist"
+7		"Carica playlist"
 8		"Seleziona sorgente"
 9		"Interno"
 10		"File sorgente"
-11		"Initial buffer size"
-12		"% of source file size"
+11		"Buffer size iniziale"
+12		"% della dim. file sorgente"
 13		"Mb"
 END
 
@@ -1113,7 +1113,7 @@ END
 
 STRING IDC_BUTTON_EXT_SET		"Cliccando questo pulsante, lo stato selezionato del gruppo rifletterà le attuali associazioni di file. Estensioni aggiunte successivamente lo renderanno grigio, quindi ricordati di riselezionarlo prima di chiudere questa finestra!"
 STRING IDC_CACH_SIZE		"Dimensione cache per le operazioni sui file"
-STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
+STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabitilare questa opzione impedirà ai sottotitoli di lampeggiare, ma può causare lo skip di alcuni frame da parte del video renderer."
 STRING IDC_CHECK_RELATIVETO		"Lo stato di default eredita da altri stili finché non viene definito"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Consente l'animazione dei sottotitoli utilizzando un subpicture buffer maggiore di 0. Disabilitando questa opzione, l'uso della CPU sarà inferiore. Disabilitare anche in caso di sottotitoli lampeggianti."
 STRING IDC_CHECK_SUBRESYNC		"Permette di visualizzare e modificare i sottotitoli (incluso il time code).Potrebbe rallentare il caricamento degli stessi sottotitoli."
@@ -1640,7 +1640,7 @@ STRING IDS_MFMT_WAVPACK		"WavPack"
 STRING IDS_MFMT_WEBM		"WebM"
 STRING IDS_MFMT_WMA		"Windows Media Audio"
 STRING IDS_MFMT_WMV		"Windows Media Video"
-STRING IDS_MKVSPLT_CALC_DURATION		"Calculate the duration based on the video data"
+STRING IDS_MKVSPLT_CALC_DURATION		"Calcola la durata in base ai dati video"
 STRING IDS_MKVSPLT_LOAD_EMBEDDED_FONTS		"Carica i font embedded"
 STRING IDS_MPADEC_AC3ENCODE		"Codifica in AC-3"
 STRING IDS_MPADEC_DRC		"Applica DRC per AC-3 e E-AC3"
@@ -1723,8 +1723,8 @@ STRING IDS_NEW_UPDATE_AVAILABLE		"Una nuova %s è disponibile.\n\nVuoi visitare 
 STRING IDS_NO_MORE_MEDIA		"Terminati i file multimediali nella cartella corrente."
 STRING IDS_OPEN_WITH_MPC		"Riproduci con MPC-BE"
 STRING IDS_OPTIONS_CAPTION		"Opzioni"
-STRING IDS_OSD_AUTOVOLUMECONTROL_OFF		"Auto volume control: Off"
-STRING IDS_OSD_AUTOVOLUMECONTROL_ON		"Auto volume control: On"
+STRING IDS_OSD_AUTOVOLUMECONTROL_OFF		"Controllo volume automatico: Off"
+STRING IDS_OSD_AUTOVOLUMECONTROL_ON		"Controllo volume automatico: On"
 STRING IDS_OSD_BRIGHTNESS		"Luminosità: %s"
 STRING IDS_OSD_CONTRAST		"Contrasto: %s"
 STRING IDS_OSD_CUSTOM_CH_MAPPING_OFF		"Mappatura personalizzata dei canali: Off"
@@ -1835,7 +1835,7 @@ STRING IDS_PPSDB_BADURL		"URL non corretto, impossibile trovare il database di s
 STRING IDS_PPSDB_PROTOCOLERR		"Incompatibilità versioni del protocollo, aggiorna il lettore o scegli un indirizzo diverso!"
 STRING IDS_PPSDB_URLCORRECT		"L'URL sembra corretto!"
 STRING IDS_PROPSHEET_PROPERTIES		"Proprietà"
-STRING IDS_PUBLISHED		"Published : "
+STRING IDS_PUBLISHED		"Pubblicato : "
 STRING IDS_REALVIDEO_INCOMPATIBLE		"Il nome del file contiene caratteri non consentiti (usa solo A-Z, 0-9)"
 STRING IDS_RECENT_FILES		"File recenti"
 STRING IDS_RECENT_FILES_CLEAR		"Pulisci lista"
