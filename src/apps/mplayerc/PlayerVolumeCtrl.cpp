@@ -319,13 +319,11 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	CRect r;
 	GetChannelRect(&r);
-
-	if (r.left >= r.right) {
-		return;
-	}
+	ASSERT(r.left < r.right);
 
 	int start, stop;
 	GetRange(start, stop);
+	ASSERT(start < stop);
 
 	r.left += 3;
 	r.right -= 4;
@@ -334,10 +332,10 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		SetPos(start);
 	} else if (point.x >= r.right) {
 		SetPos(stop);
-	} else if (start < stop) {
-		int w = r.right - r.left - 4;
-		SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w / 2)) / w);
 	}
+	
+	int w = r.right - r.left - 4;
+	SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w / 2)) / w);
 
 	CSliderCtrl::OnLButtonDown(nFlags, point);
 }
@@ -353,19 +351,18 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 {
 	int nVolMin, nVolMax;
 	GetRange(nVolMin, nVolMax);
+	int nVol = min(max(nVolMin, (int)nSBCode), nVolMax);
 
-	if ((UINT)nVolMin <= nSBCode && nSBCode <= (UINT)nVolMax) {
-		CRect r;
-		GetClientRect(&r);
-		InvalidateRect(&r);
-		UpdateWindow();
+	CRect r;
+	GetClientRect(&r);
+	InvalidateRect(&r);
+	UpdateWindow();
 
-		AfxGetAppSettings().nVolume = GetPos();
-		CFrameWnd* pFrame = GetParentFrame();
+	AfxGetAppSettings().nVolume = GetPos();
+	CFrameWnd* pFrame = GetParentFrame();
 
-		if (pFrame && pFrame != GetParent()) {
-			pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
-		}
+	if (pFrame && pFrame != GetParent()) {
+		pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
 	}
 }
 
