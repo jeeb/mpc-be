@@ -1538,8 +1538,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
 				ret.AddStyle(StyleName, style);
 			} catch (...) {
-				delete style;
-				return false;
+				ret.CreateDefaultStyle(CharSet);
 			}
 		} else if (entry == L"[script info]") {
 			fRet = true;
