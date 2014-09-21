@@ -123,7 +123,11 @@ HRESULT CSubPicQueueImpl::RenderTo(ISubPic* pSubPic, REFERENCE_TIME rtStart, REF
 	}
 	if (SUCCEEDED(hr)) {
 		CRect r(0,0,0,0);
-		hr = pSubPicProvider->Render(spd, bIsAnimated ? rtStart : ((rtStart + rtStop) / 2), fps, r);
+		REFERENCE_TIME rtRender = rtStart;
+		if (!bIsAnimated) {
+			rtRender += (rtStop - rtStart - 1);
+		}
+		hr = pSubPicProvider->Render(spd, rtRender, fps, r);
 
 		pSubPic->SetStart(rtStart);
 		pSubPic->SetStop(rtStop);
@@ -232,6 +236,11 @@ STDMETHODIMP CSubPicQueue::Invalidate(REFERENCE_TIME rtInvalidate)
 		TRACE(_T("  %f -> %f -> %f\n"), double(rtStart) / 10000000.0, double(rtStop) / 10000000.0, double(rtSegmentStop) / 10000000.0);
 #endif
 		m_queue.RemoveTailNoReturn();
+	}
+
+	// If we invalidate in the past, always give the queue a chance to re-render the modified subtitles
+	if (rtInvalidate >= 0 && rtInvalidate < m_rtNow) {
+		m_rtNow = rtInvalidate;
 	}
 
 	lock.unlock();

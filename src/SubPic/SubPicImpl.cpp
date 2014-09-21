@@ -29,10 +29,16 @@
 
 CSubPicImpl::CSubPicImpl()
 	: CUnknown(NAME("CSubPicImpl"), NULL)
-	, m_rtStart(0), m_rtStop(0)
-	, m_rtSegmentStart(0), m_rtSegmentStop(0)
-	, m_rcDirty(0, 0, 0, 0), m_maxsize(0, 0), m_size(0, 0), m_vidrect(0, 0, 0, 0)
-	, m_VirtualTextureSize(0, 0), m_VirtualTextureTopLeft (0, 0)
+	, m_rtStart(0)
+	, m_rtStop(0)
+	, m_rtSegmentStart(0)
+	, m_rtSegmentStop(0)
+	, m_rcDirty(0, 0, 0, 0)
+	, m_maxsize(0, 0)
+	, m_size(0, 0)
+	, m_vidrect(0, 0, 0, 0)
+	, m_VirtualTextureSize(0, 0)
+	, m_VirtualTextureTopLeft (0, 0)
 {
 }
 
@@ -87,9 +93,7 @@ STDMETHODIMP_(void) CSubPicImpl::SetStop(REFERENCE_TIME rtStop)
 
 STDMETHODIMP CSubPicImpl::CopyTo(ISubPic* pSubPic)
 {
-	if (!pSubPic) {
-		return E_POINTER;
-	}
+	CheckPointer(pSubPic, E_POINTER);
 
 	pSubPic->SetStart(m_rtStart);
 	pSubPic->SetStop(m_rtStop);
@@ -176,8 +180,8 @@ STDMETHODIMP CSubPicImpl::GetSize(SIZE* pSize)
 
 STDMETHODIMP CSubPicImpl::SetVirtualTextureSize (const SIZE pSize, const POINT pTopLeft)
 {
-	m_VirtualTextureSize.SetSize (pSize.cx, pSize.cy);
-	m_VirtualTextureTopLeft.SetPoint (pTopLeft.x, pTopLeft.y);
+	m_VirtualTextureSize.SetSize(pSize.cx, pSize.cy);
+	m_VirtualTextureTopLeft.SetPoint(pTopLeft.x, pTopLeft.y);
 
 	return S_OK;
 }
@@ -217,9 +221,7 @@ STDMETHODIMP CSubPicAllocatorImpl::SetCurVidRect(RECT curvidrect)
 
 STDMETHODIMP CSubPicAllocatorImpl::GetStatic(ISubPic** ppSubPic)
 {
-	if (!ppSubPic) {
-		return E_POINTER;
-	}
+	CheckPointer(ppSubPic, E_POINTER);
 
 	CSize size(0, 0);
 	if (m_pStatic && (FAILED(m_pStatic->GetSize(&size)) || size.cx != m_cursize.cx) || (size.cy != m_cursize.cy)) {
@@ -242,9 +244,7 @@ STDMETHODIMP CSubPicAllocatorImpl::GetStatic(ISubPic** ppSubPic)
 
 STDMETHODIMP CSubPicAllocatorImpl::AllocDynamic(ISubPic** ppSubPic)
 {
-	if (!ppSubPic) {
-		return E_POINTER;
-	}
+	CheckPointer(ppSubPic, E_POINTER);
 
 	if (!Alloc(false, ppSubPic) || !*ppSubPic) {
 		return E_OUTOFMEMORY;

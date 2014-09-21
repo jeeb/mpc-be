@@ -27,12 +27,15 @@
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
 	: CUnknown(NAME("CSubPicAllocatorPresenterImpl"), NULL)
 	, m_hWnd(hWnd)
-	, m_NativeVideoSize(0, 0), m_AspectRatio(0, 0)
-	, m_VideoRect(0, 0, 0, 0), m_WindowRect(0, 0, 0, 0)
+	, m_NativeVideoSize(0, 0)
+	, m_AspectRatio(0, 0)
+	, m_VideoRect(0, 0, 0, 0)
+	, m_WindowRect(0, 0, 0, 0)
 	, m_fps(25.0)
 	, m_rtSubtitleDelay(0)
 	, m_bDeviceResetRequested(false)
 	, m_bPendingResetDevice(false)
+	, m_rtNow(0)
 {
 	if (!IsWindow(m_hWnd)) {
 		hr = E_INVALIDARG;
