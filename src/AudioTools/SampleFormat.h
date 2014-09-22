@@ -20,6 +20,6 @@ enum SampleFormat {
     SAMPLE_FMT_NB           ///< Number of sample formats.
 };
 
-int get_bits_per_sample(SampleFormat sample_fmt);
-int get_bytes_per_sample(SampleFormat sample_fmt);
-bool sample_fmt_is_planar(SampleFormat sample_fmt);
+int get_bits_per_sample(const SampleFormat sample_fmt);
+int get_bytes_per_sample(const SampleFormat sample_fmt);
+bool sample_fmt_is_planar(const SampleFormat sample_fmt);

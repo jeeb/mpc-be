@@ -866,7 +866,7 @@ HRESULT CMpcAudioRenderer::EndOfStream(void)
 #pragma region
 // ==== WASAPI
 
-static const TCHAR *GetSampleFormatString(SampleFormat value)
+static const TCHAR *GetSampleFormatString(const SampleFormat value)
 {
 #define UNPACK_VALUE(VALUE) case VALUE: return _T( #VALUE );
 	switch (value) {

@@ -112,16 +112,16 @@ SAMPLECONVERTFUNCT(double, float)
 
 SAMPLECONVERTFUNCT(float, double)
 
-SampleFormat GetSampleFormat(WAVEFORMATEX* wfe);
+SampleFormat GetSampleFormat(const WAVEFORMATEX* wfe);
 
-HRESULT convert_to_int16(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, int16_t* pOut);
-HRESULT convert_to_int24(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, BYTE* pOut);
-HRESULT convert_to_int32(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, int32_t* pOut);
-HRESULT convert_to_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, float* pOut);
+HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int16_t* pOut);
+HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, BYTE* pOut);
+HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int32_t* pOut);
+HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut);
 
-HRESULT convert_to_planar_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, float* pOut);
+HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut);
 
-HRESULT convert_float_to(SampleFormat sfmt, WORD nChannels, DWORD nSamples, float* pIn, BYTE* pOut);
+HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, float* pIn, BYTE* pOut);
 
 inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
 {

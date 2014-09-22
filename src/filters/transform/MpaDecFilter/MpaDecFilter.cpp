@@ -1545,7 +1545,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 	}
 
 	MPCSampleFormat out_mpcsf = SelectSampleFormat(SamplefmtToMPC[sfmt]);
-	SampleFormat out_sf = MPCtoSamplefmt[out_mpcsf];
+	const SampleFormat out_sf = MPCtoSamplefmt[out_mpcsf];
 
 	BYTE*  pDataIn  = pBuff;
 	CAtlArray<float> mixData;

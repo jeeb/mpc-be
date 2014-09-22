@@ -25,11 +25,11 @@
 
 #define limit(a, x, b) if (x < a) { x = a; } else if (x > b) { x = b; }
 
-SampleFormat GetSampleFormat(WAVEFORMATEX* wfe)
+SampleFormat GetSampleFormat(const WAVEFORMATEX* wfe)
 {
 	SampleFormat sample_format = SAMPLE_FMT_NONE;
 
-	WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+	const WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
 	WORD tag = wfe->wFormatTag;
 
 	if (tag == WAVE_FORMAT_PCM || (tag == WAVE_FORMAT_EXTENSIBLE && wfex->SubFormat == KSDATAFORMAT_SUBTYPE_PCM)) {
@@ -61,7 +61,7 @@ SampleFormat GetSampleFormat(WAVEFORMATEX* wfe)
 	return sample_format;
 }
 
-HRESULT convert_to_int16(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, int16_t* pOut)
+HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int16_t* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -134,7 +134,7 @@ HRESULT convert_to_int16(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 	return S_OK;
 }
 
-HRESULT convert_to_int24(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, BYTE* pOut)
+HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, BYTE* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -246,7 +246,7 @@ HRESULT convert_to_int24(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 	return S_OK;
 }
 
-HRESULT convert_to_int32(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, int32_t* pOut)
+HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int32_t* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -320,7 +320,7 @@ HRESULT convert_to_int32(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 	return S_OK;
 }
 
-HRESULT convert_to_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, float* pOut)
+HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -398,7 +398,7 @@ HRESULT convert_to_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 	return S_OK;
 }
 
-HRESULT convert_to_planar_float(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE* pIn, float* pOut)
+HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -465,7 +465,7 @@ HRESULT convert_to_planar_float(SampleFormat sfmt, WORD nChannels, DWORD nSample
 	return S_OK;
 }
 
-HRESULT convert_float_to(SampleFormat sfmt, WORD nChannels, DWORD nSamples, float* pIn, BYTE* pOut)
+HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, float* pIn, BYTE* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 

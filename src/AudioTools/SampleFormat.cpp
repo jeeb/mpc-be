@@ -21,17 +21,17 @@ sample_fmt_info[SAMPLE_FMT_NB] = {
 //  { 24,  true }  // SAMPLE_FMT_S24P
 };
 
-int get_bits_per_sample(SampleFormat sample_fmt)
+int get_bits_per_sample(const SampleFormat sample_fmt)
 {
     return sample_fmt < 0 || sample_fmt >= SAMPLE_FMT_NB ? 0 : sample_fmt_info[sample_fmt].bits;
 }
 
-int get_bytes_per_sample(SampleFormat sample_fmt)
+int get_bytes_per_sample(const SampleFormat sample_fmt)
 {
     return sample_fmt < 0 || sample_fmt >= SAMPLE_FMT_NB ? 0 : sample_fmt_info[sample_fmt].bits >> 3;
 }
 
-bool sample_fmt_is_planar(SampleFormat sample_fmt)
+bool sample_fmt_is_planar(const SampleFormat sample_fmt)
 {
     return sample_fmt < 0 || sample_fmt >= SAMPLE_FMT_NB ? false : sample_fmt_info[sample_fmt].planar;
 }

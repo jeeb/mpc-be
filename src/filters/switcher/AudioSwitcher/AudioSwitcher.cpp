@@ -96,7 +96,7 @@ channel_mode[] = {
 	{8, AV_CH_LAYOUT_7POINT1, /*_T("7.1")*/ }, // SPK_7_1    "7.1"
 };
 
-DWORD GetChannelLayout(WAVEFORMATEX* wfe)
+static DWORD GetChannelLayout(const WAVEFORMATEX* wfe)
 {
 	DWORD channel_layout = 0;
 
@@ -187,8 +187,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return __super::Transform(pIn, pOut);
 	}
 
-	WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
-	WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
+	const WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
+	const WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
 
 	const SampleFormat in_sampleformat = GetSampleFormat(in_wfe);
 	if (in_sampleformat == SAMPLE_FMT_NONE) {
