@@ -844,7 +844,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 				} else if (CodecID == "A_TRUEHD" ||
 						   CodecID == "A_MLP") {
-					wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3;
 					mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
 					mts.Add(mt);
 				} else if (CodecID == "A_DTS") {
