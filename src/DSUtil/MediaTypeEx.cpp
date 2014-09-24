@@ -510,6 +510,9 @@ CString GetGUIDString(const GUID& guid)
 		ADDENTRY(DXVA_Intel_VC1_ClearVideo_2);
 		ADDENTRY(DXVA_MPEG4_ASP);
 
+		ADDENTRY(DXVA_ModeHEVC_VLD_Main);
+		ADDENTRY(DXVA_ModeHEVC_VLD_Main10);
+
 		ADDENTRY(DXVA_NoEncrypt);
 	}
 
