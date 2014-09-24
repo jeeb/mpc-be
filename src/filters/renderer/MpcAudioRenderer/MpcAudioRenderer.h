@@ -39,6 +39,7 @@
 class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CMpcAudioRenderer : public CBaseRenderer
 	, public IBasicAudio
+	, public IMediaSeeking
 	, public ISpecifyPropertyPages2
 	, public IMpcAudioRendererFilter
 {
@@ -54,41 +55,60 @@ public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
 	virtual ~CMpcAudioRenderer();
 
-	HRESULT						Receive(IMediaSample* pSample);
-	HRESULT						CheckInputType(const CMediaType* mtIn);
-	virtual HRESULT				CheckMediaType(const CMediaType *pmt);
-	virtual HRESULT				SetMediaType(const CMediaType *pmt);
-	virtual HRESULT				DoRenderSample(IMediaSample *pMediaSample) {return E_NOTIMPL;}
+	HRESULT				Receive(IMediaSample* pSample);
+	HRESULT				CheckInputType(const CMediaType* mtIn);
+	virtual HRESULT		CheckMediaType(const CMediaType *pmt);
+	virtual HRESULT		SetMediaType(const CMediaType *pmt);
+	virtual HRESULT		DoRenderSample(IMediaSample *pMediaSample) {return E_NOTIMPL;}
 
-	virtual HRESULT				BeginFlush();
-	virtual HRESULT				EndFlush();
+	virtual HRESULT		BeginFlush();
+	virtual HRESULT		EndFlush();
 
-	HRESULT						EndOfStream(void);
+	HRESULT				EndOfStream(void);
 
 	DECLARE_IUNKNOWN
 
-	STDMETHODIMP				NonDelegatingQueryInterface(REFIID riid, void **ppv);
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
 
 	// === IMediaFilter
-	STDMETHOD(Run)				(REFERENCE_TIME rtStart);
-	STDMETHOD(Stop)				();
-	STDMETHOD(Pause)			();
+	STDMETHODIMP Run(REFERENCE_TIME rtStart);
+	STDMETHODIMP Stop();
+	STDMETHODIMP Pause();
 
 	// === IDispatch (pour IBasicAudio)
-	STDMETHOD(GetTypeInfoCount)	(UINT * pctinfo) { return E_NOTIMPL; };
-	STDMETHOD(GetTypeInfo)		(UINT itinfo, LCID lcid, ITypeInfo ** pptinfo) { return E_NOTIMPL; };
-	STDMETHOD(GetIDsOfNames)	(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) { return E_NOTIMPL; };
-	STDMETHOD(Invoke)			(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) { return E_NOTIMPL; };
+	STDMETHODIMP GetTypeInfoCount(UINT * pctinfo) { return E_NOTIMPL; };
+	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo ** pptinfo) { return E_NOTIMPL; };
+	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) { return E_NOTIMPL; };
+	STDMETHODIMP Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) { return E_NOTIMPL; };
 
 	// === IBasicAudio
-	STDMETHOD(put_Volume)		(long lVolume);
-	STDMETHOD(get_Volume)		(long *plVolume);
-	STDMETHOD(put_Balance)		(long lBalance) {return E_NOTIMPL;}
-	STDMETHOD(get_Balance)		(long *plBalance) {return E_NOTIMPL;}
+	STDMETHODIMP put_Volume(long lVolume);
+	STDMETHODIMP get_Volume(long *plVolume);
+	STDMETHODIMP put_Balance(long lBalance) {return E_NOTIMPL;}
+	STDMETHODIMP get_Balance(long *plBalance) {return E_NOTIMPL;}
+
+	// === IMediaSeeking
+	STDMETHODIMP GetCapabilities(DWORD* pCapabilities);
+	STDMETHODIMP CheckCapabilities(DWORD* pCapabilities);
+	STDMETHODIMP IsFormatSupported(const GUID* pFormat);
+	STDMETHODIMP QueryPreferredFormat(GUID* pFormat);
+	STDMETHODIMP GetTimeFormat(GUID* pFormat);
+	STDMETHODIMP IsUsingTimeFormat(const GUID* pFormat);
+	STDMETHODIMP SetTimeFormat(const GUID* pFormat);
+	STDMETHODIMP GetDuration(LONGLONG* pDuration);
+	STDMETHODIMP GetStopPosition(LONGLONG* pStop);
+	STDMETHODIMP GetCurrentPosition(LONGLONG* pCurrent);
+	STDMETHODIMP ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat);
+	STDMETHODIMP SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
+	STDMETHODIMP GetPositions(LONGLONG* pCurrent, LONGLONG* pStop);
+	STDMETHODIMP GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest);
+	STDMETHODIMP SetRate(double dRate);
+	STDMETHODIMP GetRate(double* pdRate);
+	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
 
 	// === ISpecifyPropertyPages2
-	STDMETHODIMP				GetPages(CAUUID* pPages);
-	STDMETHODIMP				CreatePage(const GUID& guid, IPropertyPage** ppPage);
+	STDMETHODIMP GetPages(CAUUID* pPages);
+	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
 	// === IMpcAudioRendererFilter
 	STDMETHODIMP					Apply();
@@ -106,96 +126,96 @@ public:
 
 	// CMpcAudioRenderer
 private:
-	HRESULT						GetReferenceClockInterface(REFIID riid, void **ppv);
+	HRESULT					GetReferenceClockInterface(REFIID riid, void **ppv);
 
-	CCritSec					m_csProps;
-	CCritSec					m_csCheck;
+	CCritSec				m_csProps;
+	CCritSec				m_csCheck;
 
-	WAVEFORMATEX				*m_pWaveFileFormat;
-	WAVEFORMATEX				*m_pWaveFileFormatOutput;
-	CBaseReferenceClock*		m_pReferenceClock;
-	double						m_dRate;
-	long						m_lVolume;
+	WAVEFORMATEX			*m_pWaveFileFormat;
+	WAVEFORMATEX			*m_pWaveFileFormatOutput;
+	CBaseReferenceClock*	m_pReferenceClock;
+	double					m_dRate;
+	long					m_lVolume;
 
 	// CMpcAudioRenderer WASAPI methods
-	HRESULT						GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
-	HRESULT						GetAudioDevice();
-	HRESULT						CreateAudioClient();
-	HRESULT						InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
-	HRESULT						CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
-	HRESULT						DoRenderSampleWasapi(IMediaSample *pMediaSample);
-	HRESULT						GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
+	HRESULT					GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
+	HRESULT					GetAudioDevice();
+	HRESULT					CreateAudioClient();
+	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
+	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
+	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
+	HRESULT					GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
 
-	bool						IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
-	bool						CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
-	bool						CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
+	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
+	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
+	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
-	BOOL						IsBitstream(WAVEFORMATEX *pWaveFormatEx);
-	HRESULT						SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
-	void						CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec);
+	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
+	HRESULT					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
+	void					CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec);
 
-	HRESULT						StartAudioClient();
-	HRESULT						StopAudioClient();
+	HRESULT					StartAudioClient();
+	HRESULT					StopAudioClient();
 
-	HRESULT						RenderWasapiBuffer();
-	void						CheckBufferStatus();
-	void						WasapiFlush();
+	HRESULT					RenderWasapiBuffer();
+	void					CheckBufferStatus();
+	void					WasapiFlush();
 
-	inline REFERENCE_TIME		GetClockTime();
+	inline REFERENCE_TIME	GetClockTime();
 
 	// WASAPI variables
-	HMODULE						m_hModule;
-	HANDLE						m_hTask;
-	WASAPI_MODE					m_WASAPIMode;
-	WASAPI_MODE					m_WASAPIModeAfterRestart;
-	CString						m_DeviceName;
-	IMMDevice					*m_pMMDevice;
-	IAudioClient				*m_pAudioClient;
-	IAudioRenderClient			*m_pRenderClient;
-	UINT32						m_nFramesInBuffer;
-	REFERENCE_TIME				m_hnsPeriod;
-	bool						m_isAudioClientStarted;
-	double						m_dVolume;
-	BOOL						m_bIsBitstream;
-	BOOL						m_bUseBitExactOutput;
-	BOOL						m_bUseSystemLayoutChannels;
-	FILTER_STATE				m_filterState;
+	HMODULE					m_hModule;
+	HANDLE					m_hTask;
+	WASAPI_MODE				m_WASAPIMode;
+	WASAPI_MODE				m_WASAPIModeAfterRestart;
+	CString					m_DeviceName;
+	IMMDevice				*m_pMMDevice;
+	IAudioClient			*m_pAudioClient;
+	IAudioRenderClient		*m_pRenderClient;
+	UINT32					m_nFramesInBuffer;
+	REFERENCE_TIME			m_hnsPeriod;
+	bool					m_isAudioClientStarted;
+	double					m_dVolume;
+	BOOL					m_bIsBitstream;
+	BOOL					m_bUseBitExactOutput;
+	BOOL					m_bUseSystemLayoutChannels;
+	FILTER_STATE			m_filterState;
 
-	typedef HANDLE				(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
-	typedef BOOL				(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
+	typedef HANDLE			(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
+	typedef BOOL			(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
 
 	PTR_AvSetMmThreadCharacteristicsW	pfAvSetMmThreadCharacteristicsW;
 	PTR_AvRevertMmThreadCharacteristics	pfAvRevertMmThreadCharacteristics;
 	
-	HRESULT						EnableMMCSS();
-	HRESULT						RevertMMCSS();
+	HRESULT					EnableMMCSS();
+	HRESULT					RevertMMCSS();
 
 	// Rendering thread
-	static DWORD WINAPI			RenderThreadEntryPoint(LPVOID lpParameter);
-	DWORD						RenderThread();
-	DWORD						m_nThreadId;
+	static DWORD WINAPI		RenderThreadEntryPoint(LPVOID lpParameter);
+	DWORD					RenderThread();
+	DWORD					m_nThreadId;
  
-	BOOL						m_bThreadPaused;
+	BOOL					m_bThreadPaused;
 
-	HRESULT						StopRendererThread();
-	HRESULT						StartRendererThread();
-	HRESULT						PauseRendererThread();
+	HRESULT					StopRendererThread();
+	HRESULT					StartRendererThread();
+	HRESULT					PauseRendererThread();
 
-	HANDLE						m_hRenderThread;
+	HANDLE					m_hRenderThread;
 
-	HANDLE						m_hDataEvent;
-	HANDLE						m_hPauseEvent;
-	HANDLE						m_hResumeEvent;
-	HANDLE						m_hWaitPauseEvent;
-	HANDLE						m_hWaitResumeEvent;
-	HANDLE						m_hStopRenderThreadEvent;
+	HANDLE					m_hDataEvent;
+	HANDLE					m_hPauseEvent;
+	HANDLE					m_hResumeEvent;
+	HANDLE					m_hWaitPauseEvent;
+	HANDLE					m_hWaitResumeEvent;
+	HANDLE					m_hStopRenderThreadEvent;
 
-	HANDLE						m_hRendererNeedMoreData;
-	HANDLE						m_hStopWaitingRenderer;
+	HANDLE					m_hRendererNeedMoreData;
+	HANDLE					m_hStopWaitingRenderer;
 
-	CSimpleArray<WORD>			m_wBitsPerSampleList;
-	CSimpleArray<WORD>			m_nChannelsList;
-	CSimpleArray<DWORD>			m_dwChannelMaskList;
+	CSimpleArray<WORD>		m_wBitsPerSampleList;
+	CSimpleArray<WORD>		m_nChannelsList;
+	CSimpleArray<DWORD>		m_dwChannelMaskList;
 
 	struct AudioParams {
 		WORD	wBitsPerSample;
@@ -211,5 +231,5 @@ private:
 					&& (*this).nSamplesPerSec == ap.nSamplesPerSec);
 		}
 	};
-	CSimpleArray<AudioParams>	m_AudioParamsList;
+	CSimpleArray<AudioParams> m_AudioParamsList;
 };

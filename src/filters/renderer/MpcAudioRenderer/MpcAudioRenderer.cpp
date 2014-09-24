@@ -224,8 +224,20 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_hRendererNeedMoreData		= CreateEvent(NULL, TRUE, FALSE, NULL);
 	m_hStopWaitingRenderer		= CreateEvent(NULL, FALSE, FALSE, NULL);
 
+	HRESULT hr = S_OK;
+	// CBaseRenderer is using a lazy initialization for the CRendererPosPassThru - we need it always
+	CBasePin *pPin = GetPin(0);
+	m_pPosition = new CRendererPosPassThru(NAME("CRendererPosPassThru"), CBaseFilter::GetOwner(), &hr, pPin);
+	if (m_pPosition == NULL) {
+		hr = E_OUTOFMEMORY;
+	} else if (FAILED(hr)) {
+		delete m_pPosition;
+		m_pPosition = NULL;
+		hr = E_NOINTERFACE;
+	}
+
 	if (phr) {
-		*phr = S_OK;
+		*phr = hr;
 	}
 }
 
@@ -240,31 +252,15 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 
 	WasapiFlush();
 
-	if (m_hStopRenderThreadEvent) {
-		CloseHandle(m_hStopRenderThreadEvent);
-	}
-	if (m_hDataEvent) {
-		CloseHandle(m_hDataEvent);
-	}
-	if (m_hPauseEvent) {
-		CloseHandle(m_hPauseEvent);
-	}
-	if (m_hWaitPauseEvent) {
-		CloseHandle(m_hWaitPauseEvent);
-	}
-	if (m_hResumeEvent) {
-		CloseHandle(m_hResumeEvent);
-	}
-	if (m_hWaitResumeEvent) {
-		CloseHandle(m_hWaitResumeEvent);
-	}
+	SAFE_CLOSE_HANDLE(m_hStopRenderThreadEvent);
+	SAFE_CLOSE_HANDLE(m_hDataEvent);
+	SAFE_CLOSE_HANDLE(m_hPauseEvent);
+	SAFE_CLOSE_HANDLE(m_hWaitPauseEvent);
+	SAFE_CLOSE_HANDLE(m_hResumeEvent);
+	SAFE_CLOSE_HANDLE(m_hWaitResumeEvent);
 
-	if (m_hRendererNeedMoreData) {
-		CloseHandle(m_hRendererNeedMoreData);
-	}
-	if (m_hStopWaitingRenderer) {
-		CloseHandle(m_hStopWaitingRenderer);
-	}
+	SAFE_CLOSE_HANDLE(m_hRendererNeedMoreData);
+	SAFE_CLOSE_HANDLE(m_hStopWaitingRenderer);
 
 	SAFE_RELEASE(m_pRenderClient);
 	SAFE_RELEASE(m_pAudioClient);
@@ -397,6 +393,8 @@ STDMETHODIMP CMpcAudioRenderer::NonDelegatingQueryInterface(REFIID riid, void **
 		return GetInterface(static_cast<IDispatch*>(this), ppv);
 	} else if (riid == IID_IBasicAudio) {
 		return GetInterface(static_cast<IBasicAudio*>(this), ppv);
+	} else if (riid == IID_IMediaSeeking) {
+        return GetInterface(static_cast<IMediaSeeking*>(this), ppv);
 	} else if (riid == __uuidof(ISpecifyPropertyPages)) {
 		return GetInterface(static_cast<ISpecifyPropertyPages*>(this), ppv);
 	} else if (riid == __uuidof(ISpecifyPropertyPages2)) {
@@ -648,6 +646,92 @@ STDMETHODIMP CMpcAudioRenderer::get_Volume(long *plVolume)
 	*plVolume = m_lVolume;
 
 	return S_OK;
+}
+
+// === IMediaSeeking
+STDMETHODIMP CMpcAudioRenderer::IsFormatSupported(const GUID* pFormat)
+{
+	return m_pPosition->IsFormatSupported(pFormat);
+}
+
+STDMETHODIMP CMpcAudioRenderer::QueryPreferredFormat(GUID* pFormat)
+{
+	return m_pPosition->QueryPreferredFormat(pFormat);
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetTimeFormat(const GUID* pFormat)
+{
+	return m_pPosition->SetTimeFormat(pFormat);
+}
+
+STDMETHODIMP CMpcAudioRenderer::IsUsingTimeFormat(const GUID* pFormat)
+{
+	return m_pPosition->IsUsingTimeFormat(pFormat);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetTimeFormat(GUID* pFormat)
+{
+	return m_pPosition->GetTimeFormat(pFormat);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetDuration(LONGLONG* pDuration)
+{
+	return m_pPosition->GetDuration(pDuration);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetStopPosition(LONGLONG* pStop)
+{
+	return m_pPosition->GetStopPosition(pStop);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetCurrentPosition(LONGLONG* pCurrent)
+{
+	return m_pPosition->GetCurrentPosition(pCurrent);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetCapabilities(DWORD* pCapabilities)
+{
+	return m_pPosition->GetCapabilities(pCapabilities);
+}
+
+STDMETHODIMP CMpcAudioRenderer::CheckCapabilities(DWORD* pCapabilities)
+{
+	return m_pPosition->CheckCapabilities(pCapabilities);
+}
+
+STDMETHODIMP CMpcAudioRenderer::ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat)
+{
+	return m_pPosition->ConvertTimeFormat(pTarget, pTargetFormat, Source, pSourceFormat);
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetPositions(LONGLONG* pCurrent, DWORD CurrentFlags, LONGLONG* pStop, DWORD StopFlags)
+{
+	return m_pPosition->SetPositions(pCurrent, CurrentFlags, pStop, StopFlags);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetPositions(LONGLONG* pCurrent, LONGLONG* pStop)
+{
+	return m_pPosition->GetPositions(pCurrent, pStop);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest)
+{
+	return m_pPosition->GetAvailable(pEarliest, pLatest);
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetRate(double dRate)
+{
+	return VFW_E_UNSUPPORTED_AUDIO;
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetRate(double* pdRate)
+{
+	return m_pPosition->GetRate(pdRate);
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetPreroll(LONGLONG* pPreroll)
+{
+	return m_pPosition->GetPreroll(pPreroll);
 }
 
 // === ISpecifyPropertyPages2
