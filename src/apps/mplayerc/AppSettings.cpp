@@ -957,8 +957,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	CMPlayerCApp::SetLanguage(iLanguage);
 
-	CreateCommands();
-
 	PerfomanceSettings.LoadSettings();
 	FiltersPrioritySettings.LoadSettings();
 
@@ -1160,6 +1158,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iAudioNormRealeaseTime	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, 8);
 
 	{
+		m_filters.RemoveAll();
 		for (unsigned int i = 0; ; i++) {
 			CString key;
 			key.Format(_T("%s\\%04u"), IDS_R_FILTERS, i);
@@ -1258,6 +1257,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		m_pnspresets.Add(str);
 	}
 
+	wmcmds.RemoveAll();
+	CreateCommands();
 	for (int i = 0; i < wmcmds.GetCount(); i++) {
 		CString str;
 		str.Format(_T("CommandMod%d"), i);
@@ -1430,6 +1431,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nDVBLastChannel			= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_DVB_LAST_CHANNEL, 1);
 	fBDAIgnoreEncryptedChannels = !!pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_IGNORE_ENCRYPTED_CHANNELS, 0);
 
+	m_DVBChannels.RemoveAll();
 	for (int iChannel = 0; ; iChannel++) {
 		CString strTemp;
 		CString strChannel;
@@ -1440,7 +1442,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			break;
 		}
 		Channel.FromString(strChannel);
-		m_DVBChannels.AddTail (Channel);
+		m_DVBChannels.AddTail(Channel);
 	}
 
 	// playback positions for last played DVDs
@@ -1448,8 +1450,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nCurrentDvdPosition = -1;
 	memset(DvdPosition, 0, sizeof(DvdPosition));
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
-		CString		strDVDPos;
-		CString		strValue;
+		CString	strDVDPos;
+		CString	strValue;
 
 		strDVDPos.Format(_T("DVD Position %d"), i);
 		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strDVDPos);
@@ -1462,8 +1464,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fRememberFilePos		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, 0);
 	nCurrentFilePosition	= -1;
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-		CString		strFilePos;
-		CString		strValue;
+		CString	strFilePos;
+		CString strValue;
 
 		strFilePos.Format(_T("File Name %d"), i);
 		FilePosition[i].strFile = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);

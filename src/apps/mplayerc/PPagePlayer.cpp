@@ -88,6 +88,7 @@ BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_FILE_POS, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdatePos)
+	ON_EN_CHANGE(IDC_EDIT1, OnChangeEdit1)
 	ON_EN_KILLFOCUS(IDC_EDIT1, OnKillFocusEdit1)
 END_MESSAGE_MAP()
 
@@ -234,4 +235,13 @@ void CPPagePlayer::OnKillFocusEdit1()
 	m_nRecentFiles = min(max(MIN_RECENT_FILES, m_nRecentFiles), MAX_RECENT_FILES); // CSpinButtonCtrl.SetRange() does not affect the manual input
 
 	UpdateData(FALSE);
+}
+
+void CPPagePlayer::OnChangeEdit1()
+{
+	CString rString;
+	GetDlgItemText(IDC_EDIT1, rString);
+	if (rString.IsEmpty()) {
+		OnKillFocusEdit1();
+	}
 }
