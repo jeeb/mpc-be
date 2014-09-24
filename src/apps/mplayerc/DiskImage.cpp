@@ -25,7 +25,7 @@
 #include <WinIoCtl.h>
 #include "DiskImage.h"
 
-DiskImage::DiskImage()
+CDiskImage::CDiskImage()
 	: m_DriveType(NONE)
 	, m_DriveLetter(0)
 	, m_hVirtualDiskModule(NULL)
@@ -39,7 +39,7 @@ DiskImage::DiskImage()
 {
 }
 
-DiskImage::~DiskImage()
+CDiskImage::~CDiskImage()
 {
 	UnmountDiskImage();
 
@@ -49,7 +49,7 @@ DiskImage::~DiskImage()
 	}
 }
 
-void DiskImage::Init()
+void CDiskImage::Init()
 {
 	// Windows 8 Virtual Disks functions
 	if (IsWinEightOrLater()) {
@@ -110,12 +110,12 @@ void DiskImage::Init()
 #endif
 }
 
-bool DiskImage::DriveAvailable()
+bool CDiskImage::DriveAvailable()
 {
 	return (m_DriveType > NONE);
 }
 
-const LPCTSTR DiskImage::GetExts()
+const LPCTSTR CDiskImage::GetExts()
 {
 	if (m_DriveType == WIN8) {
 		return _T("*.iso");
@@ -129,7 +129,7 @@ const LPCTSTR DiskImage::GetExts()
 	return NULL;
 }
 
-bool DiskImage::CheckExtension(LPCTSTR pathName)
+bool CDiskImage::CheckExtension(LPCTSTR pathName)
 {
 	CString ext = GetFileExt(pathName).MakeLower();
 
@@ -149,7 +149,7 @@ bool DiskImage::CheckExtension(LPCTSTR pathName)
 	return false;
 }
 
-TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
+TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 {
 	UnmountDiskImage();
 	m_DriveLetter = 0;
@@ -168,7 +168,7 @@ TCHAR DiskImage::MountDiskImage(LPCTSTR pathName)
 	return m_DriveLetter;
 }
 
-void DiskImage::UnmountDiskImage()
+void CDiskImage::UnmountDiskImage()
 {
 	if (m_DriveType == WIN8) {
 		SAFE_CLOSE_HANDLE(m_VHDHandle);
@@ -201,7 +201,7 @@ void DiskImage::UnmountDiskImage()
 	m_DriveLetter = 0;
 }
 
-TCHAR DiskImage::MountWin8(LPCTSTR pathName)
+TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 {
 	if (m_hVirtualDiskModule) {
 		CString ISOVolumeName;
@@ -324,7 +324,7 @@ TCHAR DiskImage::MountWin8(LPCTSTR pathName)
 }
 
 #if ENABLE_DTLITE_SUPPORT
-TCHAR DiskImage::MountDTLite(LPCTSTR pathName)
+TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
 {
 	m_dtdrive = dt_none;
 

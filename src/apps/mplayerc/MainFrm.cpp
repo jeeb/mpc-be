@@ -4389,7 +4389,10 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetDwmPreview(FALSE);
 	m_wndToolBar.SwitchTheme();
 
-	m_DiskImage.UnmountDiskImage();
+	if (m_bNeedUnmountImage) {
+		m_DiskImage.UnmountDiskImage();
+	}
+	m_bNeedUnmountImage = TRUE;
 
 	SetThreadExecutionState(ES_CONTINUOUS);
 
@@ -10363,26 +10366,27 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 	if (GetPlaybackMode() == PM_FILE) {
 		UINT id = nID - ID_NAVIGATE_CHAP_SUBITEM_START;
 
-		if (id < m_MPLSPlaylist.GetCount() && m_MPLSPlaylist.GetCount() > 1) {
+		if (!m_MPLSPlaylist.IsEmpty() && id < m_MPLSPlaylist.GetCount()) {
 			POSITION pos = m_MPLSPlaylist.GetHeadPosition();
 			UINT idx = 0;
 			while (pos) {
 				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
 				if (idx == id) {
+					m_bNeedUnmountImage = FALSE;
 					SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					m_bIsBDPlay = TRUE;
 
 					CAtlList<CString> sl;
 					sl.AddTail(Item->m_strFileName);
 					m_wndPlaylistBar.Open(sl, false);
-					OpenCurPlaylistItem();
+					OpenCurPlaylistItem(INVALID_TIME, !m_DiskImage.DriveAvailable());
 					return;
 				}
 				idx++;
 			}
 		}
 
-		if (m_MPLSPlaylist.GetCount() > 1) {
+		if (!m_MPLSPlaylist.IsEmpty()) {
 			id -= m_MPLSPlaylist.GetCount();
 		}
 

@@ -1234,7 +1234,8 @@ public:
 
 	CColorControl	m_ColorCintrol;
 protected:
-	DiskImage	m_DiskImage;
+	CDiskImage	m_DiskImage;
+	BOOL		m_bNeedUnmountImage = TRUE;
 	BOOL		OpenIso(CString pathName);
 
 	void		AddRecent(CString pathName);

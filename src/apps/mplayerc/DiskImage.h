@@ -24,7 +24,7 @@
 
 #define ENABLE_DTLITE_SUPPORT 1
 
-class DiskImage
+class CDiskImage
 {
 private:
 	enum DriveType {NONE, WIN8, DTLITE};
@@ -60,8 +60,8 @@ private:
 #endif
 
 public:
-	DiskImage();
-	~DiskImage();
+	CDiskImage();
+	~CDiskImage();
 
 	void Init();
 	bool DriveAvailable();
