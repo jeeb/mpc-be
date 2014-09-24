@@ -763,9 +763,9 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	if (m_IsPreview) {
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
 			// Allow only video
-			if (pmt->majortype	== MEDIATYPE_Audio
-				|| pmt->majortype	== MEDIATYPE_AUXLine21Data
-				|| pmt->majortype	== MEDIATYPE_Midi
+			if (pmt->majortype == MEDIATYPE_Audio
+				|| pmt->majortype == MEDIATYPE_AUXLine21Data
+				|| pmt->majortype == MEDIATYPE_Midi
 				|| CMediaTypeEx(*pmt).ValidateSubtitle()) {
 				return S_FALSE;
 			}
@@ -1383,7 +1383,7 @@ STDMETHODIMP CFGManager::IsPinConnected(IPin* pPin)
 static bool FindMT(IPin* pPin, const GUID majortype)
 {
 	BeginEnumMediaTypes(pPin, pEM, pmt) {
-		if (pmt->majortype == MEDIATYPE_AUXLine21Data) {
+		if (pmt->majortype == majortype) {
 			return true;
 		}
 	}
