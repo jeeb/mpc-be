@@ -6661,15 +6661,18 @@ void CMainFrame::OnFileLoadAudio()
 		while (pos) {
 			CString fname = fd.GetNextPathName(pos);
 
-			if (SUCCEEDED(m_pGB->RenderFile(fname, NULL))) {
-				pli->m_fns.AddTail(fname);
-				AddAudioPathsAddons(fname);
+			if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB) {
+				HRESULT hr = pGBA->RenderAudioFile(fname);
+				if (SUCCEEDED(hr)) {
+					pli->m_fns.AddTail(fname);
+					AddAudioPathsAddons(fname);
 
-				CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
-				if (pSSa) {
-					DWORD cStreams = 0;
-					if (SUCCEEDED(pSSa->Count(&cStreams)) && cStreams > 0) {
-						pSSa->Enable(cStreams - 1, AMSTREAMSELECTENABLE_ENABLE);
+					CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
+					if (pSSa) {
+						DWORD cStreams = 0;
+						if (SUCCEEDED(pSSa->Count(&cStreams)) && cStreams > 0) {
+							pSSa->Enable(cStreams - 1, AMSTREAMSELECTENABLE_ENABLE);
+						}
 					}
 				}
 			}
@@ -12701,7 +12704,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	bool fFirst = true;
+	bool bFirst = true;
 
 	POSITION pos = pOFD->fns.GetHeadPosition();
 	while (pos) {
@@ -12709,7 +12712,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CString fn = fi;
 
 		fn.Trim();
-		if (fn.IsEmpty() && !fFirst) {
+		if (fn.IsEmpty() && !bFirst) {
 			break;
 		}
 
@@ -12807,7 +12810,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						bIsDirSet = SetCurrentDirectory(GetFolderOnly(tmpName));
 					}
 
-					hr = m_pGB->RenderFile(tmpName, NULL);
+					if (bFirst) {
+						hr = m_pGB->RenderFile(tmpName, NULL);
+					} else if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB) {
+						hr = pGBA->RenderAudioFile(tmpName);
+					}
 
 					if (bIsDirSet) {
 						SetCurrentDirectory(path);
@@ -12822,7 +12829,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		if (FAILED(hr)) {
 
-			if (fFirst) {
+			if (bFirst) {
 				if (s.fReportFailedPins && !(m_pFullscreenWnd && m_pFullscreenWnd->IsWindow())) {
 					CComQIPtr<IGraphBuilderDeadEnd> pGBDE = m_pGB;
 					if (pGBDE && pGBDE->GetCount()) {
@@ -12874,7 +12881,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if ((CString(fn).MakeLower().Find(_T("://"))) < 0 && fFirst) {
+		if ((CString(fn).MakeLower().Find(_T("://"))) < 0 && bFirst) {
 			if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
 				REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
 				if (m_pMS) {
@@ -12884,7 +12891,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 		QueryPerformanceCounter(&m_LastSaveTime);
 
-		if (b_UseSmartSeek && fFirst) {
+		if (b_UseSmartSeek && bFirst) {
 			bool bIsVideo = false;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				// Checks if any Video Renderer is in the graph
@@ -12921,7 +12928,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		if (s.fKeepHistory && pOFD->bAddRecent) {
-			CRecentFileList* pMRU = fFirst ? &s.MRU : &s.MRUDub;
+			CRecentFileList* pMRU = bFirst ? &s.MRU : &s.MRUDub;
 			pMRU->ReadList();
 			pMRU->Add(fn);
 			pMRU->WriteList();
@@ -12931,7 +12938,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (fFirst) {
+		if (bFirst) {
 			pOFD->title = (m_youtubeFields.fname.IsEmpty() ? m_strUrl : m_youtubeFields.fname);
 			{
 				BeginEnumFilters(m_pGB, pEF, pBF);
@@ -12996,7 +13003,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		fFirst = false;
+		bFirst = false;
 
 		if (m_fCustomGraph) {
 			break;

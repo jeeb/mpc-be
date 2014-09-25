@@ -32,6 +32,7 @@ class CFGManager
 	, public IGraphBuilder2
 	, public IGraphBuilderDeadEnd
 	, public IGraphBuilderSub
+	, public IGraphBuilderAudio
 	, public CCritSec
 {
 public:
@@ -117,7 +118,12 @@ protected:
 
 	// IGraphBuilderSub
 	STDMETHODIMP RenderSubFile(LPCWSTR lpcwstrFile);
-	BOOL bOnlySub;
+
+	// IGraphBuilderAudio
+	STDMETHODIMP RenderAudioFile(LPCWSTR lpcwstrFile);
+	
+	BOOL m_bOnlySub;
+	BOOL m_bOnlyAudio;
 
 	//
 	HWND m_hWnd;
@@ -125,12 +131,11 @@ protected:
 	//
 	HRESULT ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF);
 
+	bool m_bIsPreview;
 
 public:
 	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);
 	virtual ~CFGManager();
-
-	bool m_IsPreview;
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

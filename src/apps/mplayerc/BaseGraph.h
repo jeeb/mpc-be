@@ -61,6 +61,13 @@ public IUnknown {
 };
 
 // private use only
+interface __declspec(uuid("4EBE052F-3BF0-450D-90F8-33DDC9551FD0"))
+IGraphBuilderAudio :
+public IUnknown {
+	STDMETHOD(RenderAudioFile) (LPCWSTR lpcwstrFileName) PURE;
+};
+
+// private use only
 interface __declspec(uuid("43CDA93D-6A4E-4A07-BD3E-49D161073EE7"))
 IBDATuner :
 public IUnknown {

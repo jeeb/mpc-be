@@ -44,13 +44,13 @@
 
 class CFGMPCVideoDecoderInternal : public CFGFilterInternal<CMPCVideoDecFilter>
 {
-	bool	m_IsPreview;
+	bool	m_bIsPreview;
 	UINT64	m_merit;
 
 public:
 	CFGMPCVideoDecoderInternal(CStringW name = L"", UINT64 merit = MERIT64_DO_USE, bool IsPreview = false)
 		: CFGFilterInternal<CMPCVideoDecFilter>(name, merit)
-		, m_IsPreview(IsPreview)
+		, m_bIsPreview(IsPreview)
 		, m_merit(merit) {
 
 		AppSettings& s = AfxGetAppSettings();
@@ -64,11 +64,11 @@ public:
 			POSITION pos = fmts.GetHeadPosition();
 			while (pos) {
 				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
-				if (m_IsPreview || s.VideoFilters[fmt.FFMPEGCode] || s.DXVAFilters[fmt.DXVACode]) {
+				if (m_bIsPreview || s.VideoFilters[fmt.FFMPEGCode] || s.DXVAFilters[fmt.DXVACode]) {
 					AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 				}
 			}
-		} else if (!m_IsPreview) {
+		} else if (!m_bIsPreview) {
 			// Low merit MPC Video Decoder
 			POSITION pos = fmts.GetHeadPosition();
 			while (pos) {
@@ -103,7 +103,7 @@ public:
 			memset(&video_filters, true, sizeof(video_filters));
 			memset(&audio_filters, true, sizeof(audio_filters));
 		}
-		if (m_IsPreview) {
+		if (m_bIsPreview) {
 			memset(&dxva_filters, false, sizeof(dxva_filters));
 			memset(&video_filters, true, sizeof(video_filters));
 			memset(&audio_filters, false, sizeof(audio_filters));
@@ -130,8 +130,9 @@ CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CUnknown(pName, pUnk)
 	, m_dwRegister(0)
 	, m_hWnd(hWnd)
-	, m_IsPreview(IsPreview)
-	, bOnlySub(FALSE)
+	, m_bIsPreview(IsPreview)
+	, m_bOnlySub(FALSE)
+	, m_bOnlyAudio(FALSE)
 {
 	m_pUnkInner.CoCreateInstance(CLSID_FilterGraph, GetOwner());
 	m_pFM.CoCreateInstance(CLSID_FilterMapper2);
@@ -164,6 +165,7 @@ STDMETHODIMP CFGManager::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		QI(IGraphBuilder2)
 		QI(IGraphBuilderDeadEnd)
 		QI(IGraphBuilderSub)
+		QI(IGraphBuilderAudio)
 		m_pUnkInner && (riid != IID_IUnknown && SUCCEEDED(m_pUnkInner->QueryInterface(riid, ppv))) ? S_OK :
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
@@ -760,7 +762,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	}
 
 	// skip Audio output Pin for preview mode;
-	if (m_IsPreview) {
+	if (m_bIsPreview) {
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
 			// Allow only video
 			if (pmt->majortype == MEDIATYPE_Audio
@@ -788,9 +790,18 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	}
 	EndEnumMediaTypes(pmt)
 
-	if (bOnlySub) {
+	if (m_bOnlySub) {
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
 			if (!CMediaTypeEx(*pmt).ValidateSubtitle()) {
+				return S_FALSE;
+			}
+		}
+		EndEnumMediaTypes(pmt)
+	}
+
+	if (m_bOnlyAudio) {
+		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
+			if (pmt->majortype != MEDIATYPE_Audio) {
 				return S_FALSE;
 			}
 		}
@@ -968,7 +979,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				continue;
 			}
 
-			if (!m_IsPreview && !pMadVRAllocatorPresenter) {
+			if (!m_bIsPreview && !pMadVRAllocatorPresenter) {
 				if (CComQIPtr<IMFGetService, &__uuidof(IMFGetService)> pMFGS = pBF) {
 					// hook IDirectXVideoDecoderService to get DXVA status & logging;
 					// why before ConnectFilterDirect() - some decoder, like ArcSoft & Cyberlink, init DXVA2 decoder while connect to the renderer ...
@@ -1072,7 +1083,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						//	pMFGS->GetService (MF_WORKQUEUE_SERVICES, IID_IMFWorkQueueServices, (void**)&pMFWQS);
 						//	pMFWQS->BeginRegisterPlatformWorkQueueWithMMCSS(
 
-						if (!m_IsPreview && pMadVRAllocatorPresenter) {
+						if (!m_bIsPreview && pMadVRAllocatorPresenter) {
 							// hook IDirectXVideoDecoderService to get DXVA status & logging;
 							// madVR crash on call ::GetService() before connect - so set Hook after ConnectFilterDirect()
 							CComPtr<IDirectXVideoDecoderService>	pDecoderService;
@@ -1691,7 +1702,7 @@ STDMETHODIMP CFGManager::ConnectFilterDirect(IPin* pPinOut, IBaseFilter* pBF, co
 				}
 			}
 
-			if (!m_IsPreview && pPin && !GetDXVAStatus()) {
+			if (!m_bIsPreview && pPin && !GetDXVAStatus()) {
 				if (CComQIPtr<IAMVideoAccelerator> pAMVA = pPin) {
 					HookAMVideoAccelerator((IAMVideoAcceleratorC*)(IAMVideoAccelerator*)pAMVA);
 				}
@@ -1838,7 +1849,7 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 	HRESULT hr = VFW_E_CANNOT_RENDER;
 	CAutoPtrArray<CStreamDeadEnd> deadends;
 
-	bOnlySub = TRUE;
+	m_bOnlySub = TRUE;
 
 	// support only .mks - use internal MatroskaSource
 	CFGFilter* pFG = DNew CFGFilterInternal<CMatroskaSourceFilter>();
@@ -1850,9 +1861,20 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 
 		hr = ConnectFilter(pBF, NULL);
 	}
-	bOnlySub = FALSE;
+	m_bOnlySub = FALSE;
 
 	delete pFG;
+
+	return hr;
+}
+
+// IGraphBuilderAudio
+
+STDMETHODIMP CFGManager::RenderAudioFile(LPCWSTR lpcwstrFileName)
+{
+	m_bOnlyAudio = TRUE;
+	HRESULT hr = RenderFile(lpcwstrFileName, NULL);
+	m_bOnlyAudio = TRUE;
 
 	return hr;
 }
@@ -2761,7 +2783,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 #if !DBOXVersion
-	if (!m_IsPreview) {
+	if (!m_bIsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", MERIT64_HIGHEST);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 		m_transform.AddTail(pFGF);
@@ -2772,7 +2794,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 #endif
 
 	// Renderers
-	if (!m_IsPreview) {
+	if (!m_bIsPreview) {
 		switch (s.iDSVideoRendererType) {
 			case VIDRNDT_DS_OVERLAYMIXER:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_OverlayMixer, L"Overlay Mixer", m_vrmerit));
@@ -2823,7 +2845,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		}
 	}
 
-	if (!m_IsPreview) {
+	if (!m_bIsPreview) {
 		CString SelAudioRenderer = s.SelectedAudioRenderer();
 		m_armerit += 0x1000;
 
