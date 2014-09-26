@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about PCM files
+// Information about XMP files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_PcmH
-#define MediaInfo_File_PcmH
+#ifndef MediaInfo_File_XmpH
+#define MediaInfo_File_XmpH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -23,42 +23,14 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_Pcm
+// Class File_Sami
 //***************************************************************************
 
-class File_Pcm : public File__Analyze
+class File_Xmp : public File__Analyze
 {
-public :
-    //In
-    int64u          Frame_Count_Valid;
-    ZenLib::Ztring  Codec;
-    int32u          SamplingRate;
-    int8u           BitDepth;
-    int8u           BitDepth_Significant;
-    int8u           Channels;
-    int8u           Endianness;
-    int8u           Sign;
-
-    //Buffer - Global
-    void Read_Buffer_Continue ();
-    #if MEDIAINFO_DEMUX
-    int64u  Frame_Count_Valid_Demux;
-    #endif //MEDIAINFO_DEMUX
-
-    //Constructor/Destructor
-    File_Pcm();
-
 private :
-    //Streams management
-    void Streams_Fill();
-    void Streams_Finish();
-
     //Buffer - File header
     bool FileHeader_Begin();
-
-    //Buffer - Per element
-    void Header_Parse();
-    void Data_Parse();
 };
 
 } //NameSpace

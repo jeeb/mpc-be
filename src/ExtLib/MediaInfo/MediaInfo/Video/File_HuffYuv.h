@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about PCM files
+// Information about HUFFYUV files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_PcmH
-#define MediaInfo_File_PcmH
+#ifndef MediaInfo_HuffYUVH
+#define MediaInfo_HuffYUVH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -23,42 +23,29 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_Pcm
+// Class File_HuffYuv
 //***************************************************************************
 
-class File_Pcm : public File__Analyze
+class File_HuffYuv : public File__Analyze
 {
 public :
     //In
-    int64u          Frame_Count_Valid;
-    ZenLib::Ztring  Codec;
-    int32u          SamplingRate;
-    int8u           BitDepth;
-    int8u           BitDepth_Significant;
-    int8u           Channels;
-    int8u           Endianness;
-    int8u           Sign;
-
-    //Buffer - Global
-    void Read_Buffer_Continue ();
-    #if MEDIAINFO_DEMUX
-    int64u  Frame_Count_Valid_Demux;
-    #endif //MEDIAINFO_DEMUX
+    bool    IsOutOfBandData;
+    int16u  BitCount;
+    int32u  Height;
 
     //Constructor/Destructor
-    File_Pcm();
+    File_HuffYuv();
 
 private :
     //Streams management
-    void Streams_Fill();
-    void Streams_Finish();
+    void Streams_Accept();
 
-    //Buffer - File header
-    bool FileHeader_Begin();
+    //Buffer - Global
+    void Read_Buffer_Continue();
 
-    //Buffer - Per element
-    void Header_Parse();
-    void Data_Parse();
+    //Elements
+    void FrameHeader();
 };
 
 } //NameSpace

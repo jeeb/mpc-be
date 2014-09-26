@@ -40,6 +40,7 @@
 #if MEDIAINFO_SEEK
     #include "MediaInfo/MediaInfo_Internal.h"
 #endif // MEDIAINFO_SEEK
+#include "MediaInfo/File_Unknown.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -737,7 +738,7 @@ bool File_SmpteSt0337::Synched_Test()
                         case 24 :
                                     switch (Stream_Bits)
                                     {
-                                        case 16 : if (CC6(Buffer+Buffer_Offset)!=0xF872004E1F00LL) {Synched=false; return true;} break;
+                                        case 16 : if (CC6(Buffer+Buffer_Offset)!=0x00F872004E1FLL) {Synched=false; return true;} break;
                                         case 20 : if (CC6(Buffer+Buffer_Offset)!=0x6F872054E1F0LL) {Synched=false; return true;} break;
                                         case 24 : if (CC6(Buffer+Buffer_Offset)!=0x96F872A54E1FLL) {Synched=false; return true;} break;
                                         default : ;
@@ -1158,12 +1159,33 @@ void File_SmpteSt0337::Data_Parse()
                         break;
             case  7 :   // MPEG-2 AAC in ADTS
             case 19 :   // MPEG-2 AAC in ADTS low frequency
-                        Parser=new File_Aac();
-                        ((File_Aac*)Parser)->Mode=File_Aac::Mode_ADTS;
+                        #if defined(MEDIAINFO_AAC_YES)
+                            Parser=new File_Aac();
+                            ((File_Aac*)Parser)->Mode=File_Aac::Mode_ADTS;
+                        #else
+                        {
+                            //Filling
+                            File__Analyze* Parser=new File_Unknown();
+                            Open_Buffer_Init(Parser);
+                            Parser->Stream_Prepare(Stream_Audio);
+                            Parser->Fill(Stream_Audio, 0, Audio_Format, "AAC");
+                            Parser->Fill(Stream_Audio, 0, Audio_MuxingMode, "ADTS");
+                        }
+                        #endif //defined(MEDIAINFO_AAC_YES)
                         break;
             case 10 :   // MPEG-4 AAC in ADTS or LATM
             case 11 :   // MPEG-4 AAC in ADTS or LATM
-                        Parser=new File_Aac();
+                        #if defined(MEDIAINFO_AAC_YES)
+                            Parser=new File_Aac();
+                        #else
+                        {
+                            //Filling
+                            File__Analyze* Parser=new File_Unknown();
+                            Open_Buffer_Init(Parser);
+                            Parser->Stream_Prepare(Stream_Audio);
+                            Parser->Fill(Stream_Audio, 0, Audio_Format, "AAC");
+                        }
+                        #endif //defined(MEDIAINFO_AAC_YES)
                         break;
             case 28 :   // Dolby E
                         Parser=new File_DolbyE();
@@ -1273,6 +1295,8 @@ void File_SmpteSt0337::Data_Parse()
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)
             Frame_Count_NotParsedIncluded++;
 
+        if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFilled]))
+            Fill("AES3");
         if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFinished]))
             Finish("AES3");
     FILLING_END();

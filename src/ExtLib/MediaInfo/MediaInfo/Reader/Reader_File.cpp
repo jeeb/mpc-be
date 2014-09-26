@@ -414,14 +414,16 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 if (MI->Config.File_Names.size()>1)
                 {
                     size_t Pos;
-                    #if MEDIAINFO_ADVANCED
-                        if (MI->Config.File_Sizes.size()!=MI->Config.File_Names.size())
+                    #if MEDIAINFO_SEEK
+                        if (MI->Config.File_GoTo_IsFrameOffset)
                         {
                             Pos=(size_t)MI->Open_Buffer_Continue_GoTo_Get(); //File_GoTo is the frame offset in that case
+                            MI->Info->File_GoTo=(int64u)-1;
+                            MI->Config.File_GoTo_IsFrameOffset=false;
                             GoTo=0;
                         }
                         else
-                    #endif //MEDIAINFO_ADVANCED
+                    #endif //MEDIAINFO_SEEK
                     {
                         for (Pos=0; Pos<MI->Config.File_Sizes.size(); Pos++)
                         {
@@ -440,6 +442,11 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                     {
                         F.Close();
                         F.Open(MI->Config.File_Names[Pos]);
+                        if (Pos>=MI->Config.File_Sizes.size())
+                        {
+                            MI->Config.File_Sizes.resize(Pos, (int64u)-1);
+                            MI->Config.File_Sizes.push_back(F.Size_Get());
+                        }
                         MI->Config.File_Names_Pos=Pos+1;
                         MI->Config.File_Current_Size=MI->Config.File_Current_Offset+F.Size_Get();
                         Buffer_NoJump_Temp=0;
@@ -510,14 +517,19 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 #if MEDIAINFO_ADVANCED2
                 MI->Open_Buffer_SegmentChange();
                 #endif //MEDIAINFO_ADVANCED2
-                if (MI->Config.File_Names_Pos<MI->Config.File_Names.size())
+                if (MI->Config.File_Names_Pos && MI->Config.File_Names_Pos<MI->Config.File_Names.size())
                 {
-                    MI->Config.File_Current_Offset+=F.Size_Get();
+                    MI->Config.File_Current_Offset+=MI->Config.File_Names_Pos<=MI->Config.File_Sizes.size()?MI->Config.File_Sizes[MI->Config.File_Names_Pos-1]:F.Size_Get();
                     F.Close();
                     #if MEDIAINFO_EVENTS
                         MI->Config.Event_SubFile_Start(MI->Config.File_Names[MI->Config.File_Names_Pos]);
                     #endif //MEDIAINFO_EVENTS
                     F.Open(MI->Config.File_Names[MI->Config.File_Names_Pos]);
+                    if (MI->Config.File_Names_Pos>=MI->Config.File_Sizes.size())
+                    {
+                        MI->Config.File_Sizes.resize(MI->Config.File_Names_Pos, (int64u)-1);
+                        MI->Config.File_Sizes.push_back(F.Size_Get());
+                    }
                     MI->Config.File_Names_Pos++;
                     MI->Config.File_Current_Size+=F.Size_Get();
                 }
@@ -543,7 +555,17 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                         if (MI->Config.File_Buffer_Size)
                             break;
 
-                        if (ThreadInstance->IsExited())
+                        if (!ThreadInstance->IsExited())
+                        {
+                            CS.Leave();
+                            #ifdef WINDOWS
+                                WaitForSingleObject(Condition_WaitingForMoreData, INFINITE);
+                            #else //WINDOWS
+                                Sleep(0);
+                            #endif //WINDOWS
+                            CS.Enter();
+                        }
+                        else
                         {
                             if (IsLooping)
                             {
@@ -556,14 +578,6 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                             MI->Config.File_Buffer_Size=Buffer_End-Buffer_Begin;
                             break;
                         }
-
-                        CS.Leave();
-                        #ifdef WINDOWS
-                            WaitForSingleObject(Condition_WaitingForMoreData, INFINITE);
-                        #else //WINDOWS
-                            Sleep(0);
-                        #endif //WINDOWS
-                        CS.Enter();
                     }
                     MI->Config.File_Buffer=Buffer+Buffer_Begin;
                     CS.Leave();

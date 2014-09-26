@@ -1103,6 +1103,8 @@ protected :
     void Streams_Finish_Cosmetic_Chapters(size_t StreamPos);
     void Streams_Finish_Cosmetic_Image(size_t StreamPos);
     void Streams_Finish_Cosmetic_Menu(size_t StreamPos);
+    void Streams_Finish_HumanReadable();
+    void Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, size_t StreamPos, size_t Parameter);
 
     void Tags ();
     void Video_FrameRate_Rounding (size_t Pos, video Parameter);
@@ -1295,6 +1297,14 @@ public :
     bool    PES_FirstByte_Value;
 
     int64u  Unsynch_Frame_Count;
+
+    //AES
+    #if MEDIAINFO_AES
+        AESdecrypt* AES;
+        int8u*      AES_IV;
+        int8u*      AES_Decrypted;
+        size_t      AES_Decrypted_Size;
+    #endif //MEDIAINFO_AES
 
     //MD5
     #if MEDIAINFO_MD5

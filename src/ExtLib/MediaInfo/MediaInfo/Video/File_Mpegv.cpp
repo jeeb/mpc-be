@@ -1842,7 +1842,7 @@ bool File_Mpegv::Demux_UnpacketizeContainer_Test()
             Demux_Offset=Buffer_Offset;
             Demux_IntermediateItemFound=false;
         }
-        if (ParserIDs[0]==MediaInfo_Parser_Mxf)
+        if (IsSub && ParserIDs[0]==MediaInfo_Parser_Mxf) //TODO: find a better way to demux, currently implemeted this way because we need I-frame status info from MXF
         {
             Demux_Offset=Buffer_Size;
             Demux_IntermediateItemFound=true;
@@ -1900,8 +1900,14 @@ bool File_Mpegv::Demux_UnpacketizeContainer_Test()
         bool RandomAccess=Buffer[Buffer_Offset+3]==0xB3;
         if (!Status[IsAccepted])
         {
-            Accept("AVC");
             if (Config->Demux_EventWasSent)
+                return false;
+            File_Mpegv* MI=new File_Mpegv;
+            Open_Buffer_Init(MI);
+            Open_Buffer_Continue(MI, Buffer, Buffer_Size);
+            bool IsOk=MI->Status[IsAccepted];
+            delete MI;
+            if (!IsOk)
                 return false;
         }
         if (IFrame_IsParsed || RandomAccess)
@@ -3619,8 +3625,8 @@ void File_Mpegv::sequence_header()
         if (Frame_Count<Frame_Count_Valid)
         {
             FrameRate=Mpegv_frame_rate[frame_rate_code];
-            SizeToAnalyse_Begin=bit_rate_value*50*2; //standard delay between TimeStamps is 0.7s, we try 2s to be sure to have at least 2 timestamps (for integrity checking)
-            SizeToAnalyse_End=bit_rate_value*50*2; //standard delay between TimeStamps is 0.7s, we try 2s to be sure
+            SizeToAnalyse_Begin=((int64u)bit_rate_value)*50*2; //standard delay between TimeStamps is 0.7s, we try 2s to be sure to have at least 2 timestamps (for integrity checking)
+            SizeToAnalyse_End=((int64u)bit_rate_value)*50*2; //standard delay between TimeStamps is 0.7s, we try 2s to be sure
         }
 
         #if MEDIAINFO_MACROBLOCKS
