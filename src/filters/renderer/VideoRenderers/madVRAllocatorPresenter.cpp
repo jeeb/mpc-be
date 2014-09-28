@@ -28,6 +28,7 @@
 
 using namespace DSObjects;
 
+extern bool g_bExternalSubtitleTime;
 //
 // CmadVRAllocatorPresenter
 //
@@ -83,8 +84,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, 
 
 HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 {
-	if (!pD3DDev)
-	{
+	if (!pD3DDev) {
 		// release all resources
 		m_pSubPicQueue = NULL;
 		m_pAllocator = NULL;
@@ -148,7 +148,7 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 		m_pSubPicQueue->SetSubPicProvider(m_SubPicProvider);
 	}
 
-	return S_OK;
+	return hr;
 }
 
 HRESULT CmadVRAllocatorPresenter::Render(
@@ -156,7 +156,9 @@ HRESULT CmadVRAllocatorPresenter::Render(
 	int left, int top, int right, int bottom, int width, int height)
 {
 	__super::SetPosition(CRect(0, 0, width, height), CRect(left, top, right, bottom)); // needed? should be already set by the player
-	SetTime(rtStart);
+	if (!g_bExternalSubtitleTime) {
+		SetTime(rtStart);
+	}
 	if (atpf > 0 && m_pSubPicQueue) {
 		m_fps = (double)(10000000.0 / atpf);
 		m_pSubPicQueue->SetFPS(m_fps);
@@ -249,7 +251,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader(LPCSTR pSrcData, LPCSTR pT
 {
 	HRESULT hr = E_NOTIMPL;
 	if (CComQIPtr<IMadVRExternalPixelShaders> pEPS = m_pDXR) {
-		if ((!pSrcData) && (!pTarget)) {
+		if (!pSrcData && !pTarget) {
 			hr = pEPS->ClearPixelShaders(false);
 		} else {
 			hr = pEPS->AddPixelShader(pSrcData, pTarget, ShaderStage_PreScale, NULL);
@@ -262,7 +264,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader2(LPCSTR pSrcData, LPCSTR p
 {
 	HRESULT hr = E_NOTIMPL;
 	if (CComQIPtr<IMadVRExternalPixelShaders> pEPS = m_pDXR) {
-		if ((!pSrcData) && (!pTarget)) {
+		if (!pSrcData && !pTarget) {
 			hr = pEPS->ClearPixelShaders(bScreenSpace);
 		} else {
 			hr = pEPS->AddPixelShader(pSrcData, pTarget, bScreenSpace ? ShaderStage_PostScale : ShaderStage_PreScale, NULL);

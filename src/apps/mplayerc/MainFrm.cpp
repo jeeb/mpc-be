@@ -12127,8 +12127,12 @@ double CMainFrame::GetZoomAutoFitScale()
 
 void CMainFrame::RepaintVideo()
 {
-	if (m_pCAP) {
-		m_pCAP->Paint(false);
+	if (GetMediaState() != State_Running) {
+		if (m_pCAP) {
+			m_pCAP->Paint(false);
+		} else if (m_pMFVDC) {
+			m_pMFVDC->RepaintVideo();
+		}
 	}
 }
 
