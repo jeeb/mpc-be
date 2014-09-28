@@ -138,7 +138,7 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	HRESULT hr = S_OK;
 
 	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, false, m_pAllocator, &hr)
 					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		return E_FAIL;
