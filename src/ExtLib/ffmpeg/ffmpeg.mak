@@ -120,6 +120,9 @@ SRCS_LC = \
 	libavcodec/apedec.c \
 	libavcodec/atrac.c \
 	libavcodec/atrac3.c \
+	libavcodec/atrac3plus.c \
+	libavcodec/atrac3plusdec.c \
+	libavcodec/atrac3plusdsp.c \
 	libavcodec/audiodsp.c \
 	libavcodec/avdct.c \
 	libavcodec/avfft.c \

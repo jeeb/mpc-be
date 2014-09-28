@@ -2381,6 +2381,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(MPCAudioDecName, MERIT64_ABOVE_DSHOW);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC3);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC3plus);
 		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
