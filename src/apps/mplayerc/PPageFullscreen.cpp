@@ -524,7 +524,7 @@ void CPPageFullscreen::ModesUpdate()
 		if (!GetDispMode(i, dm, m_f_hmonitor)) {
 			break;
 		}
-		if (dm.bpp != 32 || dm.size.cx < 720 || dm.size.cx < 480) {
+		if (dm.bpp != 32 || dm.size.cx < 720 || dm.size.cy < 480) {
 			continue; // skip low resolution and non 32bpp mode
 		}
 
@@ -572,7 +572,6 @@ void CPPageFullscreen::ModesUpdate()
 	}
 
 	auto findDisplayMode = [this](const dispmode& dm, const int& curModeIdx) {
-		int dmIdx = curModeIdx;
 		for (size_t i = 0; i < m_dms.GetCount(); i++) {
 			if (dm == m_dms[i]) {
 				return (int)i;
