@@ -1874,7 +1874,7 @@ STDMETHODIMP CFGManager::RenderAudioFile(LPCWSTR lpcwstrFileName)
 {
 	m_bOnlyAudio = TRUE;
 	HRESULT hr = RenderFile(lpcwstrFileName, NULL);
-	m_bOnlyAudio = TRUE;
+	m_bOnlyAudio = FALSE;
 
 	return hr;
 }
