@@ -35,6 +35,7 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
 	, m_fFlushing(false)
+	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
 	, m_rtPrev(0)
 	, m_rtOffset(0)
@@ -53,6 +54,7 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilt
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, pName)
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
 	, m_fFlushing(false)
+	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
 	, m_MinQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueuePackets())
 	, m_MaxQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueuePackets() * factor)
