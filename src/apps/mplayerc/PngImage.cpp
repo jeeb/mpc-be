@@ -81,16 +81,16 @@ bool CMPCPngImage::DecompressPNG(struct png_t* png)
 
 	unsigned int w = png_get_image_width(png_ptr, info_ptr), h = png_get_image_height(png_ptr, info_ptr);
 	unsigned int b = png_get_channels(png_ptr, info_ptr);
-	unsigned int x, y, c, len = w * b;
+	unsigned int len = w * b;
 	unsigned char *row, *pic = (unsigned char*)malloc(len * h);
 
 	bool ret = false;
 
 	if (Create(w, -(int)h, b * 8)) {
-		for (y = 0; y < h; y++) {
+		for (unsigned y = 0; y < h; y++) {
 			row = &pic[len * y];
-			for (x = 0; x < len; row += b) {
-				for (c = 0; c < b; c++) {
+			for (unsigned x = 0; x < len; row += b) {
+				for (unsigned c = 0; c < b; c++) {
 					row[c] = row_pointers[y][x++];
 				}
 			}

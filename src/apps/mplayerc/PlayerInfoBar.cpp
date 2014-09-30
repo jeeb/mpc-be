@@ -188,8 +188,6 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 		r.InflateRect(1, 0, 1, 0);
 	}
 
-	int R, G, B;
-
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		CPen penBlend(PS_SOLID,0,RGB(0,0,0));
 		CPen *penSaved = pDC->SelectObject(&penBlend);
@@ -198,6 +196,7 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 		pDC->SelectObject(&penSaved);
 		r.DeflateRect(0,1,0,0);
 
+		int R, G, B;
 		ThemeRGB(5, 10, 15, R, G, B);
 		pDC->FillSolidRect(&r, RGB(R,G,B));
 	} else {
