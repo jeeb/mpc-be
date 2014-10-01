@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2014 vedi file Authors.txt"
@@ -2017,10 +2017,8 @@ STRING IDS_VIEW_BORDERLESS		"Nascondi bordi\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"Menù e intestazioni\tCtrl+0"
 STRING IDS_VIEW_FRAMEONLY		"Solo video\tCtrl+0"
 STRING IDS_VIEW_HIDEMENU		"Nascondi menù\tCtrl+0"
-STRING IDS_VOLUME_BOOST_DEC		"Amplificazione volume: decremento"
-STRING IDS_VOLUME_BOOST_INC		"Amplificazione volume: aumento"
-STRING IDS_VOLUME_BOOST_MAX		"Amplificazione volume: massimo"
-STRING IDS_VOLUME_BOOST_MIN		"Amplificazione volume: minimo"
+STRING IDS_VOLUME_GAIN_DEC		"Volume gain decrease"
+STRING IDS_VOLUME_GAIN_INC		"Volume gain increase"
 STRING IDS_VOLUME_OSD		"Vol: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [Muto]"
 STRING IDS_VTSREADER_LOAD_PGC		"Leggi tutte le catene di programma (calcola la durata)"

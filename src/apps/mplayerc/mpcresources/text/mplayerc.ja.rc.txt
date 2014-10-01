@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2014 (Authors.txt ファイルを参照)"
@@ -2017,10 +2017,8 @@ STRING IDS_VIEW_BORDERLESS		"境界線を隠す\tCtrl+0"
 STRING IDS_VIEW_CAPTIONMENU		"タイトル バーとメニュー バーを表示する\tCtrl+0"
 STRING IDS_VIEW_FRAMEONLY		"フレームだけ\tCtrl+0"
 STRING IDS_VIEW_HIDEMENU		"メニューを隠す\tCtrl+0"
-STRING IDS_VOLUME_BOOST_DEC		"音量 ブースト 下げる"
-STRING IDS_VOLUME_BOOST_INC		"音量 ブースト 上げる"
-STRING IDS_VOLUME_BOOST_MAX		"音量 ブースト 最大"
-STRING IDS_VOLUME_BOOST_MIN		"音量 ブースト 最小"
+STRING IDS_VOLUME_GAIN_DEC		"Volume gain decrease"
+STRING IDS_VOLUME_GAIN_INC		"Volume gain increase"
 STRING IDS_VOLUME_OSD		"音量: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"音量: %d%% [ミュート]"
 STRING IDS_VTSREADER_LOAD_PGC		"すべてのプログラム連鎖を読む (時間を計算)"
