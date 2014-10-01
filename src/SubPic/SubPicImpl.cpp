@@ -63,12 +63,12 @@ STDMETHODIMP_(REFERENCE_TIME) CSubPicImpl::GetStop()
 
 STDMETHODIMP_(REFERENCE_TIME) CSubPicImpl::GetSegmentStart()
 {
-	return m_rtSegmentStart ? m_rtSegmentStart : m_rtStart;
+	return m_rtSegmentStart >= 0 ? m_rtSegmentStart : m_rtStart;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CSubPicImpl::GetSegmentStop()
 {
-	return m_rtSegmentStop ? m_rtSegmentStop : m_rtStop;
+	return m_rtSegmentStop >= 0 ? m_rtSegmentStop : m_rtStop;
 }
 
 STDMETHODIMP_(void) CSubPicImpl::SetSegmentStart(REFERENCE_TIME rtStart)

@@ -124,7 +124,11 @@ HRESULT CSubPicQueueImpl::RenderTo(ISubPic* pSubPic, REFERENCE_TIME rtStart, REF
 	if (SUCCEEDED(hr)) {
 		CRect r(0,0,0,0);
 		REFERENCE_TIME rtRender = rtStart;
-		if (!bIsAnimated) {
+		if (bIsAnimated) {
+			// This is some sort of hack to avoid rendering the wrong frame
+			// when the start time is slightly mispredicted by the queue
+			rtRender = (rtStart + rtStop) / 2;
+		} else {
 			rtRender += (rtStop - rtStart - 1);
 		}
 		hr = pSubPicProvider->Render(spd, rtRender, fps, r);
@@ -326,8 +330,9 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, CComPtr<ISu
 							// Reuse old subpic
 							ppSubPic = pSubPic;
 						} else { // rtNow < rtStart
-							if (!ppSubPic) {
+							if (!ppSubPic || ppSubPic->GetStop() <= rtNow) {
 								// Should be really rare that we use a subpic in advance
+								// unless we mispredicted the timing slightly
 								ppSubPic = pSubPic;
 							} else {
 								bRemoveFromQueue = false;
@@ -569,8 +574,9 @@ DWORD CSubPicQueue::ThreadProc()
 
 						HRESULT hr;
 						if (bIsAnimated) {
-							REFERENCE_TIME rtEndThis = min(rtCurrent + rtTimePerFrame, rtStopReal);
-							hr = RenderTo(pStatic, rtCurrent, rtEndThis, fps, bIsAnimated);
+							// 3/4 is a magic number we use to avoid reusing the wrong frame due to slight
+							// misprediction of the frame end time
+							hr = RenderTo(pStatic, rtCurrent, min(rtCurrent + rtTimePerFrame * 3 / 4, rtStopReal), fps, bIsAnimated);
 							// Set the segment start and stop timings
 							pStatic->SetSegmentStart(rtStart);
 							// The stop timing can be moved so that the duration from the current start time
@@ -579,12 +585,12 @@ DWORD CSubPicQueue::ThreadProc()
 							// At worst this can cause a segment to be displayed for one more frame than expected
 							// but it's much less annoying than having the subtitle disappearing for one frame
 							pStatic->SetSegmentStop(max(rtCurrent + rtTimePerFrame, rtStopReal));
-							rtCurrent = rtEndThis;
+							rtCurrent = min(rtCurrent + rtTimePerFrame, rtStopReal);
 						} else {
 							hr = RenderTo(pStatic, rtStart, rtStopReal, fps, bIsAnimated);
 							// Non-animated subtitles aren't part of a segment
-							pStatic->SetSegmentStart(0);
-							pStatic->SetSegmentStop(0);
+							pStatic->SetSegmentStart(ISubPic::INVALID_SUBPIC_TIME);
+							pStatic->SetSegmentStop(ISubPic::INVALID_SUBPIC_TIME);
 							rtCurrent = rtStopReal;
 						}
 

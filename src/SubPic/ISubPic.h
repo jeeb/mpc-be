@@ -55,6 +55,8 @@ struct SubPicDesc {
 interface __declspec(uuid("449E11F3-52D1-4a27-AA61-E2733AC92CC0"))
 ISubPic :
 public IUnknown {
+	static const REFERENCE_TIME INVALID_SUBPIC_TIME = -1;
+
 	STDMETHOD_(void*, GetObject) () PURE;
 
 	STDMETHOD_(REFERENCE_TIME, GetStart) () PURE;
