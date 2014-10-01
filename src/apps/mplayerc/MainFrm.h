@@ -974,6 +974,7 @@ public:
 
 	afx_msg void OnSelectStream(UINT nID);
 	afx_msg void OnPlayVolume(UINT nID);
+	afx_msg void OnPlayVolumeGain(UINT nID);
 	afx_msg void OnAutoVolumeControl();
 	afx_msg void OnUpdateNormalizeVolume(CCmdUI* pCmdUI);
 	afx_msg void OnPlayColor(UINT nID);

@@ -513,6 +513,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND_RANGE(ID_FILTERSTREAMS_SUBITEM_START, ID_FILTERSTREAMS_SUBITEM_END, OnSelectStream)
 	ON_COMMAND_RANGE(ID_VOLUME_UP, ID_VOLUME_MUTE, OnPlayVolume)
+    ON_COMMAND_RANGE(ID_VOLUME_GAIN_INC, ID_VOLUME_GAIN_DEC, OnPlayVolumeGain)
 	ON_COMMAND(ID_NORMALIZE, OnAutoVolumeControl)
 	ON_UPDATE_COMMAND_UI(ID_NORMALIZE, OnUpdateNormalizeVolume)
 	ON_COMMAND_RANGE(ID_COLOR_BRIGHTNESS_INC, ID_COLOR_RESET, OnPlayColor)
@@ -9746,13 +9747,45 @@ void CMainFrame::OnPlayVolume(UINT nID)
 	m_Lcd.SetVolume((m_wndToolBar.Volume > -10000 ? m_wndToolBar.m_volctrl.GetPos() : 1));
 }
 
+void CMainFrame::OnPlayVolumeGain(UINT nID)
+{
+	AppSettings& s = AfxGetAppSettings();
+	if (s.bAudioAutoVolumeControl) {
+		return;
+	}
+
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
+		switch (nID) {
+		case ID_VOLUME_GAIN_INC:
+			s.fAudioGain_dB = floor(s.fAudioGain_dB * 2) / 2 + 0.5;
+			if (s.fAudioGain_dB > 10.0) {
+				s.fAudioGain_dB = 10.0;
+			}
+			break;
+		case ID_VOLUME_GAIN_DEC:
+			s.fAudioGain_dB = ceil(s.fAudioGain_dB * 2) / 2 - 0.5;
+			if (s.fAudioGain_dB < -3.0) {
+				s.fAudioGain_dB = -3.0;
+			}
+			break;
+		}
+		pASF->SetAudioGain(s.fAudioGain_dB);
+
+		CString osdMessage;
+		osdMessage.Format(IDS_GAIN_OSD, s.fAudioGain_dB);
+		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
+	}
+}
+
 void CMainFrame::OnAutoVolumeControl()
 {
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
 		AppSettings& s = AfxGetAppSettings();
+
 		s.bAudioAutoVolumeControl = !s.bAudioAutoVolumeControl;
-		CString osdMessage = ResStr(s.bAudioAutoVolumeControl ? IDS_OSD_AUTOVOLUMECONTROL_ON : IDS_OSD_AUTOVOLUMECONTROL_OFF);
 		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+
+		CString osdMessage = ResStr(s.bAudioAutoVolumeControl ? IDS_OSD_AUTOVOLUMECONTROL_ON : IDS_OSD_AUTOVOLUMECONTROL_OFF);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
 	}
 }

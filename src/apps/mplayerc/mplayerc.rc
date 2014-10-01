@@ -2892,7 +2892,7 @@ BEGIN
     IDS_AG_CHAPTER2         "Chapter: "
     IDS_VOLUME_OSD          "Vol: %d%%"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
-    IDS_BOOST_OSD           "Boost: +%.1f dB"
+    IDS_GAIN_OSD            "Gain: %+.1f dB"
     IDS_BALANCE_OSD         "Balance: %s"
     IDS_FULLSCREENMONITOR_CURRENT "Current"
     IDS_MPC_CRASH           "MPC-BE terminated unexpectedly. To help us fix this problem, please send this file '%s' to our bug tracker.\n\nDo you want to open the folder containing the minidump file and visit the bug tracker now?"
