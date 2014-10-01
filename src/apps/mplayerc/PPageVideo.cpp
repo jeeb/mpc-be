@@ -28,8 +28,6 @@
 
 // CPPageVideo dialog
 
-static const LPCTSTR EmptyText = L"";
-
 static bool IsRenderTypeAvailable(UINT VideoRendererType)
 {
 	switch (VideoRendererType) {
@@ -41,6 +39,11 @@ static bool IsRenderTypeAvailable(UINT VideoRendererType)
 			return IsCLSIDRegistered(CLSID_DXR);
 		case VIDRNDT_DS_MADVR:
 			return IsCLSIDRegistered(CLSID_madVR);
+		case VIDRNDT_DS_VMR7RENDERLESS:
+			#ifdef _WIN64
+			return false;
+			#endif
+			return GetSystemMetrics(SM_CXVIRTUALSCREEN) < 2048 && GetSystemMetrics(SM_CYVIRTUALSCREEN) < 2048;
 		default:
 		return true;
 	}
@@ -166,47 +169,80 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CorrectComboListWidth(m_iD3D9RenderDeviceCtrl);
 
+	auto addRenderer = [&](int nID) {
+		CString sName;
+
+		switch (nID) {
+			case VIDRNDT_DS_DEFAULT:
+				sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);
+				break;
+			case VIDRNDT_DS_OVERLAYMIXER:
+				if (!IsWinXP()) {
+					return;
+				}
+				sName = ResStr(IDS_PPAGE_OUTPUT_OVERLAYMIXER);
+				break;
+			case VIDRNDT_DS_VMR7WINDOWED:
+				sName = ResStr(IDS_PPAGE_OUTPUT_VMR7WINDOWED);
+				break;
+			case VIDRNDT_DS_VMR9WINDOWED:
+				sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);
+				break;
+			case VIDRNDT_DS_VMR7RENDERLESS:
+				sName = ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS);
+				break;
+			case VIDRNDT_DS_VMR9RENDERLESS:
+				sName = ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS);
+				break;
+			case VIDRNDT_DS_DXR:
+				sName = ResStr(IDS_PPAGE_OUTPUT_DXR);
+				break;
+			case VIDRNDT_DS_NULL_COMP:
+				sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);
+				break;
+			case VIDRNDT_DS_NULL_UNCOMP:
+				sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);
+				break;
+			case VIDRNDT_DS_EVR:
+				sName = ResStr(IDS_PPAGE_OUTPUT_EVR);
+				break;
+			case VIDRNDT_DS_EVR_CUSTOM:
+				sName = ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM);
+				break;
+			case VIDRNDT_DS_MADVR:
+				sName = ResStr(IDS_PPAGE_OUTPUT_MADVR);
+				break;
+			case VIDRNDT_DS_SYNC:
+				sName = ResStr(IDS_PPAGE_OUTPUT_SYNC);
+				break;
+			default:
+				ASSERT(FALSE);
+				return;
+		}
+
+		if (!IsRenderTypeAvailable(nID)) {
+			sName.AppendFormat(L" %s", ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
+		}
+
+		m_iDSVideoRendererTypeCtrl.SetItemData(m_iDSVideoRendererTypeCtrl.AddString(sName), nID);
+	};
+
+
 	CComboBox& m_iDSVRTC = m_iDSVideoRendererTypeCtrl;
-	m_iDSVRTC.SetRedraw(FALSE); // Do not draw the control while we are filling it with items
-	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_SYS_DEF)), VIDRNDT_DS_DEFAULT);
-	if (IsWinXP()) {
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_OVERLAYMIXER)), VIDRNDT_DS_OVERLAYMIXER);
-	}
-	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR7WINDOWED)), VIDRNDT_DS_VMR7WINDOWED);
-	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED)), VIDRNDT_DS_VMR9WINDOWED);
-	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS)), VIDRNDT_DS_VMR7RENDERLESS);
-	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS)), VIDRNDT_DS_VMR9RENDERLESS);
-	if (IsCLSIDRegistered(CLSID_EnhancedVideoRenderer)) {
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_EVR)), VIDRNDT_DS_EVR);
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM)), VIDRNDT_DS_EVR_CUSTOM);
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_SYNC)), VIDRNDT_DS_SYNC);
-	} else {
-		CString str;
-		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_EVR), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_EVR);
-		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_EVR_CUSTOM);
-		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_SYNC), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_SYNC);
-	}
-
-	if (IsCLSIDRegistered(CLSID_DXR)) {
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_DXR)), VIDRNDT_DS_DXR);
-	} else {
-		CString str;
-		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_DXR), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_DXR);
-	}
-
-	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_NULL_COMP)), VIDRNDT_DS_NULL_COMP);
-	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP)), VIDRNDT_DS_NULL_UNCOMP);
-	if (IsCLSIDRegistered(CLSID_madVR)) {
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_MADVR)), VIDRNDT_DS_MADVR);
-	} else {
-		CString str;
-		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_MADVR), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
-		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_MADVR);
-	}
+	m_iDSVRTC.SetRedraw(FALSE);
+	addRenderer(VIDRNDT_DS_DEFAULT);
+	addRenderer(VIDRNDT_DS_OVERLAYMIXER);
+	addRenderer(VIDRNDT_DS_VMR7WINDOWED);
+	addRenderer(VIDRNDT_DS_VMR9WINDOWED);
+	addRenderer(VIDRNDT_DS_VMR7RENDERLESS);
+	addRenderer(VIDRNDT_DS_VMR9RENDERLESS);
+	addRenderer(VIDRNDT_DS_EVR);
+	addRenderer(VIDRNDT_DS_EVR_CUSTOM);
+	addRenderer(VIDRNDT_DS_SYNC);
+	addRenderer(VIDRNDT_DS_DXR);
+	addRenderer(VIDRNDT_DS_MADVR);
+	addRenderer(VIDRNDT_DS_NULL_COMP);
+	addRenderer(VIDRNDT_DS_NULL_UNCOMP);
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
 		if (m_iDSVideoRendererType == m_iDSVRTC.GetItemData(i)) {
@@ -241,10 +277,10 @@ BOOL CPPageVideo::OnInitDialog()
 	UpdateData(FALSE);
 
 	CreateToolTip();
-	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), EmptyText);
-	m_wndToolTip.AddTool(GetDlgItem(IDC_RMRND_COMBO), EmptyText);
-	m_wndToolTip.AddTool(GetDlgItem(IDC_QTRND_COMBO), EmptyText);
-	m_wndToolTip.AddTool(GetDlgItem(IDC_DX_SURFACE), EmptyText);
+	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), L"");
+	m_wndToolTip.AddTool(GetDlgItem(IDC_RMRND_COMBO), L"");
+	m_wndToolTip.AddTool(GetDlgItem(IDC_QTRND_COMBO), L"");
+	m_wndToolTip.AddTool(GetDlgItem(IDC_DX_SURFACE), L"");
 
 	OnDSRendererChange();
 	OnRMRendererChange();
@@ -457,7 +493,7 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		default:
-			m_wndToolTip.UpdateTipText(EmptyText, GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(L"", GetDlgItem(IDC_VIDRND_COMBO));
 	}
 
 	SetModified();

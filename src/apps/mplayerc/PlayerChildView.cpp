@@ -252,9 +252,13 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 
 void CChildView::OnSize(UINT nType, int cx, int cy)
 {
-	CWnd::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 
-	((CMainFrame*)GetParentFrame())->MoveVideoWindow();
+	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+	if (pFrame) {
+		pFrame->MoveVideoWindow();
+		pFrame->UpdateThumbnailClip();
+	}
 }
 
 BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)

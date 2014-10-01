@@ -19275,24 +19275,21 @@ HRESULT CMainFrame::UpdateThumbarButton()
 
 HRESULT CMainFrame::UpdateThumbnailClip()
 {
-	if ( !m_pTaskbarList ) {
-		return E_FAIL;
+	CheckPointer(m_pTaskbarList, E_FAIL);
+
+	const CAppSettings& s = AfxGetAppSettings();
+
+	CRect r;
+	m_wndView.GetClientRect(&r);
+	if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
+		r.OffsetRect(0, GetSystemMetrics(SM_CYMENU));
 	}
 
-	if (!AfxGetAppSettings().fUseWin7TaskBar || m_iMediaLoadState != MLS_LOADED || m_fAudioOnly || m_fFullScreen) {
-		return m_pTaskbarList->SetThumbnailClip( m_hWnd, NULL );
+	if (!s.fUseWin7TaskBar || m_iMediaLoadState != MLS_LOADED || m_fAudioOnly || m_fFullScreen || IsD3DFullScreenMode() || r.Width() <= 0 || r.Height() <= 0) {
+		return m_pTaskbarList->SetThumbnailClip(m_hWnd, NULL);
 	}
 
-	RECT vid_rect, result_rect;
-	m_wndView.GetClientRect(&vid_rect);
-
-	// NOTE: For remove menu from thumbnail clip preview, only if it's present
-	result_rect.left	= 2;
-	result_rect.right	= result_rect.left + (vid_rect.right - vid_rect.left) - 4;
-	result_rect.top		= (AfxGetAppSettings().iCaptionMenuMode == MODE_SHOWCAPTIONMENU) ? 22 : 2;
-	result_rect.bottom	= result_rect.top + (vid_rect.bottom - vid_rect.top) - 4;
-
-	return m_pTaskbarList->SetThumbnailClip(m_hWnd, &result_rect);
+	return m_pTaskbarList->SetThumbnailClip(m_hWnd, &r);
 }
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
