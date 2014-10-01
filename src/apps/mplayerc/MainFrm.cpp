@@ -18350,29 +18350,26 @@ void CMainFrame::SetupVMR9ColorControl()
 
 void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, int& hue, int& saturation)
 {
-	static VMR9ProcAmpControl  ClrControl;
-	static DXVA2_ProcAmpValues ClrValues;
-
 	COLORPROPERTY_RANGE* cr;
-	if (flags&ProcAmp_Brightness) {
+	if (flags & ProcAmp_Brightness) {
 		cr = m_ColorCintrol.GetColorControl(ProcAmp_Brightness);
 		brightness = min(max(brightness, cr->MinValue), cr->MaxValue);
 	}
-	if (flags&ProcAmp_Contrast) {
+	if (flags & ProcAmp_Contrast) {
 		cr = m_ColorCintrol.GetColorControl(ProcAmp_Contrast);
 		contrast = min(max(contrast, cr->MinValue), cr->MaxValue);
 	}
-	if (flags&ProcAmp_Hue) {
+	if (flags & ProcAmp_Hue) {
 		cr = m_ColorCintrol.GetColorControl(ProcAmp_Hue);
-		hue =min(max(hue, cr->MinValue), cr->MaxValue);
+		hue = min(max(hue, cr->MinValue), cr->MaxValue);
 	}
-	if (flags&ProcAmp_Saturation) {
+	if (flags & ProcAmp_Saturation) {
 		cr = m_ColorCintrol.GetColorControl(ProcAmp_Saturation);
 		saturation = min(max(saturation, cr->MinValue), cr->MaxValue);
 	}
 
-
 	if (m_pVMRMC9) {
+		VMR9ProcAmpControl ClrControl;
 		ClrControl.dwSize     = sizeof(ClrControl);
 		ClrControl.dwFlags    = flags;
 		ClrControl.Brightness = (float)brightness;
@@ -18382,6 +18379,7 @@ void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, in
 
 		m_pVMRMC9->SetProcAmpControl(0, &ClrControl);
 	} else if (m_pMFVP) {
+		DXVA2_ProcAmpValues ClrValues;
 		ClrValues.Brightness = IntToFixed(brightness);
 		ClrValues.Contrast   = IntToFixed(contrast + 100, 100);
 		ClrValues.Hue        = IntToFixed(hue);

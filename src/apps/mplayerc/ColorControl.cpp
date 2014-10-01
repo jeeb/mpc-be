@@ -53,6 +53,7 @@ COLORPROPERTY_RANGE* CColorControl::GetColorControl(ControlType nFlag)
 		case ProcAmp_Saturation :
 			return &m_ColorControl[3];
 	}
+
 	return NULL;
 }
 
@@ -103,8 +104,7 @@ void CColorControl::UpdateColorControlRange(bool isEVR)
 		m_ColorControl[3].MaxValue		= FixedToInt(m_EVRColorControl[3].MaxValue, 100) - 100;
 		m_ColorControl[3].DefaultValue	= FixedToInt(m_EVRColorControl[3].DefaultValue, 100) - 100;
 		m_ColorControl[3].StepSize		= max(1, FixedToInt(m_EVRColorControl[3].StepSize, 100));
-	}
-	else {
+	} else {
 		// Brightness
 		m_ColorControl[0].MinValue		= (int)floor(m_VMR9ColorControl[0].MinValue + 0.5);
 		m_ColorControl[0].MaxValue		= (int)floor(m_VMR9ColorControl[0].MaxValue + 0.5);
@@ -112,7 +112,9 @@ void CColorControl::UpdateColorControlRange(bool isEVR)
 		m_ColorControl[0].StepSize		= max(1,(int)(m_VMR9ColorControl[0].StepSize + 0.5));
 		// Contrast
 		//if(m_VMR9ColorControl[1].MinValue == 0.0999908447265625) m_VMR9ColorControl[1].MinValue = 0.11; //fix nvidia bug
-		if (*(int*)&m_VMR9ColorControl[1].MinValue == 1036830720) m_VMR9ColorControl[1].MinValue = 0.11f; //fix nvidia bug
+		if (*(int*)&m_VMR9ColorControl[1].MinValue == 1036830720) {
+			m_VMR9ColorControl[1].MinValue = 0.11f; //fix nvidia bug
+		}
 		m_ColorControl[1].MinValue		= (int)floor(m_VMR9ColorControl[1].MinValue * 100 + 0.5) - 100;
 		m_ColorControl[1].MaxValue		= (int)floor(m_VMR9ColorControl[1].MaxValue * 100 + 0.5) - 100;
 		m_ColorControl[1].DefaultValue	= (int)floor(m_VMR9ColorControl[1].DefaultValue * 100 + 0.5) - 100;
@@ -130,17 +132,17 @@ void CColorControl::UpdateColorControlRange(bool isEVR)
 	}
 
 	// Brightness
-	if (m_ColorControl[0].MinValue < -100) m_ColorControl[0].MinValue = -100;
-	if (m_ColorControl[0].MaxValue > 100)  m_ColorControl[0].MaxValue = 100;
+	m_ColorControl[0].MinValue = max(-100, m_ColorControl[0].MinValue);
+	m_ColorControl[0].MaxValue = min( 100, m_ColorControl[0].MaxValue);
 	// Contrast
-	if (m_ColorControl[1].MinValue < -100) m_ColorControl[0].MinValue = -100;
-	if (m_ColorControl[1].MaxValue > 100)  m_ColorControl[0].MaxValue = 100;
+	m_ColorControl[1].MinValue = max(-100, m_ColorControl[1].MinValue);
+	m_ColorControl[1].MaxValue = min( 100, m_ColorControl[1].MaxValue);
 	// Hue
-	if (m_ColorControl[2].MinValue < -180) m_ColorControl[0].MinValue = -180;
-	if (m_ColorControl[2].MaxValue > 180)  m_ColorControl[0].MaxValue = 180;
+	m_ColorControl[2].MinValue = max(-180, m_ColorControl[2].MinValue);
+	m_ColorControl[2].MaxValue = min( 180, m_ColorControl[2].MaxValue);
 	// Saturation
-	if (m_ColorControl[3].MinValue < -100) m_ColorControl[0].MinValue = -100;
-	if (m_ColorControl[3].MaxValue > 100)  m_ColorControl[0].MaxValue = 100;
+	m_ColorControl[3].MinValue = max(-100, m_ColorControl[3].MinValue);
+	m_ColorControl[3].MaxValue = min( 100, m_ColorControl[3].MaxValue);
 }
 
 VMR9ProcAmpControlRange* CColorControl::GetVMR9ColorControl(ControlType nFlag)
