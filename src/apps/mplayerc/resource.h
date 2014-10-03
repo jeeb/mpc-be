@@ -242,6 +242,8 @@
 #define ID_FILE_OPENQUICK               969
 #define ID_VOLUME_GAIN_INC              970
 #define ID_VOLUME_GAIN_DEC              971
+#define ID_VOLUME_GAIN_OFF              972
+#define ID_VOLUME_GAIN_MAX              973
 #define ID_NAVIGATE_TUNERSCAN           974
 #define ID_FAVORITES_QUICKADDFAVORITE   975
 #define ID_FILE_REOPEN                  976
@@ -1137,6 +1139,8 @@
 #define IDS_MAINFRM_138                 33128
 #define IDS_VOLUME_GAIN_INC             33129
 #define IDS_VOLUME_GAIN_DEC             33130
+#define IDS_VOLUME_GAIN_OFF             33131
+#define IDS_VOLUME_GAIN_MAX             33132
 #define IDS_USAGE                       33133
 #define IDS_UNKNOWN_SWITCH              33134
 #define IDS_AG_SETTINGS                 33143
