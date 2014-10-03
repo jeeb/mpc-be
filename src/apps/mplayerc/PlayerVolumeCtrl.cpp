@@ -333,7 +333,7 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	} else if (point.x >= r.right) {
 		SetPos(stop);
 	}
-	
+
 	int w = r.right - r.left - 4;
 	SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w / 2)) / w);
 

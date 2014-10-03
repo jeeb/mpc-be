@@ -475,7 +475,7 @@ from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).a
 {
 	BOOL ret;
 	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-	PSID AdministratorsGroup; 
+	PSID AdministratorsGroup;
 	ret = AllocateAndInitializeSid(
 		  &NtAuthority,
 		  2,
@@ -486,8 +486,8 @@ from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).a
 	if (ret) {
 		if (!CheckTokenMembership(NULL, AdministratorsGroup, &ret)) {
 			ret = FALSE;
-		} 
-		FreeSid(AdministratorsGroup); 
+		}
+		FreeSid(AdministratorsGroup);
 	}
 
 	return ret;
@@ -495,7 +495,7 @@ from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).a
 
 // from http://msdn.microsoft.com/ru-RU/library/windows/desktop/ms680582(v=vs.85).aspx
 CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
-{ 
+{
 	LPVOID lpMsgBuf;
 	LPVOID lpDisplayBuf;
 

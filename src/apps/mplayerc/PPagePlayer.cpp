@@ -119,7 +119,7 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_fRememberFilePos = s.fRememberFilePos;
 	m_fLimitWindowProportions = s.fLimitWindowProportions;
 	m_bRememberPlaylistItems = s.bRememberPlaylistItems;
-	
+
 	m_nRecentFiles = s.iRecentFilesNumber;
 	m_RecentFilesCtrl.SetRange(MIN_RECENT_FILES, MAX_RECENT_FILES);
 	m_RecentFilesCtrl.SetPos(m_nRecentFiles);

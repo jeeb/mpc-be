@@ -1070,7 +1070,7 @@ public:
 	CString		m_strCurPlaybackLabel;
 	CString		m_strFnFull;
 	CString		m_strUrl;
-	
+
 	YOUTUBE_FIELDS	m_youtubeFields;
 	CString			GetStrForTitle();
 	CString			GetAltFileName();

@@ -443,7 +443,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_D3DFULLSCREEN, OnUpdateViewD3DFullscreen)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_ALTERNATIVEVSYNC, OnUpdateViewAlternativeVSync)
-	
+
 	ON_COMMAND(ID_VIEW_RESET_DEFAULT, OnViewResetDefault)
 	ON_COMMAND(ID_VIEW_RESET_OPTIMAL, OnViewResetOptimal)
 
@@ -4974,7 +4974,7 @@ void CMainFrame::OnOgmSub(UINT nID)
 
 				strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), lang);
 				m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-				
+
 				if (pszName) {
 					CoTaskMemFree(pszName);
 				}
@@ -6983,7 +6983,7 @@ void CMainFrame::OnUpdateViewColorManagementInput(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(fChecked);
 	/*
 	if (fChecked) {
-		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, pCmdUI->m_nID);	
+		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INPUT_AUTO, ID_VIEW_COLORMANAGEMENT_INPUT_SDTV_PAL, pCmdUI->m_nID);
 	}
 	*/
 }
@@ -7019,7 +7019,7 @@ void CMainFrame::OnUpdateViewColorManagementAmbientLight(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(fChecked);
 	/*
 	if (fChecked) {
-		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, pCmdUI->m_nID);	
+		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_BRIGHT, ID_VIEW_COLORMANAGEMENT_AMBIENTLIGHT_DARK, pCmdUI->m_nID);
 	}
 	*/
 }
@@ -7059,7 +7059,7 @@ void CMainFrame::OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(fChecked);
 	/*
 	if (fChecked) {
-		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, pCmdUI->m_nID);	
+		CheckMenuRadioItem(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, pCmdUI->m_nID);
 	}
 	*/
 }
@@ -7088,7 +7088,7 @@ void CMainFrame::OnUpdateViewEVROutputRange(CCmdUI* pCmdUI)
 
 	/*
 	if (fChecked) {
-		CheckMenuRadioItem(ID_VIEW_EVROUTPUTRANGE_0_255, ID_VIEW_EVROUTPUTRANGE_16_235, pCmdUI->m_nID);	
+		CheckMenuRadioItem(ID_VIEW_EVROUTPUTRANGE_0_255, ID_VIEW_EVROUTPUTRANGE_16_235, pCmdUI->m_nID);
 	}
 	*/
 }
@@ -8726,7 +8726,7 @@ void CMainFrame::OnPlayFrameStep(UINT nID)
 		} else {
 			m_pMS->GetCurrentPosition(&rtCurPos);
 		}
-		
+
 		rtCurPos += (nID == ID_PLAY_FRAMESTEP) ? rtAvgTimePerFrame : -rtAvgTimePerFrame;
 		SeekTo(rtCurPos);
 	}
@@ -13582,7 +13582,7 @@ void CMainFrame::OpenCustomizeGraph()
 								idSub = (LCID)-1;
 							}
 						}
-						
+
 						if (pszName) {
 							CoTaskMemFree(pszName);
 						}
@@ -14535,7 +14535,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 						subarray.Add(substream);
 					}
-					
+
 					if (pName) {
 						CoTaskMemFree(pName);
 					}
@@ -17415,7 +17415,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 		if (!ValidateSeek(rtPos, stop)) {
 			return;
 		}
-		
+
 		m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 
 		if (b_UseReclock) {

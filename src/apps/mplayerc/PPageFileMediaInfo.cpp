@@ -52,7 +52,6 @@ static String mi_get_lang_file()
 					WCHAR* wstr = DNew WCHAR[dstlen];
 					if (wstr) {
 						MultiByteToWideChar(acp ? CP_ACP : CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, wstr, dstlen);
-					
 						str = wstr;
 						delete[] wstr;
 					}

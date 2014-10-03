@@ -313,8 +313,8 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields)
 					CStringA paramHeader = paramA.Left(k);
 					CStringA paramValue = paramA.Mid(k + 1);
 
-					// "quality", "fallback_host", "url", "itag", "type"
-					 if (paramHeader == "url") {
+					// "quality", "fallback_host", "url", "itag", "type", "s"
+					if (paramHeader == "url") {
 						url = UrlDecode(UrlDecode(paramValue));
 					} else if (paramHeader == "itag") {
 						if (sscanf_s(paramValue, "%d", &itag) != 1) {
@@ -416,7 +416,7 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields)
 						}
 					}
 					InternetCloseHandle(s);
-				}			
+				}
 			}
 
 			return final_url;

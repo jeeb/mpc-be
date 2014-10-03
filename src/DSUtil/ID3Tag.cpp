@@ -109,7 +109,7 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 	DWORD pos		= gb.GetPos();
 
 	CString wstr;
-	
+
 	if (encoding > 0) {
 		while (size -= 2) {
 			fieldSize += 2;
@@ -250,7 +250,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				// Text encoding
 				BYTE encoding = (BYTE)gbData.BitRead(8);
 				size--;
-						
+
 				// Language
 				CHAR lang[3];
 				memset(&lang, 0 ,3);
@@ -281,7 +281,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 						gbData.BitRead(8);
 						size--;
 					}
-	
+
 					DWORD bom_big = (DWORD)gbData.BitRead(32, true);
 					if (bom_big == 0xfffe0000 || bom_big == 0xfeff0000) {
 						gbData.BitRead(32);

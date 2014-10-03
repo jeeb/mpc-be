@@ -993,7 +993,7 @@ BOOL CPPageFormats::OnApply()
 	AddAutoPlayToRegistry(AP_BDMOVIE,	!!m_apdvd.GetCheck());
 
 	s.SetRtspHandler(m_iRtspHandler == 0 ? RealMedia : m_iRtspHandler == 1 ? QuickTime:DirectShow, !!m_fRtspFileExtFirst);
-	
+
 	s.bSetContextFiles		= !!m_fContextFiles.GetCheck();
 	s.bSetContextDir		= !!m_fContextDir.GetCheck();
 	s.fAssociatedWithIcons	= !!m_fAssociatedWithIcons.GetCheck();

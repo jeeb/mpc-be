@@ -400,7 +400,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 								fl.Insert(pFGFAsync, 0);
 							}
 						}
-						
+
 						pFGF->SetMerit(MERIT64_HIGH);
 						fl.Insert(pFGF, 0, false, false);
 

@@ -240,13 +240,13 @@ TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 							if (volumeNameBuffer[len - 1] == '\\') {
 								volumeNameBuffer[len - 1] = 0;
 							}
-										
-							HANDLE volumeHandle = ::CreateFile(volumeNameBuffer, 
-																GENERIC_READ,  
-																FILE_SHARE_READ | FILE_SHARE_WRITE,  
-																NULL, 
-																OPEN_EXISTING, 
-																FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, 
+
+							HANDLE volumeHandle = ::CreateFile(volumeNameBuffer,
+																GENERIC_READ,
+																FILE_SHARE_READ | FILE_SHARE_WRITE,
+																NULL,
+																OPEN_EXISTING,
+																FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
 																NULL);
 
 							if (volumeHandle != INVALID_HANDLE_VALUE) {
@@ -290,7 +290,7 @@ TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 														  sizeof(deviceInfo),
 														  &bytesUsed,
 														  NULL)) {
-												
+
 										CString tmp_physicalDriveName;
 										tmp_physicalDriveName.Format(L"\\\\.\\CDROM%d", deviceInfo.DeviceNumber);
 										if (physicalDriveName == tmp_physicalDriveName) {

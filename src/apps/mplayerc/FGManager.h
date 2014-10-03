@@ -121,7 +121,7 @@ protected:
 
 	// IGraphBuilderAudio
 	STDMETHODIMP RenderAudioFile(LPCWSTR lpcwstrFile);
-	
+
 	BOOL m_bOnlySub;
 	BOOL m_bOnlyAudio;
 
