@@ -131,18 +131,19 @@ void CColorControl::UpdateColorControlRange(bool isEVR)
 		m_ColorControl[3].StepSize		= max(1, (int)(m_VMR9ColorControl[3].StepSize * 100 + 0.5));
 	}
 
+	// limit the minimum and maximum values
 	// Brightness
-	m_ColorControl[0].MinValue = max(-100, m_ColorControl[0].MinValue);
-	m_ColorControl[0].MaxValue = min( 100, m_ColorControl[0].MaxValue);
+	if (m_ColorControl[0].MinValue < -100) m_ColorControl[0].MinValue = -100;
+	if (m_ColorControl[0].MaxValue > 100) m_ColorControl[0].MaxValue = 100;
 	// Contrast
-	m_ColorControl[1].MinValue = max(-100, m_ColorControl[1].MinValue);
-	m_ColorControl[1].MaxValue = min( 100, m_ColorControl[1].MaxValue);
+	if (m_ColorControl[1].MinValue < -100) m_ColorControl[1].MinValue = -100;
+	if (m_ColorControl[1].MaxValue > 100) m_ColorControl[1].MaxValue = 100;
 	// Hue
-	m_ColorControl[2].MinValue = max(-180, m_ColorControl[2].MinValue);
-	m_ColorControl[2].MaxValue = min( 180, m_ColorControl[2].MaxValue);
+	if (m_ColorControl[2].MinValue < -180) m_ColorControl[2].MinValue = -180;
+	if (m_ColorControl[2].MaxValue > 180) m_ColorControl[2].MaxValue = 180;
 	// Saturation
-	m_ColorControl[3].MinValue = max(-100, m_ColorControl[3].MinValue);
-	m_ColorControl[3].MaxValue = min( 100, m_ColorControl[3].MaxValue);
+	if (m_ColorControl[3].MinValue < -100) m_ColorControl[3].MinValue = -100;
+	if (m_ColorControl[3].MaxValue > 100) m_ColorControl[3].MaxValue = 100;
 }
 
 VMR9ProcAmpControlRange* CColorControl::GetVMR9ColorControl(ControlType nFlag)
