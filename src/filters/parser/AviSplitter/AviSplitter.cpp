@@ -254,9 +254,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			BITMAPINFOHEADER* pbmi = &((BITMAPINFO*)s->strf.GetData())->bmiHeader;
 			RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
-			
+
 			REFERENCE_TIME AvgTimePerFrame = s->strh.dwRate > 0 ? 10000000ui64 * s->strh.dwScale / s->strh.dwRate : 0;
-			
+
 			DWORD dwBitRate = 0;
 			if (s->cs.GetCount() && AvgTimePerFrame > 0) {
 				UINT64 size = 0;
@@ -638,7 +638,7 @@ bool CAviSplitterFilter::DemuxLoop()
 
 		REFERENCE_TIME minTime = INT64_MAX;
 		UINT64 minpos = INT64_MAX;
-		for (DWORD track = 0; track < m_pFile->m_avih.dwStreams; track++) { 
+		for (DWORD track = 0; track < m_pFile->m_avih.dwStreams; track++) {
 			CAviFile::strm_t* s = m_pFile->m_strms[track];
 			DWORD f = m_tFrame[track];
 

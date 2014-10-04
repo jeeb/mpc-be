@@ -43,7 +43,7 @@ void CBaseSub::InitSpd(SubPicDesc& spd, int nWidth, int nHeight)
 		m_spd.bpp		= 32;
 		m_spd.pitch		= m_spd.w * 4;
 		m_spd.vidrect	= CRect(0, 0, m_spd.w, m_spd.h);
-		
+
 		m_pTempSpdBuff.Free();
 		m_pTempSpdBuff.Allocate(m_spd.pitch * m_spd.h);
 		m_spd.bits		= (void*)m_pTempSpdBuff;

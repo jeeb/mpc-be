@@ -321,7 +321,7 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 					pObject->m_rtStop	= rtTime;
 					pObject->m_width	= pObjectData.m_width;
 					pObject->m_height	= pObjectData.m_height;
-			
+
 					pObject->SetRLEData(pObjectData.GetRLEData(), pObjectData.GetRLEDataSize(), pObjectData.GetRLEDataSize());
 
 					if (!pObject->HavePalette() && m_CLUT[palette_id_ref].Palette) {
@@ -334,7 +334,7 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 									m_pCurrentWindow->Objects[i]->m_compositionNumber,
 									m_pCurrentWindow->Objects[i]->m_rtStart, m_pCurrentWindow->Objects[i]->m_rtStop,
 									ReftimeToString(m_pCurrentWindow->Objects[i]->m_rtStart), ReftimeToString(m_pCurrentWindow->Objects[i]->m_rtStop));
-	
+
 					m_pObjects.AddTail (m_pCurrentWindow->Objects[i]);
 				} else {
 					delete m_pCurrentWindow->Objects[i];

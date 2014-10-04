@@ -142,7 +142,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	m_rtMax = m_posMax = 0;
 
 	if (IsRandomAccess() || IsStreaming()) {
-		
+
 		WaitAvailable(5000, MEGABYTE*2);
 		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE*2 : MEGABYTE*5)); // max 5Mb for search a valid Program Map Table
 
@@ -277,7 +277,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 void CMpegSplitterFile::OnUpdateDuration()
 {
 	__int64 pos = GetPos();
-	
+
 	__int64 len = GetLength();
 	SearchStreams(max(m_lastLen, len - MEGABYTE / 2), len, TRUE);
 	int detected_rate = int(m_rtMax > m_rtMin ? UNITS * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
@@ -907,7 +907,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 			} else if (b >= 0xa0 && b < 0xa8) { // lpcm
 				s.ps1id = (BYTE)BitRead(8);
-				
+
 				do {
 					// DVD-Audio LPCM
 					if (b == 0xa0) {
@@ -938,7 +938,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 								type = stream_type::audio;
 							}
 							Seek(start + 10);
-							break; 
+							break;
 						}
 					}
 
@@ -1368,7 +1368,7 @@ void CMpegSplitterFile::UpdatePSM()
 	while (ps_info_length-- > 0) {
 		BitRead(8);
 	}
-	
+
 	WORD es_map_length	= (WORD)BitRead(16);
 	while (es_map_length > 4) {
 		BYTE type			= (BYTE)BitRead(8);
@@ -1376,7 +1376,7 @@ void CMpegSplitterFile::UpdatePSM()
 		WORD es_info_length	= (WORD)BitRead(16);
 
 		m_psm[es_id]		= (PES_STREAM_TYPE)type;
-        
+
 		es_map_length		-= 4 + es_info_length;
 		while (es_info_length-- > 0) {
 			BitRead(8);

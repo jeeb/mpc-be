@@ -153,7 +153,7 @@ STDMETHODIMP CMatroskaSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-static int compare(const void* a, const void* b) 
+static int compare(const void* a, const void* b)
 {
 	return (*(INT64*)a - *(INT64*)b);
 }
@@ -288,7 +288,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							CMatroskaNode Root(m_pFile);
 							m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 							m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-							
+
 							Cluster c;
 							c.ParseTimeCode(m_pCluster);
 
@@ -310,7 +310,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									if (!(bg->Block.Lacing & 0x80)) {
 										bg->ReferenceBlock.Set(0);    // not a kf
 									}
-									
+
 									bgn.AddTail(bg);
 								}
 								__int64 endpos = m_pFile->GetPos();
@@ -360,7 +360,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
-					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()); 
+					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					if (!bHasVideo)
 						mts.Add(mt);
@@ -480,7 +480,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pm2vi->dwLevel		= params.level;
 						pm2vi->dwFlags		= params.nal_length_size;
 					}
-					
+
 					if (!pm2vi->dwFlags
 							&& ((extradata[0] || extradata[1] || extradata[2] > 1 && size > 25))) {
 						pm2vi->dwFlags = (extradata[21] & 3) + 1;
@@ -560,7 +560,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-						pvih->bmiHeader.biPlanes = 1; // must be set to 1. 
+						pvih->bmiHeader.biPlanes = 1; // must be set to 1.
 						pvih->bmiHeader.biBitCount = bitdepth;
 						pvih->bmiHeader.biCompression = fourcc;
 						pvih->bmiHeader.biSizeImage = pvih->bmiHeader.biWidth * pvih->bmiHeader.biHeight * bitdepth / 8;
@@ -992,7 +992,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe->cbSize = cbSize;
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + cbSize);
 					BYTE *p = (BYTE *)(wfe + 1);
-					
+
 					memset(p, 0, cbSize);
 					memcpy(p + 3,  &cbSize, 1);
 					memcpy(p + 4, (const unsigned char *)"alac", 4);
@@ -1101,7 +1101,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	Info& info = m_pFile->m_segment.SegmentInfo;
 
 	m_rtDuration = (REFERENCE_TIME)(info.Duration * info.TimeCodeScale / 100);
-	
+
 	if (m_bCalcDuration && bHasVideo && m_pFile->m_segment.Cues.GetCount()) {
 		// calculate duration from video track;
 		m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
@@ -1702,7 +1702,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 									Cluster c;
 									c.ParseTimeCode(pCluster);
-							
+
 									pCluster->SeekTo(pos + pCueTrackPositions->CueRelativePosition);
 									CAutoPtr<CMatroskaNode> pBlock(DNew CMatroskaNode(pCluster));
 
@@ -2213,7 +2213,7 @@ static bool ParseWavpack(CMediaType* mt, CGolombBuffer gb, CAutoPtr<Packet>& p)
 		WL32(dst + offset + 24, flags);								// flags
 		WL32(dst + offset + 28, crc);								// crc
 		memcpy(dst + offset + 32, gb.GetBufferPos(), blocksize);	// block data
-				
+
 		gb.SkipBytes(blocksize);
 		offset += blocksize + 32;
 	}

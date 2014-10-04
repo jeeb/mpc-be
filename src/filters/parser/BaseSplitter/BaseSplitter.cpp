@@ -924,7 +924,7 @@ void CBaseSplitterFilter::SortOutputPin()
 
 	CAutoPtrList<CBaseSplitterOutputPin> m_pOutputsVideo;
 	CAutoPtrList<CBaseSplitterOutputPin> m_pOutputsOther;
-	
+
 	POSITION pos = m_pOutputs.GetHeadPosition();
 	while (pos) {
 		CAutoPtr<CBaseSplitterOutputPin> pin;

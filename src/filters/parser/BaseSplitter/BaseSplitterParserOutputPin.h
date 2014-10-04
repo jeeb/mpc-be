@@ -34,7 +34,7 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 
 	CAutoPtr<Packet>			m_p;
 	CAutoPtrList<CH264Packet>	m_pl;
-	
+
 	bool	m_fHasAccessUnitDelimiters;
 	bool	m_bFlushed;
 	int		m_truehd_framelength;

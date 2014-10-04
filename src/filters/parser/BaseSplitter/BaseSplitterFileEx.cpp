@@ -1297,7 +1297,7 @@ bool CBaseSplitterFileEx::Read(dvdalpcmhdr& h, int len, CMediaType* pmt)
 
 	h.firstaudioframe = (WORD)BitRead(16);// Byte pointer to start of first audio frame.
 	h.unknown1        = (BYTE)BitRead(8); // Unknown - e.g. 0x10 for stereo, 0x00 for surround
-	if (h.unknown1!= 0x10 && h.unknown1!= 0x00) 
+	if (h.unknown1!= 0x10 && h.unknown1!= 0x00)
 		return false; // this is not the aob. maybe this is a vob.
 
 	h.bitpersample1   = (BYTE)BitRead(4);
@@ -1332,7 +1332,7 @@ bool CBaseSplitterFileEx::Read(dvdalpcmhdr& h, int len, CMediaType* pmt)
 	wfe.wBitsPerSample = depth[h.bitpersample1];
 	wfe.nSamplesPerSec = freq[h.samplerate1];
 	wfe.nChannels = channels1[h.groupassignment]+channels2[h.groupassignment];
-	
+
 	if (wfe.nChannels > 2) {
 		wfe.nBlockAlign = (depth[h.bitpersample1] * channels1[h.groupassignment] * (WORD)(freq[h.samplerate1] / freq[h.samplerate2]) +
 		                   depth[h.bitpersample2] * channels2[h.groupassignment]) * 2 / 8;
@@ -2171,7 +2171,7 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 		if (!ParseDiracHeader(gb, &h.width, &h.height, &h.AvgTimePerFrame)) {
 			return false;
 		}
-		
+
 		if (!pmt) {
 			return true;
 		}
@@ -2193,7 +2193,7 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 			pvih->bmiHeader.biCompression	= pmt->subtype.Data1;
 			pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
 		}
-	
+
 		return true;
 	}
 
@@ -2297,7 +2297,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt, bool find_s
 							} else if (NAL_unit_type == NAL_UNIT_PPS) {
 								pps_present++;
 							}
-							
+
 							Seek(nal_pos);
 							int size	= tmppos - nal_pos - 4;
 							extradata	= (BYTE*)realloc(extradata, extrasize + size);

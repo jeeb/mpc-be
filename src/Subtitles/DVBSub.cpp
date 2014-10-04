@@ -368,7 +368,7 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 						pObject->m_width	= pRegion->width;
 						pObject->m_height	= pRegion->height;
 						pObject->SetPalette(pCLUT->size, pCLUT->palette, m_Display.width > 720);
-						
+	
 						InitSpd(spd, m_Display.width, m_Display.height);
 						pObject->RenderDvb(spd, nX, nY, m_bResizedRender ? &m_spd : NULL);
 						TRACE_DVB(_T(" --> %d/%d - %d/%d\n"), nRegion, pPage->regionsPos.GetCount(), nObject, pRegion->objects.GetCount());

@@ -116,7 +116,7 @@ private :
 	CAtlList<CompositionObject*>	m_pObjects;
 	HDMV_WindowDefinition*			m_pCurrentWindow	= 0;
 	CompositionObject				m_ParsedObjects[MAX_WINDOWS];
-	
+
 	HDMV_CLUT						m_CLUT[256];
 	HDMV_CLUT						m_DefaultCLUT;
 

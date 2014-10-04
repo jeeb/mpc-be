@@ -773,8 +773,8 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 CAutoPtr<Packet> COggSplitterOutputPin::GetPacket()
 {
 	CAutoLock csAutoLock(&m_csPackets);
-	
-	CAutoPtr<Packet> p;	
+
+	CAutoPtr<Packet> p;
 	if (m_packets.GetCount()) {
 		p = m_packets.RemoveHead();
 	}
@@ -813,10 +813,10 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	mt.majortype	= MEDIATYPE_Audio;
 	mt.subtype		= MEDIASUBTYPE_Vorbis;
 	mt.formattype	= FORMAT_VorbisFormat;
-	
+
 	VORBISFORMAT* vf = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
 	memset(mt.Format(), 0, mt.FormatLength());
-	
+
 	vf->nChannels		= h->audio_channels;
 	vf->nSamplesPerSec	= h->audio_sample_rate;
 	vf->nAvgBitsPerSec	= h->bitrate_nominal;
@@ -830,10 +830,10 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	mt.majortype	= MEDIATYPE_Audio;
 	mt.subtype		= MEDIASUBTYPE_Vorbis2;
 	mt.formattype	= FORMAT_VorbisFormat2;
-	
+
 	VORBISFORMAT2* vf2 = (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2));
 	memset(mt.Format(), 0, mt.FormatLength());
-	
+
 	vf2->Channels		= h->audio_channels;
 	vf2->SamplesPerSec	= h->audio_sample_rate;
 	mt.SetSampleSize(8192);
@@ -1193,11 +1193,11 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	mt.majortype	= MEDIATYPE_Video;
 	mt.subtype		= FOURCCMap(MAKEFOURCC(h->subtype[0], h->subtype[1], h->subtype[2], h->subtype[3]));
 	mt.formattype	= FORMAT_VideoInfo;
-	
+
 	VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
 	memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), h + 1, extra);
-	
+
 	pvih->AvgTimePerFrame			= h->time_unit / h->samples_per_unit;
 	pvih->bmiHeader.biWidth			= h->v.w;
 	pvih->bmiHeader.biHeight		= h->v.h;
@@ -1242,11 +1242,11 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	mt.majortype	= MEDIATYPE_Audio;
 	mt.subtype		= FOURCCMap(strtol(CStringA(h->subtype, 4), NULL, 16));
 	mt.formattype	= FORMAT_WaveFormatEx;
-	
+
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
 	memcpy(mt.Format() + sizeof(WAVEFORMATEX), h + 1, extra);
-	
+
 	wfe->cbSize				= extra;
 	wfe->wFormatTag			= (WORD)mt.subtype.Data1;
 	wfe->nChannels			= h->a.nChannels;
@@ -1342,7 +1342,7 @@ COggTheoraOutputPin::COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilt
 
 	MPEG2VIDEOINFO* vih	= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(sizeof(MPEG2VIDEOINFO));
 	memset(mt.Format(), 0, mt.FormatLength());
-	
+
 	vih->hdr.bmiHeader.biSize			= sizeof(vih->hdr.bmiHeader);
 	vih->hdr.bmiHeader.biWidth			= width;
 	vih->hdr.bmiHeader.biHeight			= height;
@@ -1370,7 +1370,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 			m_packets.RemoveHead();
 			continue;
 		}
-		
+
 		BYTE* data = p->GetData();
 		BYTE type = *data++;
 
@@ -1471,7 +1471,7 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 
 			if (p->GetCount() > 13) {
 				BYTE* buf = p->GetData();
-		
+
 				if (!memcmp(buf, "BBCD\x00", 5)) {
 					m_IsInitialized = SUCCEEDED(InitDirac(buf, p->GetCount()));
 				}
@@ -1527,7 +1527,7 @@ HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
 REFERENCE_TIME COggDiracOutputPin::GetRefTime(__int64 granule_position)
 {
 	REFERENCE_TIME pts = 0;
-	
+
 	if (m_bOldDirac) {
 		LONGLONG iframe		= granule_position >> 30;
 		LONGLONG pframe		= granule_position & 0x3fffffff;

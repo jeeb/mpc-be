@@ -527,7 +527,7 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 		} else if (c != EOF) { // might be another format
 			if (first_line_success) // may be just a syntax error, try next lines...
 				continue;
-				
+
 			return false;
 		}
 	}
@@ -1439,7 +1439,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 				if (version >= 6) {
 					marginRect.bottom = GetInt(pszBuff, nBuffLength);
 				}
-				
+
 				CString Effect = WToT(GetStrW(pszBuff, nBuffLength));
 				int len = min(Effect.GetLength(), nBuffLength);
 				if (Effect.Left(len) == WToT(CStringW(pszBuff, len))) {

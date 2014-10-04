@@ -156,7 +156,7 @@ static double int64toDouble(__int64 value)
 		__int64	i;
 		double	f;
 	} intfloat64;
-	
+
 	intfloat64.i = value;
 
 	return intfloat64.f;
@@ -853,7 +853,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						CSize aspect(h.width * h.sar.num, h.height * h.sar.den);
 						ReduceDim(aspect);
-						CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize); 
+						CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize);
 
 						delete[] headerData;
 
@@ -1029,7 +1029,7 @@ bool CFLVSplitterFilter::DemuxInit()
 
 	if (m_pFile->IsRandomAccess()) {
 		__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * 1024);
-		
+
 		if (Sync(pos)) {
 			Tag t;
 			AudioTag at;
@@ -1248,7 +1248,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 			}
 
 			m_pFile->WaitAvailable(1500, dataSize);
-			
+
 			p.Attach(DNew Packet());
 			p->TrackNumber	= t.TagType;
 			p->rtStart		= 10000i64 * t.TimeStamp;

@@ -2694,7 +2694,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	if (m_bOverrideStyle) {
 		dstScreenSize = DEFSCREENSIZE;
 	}
-	
+
 	sub->m_scalex = dstScreenSize.cx > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Width() : m_size.cx) / (dstScreenSize.cx * 8) : 1.0;
 	sub->m_scaley = dstScreenSize.cy > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Height() : m_size.cy) / (dstScreenSize.cy * 8) : 1.0;
 

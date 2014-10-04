@@ -55,7 +55,7 @@ static UINT64 ReadByte(CFile* mfile, UINT count = 1)
 	for(UINT i = 0; i < count; i++) {
 		ret = (ret << 8) + (buf[i] & 0xff);
 	}
-	
+
 	return ret;
 }
 

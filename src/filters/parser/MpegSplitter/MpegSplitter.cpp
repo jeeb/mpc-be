@@ -770,7 +770,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			p->bAppendable	= !h.fpts;
 			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
 			p->rtStop		= p->rtStart + 1;
-			
+
 			p->SetCount(h.length);
 			m_pFile->ByteRead(p->GetData(), h.length);
 
@@ -1393,7 +1393,7 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 
 		m_rtMax = m_rtMin + rtDur;
 	}
-	
+
 	return res;
 }
 
@@ -1563,7 +1563,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 				if (!p->streamCount(m_pFile->m_streams)) {
 					continue;
 				}
-			
+
 				if (j == lIndex) {
 					if (ppmt) {
 						*ppmt = NULL;
@@ -1841,7 +1841,7 @@ HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
 			return S_OK;
 		}
 	}
-	
+
 	return E_INVALIDARG;
 }
 

@@ -789,7 +789,7 @@ HRESULT CRoQVideoDecoder::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 	HRESULT hr;
 	ALLOCATOR_PROPERTIES Actual;
 
-	if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) 
+	if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual)))
 		return hr;
 
 	return(pProperties->cBuffers > Actual.cBuffers || pProperties->cbBuffer > Actual.cbBuffer
@@ -1009,7 +1009,7 @@ HRESULT CRoQAudioDecoder::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 	HRESULT hr;
 	ALLOCATOR_PROPERTIES Actual;
 
-	if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) 
+	if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual)))
 		return hr;
 
 	return pProperties->cBuffers > Actual.cBuffers || pProperties->cbBuffer > Actual.cbBuffer

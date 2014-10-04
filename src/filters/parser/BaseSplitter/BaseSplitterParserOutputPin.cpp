@@ -240,7 +240,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<Packet> p)
 			}
 
 			HandlePacket(0);
-							
+
 			start += size;
 		} else {
 			break;
@@ -512,7 +512,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseHDMVLPCM(CAutoPtr<Packet> p)
 			}
 
 			HandlePacket(4);
-							
+
 			start += size;
 		} else {
 			break;
@@ -560,7 +560,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<Packet> p)
 			}
 
 			HandlePacket(0);
-							
+
 			start += size;
 		} else {
 			break;
@@ -623,7 +623,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTrueHD(CAutoPtr<Packet> p)
 		}
 
 		HandlePacket(0);
-							
+
 		start += size;
 	}
 
@@ -672,7 +672,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDirac(CAutoPtr<Packet> p)
 			p2->pmt = CreateMediaType(&m_mt);
 			m_bFlushed = false;
 		}
-		
+
 		hr = __super::DeliverPacket(p2);
 	}
 
@@ -728,7 +728,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVobSub(CAutoPtr<Packet> p)
 			p2->pmt = CreateMediaType(&m_mt);
 			m_bFlushed = false;
 		}
-		
+
 		hr = __super::DeliverPacket(p2);
 	}
 
@@ -759,7 +759,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<Packet> p)
 					BYTE* start	= buf + i - 7;
 					int size	= headersize + adx_block_size;
 					HandlePacket(0);
-					
+
 					m_p->RemoveAt(0, i - 7 + headersize + adx_block_size);
 					break;
 				}

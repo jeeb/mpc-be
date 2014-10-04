@@ -2392,7 +2392,7 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 					for (size_t i = 0; i < 4 && colors.GetCount(); i++) {
 						*(DWORD*)&pal[i] = _tcstol(colors.RemoveHead(), NULL, 16);
 					}
-					
+
 					SetCustomPal(pal, _tridx);
 				}
 			}
@@ -2512,7 +2512,7 @@ STDMETHODIMP CVobSubStream::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 		SubPic* sp = m_subpics.GetAt(pos);
 		if (sp->tStart <= rt && rt < sp->tStop) {
 			if (m_img.iIdx != (int)pos || (sp->bAnimated && sp->tStart + m_img.tCurrent * 10000i64 <= rt)) {
-				
+
 				BYTE* pData = sp->pData.GetData();
 				m_img.Decode(
 					pData, (pData[0] << 8) | pData[1], (pData[2] << 8) | pData[3], int((rt - sp->tStart) / 10000i64),

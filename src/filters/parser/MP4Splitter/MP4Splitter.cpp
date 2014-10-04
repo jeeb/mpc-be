@@ -652,7 +652,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					HandlePASP(avc1);
 					SetAspect(Aspect, width, height, pbmi.biWidth, pbmi.biHeight, vih2);
 
-					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
+					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 
 					mts.Add(mt);
 					//b_HasVideo = true;
@@ -705,8 +705,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					AP4_Atom* atom = items->GetData();
 					AP4_Atom::Type type = atom->GetType();
 
-					if (k == 0 && stsd->GetChildren().ItemCount() > 1 && type == AP4_ATOM_TYPE_JPEG) { 
-						continue; // Multiple fourcc, we skip first JPEG. 
+					if (k == 0 && stsd->GetChildren().ItemCount() > 1 && type == AP4_ATOM_TYPE_JPEG) {
+						continue; // Multiple fourcc, we skip first JPEG.
 					}
 
 					DWORD fourcc =
@@ -906,7 +906,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (type == AP4_ATOM_TYPE_EAC3) {
 							AP4_Sample sample;
 							AP4_DataBuffer sample_data;
-							
+
 							if (track->GetSampleCount() && AP4_SUCCEEDED(track->ReadSample(1, sample, sample_data)) && sample_data.GetDataSize() >= 7) {
 								audioframe_t aframe;
 								if (ParseEAC3Header(sample_data.GetData(), &aframe)) {
@@ -1084,7 +1084,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
 					item;
 					item = item->GetNext()) {
-				
+
 				AP4_Track* track = item->GetData();
 
 				if (ChapterTrackId == track->GetId()) {
@@ -1106,7 +1106,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 							ChapterName = ConvertStr(buff);
 							REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
-					
+
 							ChapAppend(rtStart, ChapterName);
 						}
 					}
@@ -1480,7 +1480,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 STDMETHODIMP CMP4SplitterFilter::GetKeyFrameCount(UINT& nKFs)
 {
 	CheckPointer(m_pFile, E_UNEXPECTED);
-	
+
 	nKFs = m_sps.GetCount();
 	return S_OK;
 }

@@ -66,7 +66,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	BOOL m_bOpeningCompleted;
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
-	
+
 	__int64 m_lastLen;
 	virtual void OnUpdateDuration();
 
