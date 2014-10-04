@@ -4105,22 +4105,32 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 	} else if (m_iMediaLoadState == MLS_LOADED) {
 		CString msg = FillMessage();
 
-		OAFilterState fs = GetMediaState();
-		CString UI_Text =
-			!msg.IsEmpty() ? msg :
-			fs == State_Stopped ? ResStr(IDS_CONTROLS_STOPPED) :
-			(fs == State_Paused || m_fFrameSteppingActive) ? ResStr(IDS_CONTROLS_PAUSED) :
-			fs == State_Running ? ResStr(IDS_CONTROLS_PLAYING) :
-			_T("");
-		bool bDXVAonStatusBar = !(AfxGetAppSettings().bUseDarkTheme && m_wndToolBar.IsVisible());
-		if ((!m_fAudioOnly) && bDXVAonStatusBar && (UI_Text == ResStr(IDS_CONTROLS_PAUSED) || UI_Text == ResStr(IDS_CONTROLS_PLAYING))) {
-			if (GetDXVAStatus()) {
-				UI_Text.AppendFormat(_T(" [%ws]"), GetDXVAVersion());
+		if (msg.IsEmpty()) {
+			OAFilterState fs = GetMediaState();
+
+			if (fs == State_Stopped) {
+				msg = ResStr(IDS_CONTROLS_STOPPED);
+			}
+			else if (fs == State_Paused || m_fFrameSteppingActive) {
+				msg = ResStr(IDS_CONTROLS_PAUSED);
+			}
+			else if (fs == State_Running) {
+				msg = ResStr(IDS_CONTROLS_PLAYING);
+				if (m_iSpeedRate != 10) {
+					msg.AppendFormat(_T(" (%.1lfx)"), (float)m_iSpeedRate / 10);
+				}
+			}
+
+			if (!m_fAudioOnly &&
+					(fs == State_Paused || fs == State_Running) &&
+					!(AfxGetAppSettings().bUseDarkTheme && m_wndToolBar.IsVisible()) &&
+					GetDXVAStatus()) {
+				msg.AppendFormat(_T(" [%ws]"), GetDXVAVersion());
 			}
 		}
-		pCmdUI->SetText(UI_Text);
 
-		SetStatusMessage(UI_Text);
+		pCmdUI->SetText(msg);
+		SetStatusMessage(msg);
 	} else if (m_iMediaLoadState == MLS_CLOSING) {
 		pCmdUI->SetText(ResStr(IDS_CONTROLS_CLOSING));
 		if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList) {
