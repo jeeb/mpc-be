@@ -491,6 +491,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	DWORD nSamplesPerSec			= 0;
 	int   metaHM_compatibility		= 0;
 
+	LONG vWidth		= 0;
+	LONG vHeight	= 0;
+	BYTE vCodecId	= 0;
+
 	m_sps.RemoveAll();
 
 	for (int i = 0; i < 100 && ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
@@ -529,16 +533,20 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					for (size_t i = 0; i < AMF0Array.GetCount(); i++) {
 						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER) {
-							if (AMF0Array[i].name == L"duration") {
+							if (AMF0Array[i].name == L"width") {
+								vWidth = (LONG)((double)AMF0Array[i]);
+							} else if (AMF0Array[i].name == L"height") {
+								vHeight = (LONG)((double)AMF0Array[i]);
+							} else if (AMF0Array[i].name == L"videocodecid") {
+								vCodecId = (BYTE)((double)AMF0Array[i]);
+							} else if (AMF0Array[i].name == L"duration") {
 								metaDataDuration = (REFERENCE_TIME)(UNITS * (double)AMF0Array[i]);
-							}
-							else if (AMF0Array[i].name == L"framerate") {
+							} else if (AMF0Array[i].name == L"framerate") {
 								double value = AMF0Array[i];
 								if (value > 0 && value < 120) {
 									AvgTimePerFrame = (REFERENCE_TIME)(UNITS / (int)value);
 								}
-							}
-							else if (AMF0Array[i].name == L"audiosamplerate") {
+							} else if (AMF0Array[i].name == L"audiosamplerate") {
 								double value = AMF0Array[i];
 								if (value != 0) {
 									nSamplesPerSec = value;
@@ -832,30 +840,48 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						__int64 headerOffset = m_pFile->GetPos();
 						UINT32 headerSize = dataSize - 4;
-						BYTE *headerData = DNew BYTE[headerSize];
 
-						m_pFile->ByteRead(headerData, headerSize);
+						BOOL bIsAVC = FALSE;
+						for (;;) {
+							if (headerSize < 9) {
+								break;
+							}
+							BYTE *headerData = DNew BYTE[headerSize];
+							m_pFile->ByteRead(headerData, headerSize);
 
-						CGolombBuffer gb(headerData + 9, headerSize - 9);
-						avc_hdr h;
-						if (!ParseAVCHeader(gb, h)) {
+							CGolombBuffer gb(headerData + 9, headerSize - 9);
+							avc_hdr h;
+							if (ParseAVCHeader(gb, h)) {
+								BITMAPINFOHEADER pbmi;
+								memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+								pbmi.biSize			= sizeof(pbmi);
+								pbmi.biWidth		= h.width;
+								pbmi.biHeight		= h.height;
+								pbmi.biCompression	= FCC('AVC1');
+								pbmi.biPlanes		= 1;
+								pbmi.biBitCount		= 24;
+
+								CSize aspect(h.width * h.sar.num, h.height * h.sar.den);
+								ReduceDim(aspect);
+								CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize);
+
+								bIsAVC = TRUE;
+							}
+
+							delete [] headerData;
 							break;
 						}
 
-						BITMAPINFOHEADER pbmi;
-						memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
-						pbmi.biSize			= sizeof(pbmi);
-						pbmi.biWidth		= h.width;
-						pbmi.biHeight		= h.height;
-						pbmi.biCompression	= '1CVA';
-						pbmi.biPlanes		= 1;
-						pbmi.biBitCount		= 24;
+						if (!bIsAVC && vCodecId == vt.CodecID) {
+							bih->biSize			= sizeof(vih->bmiHeader);
+							bih->biWidth		= vWidth;
+							bih->biHeight		= vHeight;
+							bih->biPlanes		= 1;
+							bih->biBitCount		= 24;
+							bih->biSizeImage	= bih->biWidth * bih->biHeight * 3;
 
-						CSize aspect(h.width * h.sar.num, h.height * h.sar.den);
-						ReduceDim(aspect);
-						CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize);
-
-						delete[] headerData;
+							mt.subtype			= FOURCCMap(bih->biCompression = FCC('H264'));
+						}
 
 						name += L" H.264";
 
@@ -922,7 +948,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						CreateSequenceHeaderAVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
 
-						delete[] headerData;
+						delete [] headerData;
 
 						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = 'CVEH');
 						break;
@@ -989,7 +1015,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.dwPictAspectRatioY = aspect.cy;
 
 						CreateSequenceHeaderAVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
-						delete[] headerData;
+						delete [] headerData;
 
 						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = fourcc);
 
