@@ -8392,11 +8392,6 @@ void CMainFrame::OnPlayPlay()
 	}
 
 	if (m_iMediaLoadState == MLS_LOADED) {
-		if (GetMediaState() == State_Stopped) {
-			m_iSpeedLevel = 0;
-			m_iSpeedRate = 10;
-		}
-
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_fEndOfStream) {
 				SendMessage(WM_COMMAND, ID_PLAY_STOP);
@@ -8588,9 +8583,6 @@ void CMainFrame::OnPlayStop()
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			m_pMC->Stop();
 		}
-
-		m_iSpeedLevel = 0;
-		m_iSpeedRate = 10;
 
 		if (m_fFrameSteppingActive) { // FIXME
 			m_fFrameSteppingActive = false;
@@ -14730,6 +14722,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_ExtSubPaths.RemoveAll();
 	m_ExtSubPathsHandles.RemoveAll();
 	SetEvent(m_hRefreshNotifyRenderThreadEvent);
+
+	m_iSpeedLevel = 0;
+	m_iSpeedRate = 10;
 
 	ClearDXVAState();
 
