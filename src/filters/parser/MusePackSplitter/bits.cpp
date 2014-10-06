@@ -57,7 +57,7 @@ const int32 Bitstream::EXP_GOLOMB_MAP_INV[2][48] =
 		 1, 32, 33, 36, 34, 37, 44, 40,
 		35, 45, 38, 41, 39, 42, 43, 19,
 		 6, 24, 25, 20, 26, 21, 46, 28,
-		27, 47, 22, 29, 23, 30, 31, 12 
+		27, 47, 22, 29, 23, 30, 31, 12
 	}
 };
 
@@ -124,7 +124,7 @@ int32 Bitstream::Get_Golomb(int k)
 	while (UBits(8) == 0) {
 		l += 8;
 		DumpBits(8);
-		NeedBits();	
+		NeedBits();
 	}
 	while (UGetBits(1) == 0) l++;
 	NeedBits();

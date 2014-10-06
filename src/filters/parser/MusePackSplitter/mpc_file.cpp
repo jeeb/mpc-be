@@ -77,14 +77,14 @@ int CMPCFile::Open_SV8()
 		}
 
 		switch (packet.key) {
-			case MPC_KEY('S','H'):	
-				ret = ReadStreamHeader(&packet); 
+			case MPC_KEY('S','H'):
+				ret = ReadStreamHeader(&packet);
 				break;
-			case MPC_KEY('R','G'):  
-				ret = ReadReplaygain(&packet); 
+			case MPC_KEY('R','G'):
+				ret = ReadReplaygain(&packet);
 				break;
-			case MPC_KEY('S','O'):	
-				ret = ReadSeekOffset(&packet); 
+			case MPC_KEY('S','O'):
+				ret = ReadSeekOffset(&packet);
 				break;
 			case MPC_KEY('E','I'):
 				break;
@@ -108,7 +108,7 @@ int CMPCFile::Open_SV8()
 
 		reader->Seek(seek_table_position/8);
 		ret = packet.Load(reader);
-		ret = ReadSeekTable(&packet); 
+		ret = ReadSeekTable(&packet);
 		if (ret < 0) {
 			return ret;
 		}
@@ -132,7 +132,7 @@ int CMPCFile::Open_SV7()
 	seek_table_size		= 0;
 
 	uint8 hdr[8*4];
-	
+
 	__int64 c, a;
 	reader->GetPosition(&c, &a);
 	reader->Seek(c + 6);
@@ -152,7 +152,7 @@ int CMPCFile::Open_SV7()
 	b.UGetBits(6);				// max-band
 	b.UGetBits(4);				// profile
 	b.UGetBits(2);				// link
-	
+
 	uint8 samplerateidx = b.UGetBits(2);			// samplerate
 	sample_rate = (samplerateidx <= 3) ? freq[samplerateidx] : 0;
 
@@ -163,7 +163,7 @@ int CMPCFile::Open_SV7()
 	b.NeedBits32();
 	gain_title_db	= ((int16)b.SGetBits(16)) / 100.0;		// title gain
 	int title_peak	= b.UGetBits(16);
-	if (title_peak != 0) {		
+	if (title_peak != 0) {
 		gain_title_peak_db = (title_peak / 32767.0);
 	} else {
 		gain_title_peak_db = 0;
@@ -340,7 +340,7 @@ int CMPCFile::ReadSeekOffset(CMPCPacket *packet)
 	seek_table_position = b.GetMpcSize() * 8;
 	seek_table_position += packet->file_position;
 
-	// success 
+	// success
 	return S_OK;
 }
 
@@ -476,7 +476,7 @@ int CMPCFile::ReadAudioPacket(CMPCPacket *packet, int64 *cur_sample)
 		}
 		if (stream_version == 8) {
 			switch (packet->key) {
-				case MPC_KEY('A','P'):	
+				case MPC_KEY('A','P'):
 					current_sample += (1152*audio_block_frames);
 					return 0;			// we got one
 				case MPC_KEY('S','E'):

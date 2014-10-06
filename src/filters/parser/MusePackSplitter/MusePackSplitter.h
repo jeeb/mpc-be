@@ -29,7 +29,7 @@
 #define MusePackSplitterName	L"MPC MusePack Source"
 
 // {47A759C8-CCD7-471A-81D3-A92870431979}
-static const GUID CLSID_MusePackSplitter = 
+static const GUID CLSID_MusePackSplitter =
 	{ 0x47A759C8, 0xCCD7, 0x471A, { 0x81, 0xD3, 0xA9, 0x28, 0x70, 0x43, 0x19, 0x79 } };
 
 class CMusePackSplitter;
@@ -64,7 +64,7 @@ public:
 	STDMETHODIMP EndFlush();
 	STDMETHODIMP NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double rate);
 
-	HRESULT Inactive();	
+	HRESULT Inactive();
 public:
 	// Helpers
 	CMediaType &CurrentMediaType() { return m_mt; }
@@ -107,9 +107,9 @@ typedef CArray<CMediaType> CMediaTypes;
 //	CMusePackOutputPin class
 //
 //-----------------------------------------------------------------------------
-class CMusePackOutputPin : 
-	public CBaseOutputPin, 
-	public IMediaSeeking, 
+class CMusePackOutputPin :
+	public CBaseOutputPin,
+	public IMediaSeeking,
 	public CAMThread
 {
 public:
@@ -272,7 +272,7 @@ public:
 	static CUnknown * WINAPI CreateInstance(LPUNKNOWN pUnk, HRESULT *phr);
 
 	// override this to publicise our interfaces
-	DECLARE_IUNKNOWN 
+	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
 
 	// CBaseFilter

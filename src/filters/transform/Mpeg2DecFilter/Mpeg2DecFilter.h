@@ -184,7 +184,7 @@ public:
 	STDMETHODIMP EnablePlanarYUV(bool fEnable);
 	STDMETHODIMP_(bool) IsPlanarYUVEnabled();
 	STDMETHODIMP Apply();
-	
+
 	// IMpeg2DecFilter2
 
 	STDMETHODIMP EnableInterlaced(bool fEnable);

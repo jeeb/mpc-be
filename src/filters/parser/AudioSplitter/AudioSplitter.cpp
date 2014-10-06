@@ -189,7 +189,6 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (CComQIPtr<IDSMPropertyBag> pPB = this) {
 					if (sTitle.GetLength() > 0) {
 						pPB->SetProperty(L"TITL", sTitle);
-						
 					}
 					if (sPerformer.GetLength() > 0) {
 						pPB->SetProperty(L"AUTH", sPerformer);

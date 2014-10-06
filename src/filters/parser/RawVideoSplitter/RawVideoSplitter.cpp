@@ -200,7 +200,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		FOURCC fourcc		= FCC('I420'); // 4:2:0 - I420 by default
 		FOURCC fourcc_2		= 0;
 		WORD   bpp			= 12;
-		DWORD  interl		= 0; // 
+		DWORD  interl		= 0;
 
 		int k;
 		CAtlList<CStringA> sl;
@@ -266,7 +266,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					fourcc_2	= FCC('I444'); // for madVR
 					bpp			= 24;
 				}
-				else { // unsuppurted colour space 
+				else { // unsuppurted colour space
 					fourcc		= 0;
 					bpp			= 0;
 				}
@@ -409,7 +409,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			m_RAWType = RAW_H264;
 			pName = L"H.264/AVC1 Video Output";
 		}
-	
+
 	}
 
 	if (m_RAWType == RAW_NONE && (memcmp(buf, SYNC_VC1_F, sizeof(SYNC_VC1_F)) == 0 || memcmp(buf, SYNC_VC1_D, sizeof(SYNC_VC1_D)) == 0)) {
@@ -447,7 +447,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			// TODO - detect real fps.
 			MPEG2VIDEOINFO* pm2vi		= (MPEG2VIDEOINFO*)mt.pbFormat;
 			pm2vi->hdr.AvgTimePerFrame	= 400000;
-			
+
 			mts.Add(mt);
 			m_RAWType = RAW_HEVC;
 			pName = L"H.265/HEVC Video Output";
@@ -497,7 +497,7 @@ void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 bool CRawVideoSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
-	
+
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
 		CAutoPtr<Packet> p(DNew Packet());
 		p->TrackNumber	= 0;
@@ -517,7 +517,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 			p->SetCount(m_framesize);
 			m_pFile->ByteRead(p->GetData(), m_framesize);
-			
+
 			p->rtStart     = framenum * m_AvgTimePerFrame;
 			p->rtStop      = p->rtStart + m_AvgTimePerFrame;
 

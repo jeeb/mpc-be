@@ -26,7 +26,7 @@
 #define AMRSplitterName	L"MPC AMR Splitter"
 
 // {24FA7933-FE18-46a9-914A-C2AA0DBACE93}
-static const GUID CLSID_AMRSplitter = 
+static const GUID CLSID_AMRSplitter =
 	{ 0x24fa7933, 0xfe18, 0x46a9, { 0x91, 0x4a, 0xc2, 0xaa, 0xd, 0xba, 0xce, 0x93 } };
 
 class CAMRSplitter;
@@ -61,7 +61,7 @@ public:
 	STDMETHODIMP EndFlush();
 	STDMETHODIMP NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double rate);
 
-	HRESULT Inactive();	
+	HRESULT Inactive();
 public:
 	// Helpers
 	CMediaType &CurrentMediaType() { return m_mt; }
@@ -104,9 +104,9 @@ typedef CArray<CMediaType> CMediaTypes;
 //	CAMROutputPin class
 //
 //-----------------------------------------------------------------------------
-class CAMROutputPin : 
-	public CBaseOutputPin, 
-	public IMediaSeeking, 
+class CAMROutputPin :
+	public CBaseOutputPin,
+	public IMediaSeeking,
 	public CAMThread
 {
 public:
@@ -226,7 +226,7 @@ public:
 //
 //-----------------------------------------------------------------------------
 class __declspec(uuid("24FA7933-FE18-46a9-914A-C2AA0DBACE93"))
-    CAMRSplitter : 
+    CAMRSplitter :
 	public CBaseFilter,
 	public CAMThread,
 	public IMediaSeeking

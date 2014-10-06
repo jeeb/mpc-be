@@ -71,7 +71,7 @@ public:
 	int			sample_rate;
 	int			channels;
 	int			audio_block_frames;
-	int			block_pwr;				
+	int			block_pwr;
 	int			seek_pwr;
 
 	uint8		true_gapless;

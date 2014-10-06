@@ -84,7 +84,7 @@ public:
 	int32 Get_TE(int32 range);
 	int32 Get_Golomb(int k);
 
-	inline int32 Size_UE(uint32 val) 
+	inline int32 Size_UE(uint32 val)
 	{
 		if (val<255) return EXP_GOLOMB_SIZE[val];
 		int32 isize=0;
@@ -102,14 +102,14 @@ public:
 	inline void NeedBits32() { while (bits<32) { bitbuf |= (buf[0] << (24-bits)); buf++; bits+= 8; } };
 
 	// Musepack SV7 32-bit words
-	inline void NeedBits32_MPC() 
+	inline void NeedBits32_MPC()
 	{
 		NeedBits32();
 		uint8	tmp[4];
 		tmp[0] = (bitbuf>> 0) & 0xff;
-		tmp[1] = (bitbuf>> 8) & 0xff; 
-		tmp[2] = (bitbuf>>16) & 0xff; 
-		tmp[3] = (bitbuf>>24) & 0xff; 
+		tmp[1] = (bitbuf>> 8) & 0xff;
+		tmp[2] = (bitbuf>>16) & 0xff;
+		tmp[3] = (bitbuf>>24) & 0xff;
 		bitbuf = (tmp[0] << 24) | (tmp[1] << 16) | (tmp[2] << 8) | (tmp[3]);
 	}
 
@@ -127,12 +127,12 @@ public:
 		} else
 		bitbuf |= val << (32 - bits);
 	}
-	inline void WriteBits()	{ 
-		while (bits >= 8) { 
-			*buf++ = (bitbuf >> 24) & 0xff;	
+	inline void WriteBits() {
+		while (bits >= 8) {
+			*buf++ = (bitbuf >> 24) & 0xff;
 			bitbuf <<= 8;
-			bits -= 8; 
-		} 
+			bits -= 8;
+		}
 	}
 	inline void Put_ByteAlign_Zero() { int32 bl=(bits)&0x07; if (bl<8) { PutBits(0,8-bl); } WriteBits(); }
 	inline void Put_ByteAlign_One() { int32 bl=(bits)&0x07; if (bl<8) {	PutBits(0xffffff,8-bl); } WriteBits(); }

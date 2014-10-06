@@ -182,7 +182,7 @@ private:
 	int get_coded_block_pattern();
 	int get_luma_dc_dct_diff();
 	int get_chroma_dc_dct_diff();
-	
+
 	void get_intra_block_B14();
 	void get_intra_block_B15();
 	int get_non_intra_block();

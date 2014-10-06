@@ -36,7 +36,7 @@ class CAMRPacket
 public:
 	int64		file_position;		// absolute file position (in bytes)
 	uint8		packet[64];			// we own this one
-	int32		packet_size;		// whole packet size	
+	int32		packet_size;		// whole packet size
 	REFERENCE_TIME tStart, tStop;
 
 public:

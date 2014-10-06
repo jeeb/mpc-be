@@ -586,7 +586,7 @@ mpeg2_state_t CMpeg2Dec::seek_header()
 
 	m_chunk_start = m_chunk_ptr = m_chunk_buffer;
 
-	return m_code 
+	return m_code
 		? mpeg2_parse_header()
 		: mpeg2_header_picture_start();
 }
@@ -731,11 +731,11 @@ mpeg2_state_t CMpeg2Dec::mpeg2_parse_header()
 {
 	static int (CMpeg2Dec::* process_header[]) () =
 	{
-		&CMpeg2Dec::mpeg2_header_picture, 
-		&CMpeg2Dec::mpeg2_header_extension, 
+		&CMpeg2Dec::mpeg2_header_picture,
+		&CMpeg2Dec::mpeg2_header_extension,
 		&CMpeg2Dec::mpeg2_header_user_data,
-		&CMpeg2Dec::mpeg2_header_sequence, 
-		NULL, NULL, NULL, NULL, 
+		&CMpeg2Dec::mpeg2_header_sequence,
+		NULL, NULL, NULL, NULL,
 		&CMpeg2Dec::mpeg2_header_gop
 	};
 
@@ -792,7 +792,7 @@ mpeg2_state_t CMpeg2Dec::mpeg2_parse_header()
 		case RECEIVED (0x00, STATE_GOP):
 			m_action = &CMpeg2Dec::mpeg2_header_picture_start;
 			break;
-		case RECEIVED (0x01, STATE_PICTURE):	
+		case RECEIVED (0x01, STATE_PICTURE):
 		case RECEIVED (0x01, STATE_PICTURE_2ND):
 			mpeg2_header_matrix_finalize();
 			m_action = &CMpeg2Dec::mpeg2_header_slice_start;
@@ -873,7 +873,7 @@ int CMpeg2Dec::mpeg2_header_sequence()
     m_copy_matrix = 3;
     if(buffer[7] & 2)
 	{
-		for(i = 0; i < 64; i++) 
+		for(i = 0; i < 64; i++)
 			m_intra_quantizer_matrix[mpeg2_scan_norm_2[i]] = (buffer[i+7] << 7) | (buffer[i+8] >> 1);
 		buffer += 64;
     }
@@ -913,7 +913,7 @@ int CMpeg2Dec::mpeg2_header_gop()
 {
     uint8_t* buffer = m_chunk_start;
 	m_info.Reset();
-    if(!(buffer[1] & 8)) 
+    if(!(buffer[1] & 8))
 		return 1;
     m_info.m_gop = &m_gop;
     m_gop.hours = (buffer[0] >> 2) & 31;
@@ -964,10 +964,10 @@ mpeg2_state_t CMpeg2Dec::mpeg2_header_picture_start()
 		}
     }
 
-    m_picture->display_offset[0].x = 
+    m_picture->display_offset[0].x =
 	m_picture->display_offset[1].x =
 	m_picture->display_offset[2].x = m_display_offset_x;
-    m_picture->display_offset[0].y = 
+    m_picture->display_offset[0].y =
 	m_picture->display_offset[1].y =
 	m_picture->display_offset[2].y = m_display_offset_y;
 
@@ -1017,7 +1017,7 @@ int CMpeg2Dec::mpeg2_header_picture()
 					m_info.m_display_fbuf = m_fbuf[1];
 				}
 			}
-			
+
 			if(!low_delay + !NULL/*m_convert_start*/)
 				m_info.m_discard_fbuf = m_fbuf[!low_delay + !NULL/*m_convert_start*/];
 		}
@@ -1080,13 +1080,13 @@ int CMpeg2Dec::mpeg2_header_extension()
 {
     static int (CMpeg2Dec::* parser[]) () =
 	{
-		NULL, 
-		&CMpeg2Dec::sequence_ext, 
-		&CMpeg2Dec::sequence_display_ext, 
+		NULL,
+		&CMpeg2Dec::sequence_ext,
+		&CMpeg2Dec::sequence_display_ext,
 		&CMpeg2Dec::quant_matrix_ext,
-		&CMpeg2Dec::copyright_ext, 
-		NULL, NULL, 
-		&CMpeg2Dec::picture_display_ext, 
+		&CMpeg2Dec::copyright_ext,
+		NULL, NULL,
+		&CMpeg2Dec::picture_display_ext,
 		&CMpeg2Dec::picture_coding_ext
     };
 
@@ -1146,10 +1146,10 @@ void mpeg2_sequence_t::finalize()
 		w *= display_height;
 		h *= display_width;
     }
-	else 
+	else
 	{
-		if(byte_rate == 50 * 0x3ffff) 
-			byte_rate = 0;        /* mpeg-1 VBR */ 
+		if(byte_rate == 50 * 0x3ffff)
+			byte_rate = 0;        /* mpeg-1 VBR */
 
 		switch(pixel_width)
 		{
@@ -1206,7 +1206,7 @@ void CMpeg2Dec::mpeg2_header_sequence_finalize()
 	m_sequence.byte_rate = sequence->byte_rate;
 	m_sequence.vbv_buffer_size = sequence->vbv_buffer_size;
 
-    if(!memcmp(&m_sequence, sequence, FIELD_OFFSET(mpeg2_sequence_t, colour_primaries) /*sizeof(mpeg2_sequence_t)*/)) 
+    if(!memcmp(&m_sequence, sequence, FIELD_OFFSET(mpeg2_sequence_t, colour_primaries) /*sizeof(mpeg2_sequence_t)*/))
 	{
 		m_state = STATE_SEQUENCE_REPEATED;
 	}
@@ -1223,7 +1223,7 @@ void CMpeg2Dec::mpeg2_header_sequence_finalize()
 
 mpeg2_state_t CMpeg2Dec::mpeg2_header_slice_start()
 {
-	m_info.m_user_data = NULL; 
+	m_info.m_user_data = NULL;
 	m_info.m_user_data_len = 0;
 	m_state = (m_picture->nb_fields > 1 || m_state == STATE_PICTURE_2ND) ? STATE_SLICE : STATE_SLICE_1ST;
 
@@ -1253,7 +1253,7 @@ mpeg2_state_t CMpeg2Dec::mpeg2_header_end()
 
 	m_state = STATE_END;
 	m_info.Reset();
-	
+
 	if(!(m_sequence.flags & SEQ_FLAG_LOW_DELAY))
 	{
 		m_info.m_display_picture = picture;
@@ -1304,9 +1304,9 @@ int CMpeg2Dec::sequence_ext()
 
 	sequence->profile_level_id = (buffer[0] << 4) | (buffer[1] >> 4);
 
-	sequence->display_width = 
+	sequence->display_width =
 		sequence->picture_width += ((buffer[1] << 13) | (buffer[2] << 5)) & 0x3000;
-	sequence->display_height = 
+	sequence->display_height =
 		sequence->picture_height += (buffer[2] << 7) & 0x3000;
 
 	sequence->width = (sequence->picture_width + 15) & ~15;
@@ -1343,7 +1343,7 @@ int CMpeg2Dec::sequence_ext()
 
 	sequence->vbv_buffer_size |= buffer[4] << 21;
 
-	sequence->frame_period = 
+	sequence->frame_period =
 		sequence->frame_period * ((buffer[5]&31)+1) / (((buffer[5]>>2)&3)+1);
 
 	m_ext_state = SEQ_DISPLAY_EXT;
@@ -1926,7 +1926,7 @@ CMpeg2Decoder::CMpeg2Decoder()
     m_bitstream_buf = 0;
     m_bitstream_bits = 0;
     m_bitstream_ptr = NULL;
-    
+
 	memset(&m_dest, 0, sizeof(m_dest));
 	memset(&m_picture_dest, 0, sizeof(m_picture_dest));
 
@@ -1998,7 +1998,7 @@ CMpeg2Decoder::~CMpeg2Decoder()
 #define bit_buf (m_bitstream_buf)
 #define bits (m_bitstream_bits)
 #define bit_ptr (m_bitstream_ptr)
-	
+
 int CMpeg2Decoder::get_macroblock_modes()
 {
 	int macroblock_modes;
@@ -2111,7 +2111,7 @@ intra:
 		DUMPBITS(1);
 		return MACROBLOCK_INTRA;
 	}
-    
+
 	return 0;
 }
 
@@ -2120,7 +2120,7 @@ int CMpeg2Decoder::get_quantizer_scale()
     int quantizer_scale_code = UBITS(bit_buf, 5);
     DUMPBITS(5);
 
-    return m_q_scale_type 
+    return m_q_scale_type
 		? non_linear_quantizer_scale[quantizer_scale_code]
 		: (quantizer_scale_code << 1);
 }
@@ -2952,7 +2952,7 @@ void CMpeg2Decoder::slice_intra_DCT(const int cc, uint8_t* dest, int stride)
 	m_dc_dct_pred[cc] += (cc == 0)
 		? get_luma_dc_dct_diff()
 		: get_chroma_dc_dct_diff();
-    
+
 	m_DCTblock[0] = m_dc_dct_pred[cc] << (3 - m_intra_dc_precision);
 
     if(m_mpeg1)
@@ -2974,16 +2974,16 @@ void CMpeg2Decoder::slice_intra_DCT(const int cc, uint8_t* dest, int stride)
 
 void CMpeg2Decoder::slice_non_intra_DCT(uint8_t* dest, int stride)
 {
-    int last = m_mpeg1 
+    int last = m_mpeg1
 		? get_mpeg1_non_intra_block()
 		: get_non_intra_block ();
-    
+
 	m_idct_add(last, m_DCTblock, dest, stride);
 }
 
 void CMpeg2Decoder::MOTION(
-	mpeg2_mc_fct * const * const table, uint8_t** ref, 
-	int motion_x, int motion_y, 
+	mpeg2_mc_fct * const * const table, uint8_t** ref,
+	int motion_x, int motion_y,
 	unsigned int size, unsigned int y, unsigned int limit_y)
 {
 	unsigned int pos_x, pos_y, xy_half, offset, dest_offset;
@@ -3017,8 +3017,8 @@ void CMpeg2Decoder::MOTION(
 }
 
 void CMpeg2Decoder::MOTION_FIELD(
-	mpeg2_mc_fct * const * const table, uint8_t** ref, 
-	int motion_x, int motion_y, 
+	mpeg2_mc_fct * const * const table, uint8_t** ref,
+	int motion_x, int motion_y,
 	int dest_field, int src_field, unsigned int op)
 {
     unsigned int pos_x, pos_y, xy_half, offset, dest_offset;
@@ -3041,7 +3041,7 @@ void CMpeg2Decoder::MOTION_FIELD(
 	xy_half = ((pos_y & 1) << 1) | (pos_x & 1);
 	offset = (pos_x >> 1) + ((op ? (pos_y | 1) : (pos_y & ~1)) + src_field) * m_stride;
 	table[xy_half] (m_dest[0] + dest_field * m_stride + m_offset, ref[0] + offset, 2 * m_stride, 8);
-	
+
 	motion_x /= 2;	motion_y /= 2;
 
 	xy_half = ((motion_y & 1) << 1) | (motion_x & 1);
@@ -3165,7 +3165,7 @@ void CMpeg2Decoder::motion_fr_dmv(motion_t* motion, mpeg2_mc_fct * const * const
     offset = (pos_x >> 1) + (pos_y & ~1) * m_stride;
     m_mc->avg[xy_half](m_dest[0] + m_offset, motion->ref[0][0] + offset, 2 * m_stride, 8);
     m_mc->avg[xy_half](m_dest[0] + m_stride + m_offset, motion->ref[0][0] + m_stride + offset, 2 * m_stride, 8);
-    motion_x /= 2; 
+    motion_x /= 2;
 	motion_y /= 2;
     xy_half = ((motion_y & 1) << 1) | (motion_x & 1);
     offset = ((m_offset + motion_x) >> 1) + ((m_v_offset >> 1) + (motion_y & ~1)) * m_uv_stride;
@@ -3433,7 +3433,7 @@ int CMpeg2Decoder::slice_init(int code)
 			mba = MBA_11 + (UBITS(bit_buf, 12) - 24);
 			break;
 		}
-		else 
+		else
 		{
 			switch(UBITS(bit_buf, 12))
 			{
@@ -3639,8 +3639,8 @@ void CMpeg2Decoder::mpeg2_slice(int code, const uint8_t* buffer)
 					slice_non_intra_DCT(m_dest[2] + (offset >> 1), m_uv_stride);
 			}
 
-			m_dc_dct_pred[0] = 
-			m_dc_dct_pred[1] = 
+			m_dc_dct_pred[0] =
+			m_dc_dct_pred[1] =
 			m_dc_dct_pred[2] = 128 << m_intra_dc_precision;
 		}
 
@@ -3682,7 +3682,7 @@ void CMpeg2Decoder::mpeg2_slice(int code, const uint8_t* buffer)
 
 		if(mba_inc)
 		{
-			m_dc_dct_pred[0] = 
+			m_dc_dct_pred[0] =
 			m_dc_dct_pred[1] =
 			m_dc_dct_pred[2] = 128 << m_intra_dc_precision;
 

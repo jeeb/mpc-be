@@ -174,8 +174,7 @@ HRESULT CMusePackSplitter::CheckConnect(PIN_DIRECTION Dir, IPin *pPin)
 
 HRESULT CMusePackSplitter::CheckInputType(const CMediaType* mtIn)
 {
-	if (mtIn->majortype == MEDIATYPE_Stream) 
-	{
+	if (mtIn->majortype == MEDIATYPE_Stream) {
 		// we are sure we can accept this type
 		if (mtIn->subtype == MEDIASUBTYPE_MUSEPACK_Stream) {
 			return S_OK;
@@ -353,8 +352,8 @@ HRESULT CMusePackSplitter::AddOutputPin(CMusePackOutputPin *pPin)
 
 STDMETHODIMP CMusePackSplitter::GetCapabilities(DWORD* pCapabilities)
 {
-	return pCapabilities ? *pCapabilities =	
-			AM_SEEKING_CanGetStopPos|AM_SEEKING_CanGetDuration|AM_SEEKING_CanSeekAbsolute|AM_SEEKING_CanSeekForwards|AM_SEEKING_CanSeekBackwards, 
+	return pCapabilities ? *pCapabilities =
+			AM_SEEKING_CanGetStopPos|AM_SEEKING_CanGetDuration|AM_SEEKING_CanSeekAbsolute|AM_SEEKING_CanSeekForwards|AM_SEEKING_CanSeekBackwards,
 			S_OK : E_POINTER;
 }
 
@@ -412,9 +411,9 @@ STDMETHODIMP CMusePackSplitter::SetRate(double dRate) {return dRate > 0 ? rate =
 STDMETHODIMP CMusePackSplitter::GetRate(double* pdRate) {return pdRate ? *pdRate = rate, S_OK : E_POINTER;}
 STDMETHODIMP CMusePackSplitter::GetPreroll(LONGLONG* pllPreroll) {return pllPreroll ? *pllPreroll = 0, S_OK : E_POINTER;}
 
-STDMETHODIMP CMusePackSplitter::GetDuration(LONGLONG* pDuration) 
-{	
-	CheckPointer(pDuration, E_POINTER); 
+STDMETHODIMP CMusePackSplitter::GetDuration(LONGLONG* pDuration)
+{
+	CheckPointer(pDuration, E_POINTER);
 	*pDuration = 0;
 
 	if (file && pDuration) {
@@ -432,7 +431,7 @@ STDMETHODIMP CMusePackSplitter::SetPositionsInternal(int iD, LONGLONG* pCurrent,
 
 	CAutoLock cAutoLock(&lock_filter);
 
-	if (!pCurrent && !pStop || (dwCurrentFlags&AM_SEEKING_PositioningBitsMask) == AM_SEEKING_NoPositioning 
+	if (!pCurrent && !pStop || (dwCurrentFlags&AM_SEEKING_PositioningBitsMask) == AM_SEEKING_NoPositioning
 		&& (dwStopFlags&AM_SEEKING_PositioningBitsMask) == AM_SEEKING_NoPositioning) {
 		return S_OK;
 	}
@@ -604,9 +603,11 @@ DWORD CMusePackSplitter::ThreadProc()
 	while (true) {
 		cmd = GetRequest();
 		switch (cmd) {
-			case CMD_EXIT:	Reply(NOERROR); return 0;
-			case CMD_STOP:	
-				Reply(NOERROR); 
+			case CMD_EXIT:
+				Reply(NOERROR);
+				return 0;
+			case CMD_STOP:
+				Reply(NOERROR);
 				break;
 			case CMD_RUN:
 				{
@@ -632,7 +633,7 @@ DWORD CMusePackSplitter::ThreadProc()
 					do {
 						// are we supposed to abort ?
 						if (ev_abort.Check()) {
-							break; 
+							break;
 						}
 
 						ret = file->ReadAudioPacket(&packet, &current_sample);
@@ -960,7 +961,7 @@ HRESULT CMusePackOutputPin::Inactive()
 HRESULT CMusePackOutputPin::Active()
 {
 	if (active) return S_OK;
-	
+
 	FlushQueue();
 	if (!IsConnected()) {
 		return VFW_E_NOT_CONNECTED;
@@ -1081,7 +1082,7 @@ HRESULT CMusePackOutputPin::DeliverPacket(CMPCPacket &packet)
 	// spocitame casy
 	outp->rtStart = packet.tStart;
 	outp->rtStop  = packet.tStop;
-	
+
 	outp->size	  = packet.payload_size;
 	outp->buf	  = (BYTE*)malloc(outp->size);
 	memcpy(outp->buf, packet.payload, packet.payload_size);
@@ -1158,11 +1159,11 @@ HRESULT CMusePackOutputPin::DeliverDataPacketMPC(DataPacketMPC &packet)
 		sample->SetSyncPoint(FALSE);
 	}
 
-	if (discontinuity)	{ 
+	if (discontinuity)	{
 		discontinuity = false;
-		sample->SetDiscontinuity(TRUE); 
-	} else { 
-		sample->SetDiscontinuity(FALSE); 
+		sample->SetDiscontinuity(TRUE);
+	} else {
+		sample->SetDiscontinuity(FALSE);
 	}
 
 	// do we have a time stamp ?
@@ -1170,7 +1171,7 @@ HRESULT CMusePackOutputPin::DeliverDataPacketMPC(DataPacketMPC &packet)
 		sample->SetTime(&packet.rtStart, &packet.rtStop);
 	}
 
-	hr = Deliver(sample);	
+	hr = Deliver(sample);
 	sample->Release();
 	return hr;
 }
@@ -1225,7 +1226,7 @@ DWORD CMusePackOutputPin::ThreadProc()
 				return 0;
 				break;
 			case CMD_STOP:
-				Reply(0); 
+				Reply(0);
 				break;
 			case CMD_RUN:
 				{
@@ -1244,7 +1245,7 @@ DWORD CMusePackOutputPin::ThreadProc()
 					do {
 						if (ev_abort.Check()) break;
 						hr = NOERROR;
-					
+
 						HANDLE	events[] = { ev_can_read, ev_abort};
 						DWORD	ret = WaitForMultipleObjects(2, events, FALSE, 10);
 
@@ -1269,7 +1270,7 @@ DWORD CMusePackOutputPin::ThreadProc()
 								hr = DeliverNewSegment(packet->rtStart, packet->rtStop, packet->rate);
 							} else if (packet->type == DataPacketMPC::PACKET_TYPE_DATA) {
 								hr = DeliverDataPacketMPC(*packet);
-							}					
+							}
 
 							delete packet;
 
@@ -1281,7 +1282,7 @@ DWORD CMusePackOutputPin::ThreadProc()
 				}
 				break;
 			default:
-				Reply(E_UNEXPECTED); 
+				Reply(E_UNEXPECTED);
 				break;
 		}
 	}
@@ -1460,7 +1461,7 @@ int CMusePackReader::GetSizeElm(int64 &size, int32 &size_len)
 		size <<= 7;
 		size_len ++;
 	}
-	return 0;	
+	return 0;
 }
 
 bool CMusePackReader::KeyValid(uint16 key)
