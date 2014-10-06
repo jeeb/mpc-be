@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "AudioFile.h"
+#include "AMRFile.h"
 #include "APEFile.h"
 #include "TAKFile.h"
 #include "TTAFile.h"
@@ -75,6 +76,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 		pAudioFile = DNew CTTAFile();
 	} else if (*id == FCC('wvpk')) {
 		pAudioFile = DNew CWavPackFile();
+	} else if (memcmp(data, AMR_header, 6) == 0 || memcmp(data, AMRWB_header, 9) == 0) {
+		pAudioFile = DNew CAMRFile();
 	} else if (*id == FCC('RIFF') && *(DWORD*)(data+8) == FCC('WAVE')) {
 		pAudioFile = DNew CWAVFile();
 	} else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {

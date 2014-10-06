@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2014 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +20,24 @@
 
 #pragma once
 
-#include "../../../DSUtil/SharedInclude.h"
-#include "../../../../include/stdafx_common.h"
-#include "../../../../include/stdafx_common_afx.h"
-#include "../../../../include/stdafx_common_dshow.h"
+#include "AudioFile.h"
+
+const uint8_t AMR_header[6]   = { '#', '!', 'A', 'M', 'R', 0x0A };
+const uint8_t AMRWB_header[9] = { '#', '!', 'A', 'M', 'R', '-', 'W', 'B', 0x0A };
+
+class CAMRFile : public CAudioFile
+{
+	int				m_framelen;
+	bool			m_isAMRWB;
+	int				m_currentframe;
+	CArray<__int64>	m_seek_table;
+
+public:
+	CAMRFile();
+	~CAMRFile();
+
+	HRESULT Open(CBaseSplitterFile* pFile);
+	REFERENCE_TIME Seek(REFERENCE_TIME rt);
+	int GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart);
+	CString GetName() const { return L"AMR"; };
+};

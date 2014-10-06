@@ -25,7 +25,6 @@
 #include "muxer/MatroskaMuxer/MatroskaMuxer.h"
 #include "muxer/WavDest/WavDest.h"
 
-#include "parser/AMRSplitter/AMRSplitter.h"
 #include "parser/AviSplitter/AviSplitter.h"
 #include "parser/DSMSplitter/DSMSplitter.h"
 #include "parser/FLVSplitter/FLVSplitter.h"

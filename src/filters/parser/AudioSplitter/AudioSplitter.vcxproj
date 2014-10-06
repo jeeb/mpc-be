@@ -197,6 +197,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AMRFile.cpp" />
     <ClCompile Include="APEFile.cpp" />
     <ClCompile Include="AudioFile.cpp" />
     <ClCompile Include="TAKFile.cpp" />
@@ -213,6 +214,7 @@
     <None Include="AudioSplitter.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AMRFile.h" />
     <ClInclude Include="APEFile.h" />
     <ClInclude Include="AudioFile.h" />
     <ClInclude Include="TAKFile.h" />

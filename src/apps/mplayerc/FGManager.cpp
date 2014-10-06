@@ -2179,14 +2179,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 	}
 
-	if (src[SRC_AMR] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAMRSplitter>(AMRSplitterName, MERIT64_ABOVE_DSHOW);
-	} else {
-		pFGF = DNew CFGFilterInternal<CAMRSplitter>(LowMerit(AMRSplitterName), MERIT64_DO_USE);
-	}
-	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-	m_transform.AddTail(pFGF);
-
 	if (src[SRC_DSM] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDSMSplitterFilter>(DSMSplitterName, MERIT64_ABOVE_DSHOW);
 	} else {
@@ -2222,8 +2214,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(
-					(src[SRC_APE] && src[SRC_TAK] && src[SRC_TTA] && src[SRC_WAVPACK] && src[SRC_WAV]) ? AudioSplitterName : LowMerit(AudioSplitterName),
-					(src[SRC_APE] && src[SRC_TAK] && src[SRC_TTA] && src[SRC_WAVPACK] && src[SRC_WAV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+					(src[SRC_AMR] && src[SRC_APE] && src[SRC_TAK] && src[SRC_TTA] && src[SRC_WAVPACK] && src[SRC_WAV]) ? AudioSplitterName : LowMerit(AudioSplitterName),
+					(src[SRC_AMR] && src[SRC_APE] && src[SRC_TAK] && src[SRC_TTA] && src[SRC_WAVPACK] && src[SRC_WAV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 		m_transform.AddTail(pFGF);
 	}
@@ -2273,8 +2265,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_AMR]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_AMR]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SAMR);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_AMR);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SAMR);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SAWB);
 		m_transform.AddTail(pFGF);
 
