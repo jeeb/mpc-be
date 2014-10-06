@@ -59,12 +59,12 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 		m_samplerate = 8000;
 		m_framelen   = 160;
 	}
-	//else if (memcmp(data, AMRWB_header, 9) == 0) {
-	//	m_isAMRWB = true;
-	//	m_subtype = MEDIASUBTYPE_SAWB;
-	//	m_samplerate = 16000;
-	//	m_framelen   = 320;
-	//}
+	else if (memcmp(data, AMRWB_header, 9) == 0) {
+		m_isAMRWB = true;
+		m_subtype = MEDIASUBTYPE_SAWB;
+		m_samplerate = 16000;
+		m_framelen   = 320;
+	}
 	else {
 		return E_FAIL;
 	}
@@ -88,8 +88,8 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 		}
 
 		m_endpos = m_pFile->GetPos() - 1;
-		m_seek_table.Add(m_endpos);
 		m_pFile->Seek(m_endpos + size);
+		m_seek_table.Add(m_endpos);
 	}
 	if (m_endpos <= m_startpos) {
 		return E_FAIL;
@@ -127,6 +127,8 @@ int CAMRFile::GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart)
 
 	packet->rtStart = 10000000i64 * m_currentframe * m_framelen / m_samplerate;
 	m_pFile->Seek(m_seek_table[m_currentframe]);
+
+	m_currentframe++;
 
 	int size;
 	if (m_currentframe == m_seek_table.GetCount()) {

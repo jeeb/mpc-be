@@ -242,7 +242,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("ac3dts"),      ResStr(IDS_MFMT_AC3),         _T("ac3 dts dtshd"), TAudio));
 		ADDFMT((_T("aiff"),        ResStr(IDS_MFMT_AIFF),        _T("aif aifc aiff"), TAudio));
 		ADDFMT((_T("alac"),        ResStr(IDS_MFMT_ALAC),        _T("alac"), TAudio));
-		ADDFMT((_T("amr"),         ResStr(IDS_MFMT_AMR),         _T("amr"), TAudio));
+		ADDFMT((_T("amr"),         ResStr(IDS_MFMT_AMR),         _T("amr awb"), TAudio));
 		ADDFMT((_T("ape"),         ResStr(IDS_MFMT_APE),         _T("ape apl"), TAudio));
 		ADDFMT((_T("au"),          ResStr(IDS_MFMT_AU),          _T("au snd"), TAudio));
 		ADDFMT((_T("audiocd"),     ResStr(IDS_MFMT_CDA),         _T("cda"), TAudio));

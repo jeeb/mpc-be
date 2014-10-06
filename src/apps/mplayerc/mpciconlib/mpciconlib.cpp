@@ -56,7 +56,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_AIFF_ICON;
 	} else if (_tcsicmp(ext, _T(".alac")) == 0) {
 		iconindex = IDI_ALAC_ICON;
-	} else if (_tcsicmp(ext, _T(".amr")) == 0) {
+	} else if (_tcsicmp(ext, _T(".amr")) == 0
+			|| _tcsicmp(ext, _T(".awb")) == 0) {
 		iconindex = IDI_AMR_ICON;
 	} else if (_tcsicmp(ext, _T(".amv")) == 0) {
 		iconindex = IDI_AMV_ICON;
