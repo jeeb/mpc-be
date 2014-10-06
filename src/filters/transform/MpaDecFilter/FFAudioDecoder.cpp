@@ -220,9 +220,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 		WORD nChannels, nBitsPerSample, nBlockAlign;
 		audioFormatTypeHandler((BYTE*)pCurrentMediaType->Format(), pCurrentMediaType->FormatType(), &nSamples, &nChannels, &nBitsPerSample, &nBlockAlign, &nBytesPerSec);
 
-		if (nCodecId == AV_CODEC_ID_AMR_NB || nCodecId == AV_CODEC_ID_AMR_WB) {
+		if (nCodecId == AV_CODEC_ID_AMR_NB) {
 			nChannels = 1;
 			nSamples  = 8000;
+		}
+		if (nCodecId == AV_CODEC_ID_AMR_WB) {
+			nChannels = 1;
+			nSamples  = 16000;
 		}
 
 		m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
