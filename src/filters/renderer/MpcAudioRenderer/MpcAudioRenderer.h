@@ -24,10 +24,9 @@
 #include <mmdeviceapi.h>
 #include <audioclient.h>
 #include <FunctionDiscoveryKeys_devpkey.h>
-
 #include "MpcAudioRendererSettingsWnd.h"
-
 #include "Mixer.h"
+#include "Filter.h"
 #include "../../../DSUtil/Packet.h"
 
 #define MpcAudioRendererName L"MPC Audio Renderer"
@@ -136,6 +135,8 @@ private:
 	CBaseReferenceClock*	m_pReferenceClock;
 	double					m_dRate;
 	long					m_lVolume;
+
+	CFilter					m_Filter;
 
 	// CMpcAudioRenderer WASAPI methods
 	HRESULT					GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);

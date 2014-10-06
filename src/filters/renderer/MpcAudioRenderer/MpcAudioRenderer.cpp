@@ -721,7 +721,14 @@ STDMETHODIMP CMpcAudioRenderer::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLat
 
 STDMETHODIMP CMpcAudioRenderer::SetRate(double dRate)
 {
-	return VFW_E_UNSUPPORTED_AUDIO;
+	CAutoLock cInterfaceLock(&m_InterfaceLock);
+
+	if (dRate < 0.25 || dRate > 4.0 || m_bIsBitstream) {
+		return VFW_E_UNSUPPORTED_AUDIO;
+	}
+
+	m_dRate = dRate;
+	return S_OK;
 }
 
 STDMETHODIMP CMpcAudioRenderer::GetRate(double* pdRate)
@@ -875,21 +882,19 @@ STDMETHODIMP_(BITSTREAM_MODE) CMpcAudioRenderer::GetBitstreamMode()
 	if (m_pGraph && m_bIsBitstream && m_pWaveFileFormatOutput) {
 		if (m_pWaveFileFormatOutput->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
 			// AC3/DTS
-			{
-				CAutoLock cRenderLock(&m_csRender);
-				if (m_WasapiQueue.GetCount()) {
-					CAutoPtr<Packet> Packet = m_WasapiQueue.GetLast();
-					if (Packet->GetCount() > 8) {
-						BYTE* pData = Packet->GetData();
-						BYTE IEC61937_type = pData[4];
-						switch (IEC61937_type) {
-							case IEC61937_AC3:
-								return BITSTREAM_AC3;
-							case IEC61937_DTS1:
-							case IEC61937_DTS2:
-							case IEC61937_DTS3:
-								return BITSTREAM_DTS;
-						}
+			CAutoLock cRenderLock(&m_csRender);
+			if (m_WasapiQueue.GetCount()) {
+				CAutoPtr<Packet> Packet = m_WasapiQueue.GetLast();
+				if (Packet->GetCount() > 8) {
+					BYTE* pData = Packet->GetData();
+					BYTE IEC61937_type = pData[4];
+					switch (IEC61937_type) {
+						case IEC61937_AC3:
+							return BITSTREAM_AC3;
+						case IEC61937_DTS1:
+						case IEC61937_DTS2:
+						case IEC61937_DTS3:
+							return BITSTREAM_DTS;
 					}
 				}
 			}
@@ -956,10 +961,10 @@ static const TCHAR *GetSampleFormatString(const SampleFormat value)
 	switch (value) {
 		UNPACK_VALUE(SAMPLE_FMT_U8);
 		UNPACK_VALUE(SAMPLE_FMT_S16);
+		UNPACK_VALUE(SAMPLE_FMT_S24);
 		UNPACK_VALUE(SAMPLE_FMT_S32);
 		UNPACK_VALUE(SAMPLE_FMT_FLT);
 		UNPACK_VALUE(SAMPLE_FMT_DBL);
-		UNPACK_VALUE(SAMPLE_FMT_S24);
 	};
 #undef UNPACK_VALUE
 	return L"Error value";
@@ -1027,7 +1032,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		return E_FAIL;
 	}
 
-	bool bFormatChanged = !IsBitstream(m_pWaveFileFormat) && IsFormatChanged(m_pWaveFileFormat, m_pWaveFileFormatOutput);
+	bool bFormatChanged = !m_bIsBitstream && IsFormatChanged(m_pWaveFileFormat, m_pWaveFileFormatOutput);
 
 	if (bFormatChanged) {
 		// prepare for resample ... if needed
@@ -1227,7 +1232,17 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		p->rtStop	= rtStop;
 		p->SetData(pInputBufferPointer, lSize);
 
-		m_WasapiQueue.Add(p);
+		if (m_dRate != 1.0
+				&& !m_bIsBitstream
+				&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFileFormatOutput)) )) {
+			if (SUCCEEDED(m_Filter.Push(p))) {
+				while (SUCCEEDED(m_Filter.Pull(p))) {
+					m_WasapiQueue.Add(p);
+				}
+			}
+		} else {
+			m_WasapiQueue.Add(p);
+		}
 	}
 
 	SAFE_DELETE_ARRAY(out_buf);
@@ -1422,6 +1437,10 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 	if (SUCCEEDED(hr) && bInitNeed) {
 		SAFE_RELEASE(m_pRenderClient);
 		hr = InitAudioClient(m_pWaveFileFormatOutput);
+	}
+
+	if (SUCCEEDED(hr)) {
+		m_Filter.Flush();
 	}
 
 	return hr;
@@ -2310,6 +2329,7 @@ HRESULT	CMpcAudioRenderer::EndFlush()
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::EndFlush()"));
 
 	WasapiFlush();
+	m_Filter.Flush();
 
 	return CBaseRenderer::EndFlush();
 }

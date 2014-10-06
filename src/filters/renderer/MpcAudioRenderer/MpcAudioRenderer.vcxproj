@@ -221,6 +221,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Filter.cpp" />
     <ClCompile Include="MpcAudioRenderer.cpp" />
     <ClCompile Include="MpcAudioRendererSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -231,6 +232,7 @@
     <None Include="MpcAudioRenderer.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Filter.h" />
     <ClInclude Include="IMpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRendererSettingsWnd.h" />
