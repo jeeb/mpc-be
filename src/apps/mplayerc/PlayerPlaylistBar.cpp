@@ -112,6 +112,9 @@ static bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CStr
 			}
 			rt = _I64_MIN;
 			sFileName = sFileName2;
+			if (!Performer.IsEmpty()) {
+				sPerformer = Performer;
+			}
 
 			TCHAR type[256] = { 0 };
 			trackNum = 0;
@@ -130,7 +133,7 @@ static bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CStr
 			cueLine.Trim(L" \"");
 			sPerformer = cueLine;
 
-			if (sFileName2.IsEmpty()) {
+			if (sFileName2.IsEmpty() && Performer.IsEmpty()) {
 				Performer = sPerformer;
 			}
 		} else if (cmd == L"FILE" && cueLine.Find(L" WAVE") > 0) {
