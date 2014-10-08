@@ -318,7 +318,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	if (m_frames[ape.totalframes - 1].pos + 128 <= m_endpos) {
 		m_pFile->Seek(m_endpos - 128);
 		BYTE buf[128];
-		if (m_pFile->ByteRead(buf, 128) == S_OK)
+		if (m_pFile->ByteRead(buf, 128) == S_OK
 				&& (memcmp(buf + 96, "APETAGEX", 8) || memcmp(buf + 120, "\0\0\0\0\0\0\0\0", 8))
 				&& memcmp(buf, "TAG", 3) == 0) {
 			// ignore ID3v1/1.1 tag

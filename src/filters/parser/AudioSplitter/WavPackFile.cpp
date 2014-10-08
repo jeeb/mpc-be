@@ -287,7 +287,7 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 	if (m_startpos + 128 <= m_endpos) {
 		m_pFile->Seek(m_endpos - 128);
 		BYTE buf[128];
-		if (SUCCEEDED(m_pFile->ByteRead(buf, 128))
+		if (m_pFile->ByteRead(buf, 128) == S_OK
 				&& (memcmp(buf + 96, "APETAGEX", 8) || memcmp(buf + 120, "\0\0\0\0\0\0\0\0", 8))
 				&& memcmp(buf, "TAG", 3) == 0) {
 			// ignore ID3v1/1.1 tag
@@ -300,14 +300,14 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 		memset(buf, 0, sizeof(buf));
 
 		m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
-		if (SUCCEEDED(m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES))) {
+		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
 			m_APETag = DNew CAPETag;
 			size_t tag_size = 0;
 			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
 				tag_size = m_APETag->GetTagSize();
 				m_pFile->Seek(m_endpos - tag_size);
 				BYTE *p = DNew BYTE[tag_size];
-				if (SUCCEEDED(m_pFile->ByteRead(p, tag_size))) {
+				if (m_pFile->ByteRead(p, tag_size) == S_OK) {
 					m_APETag->ReadTags(p, tag_size);
 				}
 				delete [] p;
