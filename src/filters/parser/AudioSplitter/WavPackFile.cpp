@@ -113,9 +113,8 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	hr = pFile->ByteRead(wvc->block_header, WV_HEADER_SIZE);
-	if (FAILED(hr)) {
-		return hr;
+	if (pFile->ByteRead(wvc->block_header, WV_HEADER_SIZE) != S_OK) {
+		return E_FAIL;
 	}
 
 	if (!ff_wv_parse_header(&wvc->header, wvc->block_header)) {
@@ -336,6 +335,11 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 			pos++;
 		}
 		m_pFile->Seek(pos);
+	}
+
+	if (m_block_idx_end == m_block_idx_start) {
+		m_block_idx_end = m_block_idx_start + wv_ctx.header.samples;
+		// TODO: make it more correct
 	}
 
 	if (m_block_idx_start >= m_block_idx_end) {
