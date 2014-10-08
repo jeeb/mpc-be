@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "AMRFile.h"
 
-static const uint8_t AMR_packed_size[16] = { 13, 14, 16, 18, 20, 21, 27, 32, 6, 2, 2, 2, 2, 2, 2, 2 };
+static const uint8_t AMR_packed_size[16] = { 13, 14, 16, 18, 20, 21, 27, 32, 6, 1, 1, 1, 1, 1, 1, 1 };
 static const uint8_t AMRWB_packed_size[16] = { 18, 24, 33, 37, 41, 47, 51, 59, 61, 6, 6, 0, 0, 0, 1, 1 };
 
 //
@@ -47,7 +47,7 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 
 	m_pFile->Seek(0);
 	BYTE data[9];
-	if (FAILED(m_pFile->ByteRead(data, 9))) {
+	if (m_pFile->ByteRead(data, 9) != S_OK) {
 		return E_FAIL;
 	}
 
@@ -73,19 +73,20 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 	m_layout   = SPEAKER_FRONT_CENTER;
 	m_startpos = m_pFile->GetPos();
 
-
 	m_seek_table.SetSize(0, 512);
 	m_seek_table.RemoveAll();
 	BYTE toc = 0;
-	while (SUCCEEDED(m_pFile->ByteRead(&toc, 1))) {
+	while (m_pFile->ByteRead(&toc, 1) == S_OK) {
 		unsigned mode = (toc >> 3) & 0x0F;
 		int size = m_isAMRWB ? AMRWB_packed_size[mode] : AMR_packed_size[mode];
 
-		if (!size || m_pFile->GetRemaining() < size - 1) {
-			break;
-		} else if (size == 2) {
+		if (size == 1) {
 			continue;
 		}
+		if (!size || m_pFile->GetRemaining() < size - 1) {
+			break;
+		}
+
 
 		m_endpos = m_pFile->GetPos() - 1;
 		m_pFile->Seek(m_endpos + size);
@@ -140,7 +141,7 @@ int CAMRFile::GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart)
 
 	packet->rtStop  = 10000000i64 * m_currentframe * m_framelen / m_samplerate;
 
-	if (!packet->SetCount(size) || FAILED(m_pFile->ByteRead(packet->GetData(), size))) {
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
 		return 0;
 	}
 

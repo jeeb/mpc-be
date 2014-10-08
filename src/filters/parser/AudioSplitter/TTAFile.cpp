@@ -64,14 +64,14 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(0);
 
 	BYTE data[10];
-	if (FAILED(m_pFile->ByteRead(data, sizeof(data)))) {
+	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK) {
 		return NULL;
 	}
 	int start_offset = id3v2_match_len(data);
 	m_pFile->Seek(start_offset);
 
 	DWORD id = 0;
-	if (FAILED(m_pFile->ByteRead((BYTE*)&id, 4)) || id != FCC('TTA1')) {
+	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('TTA1')) {
 		return E_FAIL;
 	}
 
@@ -111,13 +111,13 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	m_extrasize = m_pFile->GetPos() - start_offset;
 	m_extradata = (BYTE*)malloc(m_extrasize);
 	m_pFile->Seek(start_offset);
-	if FAILED(m_pFile->ByteRead(m_extradata, m_extrasize)) {
+	if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
 		return E_FAIL;
 	}
 
 	for (int i = 0; i < m_totalframes; i++) {
 		uint32_t size;
-		if (FAILED(m_pFile->ByteRead((BYTE*)&size, 4))) {
+		if (m_pFile->ByteRead((BYTE*)&size, 4) != S_OK) {
 			return E_FAIL;
 		}
 		m_index[i] = framepos;
@@ -133,14 +133,14 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 		memset(buf, 0, sizeof(buf));
 
 		m_pFile->Seek(file_size - APE_TAG_FOOTER_BYTES);
-		if (SUCCEEDED(m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES))) {
+		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
 			m_APETag = DNew CAPETag;
 			size_t tag_size = 0;
 			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
 				tag_size = m_APETag->GetTagSize();
 				m_pFile->Seek(file_size - tag_size);
 				BYTE *p = DNew BYTE[tag_size];
-				if (SUCCEEDED(m_pFile->ByteRead(p, tag_size))) {
+				if (m_pFile->ByteRead(p, tag_size) == S_OK) {
 					m_APETag->ReadTags(p, tag_size);
 				}
 				delete [] p;
@@ -207,7 +207,7 @@ int CTTAFile::GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart)
 	m_pFile->Seek(m_index[m_currentframe]);
 	m_currentframe++;
 
-	if (!packet->SetCount(size) || FAILED(m_pFile->ByteRead(packet->GetData(), size))) {
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
 		return 0;
 	}
 

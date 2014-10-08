@@ -250,7 +250,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 
 	m_pFile->Seek(0);
 	DWORD id = 0;
-	if (FAILED(m_pFile->ByteRead((BYTE*)&id, 4)) || id != FCC('tBaK')) {
+	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('tBaK')) {
 		return E_FAIL;
 	}
 
@@ -273,7 +273,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 					if (!buffer) {
 						return E_FAIL;
 					}
-					if (FAILED(m_pFile->ByteRead(buffer, size))) {
+					if (m_pFile->ByteRead(buffer, size) != S_OK) {
 						delete [] buffer;
 						return E_FAIL;
 					}
@@ -304,13 +304,13 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 
 					if (cur_pos + APE_TAG_FOOTER_BYTES <= file_size) {
 						m_pFile->Seek(file_size - APE_TAG_FOOTER_BYTES);
-						if (SUCCEEDED(m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES))) {
+						if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
 							m_APETag = DNew CAPETag;
 							if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
 								size_t tag_size = m_APETag->GetTagSize();
 								m_pFile->Seek(file_size - tag_size);
 								BYTE *p = DNew BYTE[tag_size];
-								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size))) {
+								if (m_pFile->ByteRead(p, tag_size) == S_OK) {
 									m_APETag->ReadTags(p, tag_size);
 								}
 

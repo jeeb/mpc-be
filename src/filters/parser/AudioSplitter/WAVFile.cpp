@@ -127,7 +127,7 @@ bool CWAVFile::CheckDTSAC3CD()
 	BYTE* buffer = DNew BYTE[buflen];
 
 	m_pFile->Seek(m_startpos);
-	if (SUCCEEDED(m_pFile->ByteRead(buffer, buflen))) {
+	if (m_pFile->ByteRead(buffer, buflen) == S_OK) {
 		audioframe_t aframe;
 
 		for (size_t i = 0; i + 16 < buflen; i++) {
@@ -215,7 +215,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 
 	m_pFile->Seek(0);
 	BYTE data[12];
-	if (FAILED(m_pFile->ByteRead(data, sizeof(data)))
+	if (m_pFile->ByteRead(data, sizeof(data) != S_OK)
 			|| *(DWORD*)(data+0) != FCC('RIFF')
 			|| *(DWORD*)(data+4) < (4 + 8 + sizeof(PCMWAVEFORMAT) + 8) // 'WAVE' + ('fmt ' + fmt.size) + sizeof(PCMWAVEFORMAT) + (data + data.size)
 			|| *(DWORD*)(data+8) != FCC('WAVE')) {
@@ -225,7 +225,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 
 	chunk_t Chunk;
 
-	while (SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && m_pFile->GetPos() < end) {
+	while (m_pFile->ByteRead(Chunk.data, sizeof(Chunk)) == S_OK && m_pFile->GetPos() < end) {
 		__int64 pos = m_pFile->GetPos();
 
 		TRACE(L"CWAVFile::Open() : found '%c%c%c%c' chunk.\n",
@@ -243,7 +243,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			m_fmtsize = max(Chunk.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
 			m_fmtdata = DNew BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
-			if (FAILED(m_pFile->ByteRead(m_fmtdata, Chunk.size))) {
+			if (m_pFile->ByteRead(m_fmtdata, Chunk.size) != S_OK) {
 				TRACE(L"CWAVFile::Open() : format can not be read.\n");
 				return E_FAIL;
 			}
@@ -341,14 +341,14 @@ HRESULT CWAVFile::ReadRIFFINFO(const __int64 info_pos, const int info_size)
 	DWORD id = 0;
 	m_pFile->Seek(info_pos);
 
-	if (info_size < 4 || FAILED(m_pFile->ByteRead((BYTE*)&id, 4)) || id != FCC('INFO')) {
+	if (info_size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('INFO')) {
 		return E_FAIL;
 	}
 
 	__int64 end = info_pos + info_size;
 	chunk_t Chunk;
 
-	while (m_pFile->GetPos() + 8 < end && SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && m_pFile->GetPos() + Chunk.size <= end) {
+	while (m_pFile->GetPos() + 8 < end && m_pFile->ByteRead(Chunk.data, sizeof(Chunk)) == S_OK && m_pFile->GetPos() + Chunk.size <= end) {
 		__int64 pos = m_pFile->GetPos();
 
 		if (Chunk.size > 0 && (Chunk.id == FCC('INAM') || Chunk.id == FCC('IART') || Chunk.id == FCC('ICOP') || Chunk.id == FCC('ISBJ'))) {
