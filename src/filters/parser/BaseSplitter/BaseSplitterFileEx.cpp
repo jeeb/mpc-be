@@ -315,7 +315,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 	BYTE id = 0;
 
 	while (GetPos() < endpos && id != 0xb3) {
-		if (!NextMpegStartCode(id, len)) {
+		if (!NextMpegStartCode(id, endpos - GetPos())) {
 			return false;
 		}
 
@@ -2226,7 +2226,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt, bool find_s
 	int NAL_unit_type	= -1;
 	while (GetPos() < endpos && NAL_unit_type != NAL_UNIT_SPS) {
 		BYTE id = 0;
-		if (!NextMpegStartCode(id, len)) {
+		if (!NextMpegStartCode(id, endpos - GetPos())) {
 			return false;
 		}
 		NAL_unit_type = (id >> 1) & 0x3F;
@@ -2280,7 +2280,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt, bool find_s
 				int pps_present = 0;
 				while (GetPos() < endpos) {
 					BYTE id = 0;
-					if (!NextMpegStartCode(id, len)) {
+					if (!NextMpegStartCode(id, endpos - GetPos())) {
 						break;
 					}
 					int nat = (id >> 1) & 0x3F;
