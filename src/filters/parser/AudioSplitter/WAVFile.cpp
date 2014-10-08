@@ -215,7 +215,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 
 	m_pFile->Seek(0);
 	BYTE data[12];
-	if (m_pFile->ByteRead(data, sizeof(data) != S_OK)
+	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK
 			|| *(DWORD*)(data+0) != FCC('RIFF')
 			|| *(DWORD*)(data+4) < (4 + 8 + sizeof(PCMWAVEFORMAT) + 8) // 'WAVE' + ('fmt ' + fmt.size) + sizeof(PCMWAVEFORMAT) + (data + data.size)
 			|| *(DWORD*)(data+8) != FCC('WAVE')) {
