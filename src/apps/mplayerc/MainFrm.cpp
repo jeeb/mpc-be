@@ -8987,9 +8987,9 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 
 	if (GetPlaybackMode() == PM_FILE) {
 		if (nID == ID_PLAY_INCRATE) {
-			m_PlaybackRate = GatNextRate(m_PlaybackRate, (double)s.nSpeedStep / 10);
+			m_PlaybackRate = GatNextRate(m_PlaybackRate, s.nSpeedStep / 100.0);
 		} else if (nID == ID_PLAY_DECRATE) {
-			m_PlaybackRate = GatPreviousRate(m_PlaybackRate, (double)s.nSpeedStep / 10);
+			m_PlaybackRate = GatPreviousRate(m_PlaybackRate, s.nSpeedStep / 100.0);
 		}
 		hr = m_pMS->SetRate(m_PlaybackRate);
 	}

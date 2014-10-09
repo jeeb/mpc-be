@@ -66,7 +66,6 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
 	DDX_CBIndex(pDX, IDC_COMBOVOLUME, m_nVolumeStep);
 	DDX_Control(pDX, IDC_COMBOVOLUME, m_nVolumeStepCtrl);
-	DDX_CBIndex(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStep);
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
 	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
 	DDX_Control(pDX, IDC_COMBO1, m_zoomlevelctrl);
@@ -125,18 +124,25 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	m_nVolumeStep = s.nVolumeStep - 1;
 
-	for (int idx = 0; idx <= 10; idx++) {
-		CString str;
-		if (idx == 0) {
-			str = ResStr(IDS_AG_AUTO);
-			m_nSpeedStepCtrl.AddString(str);
-			continue;
-		}
-		str.Format(_T("%.1f"), (float)idx/10);
-		m_nSpeedStepCtrl.AddString(str);
-	}
+	m_nSpeedStepCtrl.AddString(ResStr(IDS_AG_AUTO));
+	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 0);
+	m_nSpeedStepCtrl.AddString(L"0.1");
+	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 10);
+	m_nSpeedStepCtrl.AddString(L"0.2");
+	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 20);
+	m_nSpeedStepCtrl.AddString(L"0.25");
+	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 25);
+	m_nSpeedStepCtrl.AddString(L"0.5");
+	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 50);
+	m_nSpeedStepCtrl.AddString(L"1.0");
+	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 100);
 
-	m_nSpeedStep = s.nSpeedStep;
+	for (int i = 0; i < m_nSpeedStepCtrl.GetCount(); i++) {
+		if (m_nSpeedStepCtrl.GetItemData(i) == s.nSpeedStep) {
+			m_nSpeedStepCtrl.SetCurSel(i);
+			break;
+		}
+	}
 
 	m_fUseInternalSelectTrackLogic = s.fUseInternalSelectTrackLogic;
 
@@ -172,10 +178,8 @@ BOOL CPPagePlayback::OnApply()
 	s.nVolumeStep = m_nVolumeStep + 1;
 	((CMainFrame*)GetParentFrame())->m_wndToolBar.m_volctrl.SetPageSize(s.nVolumeStep);
 
-	if ((s.nSpeedStep == 0 && m_nSpeedStep > 0) || (s.nSpeedStep > 0 && m_nSpeedStep == 0)) {
-		((CMainFrame*)GetParentFrame())->OnPlayResetRate();
-	}
-	s.nSpeedStep = m_nSpeedStep;
+	s.nSpeedStep = m_nSpeedStepCtrl.GetItemData(m_nSpeedStepCtrl.GetCurSel());
+
 	s.fUseInternalSelectTrackLogic = !!m_fUseInternalSelectTrackLogic;
 
 	return __super::OnApply();

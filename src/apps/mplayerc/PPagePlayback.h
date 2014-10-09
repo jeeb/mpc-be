@@ -47,7 +47,6 @@ public:
 	CEdit		m_loopnumctrl;
 	int			m_nLoops;
 	BOOL		m_fRewind;
-	int			m_nSpeedStep;
 	CComboBox	m_nSpeedStepCtrl;
 	BOOL		m_iRememberZoomLevel;
 	int			m_iZoomLevel;
