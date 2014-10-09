@@ -102,7 +102,6 @@ bool ff_wv_parse_header(wv_header_t* wvh, const uint8_t* data)
 
 HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 {
-	HRESULT hr;
 	int rate, bpp, chan;
 	uint32_t chmask, flags;
 
