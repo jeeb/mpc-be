@@ -27,6 +27,13 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 
+#if (0)
+	#define DEBUG_ASSERT	ASSERT
+#else
+	#define DEBUG_ASSERT	__noop
+#endif
+
+
 //
 // CBaseSplitterFileEx
 //
@@ -60,7 +67,7 @@ bool CBaseSplitterFileEx::NextMpegStartCode(BYTE& code, __int64 len)
 
 //
 
-#define MARKER if (BitRead(1) != 1) {ASSERT(0); return false;}
+#define MARKER if (BitRead(1) != 1) {DEBUG_ASSERT(FALSE); /*return false;*/} // TODO
 
 bool CBaseSplitterFileEx::Read(pshdr& h)
 {
@@ -71,7 +78,7 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 	if ((b & 0xf1) == 0x21) {
 		h.type = mpeg1;
 
-		EXECUTE_ASSERT(BitRead(4) == 2);
+		ASSERT(BitRead(4) == 2);
 
 		h.scr = 0;
 		h.scr |= BitRead(3) << 30;
@@ -86,7 +93,7 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 	} else if ((b & 0xc4) == 0x44) {
 		h.type = mpeg2;
 
-		EXECUTE_ASSERT(BitRead(2) == 1);
+		ASSERT(BitRead(2) == 1);
 
 		h.scr = 0;
 		h.scr |= BitRead(3) << 30;
@@ -212,7 +219,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 	if (h.fpts) {
 		if (h.type == mpeg2) {
 			BYTE b = (BYTE)BitRead(4);
-			if (!(h.fdts && b == 3 || !h.fdts && b == 2)) {/*ASSERT(0); */goto error;} // TODO
+			if (!(h.fdts && b == 3 || !h.fdts && b == 2)) {DEBUG_ASSERT(FALSE); /*goto error;*/} // TODO
 		}
 
 		h.pts = 0;
@@ -227,7 +234,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 
 	if (h.fdts) {
 		BYTE b = (BYTE)BitRead(4);
-		if (b != 1) {/*return false;*/} // TODO
+		//if (b != 1) {return false;} // TODO
 
 		h.dts = 0;
 		h.dts |= BitRead(3) << 30;
@@ -239,11 +246,9 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 		h.dts = PTS(h.dts);
 	}
 
-	// skip to the end of header
-
 	if (h.type == mpeg1) {
 		if (!h.fpts && !h.fdts && BitRead(4) != 0xf) {
-			/*ASSERT(0);*/ goto error;
+			DEBUG_ASSERT(0);/* goto error;*/ // TODO
 		}
 
 		if (h.len) {
@@ -304,7 +309,6 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 
 error:
 	memset(&h, 0, sizeof(h));
-
 	return false;
 }
 
@@ -509,7 +513,7 @@ static int NextMpegStartCodeGb(CGolombBuffer& gb, BYTE& code)
 	return true;
 }
 
-#define MARKERGB if (gb.BitRead(1) != 1) {ASSERT(0); return false;}
+#define MARKERGB if (gb.BitRead(1) != 1) {DEBUG_ASSERT(0);/* return false;*/}
 bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt, bool find_sync)
 {
 	BYTE id = 0;
@@ -1690,7 +1694,7 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 
 			int i = 1;
 
-			if (h.fPCR && h.length>6) {
+			if (h.fPCR && h.length > 6) {
 				h.PCR = BitRead(33);
 				BitRead(6);
 				UINT64 PCRExt = BitRead(9);
@@ -1704,7 +1708,7 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 			}
 		}
 
-		h.bytes -= h.length+1;
+		h.bytes -= h.length + 1;
 
 		if (h.bytes < 0) {
 			ASSERT(0);

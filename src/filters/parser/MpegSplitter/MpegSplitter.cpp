@@ -707,46 +707,53 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 		if (h.payload && ISVALIDPID(h.pid)) {
 			DWORD TrackNumber = h.pid;
-
-			CMpegSplitterFile::peshdr h2;
-
-			if (h.payloadstart && m_pFile->NextMpegStartCode(b, 4)) { // pes packet
-				if (m_pFile->Read(h2, b)) {
-					if (h2.type == CMpegSplitterFile::mpeg2 && h2.scrambling) {
-						ASSERT(0);
-						return E_FAIL;
+			
+			if (GetOutputPin(TrackNumber)) {
+				CMpegSplitterFile::peshdr h2;
+				if (h.payloadstart) {
+					if (m_pFile->NextMpegStartCode(b, 4)) { // pes packet
+						if (m_pFile->Read(h2, b)) {
+							if (h2.type == CMpegSplitterFile::mpeg2 && h2.scrambling) {
+								ASSERT(0);
+								return E_FAIL;
+							}
+							TrackNumber = m_pFile->AddStream(h.pid, b, 0, h.bytes - (DWORD)(m_pFile->GetPos() - pos));
+						}
+					} else {
+						m_pFile->Seek(pos);
 					}
-					TrackNumber = m_pFile->AddStream(h.pid, b, 0, h.bytes - (DWORD)(m_pFile->GetPos() - pos));
-				}
-			}
-
-			if (GetOutputPin(TrackNumber) && (h.bytes > (m_pFile->GetPos() - pos))) {
-				CAutoPtr<Packet> p(DNew Packet());
-
-				if (h.fPCR) {
-					CRefTime rtNow;
-					StreamTime(rtNow);
 				}
 
-				p->TrackNumber	= TrackNumber;
-				p->bAppendable	= !h2.fpts;
-				p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : INVALID_TIME;
-				if (m_rtDuration && p->rtStart > m_rtDuration) {
-					p->rtStart	= INVALID_TIME;
-				}
-				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
-				p->bSyncPoint	= !!h2.fpts && (p->rtStart != INVALID_TIME);
+				if (h.bytes > (m_pFile->GetPos() - pos)) {
+					CAutoPtr<Packet> p(DNew Packet());
+
+					/*
+					if (h.fPCR) {
+						CRefTime rtNow;
+						StreamTime(rtNow);
+					}
+					*/
+
+					p->TrackNumber	= TrackNumber;
+					p->bAppendable	= !h2.fpts;
+					p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : INVALID_TIME;
+					if (m_rtDuration && p->rtStart > m_rtDuration) {
+						p->rtStart	= INVALID_TIME;
+					}
+					p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
+					p->bSyncPoint	= !!h2.fpts && (p->rtStart != INVALID_TIME);
 #if (DEBUG) && 0
-				if (h2.fpts) {
-					TRACE(_T("h.pid = %d, m_rtPTSOffset = [%10I64d], h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, rtStartOffset, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
-				}
+					if (h2.fpts) {
+						TRACE(_T("h.pid = %d, m_rtPTSOffset = [%10I64d], h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, rtStartOffset, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
+					}
 #endif
-				__int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
-				if (nBytes > 0) {
-					p->SetCount(nBytes);
-					m_pFile->ByteRead(p->GetData(), nBytes);
+					__int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
+					if (nBytes > 0) {
+						p->SetCount(nBytes);
+						m_pFile->ByteRead(p->GetData(), nBytes);
 
-					hr = DeliverPacket(p);
+						hr = DeliverPacket(p);
+					}
 				}
 			}
 		}
@@ -1242,7 +1249,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		REFERENCE_TIME rtmin	= rtmax - UNITS/2;
 
 		CMpegSplitterFile::stream stream = pMasterStream->GetHead();
-		if (stream.type == CMpegSplitterFile::stream::stream_type::H264) {
+		if (m_pFile->m_bPESPTSPresent && stream.type == CMpegSplitterFile::stream::stream_type::H264) {
 			__int64 save_seekpos = seekpos;
 			m_pFile->Seek(seekpos);
 
@@ -1272,7 +1279,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			return;
 		}
 
-		if (!m_pFile->m_bIsBadPacked) {
+		if (!m_pFile->m_bIsBadPacked && m_pFile->m_bPESPTSPresent) {
 			POSITION pos = pMasterStream->GetHeadPosition();
 			while (pos) {
 				DWORD TrackNum = pMasterStream->GetNext(pos);
@@ -1341,9 +1348,11 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			seekpos	= SeekPos(rt);
 			m_pFile->Seek(seekpos);
 
-			SimpleSeek;
-			if (rtPTS != INVALID_TIME) {
-				seekpos = m_pFile->GetPos();
+			if (m_pFile->m_bPESPTSPresent) {
+				SimpleSeek;
+				if (rtPTS != INVALID_TIME) {
+					seekpos = m_pFile->GetPos();
+				}
 			}
 		}
 

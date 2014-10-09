@@ -83,6 +83,12 @@ public:
 
 	REFERENCE_TIME m_rtMin, m_rtMax;
 	__int64 m_posMin, m_posMax;
+
+	REFERENCE_TIME m_rtPCRMin, m_rtPCRMax;
+	__int64 m_posPCRMin, m_posPCRMax;
+
+	BOOL m_bPESPTSPresent;
+
 	int m_rate; // byte/sec
 	BOOL m_bIsBadPacked;
 
