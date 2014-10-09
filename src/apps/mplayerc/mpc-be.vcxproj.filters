@@ -351,6 +351,9 @@
     <ClCompile Include="ColorControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RateControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">

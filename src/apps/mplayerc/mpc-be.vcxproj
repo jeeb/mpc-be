@@ -257,6 +257,7 @@
     <ClCompile Include="QuicktimeGraph.cpp">
       <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="RateControl.cpp" />
     <ClCompile Include="RealMediaGraph.cpp" />
     <ClCompile Include="RealMediaWindowlessSite.cpp" />
     <ClCompile Include="RegFilterChooserDlg.cpp" />

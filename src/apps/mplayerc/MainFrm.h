@@ -71,6 +71,7 @@
 #include <afxinet.h>
 #include <afxmt.h>
 #include "ColorControl.h"
+#include "RateControl.h"
 #include "DiskImage.h"
 
 #define USE_MEDIAINFO_STATIC
@@ -489,9 +490,8 @@ protected:
 
 	DVD_DOMAIN m_iDVDDomain;
 	DWORD m_iDVDTitle;
-	int m_iSpeedLevel;
-	int m_iSpeedRate;
-	bool bAutoSpeedStep;
+
+	double m_PlaybackRate;
 
 	double m_ZoomX, m_ZoomY, m_PosX, m_PosY;
 	int m_AngleX, m_AngleY, m_AngleZ;
