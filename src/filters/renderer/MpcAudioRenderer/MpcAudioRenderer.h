@@ -50,6 +50,8 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 
 	REFERENCE_TIME		m_rtStartTime;
 
+	BOOL				m_bEndOfStream;
+
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
 	virtual ~CMpcAudioRenderer();
@@ -174,6 +176,7 @@ private:
 	IAudioClient			*m_pAudioClient;
 	IAudioRenderClient		*m_pRenderClient;
 	UINT32					m_nFramesInBuffer;
+	UINT32					m_nAvailableBytes;
 	REFERENCE_TIME			m_hnsPeriod;
 	bool					m_isAudioClientStarted;
 	double					m_dVolume;
