@@ -8982,33 +8982,39 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 		return;
 	}
 
-	HRESULT hr = S_OK;
 	AppSettings& s = AfxGetAppSettings();
 
+	HRESULT hr = E_FAIL;
+	double PlaybackRate = 0;
 	if (GetPlaybackMode() == PM_FILE) {
 		if (nID == ID_PLAY_INCRATE) {
-			m_PlaybackRate = GatNextRate(m_PlaybackRate, s.nSpeedStep / 100.0);
+			PlaybackRate = GatNextRate(m_PlaybackRate, s.nSpeedStep / 100.0);
 		} else if (nID == ID_PLAY_DECRATE) {
-			m_PlaybackRate = GatPreviousRate(m_PlaybackRate, s.nSpeedStep / 100.0);
+			PlaybackRate = GatPreviousRate(m_PlaybackRate, s.nSpeedStep / 100.0);
 		}
-		hr = m_pMS->SetRate(m_PlaybackRate);
+		hr = m_pMS->SetRate(PlaybackRate);
 	}
 	else if (GetPlaybackMode() == PM_DVD) {
 		if (nID == ID_PLAY_INCRATE) {
-			m_PlaybackRate = GatNextDVDRate(m_PlaybackRate);
+			PlaybackRate = GatNextDVDRate(m_PlaybackRate);
 		} else if (nID == ID_PLAY_DECRATE) {
-			m_PlaybackRate = GatPreviousDVDRate(m_PlaybackRate);
+			PlaybackRate = GatPreviousDVDRate(m_PlaybackRate);
 		}
-		if (m_PlaybackRate >= 0.0) {
-			hr = m_pDVDC->PlayForwards(m_PlaybackRate, DVD_CMD_FLAG_Block, NULL);
+		if (PlaybackRate >= 0.0) {
+			hr = m_pDVDC->PlayForwards(PlaybackRate, DVD_CMD_FLAG_Block, NULL);
 		} else {
-			hr = m_pDVDC->PlayBackwards(abs(m_PlaybackRate), DVD_CMD_FLAG_Block, NULL);
+			hr = m_pDVDC->PlayBackwards(abs(PlaybackRate), DVD_CMD_FLAG_Block, NULL);
 		}
 	}
 
-	CString strODSMessage;
-	strODSMessage.Format(ResStr(IDS_OSD_SPEED), m_PlaybackRate);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT, strODSMessage);
+	if (SUCCEEDED(hr)) {
+		m_PlaybackRate = PlaybackRate;
+
+		CString strODSMessage;
+		strODSMessage.Format(ResStr(IDS_OSD_SPEED), m_PlaybackRate);
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, strODSMessage);
+
+	}
 }
 
 void CMainFrame::OnUpdatePlayChangeRate(CCmdUI* pCmdUI)
