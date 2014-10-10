@@ -1840,7 +1840,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	hr = m_pRenderClient->GetBuffer(m_nFramesInBuffer, &pData);
 	if (FAILED(hr)) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - GetBuffer failed with size %ld : (error %lx)", m_nFramesInBuffer, hr));
+		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - GetBuffer() failed with size %ld : (error %lx)", m_nFramesInBuffer, hr));
 #endif
 		return hr;
 	}
@@ -1853,18 +1853,18 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		WasapiBufLen = m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
 	}
 
-	if (m_nAvailableBytes > WasapiBufLen || m_filterState != State_Running) {
+	if (!WasapiBufLen || (m_filterState != State_Running && !m_bEndOfStream)) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 		if (m_filterState != State_Running) {
-			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Data Event, not running", m_nAvailableBytes, m_nFramesInBuffer, WasapiBufLen));
-		} else if (m_nAvailableBytes > WasapiBufLen) {
-			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Data Event, not enough data, requested: %u[%u], available: %u", m_nAvailableBytes, m_nFramesInBuffer, WasapiBufLen));
+			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - not running"));
+		} else if (!WasapiBufLen) {
+			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - data queue is empty"));
 		}
 #endif
 		bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 	} else {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Data Event, requested: %u[%u], available: %u", m_nAvailableBytes, m_nFramesInBuffer, WasapiBufLen));
+		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - requested: %u[%u], available: %u", m_nAvailableBytes, m_nFramesInBuffer, WasapiBufLen));
 #endif
 		if (pData != NULL) {
 			{
@@ -1963,7 +1963,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	hr = m_pRenderClient->ReleaseBuffer(m_nFramesInBuffer, bufferFlags);
 	if (FAILED(hr)) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - ReleaseBuffer failed with size %ld (error %lx)", m_nFramesInBuffer, hr));
+		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - ReleaseBuffer() failed with size %ld (error %lx)", m_nFramesInBuffer, hr));
 #endif
 		return hr;
 	}
