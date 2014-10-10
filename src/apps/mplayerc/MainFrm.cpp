@@ -9044,13 +9044,9 @@ void CMainFrame::OnPlayResetRate()
 		return;
 	}
 
-	HRESULT hr = E_FAIL;
-
-	if (GetMediaState() != State_Running) {
-		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
-	}
-
 	if (m_PlaybackRate != 1.0) {
+		HRESULT hr = E_FAIL;
+
 		if (GetPlaybackMode() == PM_FILE) {
 			hr = m_pMS->SetRate(1.0);
 		} else if (GetPlaybackMode() == PM_DVD) {
