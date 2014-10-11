@@ -31,3 +31,5 @@ double GatPreviousRate(double rate, double step = 0.0);
 
 double GatNextDVDRate(double rate);
 double GatPreviousDVDRate(double rate);
+
+CString Rate2String(double rate);

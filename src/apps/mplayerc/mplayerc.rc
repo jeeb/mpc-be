@@ -3324,7 +3324,7 @@ BEGIN
     IDS_OSD_RS_FT_CORRECTION_OFF        "Frame Time Correction: Off"
     IDS_OSD_RS_TARGET_VSYNC_OFFSET      "Target VSync Offset: %.1f"
     IDS_OSD_RS_VSYNC_OFFSET             "VSync Offset: %d"
-    IDS_OSD_SPEED                       "Speed: %.2lfx"
+    IDS_OSD_SPEED                       "Speed: %sx"
     IDS_OSD_ZOOM                        "Zoom: %.0lf%%"
     IDS_OSD_ZOOM_AUTO                   "Zoom: Auto"
 END

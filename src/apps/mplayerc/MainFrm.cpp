@@ -2407,9 +2407,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		break;
 		case TIMER_STATS: {
 			if (m_pQP) {
-
 				CString rate;
-				rate.Format(_T("(%.2lfx)"), m_PlaybackRate);
+				rate.Format(L" (%sx)", Rate2String(m_PlaybackRate));
 
 				CString info;
 				int val = 0;
@@ -4106,7 +4105,7 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 			else if (fs == State_Running) {
 				msg = ResStr(IDS_CONTROLS_PLAYING);
 				if (m_PlaybackRate != 1.0) {
-					msg.AppendFormat(_T(" (%.2lfx)"), m_PlaybackRate);
+					msg.AppendFormat(L" (%sx)", Rate2String(m_PlaybackRate));
 				}
 			}
 
@@ -9015,7 +9014,7 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 		m_PlaybackRate = PlaybackRate;
 
 		CString strODSMessage;
-		strODSMessage.Format(ResStr(IDS_OSD_SPEED), m_PlaybackRate);
+		strODSMessage.Format(ResStr(IDS_OSD_SPEED), Rate2String(m_PlaybackRate));
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, strODSMessage);
 
 	}
@@ -9067,7 +9066,7 @@ void CMainFrame::OnPlayResetRate()
 			m_PlaybackRate = 1.0;
 
 			CString strODSMessage;
-			strODSMessage.Format(ResStr(IDS_OSD_SPEED), m_PlaybackRate);
+			strODSMessage.Format(ResStr(IDS_OSD_SPEED), Rate2String(m_PlaybackRate));
 			m_OSD.DisplayMessage(OSD_TOPRIGHT, strODSMessage);
 		}
 	}

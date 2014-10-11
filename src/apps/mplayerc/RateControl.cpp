@@ -87,3 +87,14 @@ double GatPreviousDVDRate(double rate)
 
 	return s_dvdautorates[i - 1];
 }
+
+CString Rate2String(double rate)
+{
+	CString str;
+	str.Format(L"%.3g", rate);
+	if (str.Find('.') < 0) {
+		str += L".0";
+	}
+
+	return str;
+}
