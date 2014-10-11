@@ -71,30 +71,34 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 
 	m_channels = 1;
 	m_layout   = SPEAKER_FRONT_CENTER;
-	m_startpos = m_pFile->GetPos();
 
 	m_seek_table.SetSize(0, 512);
 	m_seek_table.RemoveAll();
 	BYTE toc = 0;
 	while (m_pFile->ByteRead(&toc, 1) == S_OK) {
-		unsigned mode = (toc >> 3) & 0x0F;
-		int size = m_isAMRWB ? AMRWB_packed_size[mode] : AMR_packed_size[mode];
+		frame_t frame;
+		frame.pos = m_pFile->GetPos() - 1;
 
-		if (size == 1) {
+		unsigned mode = (toc >> 3) & 0x0F;
+		frame.size = m_isAMRWB ? AMRWB_packed_size[mode] : AMR_packed_size[mode];
+
+		if (frame.size == 1) {
 			continue;
 		}
-		if (!size || m_pFile->GetRemaining() < size - 1) {
+		if (!frame.size || m_pFile->GetRemaining() < frame.size - 1) {
 			break;
 		}
 
-
-		m_endpos = m_pFile->GetPos() - 1;
-		m_pFile->Seek(m_endpos + size);
-		m_seek_table.Add(m_endpos);
+		m_seek_table.Add(frame);
+		m_pFile->Seek(frame.pos + frame.size);
 	}
-	if (m_endpos <= m_startpos) {
+	if (m_seek_table.IsEmpty()) {
 		return E_FAIL;
 	}
+
+	m_startpos = m_seek_table[0].pos;
+	frame_t lastframe = m_seek_table[m_seek_table.GetCount() - 1];
+	m_endpos = lastframe.pos + lastframe.size;
 
 	m_pFile->Seek(m_startpos);
 	m_currentframe = 0;
@@ -107,17 +111,19 @@ REFERENCE_TIME CAMRFile::Seek(REFERENCE_TIME rt)
 {
 	if (rt <= 0) {
 		m_currentframe = 0;
-		m_pFile->Seek(m_seek_table[0]);
+		m_pFile->Seek(m_seek_table[0].pos);
 		return 0;
 	}
 
 	__int64 samples = rt * m_samplerate / 10000000;
 	m_currentframe = samples / m_framelen;
-	if (m_currentframe >= m_seek_table.GetCount()) {
-		m_currentframe = m_seek_table.GetCount() - 1;
+
+	if (m_currentframe > m_seek_table.GetCount()) {
+		m_currentframe = m_seek_table.GetCount();
+		return m_rtduration;
 	}
 
-	m_pFile->Seek(m_seek_table[m_currentframe]);
+	m_pFile->Seek(m_seek_table[m_currentframe].pos);
 	rt = 10000000i64 * m_currentframe * m_framelen / m_samplerate;
 
 	return rt;
@@ -129,20 +135,12 @@ int CAMRFile::GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
+	m_pFile->Seek(m_seek_table[m_currentframe].pos);
+	int size = m_seek_table[m_currentframe].size;
+
 	packet->rtStart = 10000000i64 * m_currentframe * m_framelen / m_samplerate;
-	m_pFile->Seek(m_seek_table[m_currentframe]);
-
 	m_currentframe++;
-
-	int size;
-	if (m_currentframe == m_seek_table.GetCount()) {
-		size = m_endpos - m_seek_table[m_currentframe - 1];
-	} else {
-		size = m_seek_table[m_currentframe] - m_seek_table[m_currentframe - 1];
-	}
-	if (size > 61) { size = 61; }
-
-	packet->rtStop  = 10000000i64 * m_currentframe * m_framelen / m_samplerate;
+	packet->rtStop = 10000000i64 * m_currentframe * m_framelen / m_samplerate;
 
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
 		return 0;

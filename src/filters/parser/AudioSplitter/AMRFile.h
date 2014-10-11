@@ -27,10 +27,14 @@ const uint8_t AMRWB_header[9] = { '#', '!', 'A', 'M', 'R', '-', 'W', 'B', 0x0A }
 
 class CAMRFile : public CAudioFile
 {
+	struct frame_t {
+		UINT64 size : 8, pos : 54;
+	};
+
 	int				m_framelen;
 	bool			m_isAMRWB;
 	int				m_currentframe;
-	CArray<__int64>	m_seek_table;
+	CArray<frame_t>	m_seek_table;
 
 public:
 	CAMRFile();
