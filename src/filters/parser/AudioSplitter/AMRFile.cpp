@@ -118,7 +118,7 @@ REFERENCE_TIME CAMRFile::Seek(REFERENCE_TIME rt)
 	__int64 samples = rt * m_samplerate / 10000000;
 	m_currentframe = samples / m_framelen;
 
-	if (m_currentframe > m_seek_table.GetCount()) {
+	if (m_currentframe >= m_seek_table.GetCount()) {
 		m_currentframe = m_seek_table.GetCount();
 		return m_rtduration;
 	}
