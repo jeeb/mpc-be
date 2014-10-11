@@ -2928,6 +2928,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_TITLE_CHANGE:
 				if (m_pDVDC) {
+					if (m_PlaybackRate != 1.0) {
+						OnPlayResetRate();
+					}
+
 					// Save current chapter
 					DVD_POSITION* DvdPos = s.CurrentDVDPosition();
 					if (DvdPos) {
