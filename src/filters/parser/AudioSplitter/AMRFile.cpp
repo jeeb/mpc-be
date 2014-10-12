@@ -85,7 +85,7 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 		if (frame.size == 1) {
 			continue;
 		}
-		if (!frame.size || m_pFile->GetRemaining() < frame.size - 1) {
+		if (!frame.size || (UINT64)m_pFile->GetRemaining() < frame.size - 1) {
 			break;
 		}
 
