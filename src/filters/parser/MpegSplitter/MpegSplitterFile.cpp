@@ -430,15 +430,20 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 				}
 
 				if (h.fpts) {
-					if (m_rtMin == _I64_MAX) {
-						m_rtMin = h.pts;
-						m_posMin = GetPos();
+					if (m_rtMin == -1) {
+						m_rtMin = m_rtMax = h.pts;
+						m_posMin = m_posMax = GetPos();
+#if (DEBUG) && 0
 						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMin), m_rtMin, b));
+#endif
 					}
+
 					if (m_rtMin < h.pts && m_rtMax < h.pts) {
 						m_rtMax = h.pts;
 						m_posMax = GetPos();
+#if (DEBUG) && 0
 						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
+#endif
 					}
 				}
 

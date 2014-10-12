@@ -78,7 +78,7 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 	if ((b & 0xf1) == 0x21) {
 		h.type = mpeg1;
 
-		ASSERT(BitRead(4) == 2);
+		EXECUTE_ASSERT(BitRead(4) == 2);
 
 		h.scr = 0;
 		h.scr |= BitRead(3) << 30;
@@ -93,7 +93,7 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 	} else if ((b & 0xc4) == 0x44) {
 		h.type = mpeg2;
 
-		ASSERT(BitRead(2) == 1);
+		EXECUTE_ASSERT(BitRead(2) == 1);
 
 		h.scr = 0;
 		h.scr |= BitRead(3) << 30;
