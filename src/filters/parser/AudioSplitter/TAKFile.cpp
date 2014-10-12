@@ -200,12 +200,10 @@ bool CTAKFile::ParseTAKStreamInfo(BYTE* buf, int size)
 	if (DataType != 0) {
 		return false;
 	}
-	uint8_t ValidBitsPerSample      = 0;
-	uint8_t HasSpeakerAssignment    = 0;
-	DWORD   ChannelMask             = 0;
+	DWORD   ChannelMask = 0;
 	if (HasExtension && size >= 11) {
-		ValidBitsPerSample      = (buf[10] & 0x1F) + 1;
-		HasSpeakerAssignment    = (buf[10] >> 5 & 0x1);
+		uint8_t ValidBitsPerSample   = (buf[10] & 0x1F) + 1;
+		uint8_t HasSpeakerAssignment = (buf[10] >> 5 & 0x1);
 		if (HasSpeakerAssignment && size >= (80 + ChannelNum * 6 + 7) / 8) {
 			int ch = 1;
 			int bytepos = 10;

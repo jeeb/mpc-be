@@ -34,7 +34,6 @@ CAMRFile::CAMRFile()
 	, m_isAMRWB(false)
 	, m_currentframe(0)
 {
-	
 }
 
 CAMRFile::~CAMRFile()
@@ -85,7 +84,7 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 		if (frame.size == 1) {
 			continue;
 		}
-		if (!frame.size || (UINT64)m_pFile->GetRemaining() < frame.size - 1) {
+		if (!frame.size || m_pFile->GetRemaining() < (__int64)frame.size - 1) {
 			break;
 		}
 
