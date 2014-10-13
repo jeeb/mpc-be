@@ -183,17 +183,6 @@ public:
 								  L"Unknown";
 		}
 
-		const stream* FindStream(WORD pid) {
-			for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
-				const stream& s = GetAt(pos);
-				if (s.pid == pid) {
-					return &s;
-				}
-			}
-
-			return NULL;
-		}
-
 		const stream* FindStream(DWORD pid) {
 			for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
 				const stream& s = GetAt(pos);

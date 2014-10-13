@@ -418,8 +418,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 				if (!Read(h)) {
 					continue;
 				}
-			}
-			else if ((b >= 0xbd && b < 0xf0) || (b == 0xfd)) { // pes packet
+			} else if ((b >= 0xbd && b < 0xf0) || (b == 0xfd)) { // pes packet
 				peshdr h;
 				if (!Read(h, b) || !h.len) {
 					continue;
@@ -434,9 +433,10 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 
 				if (h.fpts) {
 					BOOL bStreamExist = FALSE;
-					for (int t = stream_type::video; t < stream_type::audio && !bStreamExist; t++) {
+					for (int t = stream_type::video; t < stream_type::audio; t++) {
 						if (m_streams[t].FindStream(TrackNum)) {
 							bStreamExist = TRUE;
+							break;
 						}
 					}
 
@@ -444,7 +444,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 						if (m_rtMin == -1) {
 							m_rtMin = m_rtMax = h.pts;
 							m_posMin = m_posMax = GetPos();
-#if (DEBUG) && 1
+#if (DEBUG) && 0
 							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMin), m_rtMin, b));
 #endif
 						}
@@ -452,7 +452,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 						if (m_rtMin < h.pts && m_rtMax < h.pts) {
 							m_rtMax = h.pts;
 							m_posMax = GetPos();
-#if (DEBUG) && 1
+#if (DEBUG) && 0
 							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
 #endif
 						}
@@ -890,7 +890,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				const CHdmvClipInfo::Stream *pClipInfo;
 				const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
 				if ((type == stream_type::unknown) && (pProgram != NULL) && AUDIO_STREAM_AC3_TRUE_HD == pProgram->streams[iProgram].type) {
-					stream* source = (stream*)m_streams[stream_type::audio].FindStream(s.pid);
+					stream* source = (stream*)m_streams[stream_type::audio].FindStream(s);
 					if (source && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 						ac3hdr h;
 						if (Read(h, len, &s.mt, false, false) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
@@ -1391,23 +1391,23 @@ void CMpegSplitterFile::UpdatePSM()
 	BitRead(8);
 	BitRead(8);
 	WORD ps_info_length	= (WORD)BitRead(16);
-	while (ps_info_length-- > 0) {
-		BitRead(8);
-	}
+	Seek(GetPos() + ps_info_length);
 
 	WORD es_map_length	= (WORD)BitRead(16);
-	while (es_map_length > 4) {
-		BYTE type			= (BYTE)BitRead(8);
-		BYTE es_id			= (BYTE)BitRead(8);
-		WORD es_info_length	= (WORD)BitRead(16);
+	if (es_map_length <= _countof(m_psm) * 4) {
+		while (es_map_length > 4) {
+			BYTE type			= (BYTE)BitRead(8);
+			BYTE es_id			= (BYTE)BitRead(8);
+			WORD es_info_length	= (WORD)BitRead(16);
 
-		m_psm[es_id]		= (PES_STREAM_TYPE)type;
+			m_psm[es_id]		= (PES_STREAM_TYPE)type;
 
-		es_map_length		-= 4 + es_info_length;
-		while (es_info_length-- > 0) {
-			BitRead(8);
+			es_map_length		-= 4 + es_info_length;
+			if (es_info_length) {
+				Seek(GetPos() + es_info_length);
+			}
 		}
-	}
 
-	BitRead(32);
+		BitRead(32);
+	}
 }

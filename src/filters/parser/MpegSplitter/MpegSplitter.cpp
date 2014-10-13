@@ -659,8 +659,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			if (!m_pFile->Read(h)) {
 				return S_FALSE;
 			}
-		}
-		else if ((b >= 0xbd && b < 0xf0) || (b == 0xfd)) { // pes packet
+		} else if ((b >= 0xbd && b < 0xf0) || (b == 0xfd)) { // pes packet
 			CMpegSplitterFile::peshdr h;
 
 			if (!m_pFile->Read(h, b) || !h.len) {
