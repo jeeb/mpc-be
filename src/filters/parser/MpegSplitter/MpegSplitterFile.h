@@ -193,6 +193,17 @@ public:
 
 			return NULL;
 		}
+
+		const stream* FindStream(DWORD pid) {
+			for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
+				const stream& s = GetAt(pos);
+				if (s == pid) {
+					return &s;
+				}
+			}
+
+			return NULL;
+		}
 	};
 	typedef CStreamList CStreamsList[unknown];
 	CStreamsList m_streams;

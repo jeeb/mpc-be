@@ -429,31 +429,39 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 					Seek(GetPos() + h.len);
 				}
 
-				if (h.fpts) {
-					if (m_rtMin == -1) {
-						m_rtMin = m_rtMax = h.pts;
-						m_posMin = m_posMax = GetPos();
-#if (DEBUG) && 0
-						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMin), m_rtMin, b));
-#endif
-					}
-
-					if (m_rtMin < h.pts && m_rtMax < h.pts) {
-						m_rtMax = h.pts;
-						m_posMax = GetPos();
-#if (DEBUG) && 0
-						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
-#endif
-					}
-				}
-
 				__int64 pos = GetPos();
 				DWORD TrackNum = AddStream(0, b, h.id_ext, h.len);
+
 				if (h.fpts) {
-					if (!streamPTSCount.Lookup(TrackNum)) {
-						streamPTSCount[TrackNum] = 0;
+					BOOL bStreamExist = FALSE;
+					for (int t = stream_type::video; t < stream_type::audio && !bStreamExist; t++) {
+						if (m_streams[t].FindStream(TrackNum)) {
+							bStreamExist = TRUE;
+						}
 					}
-					streamPTSCount[TrackNum]++;
+
+					if (bStreamExist) {
+						if (m_rtMin == -1) {
+							m_rtMin = m_rtMax = h.pts;
+							m_posMin = m_posMax = GetPos();
+#if (DEBUG) && 1
+							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMin), m_rtMin, b));
+#endif
+						}
+
+						if (m_rtMin < h.pts && m_rtMax < h.pts) {
+							m_rtMax = h.pts;
+							m_posMax = GetPos();
+#if (DEBUG) && 1
+							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
+#endif
+						}
+
+						if (!streamPTSCount.Lookup(TrackNum)) {
+							streamPTSCount[TrackNum] = 0;
+						}
+						streamPTSCount[TrackNum]++;
+					}
 				}
 				if (h.len) {
 					Seek(pos + h.len);
