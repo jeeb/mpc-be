@@ -27,13 +27,13 @@ class CCPUUsage
 {
 public:
 	CCPUUsage();
-	
+
 	const short GetUsage();
 private:
 	ULONGLONG SubtractTimes(const FILETIME& ftA, const FILETIME& ftB);
 	bool EnoughTimePassed();
 	inline bool IsFirstRun() const { return (m_dwLastRun == 0); }
-	
+
 	//system total times
 	FILETIME m_ftPrevSysKernel;
 	FILETIME m_ftPrevSysUser;
@@ -44,6 +44,6 @@ private:
 
 	short m_nCPUUsage;
 	DWORD m_dwLastRun;
-	
+
 	volatile LONG m_lRunCount;
 };

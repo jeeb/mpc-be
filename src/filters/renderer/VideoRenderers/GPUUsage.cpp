@@ -134,7 +134,7 @@ HRESULT CGPUUsage::Init(CString DeviceName)
 
 								if (ATIData.iOverdriveVersion == 5) {
 									ADL_OVERDRIVE5_ODPARAMETERS_GET ADL_Overdrive5_ODParameters_Get;
-						
+
 									ADL_Overdrive5_ODParameters_Get				= (ADL_OVERDRIVE5_ODPARAMETERS_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive5_ODParameters_Get");
 									ATIData.ADL_Overdrive5_CurrentActivity_Get	= (ADL_OVERDRIVE5_CURRENTACTIVITY_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive5_CurrentActivity_Get");
 									if (NULL == ADL_Overdrive5_ODParameters_Get || NULL == ATIData.ADL_Overdrive5_CurrentActivity_Get) {
@@ -146,7 +146,7 @@ HRESULT CGPUUsage::Init(CString DeviceName)
 									if (ADL_OK != ADL_Overdrive5_ODParameters_Get(adapterInfo.iAdapterIndex, &overdriveParameters) || !overdriveParameters.iActivityReportingSupported) {
 										break;
 									}
-						
+
 									ATIData.iAdapterId = adapterInfo.iAdapterIndex;
 								} else if (ATIData.iOverdriveVersion == 6) {
 									ADL_OVERDRIVE6_CAPABILITIES_GET ADL_Overdrive6_Capabilities_Get;
@@ -255,7 +255,7 @@ const short CGPUUsage::GetUsage()
 		m_dwLastRun	= GetTickCount();
 		nGPUCopy	= m_nGPUUsage;
 	}
-	
+
 	::InterlockedDecrement(&m_lRunCount);
 
 	return nGPUCopy;
@@ -264,5 +264,5 @@ const short CGPUUsage::GetUsage()
 bool CGPUUsage::EnoughTimePassed()
 {
 	const int minElapsedMS = 1000;
-	return (GetTickCount() - m_dwLastRun) >= minElapsedMS; 
+	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
 }

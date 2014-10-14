@@ -242,7 +242,7 @@ HRESULT CFilter::Pull(CAutoPtr<Packet>& p)
 			DWORD pSize		= pFrame->nb_samples * pFrame->channels * sizeof(BYTE) * 3;
 			BYTE* pTmpBuf	= DNew BYTE[pSize];
 			convert_to_int24(SAMPLE_FMT_S32, m_Channels, pFrame->nb_samples, pFrame->data[0], pTmpBuf);
-			
+
 			p->SetData(pTmpBuf, pSize);
 			delete [] pTmpBuf;
 		} else {

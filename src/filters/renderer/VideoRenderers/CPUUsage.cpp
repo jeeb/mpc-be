@@ -49,7 +49,7 @@ CCPUUsage::CCPUUsage()
 ***********************************************/
 const short CCPUUsage::GetUsage()
 {
-	//create a local copy to protect against race conditions in setting the 
+	//create a local copy to protect against race conditions in setting the
 	//member variable
 	short nCpuCopy = m_nCPUUsage;
 	if (::InterlockedIncrement(&m_lRunCount) == 1) {
@@ -68,7 +68,7 @@ const short CCPUUsage::GetUsage()
 
 		if (!GetSystemTimes(&ftSysIdle, &ftSysKernel, &ftSysUser) ||
 			!GetProcessTimes(GetCurrentProcess(), &ftProcCreation, &ftProcExit, &ftProcKernel, &ftProcUser)) {
-			
+
 			::InterlockedDecrement(&m_lRunCount);
 			return nCpuCopy;
 		}
@@ -92,17 +92,17 @@ const short CCPUUsage::GetUsage()
 				m_nCPUUsage = (short)((100.0 * nTotalProc) / nTotalSys);
 			}
 		}
-		
+
 		m_ftPrevSysKernel	= ftSysKernel;
 		m_ftPrevSysUser		= ftSysUser;
 		m_ftPrevProcKernel	= ftProcKernel;
 		m_ftPrevProcUser	= ftProcUser;
-		
+
 		m_dwLastRun = GetTickCount();
 
 		nCpuCopy = m_nCPUUsage;
 	}
-	
+
 	::InterlockedDecrement(&m_lRunCount);
 
 	return nCpuCopy;
@@ -123,5 +123,5 @@ ULONGLONG CCPUUsage::SubtractTimes(const FILETIME& ftA, const FILETIME& ftB)
 bool CCPUUsage::EnoughTimePassed()
 {
 	const int minElapsedMS = 1000;
-	return (GetTickCount() - m_dwLastRun) >= minElapsedMS; 
+	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
 }

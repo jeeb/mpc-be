@@ -1346,7 +1346,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 		AlphaBlt(rSrcPri, rcDst, m_pOSDTexture);
 	}
-	
+
 	m_pD3DDev->EndScene();
 
 	BOOL bCompositionEnabled = m_bCompositionEnabled;
@@ -1837,7 +1837,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				rtMS	= double(m_rtTimePerFrame) / 10000.0;
 				rtFPS	= 10000000.0 / (double)(m_rtTimePerFrame);
 			}
-		
+
 			if (m_bIsEVR) {
 				if (g_nFrameType != PICT_NONE) {
 					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, rtMS, rtFPS, g_nFrameType == PICT_FRAME ? L"P" : L"I", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
@@ -2120,7 +2120,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				OffsetRect(&rc, 0, TextHeight);
 			}
 		}
-		
+
 		m_pSprite->End();
 		OffsetRect(&rc, 0, TextHeight); // Extra "line feed"
 	}

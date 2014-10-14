@@ -131,7 +131,7 @@ LPCTSTR GetDXVAVersion()
 
 int GetDXVAStatus()
 {
-	return g_nDXVAVersion;	
+	return g_nDXVAVersion;
 }
 
 void ClearDXVAState()
@@ -1068,8 +1068,8 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 	BOOL res;
 	DWORD flOldProtect = 0;
 
-	// unhook previous VTables 
-	
+	// unhook previous VTables
+
 	if (g_pIAMVideoAcceleratorCVtbl) {
 		res = VirtualProtect(g_pIAMVideoAcceleratorCVtbl, sizeof(IAMVideoAcceleratorCVtbl), PAGE_WRITECOPY, &flOldProtect);
 #ifdef _DEBUG

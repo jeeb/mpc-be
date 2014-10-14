@@ -40,7 +40,7 @@ private:
 
 	AVSampleFormat	m_av_sample_fmt;
 	SampleFormat	m_sample_fmt;
-	
+
 	DWORD			m_layout;
 	DWORD			m_SamplesPerSec;
 	WORD			m_Channels;

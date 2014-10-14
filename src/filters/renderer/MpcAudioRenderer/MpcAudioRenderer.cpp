@@ -214,7 +214,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		return;
 	}
 
-	m_hDataEvent				= CreateEvent(NULL, FALSE, FALSE, NULL);	
+	m_hDataEvent				= CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	m_hPauseEvent				= CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_hWaitPauseEvent			= CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -534,7 +534,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 
 				RevertMMCSS();
 				return 0;
-			case WAIT_OBJECT_0 + 1: 
+			case WAIT_OBJECT_0 + 1:
 				{
 					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderThread() - pause events"));
 
@@ -1010,7 +1010,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	int   in_channels;
 	int   in_samplerate;
 	int   in_samples;
-	
+
 	SampleFormat out_sf;
 	DWORD out_layout;
 	int   out_channels;
@@ -1198,7 +1198,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 				if (wfeOutput->wBitsPerSample == 32) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit FLOAT", GetSampleFormatString(sfmt)));
-#endif					
+#endif
 					lSize	= out_samples * out_channels * sizeof(float);
 					out_buf	= DNew BYTE[lSize];
 					convert_to_float(sfmt, out_channels, out_samples, buff, (float*)out_buf);
@@ -1286,12 +1286,12 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 
 	// Compare the exisiting WAVEFORMATEX with the one provided
 	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFileFormat) || !m_pWaveFileFormatOutput) {
-		
+
 		// Format has changed, audio client has to be reinitialized
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckAudioClient() - Format changed, reinitialize the audio client"));
 
 		CopyWaveFormat(m_pWaveFileFormat, &m_pWaveFileFormatOutput);
-		
+
 		WAVEFORMATEX *pFormat		= NULL;
 		WAVEFORMATEX* pDeviceFormat	= NULL;
 
@@ -1706,7 +1706,7 @@ HRESULT CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE
 			CoTaskMemFree(pDeviceFormat);
 		}
 	}
-	
+
 	if (!nChannels) {
 		nChannels			= pwfx->nChannels;
 		switch (nChannels) {
@@ -1764,7 +1764,7 @@ void CMpcAudioRenderer::CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSa
 	wfe.nChannels			= nChannels;
 	wfe.nSamplesPerSec		= nSamplesPerSec;
 	wfe.wBitsPerSample		= wBitsPerSample;
-					
+
 	wfe.nBlockAlign			= nChannels * wfe.wBitsPerSample / 8;
 	wfe.nAvgBytesPerSec		= nSamplesPerSec * wfe.nBlockAlign;
 
@@ -1966,7 +1966,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 			}
 		}
 	}
-				
+
 	hr = m_pRenderClient->ReleaseBuffer(numFramesAvailable, bufferFlags);
 	if (FAILED(hr)) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
@@ -2180,8 +2180,8 @@ HRESULT CMpcAudioRenderer::CreateAudioClient()
 			DWORD nSamplesPerSecValues[]	= {44100, 48000, 88200, 96000, 176400, 192000};
 			WORD nChannelsValues[]			= {2, 4, 4, 6, 6, 8, 8};
 			DWORD dwChannelMaskValues[]		= {
-				KSAUDIO_SPEAKER_STEREO, 
-				KSAUDIO_SPEAKER_QUAD, KSAUDIO_SPEAKER_SURROUND, 
+				KSAUDIO_SPEAKER_STEREO,
+				KSAUDIO_SPEAKER_QUAD, KSAUDIO_SPEAKER_SURROUND,
 				KSAUDIO_SPEAKER_5POINT1_SURROUND, KSAUDIO_SPEAKER_5POINT1,
 				KSAUDIO_SPEAKER_7POINT1_SURROUND, KSAUDIO_SPEAKER_7POINT1
 			};
@@ -2301,7 +2301,7 @@ HRESULT CMpcAudioRenderer::RevertMMCSS()
 
 	if (m_hTask != NULL && pfAvRevertMmThreadCharacteristics != NULL) {
 		if (pfAvRevertMmThreadCharacteristics(m_hTask)) {
-			return hr; 
+			return hr;
 		} else {
 			return HRESULT_FROM_WIN32(GetLastError());
 		}
@@ -2324,7 +2324,7 @@ void CMpcAudioRenderer::WasapiFlush()
 HRESULT CMpcAudioRenderer::BeginFlush()
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::BeginFlush()"));
-	
+
 	if (m_hStopWaitingRenderer) {
 		SetEvent(m_hStopWaitingRenderer);
 	}

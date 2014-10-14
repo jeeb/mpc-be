@@ -189,7 +189,7 @@ private:
 
 	PTR_AvSetMmThreadCharacteristicsW	pfAvSetMmThreadCharacteristicsW;
 	PTR_AvRevertMmThreadCharacteristics	pfAvRevertMmThreadCharacteristics;
-	
+
 	HRESULT					EnableMMCSS();
 	HRESULT					RevertMMCSS();
 
@@ -197,7 +197,7 @@ private:
 	static DWORD WINAPI		RenderThreadEntryPoint(LPVOID lpParameter);
 	DWORD					RenderThread();
 	DWORD					m_nThreadId;
- 
+
 	BOOL					m_bThreadPaused;
 
 	HRESULT					StopRendererThread();

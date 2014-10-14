@@ -51,18 +51,18 @@ public:
 	CGPUUsage();
 	~CGPUUsage();
 	HRESULT Init(CString DeviceName);
-	
+
 	const short		GetUsage();
 	const GPUType	GetType() { return m_GPUType; }
 
 private:
 	bool EnoughTimePassed();
-	
+
 	short m_nGPUUsage;
 	DWORD m_dwLastRun;
 
 	GPUType m_GPUType;
-	
+
 	volatile LONG m_lRunCount;
 
 	struct {
@@ -80,7 +80,7 @@ private:
 		int									*gpuHandles[NVAPI_MAX_PHYSICAL_GPUS];
 		unsigned int						gpuUsages[NVAPI_MAX_USAGES_PER_GPU];
 		NvAPI_GPU_GetUsages_t				NvAPI_GPU_GetUsages;
-	
+
 	} NVData;
 
 	void Clean();
