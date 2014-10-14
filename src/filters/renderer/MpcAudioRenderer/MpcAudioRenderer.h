@@ -176,7 +176,6 @@ private:
 	IAudioClient			*m_pAudioClient;
 	IAudioRenderClient		*m_pRenderClient;
 	UINT32					m_nFramesInBuffer;
-	UINT32					m_nAvailableBytes;
 	REFERENCE_TIME			m_hnsPeriod;
 	bool					m_isAudioClientStarted;
 	double					m_dVolume;
