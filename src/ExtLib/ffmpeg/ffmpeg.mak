@@ -158,7 +158,6 @@ SRCS_LC = \
 	libavcodec/dnxhd_parser.c \
 	libavcodec/dnxhddata.c \
 	libavcodec/dnxhddec.c \
-	libavcodec/dsputil_compat.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
 	libavcodec/dv_tablegen.c \
@@ -381,6 +380,11 @@ SRCS_LC = \
 	libavcodec/v210dec.c \
 	libavcodec/v410dec.c \
 	libavcodec/vc1.c \
+	libavcodec/vc1_block.c \
+	libavcodec/vc1_loopfilter.c \
+	libavcodec/vc1_mc.c \
+	libavcodec/vc1_parser.c \
+	libavcodec/vc1_pred.c \
 	libavcodec/vc1data.c \
 	libavcodec/vc1dec.c \
 	libavcodec/vc1dsp.c \
@@ -446,11 +450,10 @@ SRCS_LC = \
 	libavcodec/x86/hpeldsp_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
 	libavcodec/x86/idctdsp_init.c \
-	libavcodec/x86/idctdsp_mmx.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
 	libavcodec/x86/lossless_videodsp_init.c \
 	libavcodec/x86/me_cmp_init.c \
-	libavcodec/x86/mlpdsp.c \
+	libavcodec/x86/mlpdsp_init.c \
 	libavcodec/x86/mpegaudiodsp.c \
 	libavcodec/x86/mpegvideo.c \
 	libavcodec/x86/mpegvideodsp.c \
@@ -623,6 +626,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
 	libavcodec/x86/me_cmp.asm \
+	libavcodec/x86/mlpdsp.asm \
 	libavcodec/x86/mpegvideoencdsp.asm \
 	libavcodec/x86/pixblockdsp.asm \
 	libavcodec/x86/pngdsp.asm \
