@@ -25,36 +25,32 @@
 
 struct Version
 {
-	UINT rev;
-	CString version;
-	CString url;
+	unsigned major;
+	unsigned minor;
+	unsigned patch;
+	unsigned revision;
 };
 
 enum Update_Status
 {
-	UPDATER_ERROR = -1,
-	UPDATER_NEWER_VERSION,
-	UPDATER_UPDATE_AVAILABLE
+	UPDATER_ERROR,
+	UPDATER_NO_NEW_VERSION,
+	UPDATER_NEW_VERSION_IS_AVAILABLE,
 };
 
 class UpdateChecker
 {
-public:
-	static const Version MPC_VERSION;
+	Version m_UpdateVersion;
+	CStringA m_UpdateURL;
 
-	UpdateChecker(CString versionFileURL);
+public:
+	UpdateChecker();
 	~UpdateChecker(void);
 
-	Update_Status isUpdateAvailable(const Version& currentVersion);
 	Update_Status isUpdateAvailable();
-	const Version& getLatestVersion() const { return latestVersion; };
 
-private :
-	CString versionFileURL;
-	Version latestVersion;
-
-	bool parseVersion(const CString& versionStr);
-	int compareVersion(const Version& v1, const Version& v2) const;
+	Version GetUpdateVersion() { return m_UpdateVersion; }
+	LPCSTR GetUpdateURL() { return m_UpdateURL; }
 };
 
 class UpdateCheckerDlg : public CDialog
@@ -62,7 +58,7 @@ class UpdateCheckerDlg : public CDialog
 	DECLARE_DYNAMIC(UpdateCheckerDlg)
 
 public:
-	UpdateCheckerDlg(Update_Status updateStatus, const Version& latestVersion, CWnd* pParent = NULL);
+	UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCSTR UpdateURL, CWnd* pParent = NULL);
 	virtual ~UpdateCheckerDlg();
 
 	enum { IDD = IDD_UPDATE_DIALOG };
@@ -81,5 +77,5 @@ private:
 	CButton m_okButton;
 	CButton m_cancelButton;
 
-	CString latestURL;
+	CString m_latestURL;
 };

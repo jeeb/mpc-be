@@ -556,7 +556,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_RECENT_FILE_START, ID_RECENT_FILE_END, OnUpdateRecentFile)
 
 	ON_COMMAND(ID_HELP_HOMEPAGE, OnHelpHomepage)
-	//ON_COMMAND(ID_HELP_CHECKFORUPDATE, OnHelpCheckForUpdate)
+	ON_COMMAND(ID_HELP_CHECKFORUPDATE, OnHelpCheckForUpdate)
 	//ON_COMMAND(ID_HELP_DOCUMENTATION, OnHelpDocumentation)
 	ON_COMMAND(ID_HELP_TOOLBARIMAGES, OnHelpToolbarImages)
 	//ON_COMMAND(ID_HELP_DONATE, OnHelpDonate)
@@ -11039,8 +11039,9 @@ void CMainFrame::OnHelpHomepage()
 
 UINT CMainFrame::CheckForUpdate(LPVOID pParam)
 {
-	UpdateChecker updateChecker(_T("http://dev.mpc-next.ru/index.php?board=29.0"));
-	UpdateCheckerDlg dlg(updateChecker.isUpdateAvailable(), updateChecker.getLatestVersion());
+	UpdateChecker updateChecker;
+	Update_Status updatestatus = updateChecker.isUpdateAvailable();
+	UpdateCheckerDlg dlg(updatestatus, updateChecker.GetUpdateVersion(), updateChecker.GetUpdateURL());
 	dlg.DoModal();
 
 	return 0;
@@ -12530,7 +12531,7 @@ static UINT YoutubeThreadProc(LPVOID pParam)
 UINT CMainFrame::YoutubeThreadProc()
 {
 	AppSettings& sApp = AfxGetAppSettings();
-	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
+	HINTERNET f, s = InternetOpen(L"MPC-BE", 0, NULL, NULL, 0);
 	if (s) {
 #ifdef _DEBUG
 		CString tmp = m_YoutubeFile;
