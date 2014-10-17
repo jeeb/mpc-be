@@ -1893,7 +1893,9 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 				}
 
 				UINT32 pos = 0;
-				if (m_CurrentPacket && RefRt != INVALID_TIME && !m_CurrentPacket->bSyncPoint && m_CurrentPacket->rtStart > RefRt) {
+				if (m_CurrentPacket
+						&& !m_CurrentPacket->bSyncPoint
+						&& RefRt != INVALID_TIME && m_CurrentPacket->rtStart > RefRt) {
 					REFERENCE_TIME rtSilenceDuration = m_CurrentPacket->rtStart - RefRt;
 					UINT32 framesSilence = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
 					UINT32 silenceBytes = min(framesSilence * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes);
@@ -1912,15 +1914,32 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					m_CurrentPacket->bSyncPoint = TRUE;
 					pos += pSize;
 
+					REFERENCE_TIME rtDuration = pSize / m_pWaveFileFormatOutput->nBlockAlign * UNITS / m_pWaveFileFormatOutput->nSamplesPerSec;
+					REFERENCE_TIME rtNextSampleTime = m_CurrentPacket->rtStart + rtDuration;
+
 					if (m_CurrentPacket->IsEmpty()) {
 						m_CurrentPacket.Free();
 					} else if (m_CurrentPacket->rtStart != INVALID_TIME) {
-						REFERENCE_TIME rtDuration = pSize / m_pWaveFileFormatOutput->nBlockAlign * UNITS / m_pWaveFileFormatOutput->nSamplesPerSec;
 						m_CurrentPacket->rtStart += rtDuration;
 					}
 
 					if (pos < nAvailableBytes && m_WasapiQueue.GetCount()) {
 						m_CurrentPacket = m_WasapiQueue.Remove();
+						// Try to keep the A/V sync when data has been dropped
+						if (m_CurrentPacket->rtStart - rtNextSampleTime > 20000) { // 2 ms
+#if defined(_DEBUG) && DBGLOG_LEVEL > 1
+							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected : %u[%u], %I64d -> %I64d(%s -> %s), %I64d)",
+									pos, nAvailableBytes,
+									rtNextSampleTime, m_CurrentPacket->rtStart,
+									ReftimeToString(rtNextSampleTime), ReftimeToString(m_CurrentPacket->rtStart),
+									m_CurrentPacket->rtStart - rtNextSampleTime));
+#endif
+							REFERENCE_TIME rtSilenceDuration = m_CurrentPacket->rtStart - rtNextSampleTime;
+							UINT32 framesSilence = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
+							UINT32 silenceBytes = min(framesSilence * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes - pos);
+							memset(pData, 0, silenceBytes);
+							pos += silenceBytes;
+						}
 					}
 				}
 
