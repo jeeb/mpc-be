@@ -120,11 +120,13 @@ BOOL CPPageMisc::OnInitDialog()
 	m_nUpdaterDelay = s.nUpdaterDelay;
 	m_updaterDelaySpin.SetRange32(1, 365);
 
+#ifndef _DEBUG
 	GetDlgItem(IDC_CHECK1)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 	GetDlgItem(IDC_SPIN1)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
+#endif
 
 	UpdateData(FALSE);
 

@@ -1247,6 +1247,13 @@ BOOL CMPlayerCApp::InitInstance()
 		m_s.UIceClient.Connect(m_s.strUIceAddr);
 	}
 
+#ifdef _DEBUG
+	if (time(NULL) >= m_s.tUpdaterLastCheck + m_s.nUpdaterDelay * 24 * 3600) {
+		pFrame->OnHelpCheckForUpdate();
+		m_s.tUpdaterLastCheck = time(NULL);
+	}
+#endif
+
 	SendCommandLine(m_pMainWnd->m_hWnd);
 	RegisterHotkeys();
 
