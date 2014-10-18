@@ -39,6 +39,7 @@
 #include <atlsync.h>
 #include <atlutil.h>
 #include <atlrx.h>
+#include "UpdateChecker.h"
 
 const LanguageResource CMPlayerCApp::languageResources[] = {
 	{ID_LANGUAGE_ARMENIAN,				1067,	_T("Armenian"),					_T("hy")},
@@ -1249,8 +1250,14 @@ BOOL CMPlayerCApp::InitInstance()
 
 #ifdef _DEBUG
 	if (time(NULL) >= m_s.tUpdaterLastCheck + m_s.nUpdaterDelay * 24 * 3600) {
-		pFrame->OnHelpCheckForUpdate();
-		m_s.tUpdaterLastCheck = time(NULL);
+		// TODO: make it in new tread
+		UpdateChecker updateChecker;
+		Update_Status updatestatus = updateChecker.isUpdateAvailable();
+		if (updatestatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
+			UpdateCheckerDlg dlg(updatestatus, updateChecker.GetUpdateVersion(), updateChecker.GetUpdateURL());
+			dlg.DoModal();
+			m_s.tUpdaterLastCheck = time(NULL);
+		}
 	}
 #endif
 
