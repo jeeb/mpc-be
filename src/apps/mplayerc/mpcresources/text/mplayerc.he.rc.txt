@@ -309,16 +309,20 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"עיין..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"כלי שליטה בצבע (עבור VMR-9 ו-EVR)"
 6		"בהירות"
 7		"ניגודיות"
 8		"גוון"
 9		"הרוויה"
 18		"אפס"
-19		"ניהול הגדרות"
-20		"איפוס"
-21		"יצוא"
+19		"Update check"
+20		"Enable automatic update check"
+21		"Delay between each check:"
+24		"day(s)"
+25		"ניהול הגדרות"
+26		"איפוס"
+27		"יצוא"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

@@ -309,16 +309,20 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Procházet..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"Nastavení barev (VMR-9 a EVR)"
 6		"Jas"
 7		"Kontrast"
 8		"Odstín"
 9		"Sytost"
 18		"Výchozí"
-19		"Správa nastavení"
-20		"Obnovit výchozí"
-21		"Exportovat"
+19		"Update check"
+20		"Enable automatic update check"
+21		"Delay between each check:"
+24		"day(s)"
+25		"Správa nastavení"
+26		"Obnovit výchozí"
+27		"Exportovat"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

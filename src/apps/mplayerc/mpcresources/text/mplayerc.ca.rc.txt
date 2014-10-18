@@ -309,16 +309,20 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Explorar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 22
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"Color controls (for VMR-9 and EVR)"
 6		"Brillantor"
 7		"Contrast"
 8		"Tint"
 9		"Saturació"
 18		"Reiniciar"
-19		"Settings management"
-20		"Reset"
-21		"Export"
+19		"Update check"
+20		"Enable automatic update check"
+21		"Delay between each check:"
+24		"day(s)"
+25		"Settings management"
+26		"Reset"
+27		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

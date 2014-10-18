@@ -103,6 +103,12 @@ BOOL CPPageMisc::OnInitDialog()
 	m_iHue        ? m_sHue.Format       (_T("%+d"), m_iHue)        : m_sHue        = _T("0");
 	m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
 
+	GetDlgItem(IDC_CHECK1)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
+	GetDlgItem(IDC_SPIN1)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
+
 	UpdateData(FALSE);
 
 	return TRUE;
