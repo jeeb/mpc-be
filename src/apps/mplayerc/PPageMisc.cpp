@@ -31,6 +31,11 @@
 IMPLEMENT_DYNAMIC(CPPageMisc, CPPageBase)
 CPPageMisc::CPPageMisc()
 	: CPPageBase(CPPageMisc::IDD, CPPageMisc::IDD)
+	, m_iBrightness(0)
+	, m_iContrast(0)
+	, m_iHue(0)
+	, m_iSaturation(0)
+	, m_nUpdaterDelay(7)
 {
 }
 
@@ -50,6 +55,10 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_STATIC2, m_sContrast);
 	DDX_Text(pDX, IDC_STATIC3, m_sHue);
 	DDX_Text(pDX, IDC_STATIC4, m_sSaturation);
+	DDX_Control(pDX, IDC_CHECK1, m_updaterAutoCheckCtrl);
+	DDX_Control(pDX, IDC_EDIT1, m_updaterDelayCtrl);
+	DDX_Control(pDX, IDC_SPIN1, m_updaterDelaySpin);
+	DDX_Text(pDX, IDC_EDIT1, m_nUpdaterDelay);
 }
 
 BEGIN_MESSAGE_MAP(CPPageMisc, CPPageBase)
@@ -57,6 +66,10 @@ BEGIN_MESSAGE_MAP(CPPageMisc, CPPageBase)
 	ON_BN_CLICKED(IDC_RESET, OnBnClickedReset)
 	ON_BN_CLICKED(IDC_RESET_SETTINGS, OnResetSettings)
 	ON_BN_CLICKED(IDC_EXPORT_SETTINGS, OnExportSettings)
+	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateDelayEditBox)
+	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdateDelayEditBox)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC5, OnUpdateDelayEditBox)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC6, OnUpdateDelayEditBox)
 END_MESSAGE_MAP()
 
 // CPPageMisc message handlers
@@ -103,6 +116,10 @@ BOOL CPPageMisc::OnInitDialog()
 	m_iHue        ? m_sHue.Format       (_T("%+d"), m_iHue)        : m_sHue        = _T("0");
 	m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
 
+	m_updaterAutoCheckCtrl.SetCheck(s.bUpdaterAutoCheck);
+	m_nUpdaterDelay = s.nUpdaterDelay;
+	m_updaterDelaySpin.SetRange32(1, 365);
+
 	GetDlgItem(IDC_CHECK1)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
@@ -120,10 +137,14 @@ BOOL CPPageMisc::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.iBrightness				= m_iBrightness;
-	s.iContrast					= m_iContrast;
-	s.iHue						= m_iHue;
-	s.iSaturation				= m_iSaturation;
+	s.iBrightness		= m_iBrightness;
+	s.iContrast			= m_iContrast;
+	s.iHue				= m_iHue;
+	s.iSaturation		= m_iSaturation;
+
+	s.bUpdaterAutoCheck	= !!m_updaterAutoCheckCtrl.GetCheck();
+	m_nUpdaterDelay		= min(max(1, m_nUpdaterDelay), 365);
+	s.nUpdaterDelay		= m_nUpdaterDelay;
 
 	return __super::OnApply();
 }
@@ -185,6 +206,11 @@ void CPPageMisc::OnBnClickedReset()
 	UpdateData(FALSE);
 
 	SetModified();
+}
+
+void CPPageMisc::OnUpdateDelayEditBox(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_updaterAutoCheckCtrl.GetCheck() == BST_CHECKED);
 }
 
 void CPPageMisc::OnResetSettings()

@@ -315,5 +315,9 @@
 
 #define IDS_RS_LASTFILEINFOPAGE				_T("LastFileInfoPage")
 
+#define IDS_RS_UPDATER_AUTO_CHECK			_T("UpdaterAutoCheck")
+#define IDS_RS_UPDATER_DELAY				_T("UpdaterDelay")
+#define IDS_RS_UPDATER_LAST_CHECK			_T("UpdaterLastCheck")
+
 #define IDS_RS_CONTEXTFILES					_T("ShowContextFiles")
 #define IDS_RS_CONTEXTDIR					_T("ShowContextDir")

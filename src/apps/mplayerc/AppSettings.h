@@ -726,6 +726,9 @@ public:
 	int				iContrast;
 	int				iHue;
 	int				iSaturation;
+	bool			bUpdaterAutoCheck;
+	int				nUpdaterDelay;
+	time_t			tUpdaterLastCheck;
 
 	// MENUS
 	// View
