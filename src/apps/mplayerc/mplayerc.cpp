@@ -1249,7 +1249,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 #ifdef _DEBUG
-	if (time(NULL) >= m_s.tUpdaterLastCheck + m_s.nUpdaterDelay * 24 * 3600) {
+	if (m_s.bUpdaterAutoCheck && time(NULL) >= m_s.tUpdaterLastCheck + m_s.nUpdaterDelay * 24 * 3600) {
 		// TODO: make it in new tread
 		UpdateChecker updateChecker;
 		Update_Status updatestatus = updateChecker.isUpdateAvailable();
