@@ -104,7 +104,7 @@ UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 		dlg.DoModal();
 	}
 
-	if (updatestatus != UPDATER_ERROR) {
+	if (autocheck && updatestatus != UPDATER_ERROR) {
 		AfxGetAppSettings().tUpdaterLastCheck = time(NULL);
 	}
 
