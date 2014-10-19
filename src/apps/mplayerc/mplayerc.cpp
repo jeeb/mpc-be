@@ -1252,7 +1252,6 @@ BOOL CMPlayerCApp::InitInstance()
 		UpdateChecker updatechecker;
 		if (updatechecker.IsTimeToAutoUpdate(m_s.nUpdaterDelay, m_s.tUpdaterLastCheck)) {
 			updatechecker.CheckForUpdate(true);
-			m_s.tUpdaterLastCheck = time(NULL);
 		}
 	}
 
