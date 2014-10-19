@@ -2648,7 +2648,6 @@ BEGIN
     IDS_AG_STEP             "Step"
     IDS_MPLAYERC_16         "Framestep back"
     IDS_AG_GO_TO            "Go To"
-    IDS_AG_INCREASE_RATE    "Increase Rate"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
     IDS_AUDIO_RELEASETIME   "Release time (%d):"
@@ -2657,10 +2656,11 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_INCREASE_RATE    "Increase Rate"
     IDS_AG_DECREASE_RATE    "Decrease Rate"
     IDS_AG_RESET_RATE       "Reset Rate"
-    IDS_MPLAYERC_21         "Audio Delay +10ms"
-    IDS_MPLAYERC_22         "Audio Delay -10ms"
+    IDS_AG_AUDIODELAY_PLUS  "Audio Delay +10ms"
+    IDS_AG_AUDIODELAY_MINUS "Audio Delay -10ms"
     IDS_MPLAYERC_23         "Jump Forward (small)"
     IDS_MPLAYERC_24         "Jump Backward (small)"
     IDS_MPLAYERC_25         "Jump Forward (medium)"
@@ -2770,6 +2770,7 @@ BEGIN
     IDS_MPLAYERC_102        "Shift Subtitle Left"
     IDS_MPLAYERC_103        "Shift Subtitle Right"
     IDS_AG_DISPLAY_STATS    "Display Stats"
+    IDS_AG_AUDIODELAY_ONOFF "Audio Delay On/Off"
 END
 
 STRINGTABLE

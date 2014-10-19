@@ -176,8 +176,8 @@
 #define ID_PLAY_SEEKFORWARDMED          902
 #define ID_PLAY_SEEKBACKWARDLARGE       903
 #define ID_PLAY_SEEKFORWARDLARGE        904
-#define ID_PLAY_INCAUDDELAY             905
-#define ID_PLAY_DECAUDDELAY             906
+#define ID_PLAY_AUDIODELAY_PLUS         905
+#define ID_PLAY_AUDIODELAY_MINUS        906
 #define ID_VOLUME_UP                    907
 #define ID_VOLUME_DOWN                  908
 #define ID_VOLUME_MUTE                  909
@@ -264,6 +264,7 @@
 #define ID_COLOR_SATURATION_DEC         991
 #define ID_COLOR_RESET                  992
 #define ID_NORMALIZE                    994
+#define ID_PLAY_AUDIODELAY_ONOFF        995
 #define ID_MENU_NAVIGATE_AUDIO          1000
 #define ID_MENU_NAVIGATE_SUBTITLES      1001
 #define ID_MENU_NAVIGATE_JUMPTO         1002
@@ -935,8 +936,8 @@
 #define IDS_AG_INCREASE_RATE            32895
 #define IDS_AG_DECREASE_RATE            32896
 #define IDS_AG_RESET_RATE               32897
-#define IDS_MPLAYERC_21                 32898
-#define IDS_MPLAYERC_22                 32899
+#define IDS_AG_AUDIODELAY_PLUS          32898
+#define IDS_AG_AUDIODELAY_MINUS         32899
 #define IDS_MPLAYERC_23                 32900
 #define IDS_MPLAYERC_24                 32901
 #define IDS_MPLAYERC_25                 32902
@@ -1019,6 +1020,7 @@
 #define IDS_MPLAYERC_102                32979
 #define IDS_MPLAYERC_103                32980
 #define IDS_AG_DISPLAY_STATS            32981
+#define IDS_AG_AUDIODELAY_ONOFF         32982
 #define IDS_PPAGEWEBSERVER_0            32996
 #define IDS_AG_DEFAULT                  33000
 #define IDS_AG_DEFAULT_L                33001
