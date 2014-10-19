@@ -1249,13 +1249,10 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 #ifdef _DEBUG
-	if (m_s.bUpdaterAutoCheck && time(NULL) >= m_s.tUpdaterLastCheck + m_s.nUpdaterDelay * 24 * 3600) {
-		// TODO: make it in new tread
-		UpdateChecker updateChecker;
-		Update_Status updatestatus = updateChecker.isUpdateAvailable();
-		if (updatestatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
-			UpdateCheckerDlg dlg(updatestatus, updateChecker.GetUpdateVersion(), updateChecker.GetUpdateURL());
-			dlg.DoModal();
+	if (m_s.bUpdaterAutoCheck) {
+		UpdateChecker updatechecker;
+		if (updatechecker.IsTimeToAutoUpdate(m_s.nUpdaterDelay, m_s.tUpdaterLastCheck)) {
+			updatechecker.CheckForUpdate(true);
 			m_s.tUpdaterLastCheck = time(NULL);
 		}
 	}

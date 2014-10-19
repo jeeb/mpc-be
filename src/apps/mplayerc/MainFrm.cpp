@@ -11037,19 +11037,10 @@ void CMainFrame::OnHelpHomepage()
 	ShellExecute(m_hWnd, _T("open"), _T(MPC_VERSION_COMMENTS), NULL, NULL, SW_SHOWDEFAULT);
 }
 
-UINT CMainFrame::CheckForUpdate(LPVOID pParam)
-{
-	UpdateChecker updateChecker;
-	Update_Status updatestatus = updateChecker.isUpdateAvailable();
-	UpdateCheckerDlg dlg(updatestatus, updateChecker.GetUpdateVersion(), updateChecker.GetUpdateURL());
-	dlg.DoModal();
-
-	return 0;
-}
-
 void CMainFrame::OnHelpCheckForUpdate()
 {
-	AfxBeginThread(CheckForUpdate, NULL);
+	UpdateChecker updatechecker;
+	updatechecker.CheckForUpdate();
 }
 
 /*

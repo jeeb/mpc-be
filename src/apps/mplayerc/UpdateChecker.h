@@ -40,17 +40,22 @@ enum Update_Status
 
 class UpdateChecker
 {
-	Version m_UpdateVersion;
-	CStringA m_UpdateURL;
+	static bool bUpdating;
+	static CCritSec csUpdating;
+
+	static Version m_UpdateVersion;
+	static CStringA m_UpdateURL;
 
 public:
 	UpdateChecker();
 	~UpdateChecker(void);
 
-	Update_Status isUpdateAvailable();
+	static bool IsTimeToAutoUpdate(int delay, time_t lastcheck);
+	static void CheckForUpdate(bool autocheck = false);
 
-	Version GetUpdateVersion() { return m_UpdateVersion; }
-	LPCSTR GetUpdateURL() { return m_UpdateURL; }
+private:
+	static Update_Status CheckNewVersion();
+	friend static UINT RunCheckForUpdateThread(LPVOID pParam);
 };
 
 class UpdateCheckerDlg : public CDialog

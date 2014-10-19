@@ -19,19 +19,40 @@
  */
 
 #include "stdafx.h"
+#include <afxinet.h>
 #include "UpdateChecker.h"
-#include "PlayerYouTube.h"
+
+// UpdateChecker
+
+bool UpdateChecker::bUpdating = false;
+CCritSec UpdateChecker::csUpdating;
+Version UpdateChecker::m_UpdateVersion = { 0, 0, 0, 0 };
+CStringA UpdateChecker::m_UpdateURL;
 
 UpdateChecker::UpdateChecker()
 {
-	m_UpdateVersion = { 0, 0, 0, 0 };
 }
 
 UpdateChecker::~UpdateChecker(void)
 {
 }
 
-Update_Status UpdateChecker::isUpdateAvailable()
+bool UpdateChecker::IsTimeToAutoUpdate(int delay, time_t lastcheck)
+{
+	return (time(NULL) >= lastcheck + delay * 24 * 3600);
+}
+
+void UpdateChecker::CheckForUpdate(bool autocheck)
+{
+	CAutoLock lock(&csUpdating);
+
+	if (!bUpdating) {
+		bUpdating = true;
+		AfxBeginThread(RunCheckForUpdateThread, (LPVOID)autocheck);
+	}
+}
+
+Update_Status UpdateChecker::CheckNewVersion()
 {
 	m_UpdateURL.Empty();
 	m_UpdateVersion = { 0, 0, 0, 0 };
@@ -71,6 +92,28 @@ Update_Status UpdateChecker::isUpdateAvailable()
 
 	return updatestatus;
 }
+
+static UINT RunCheckForUpdateThread(LPVOID pParam)
+{
+	bool autocheck = !!pParam;
+	Update_Status updatestatus = UpdateChecker::CheckNewVersion();
+
+
+	if (!autocheck || updatestatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
+		UpdateCheckerDlg dlg(updatestatus, UpdateChecker::m_UpdateVersion, UpdateChecker::m_UpdateURL);
+		dlg.DoModal();
+	}
+
+	//if (updatestatus != UPDATER_ERROR) {
+	//
+	//}
+
+	UpdateChecker::bUpdating = false;
+
+	return 0;
+}
+
+// UpdateCheckerDlg
 
 IMPLEMENT_DYNAMIC(UpdateCheckerDlg, CDialog)
 

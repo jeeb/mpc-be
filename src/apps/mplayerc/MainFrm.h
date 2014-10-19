@@ -1013,7 +1013,6 @@ public:
 	afx_msg void OnUpdateRecentFile(CCmdUI* pCmdUI);
 
 	afx_msg void OnHelpHomepage();
-	static UINT CheckForUpdate(LPVOID pParam);
 	afx_msg void OnHelpCheckForUpdate();
 	//afx_msg void OnHelpDocumentation();
 	afx_msg void OnHelpToolbarImages();
