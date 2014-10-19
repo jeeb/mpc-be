@@ -1248,7 +1248,6 @@ BOOL CMPlayerCApp::InitInstance()
 		m_s.UIceClient.Connect(m_s.strUIceAddr);
 	}
 
-#ifdef _DEBUG
 	if (m_s.bUpdaterAutoCheck) {
 		UpdateChecker updatechecker;
 		if (updatechecker.IsTimeToAutoUpdate(m_s.nUpdaterDelay, m_s.tUpdaterLastCheck)) {
@@ -1256,7 +1255,6 @@ BOOL CMPlayerCApp::InitInstance()
 			m_s.tUpdaterLastCheck = time(NULL);
 		}
 	}
-#endif
 
 	SendCommandLine(m_pMainWnd->m_hWnd);
 	RegisterHotkeys();

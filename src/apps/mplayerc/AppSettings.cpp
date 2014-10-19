@@ -843,9 +843,9 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, nLastFileInfoPage);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_UPDATER_DELAY, nUpdaterDelay);
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE)&tUpdaterLastCheck, sizeof(time_t));
+	pApp->WriteProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
+	pApp->WriteProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay);
+	pApp->WriteProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE)&tUpdaterLastCheck, sizeof(time_t));
 
 	if (pApp->m_pszRegistryKey) {
 		// WINBUG: on win2k this would crash WritePrivateProfileString
@@ -1499,10 +1499,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
 
-	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_UPDATER_AUTO_CHECK, 0);
-	nUpdaterDelay			= min(max(1, pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_UPDATER_DELAY, 7)), 365);
+	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
+	nUpdaterDelay			= min(max(1, pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7)), 365);
 	UINT nRead;
-	if (!AfxGetApp()->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE*)&tUpdaterLastCheck, &nRead) || nRead != sizeof(time_t)) {
+	if (!AfxGetApp()->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE*)&tUpdaterLastCheck, &nRead) || nRead != sizeof(time_t)) {
 		tUpdaterLastCheck = 0;
 	}
 

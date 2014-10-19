@@ -315,6 +315,7 @@
 
 #define IDS_RS_LASTFILEINFOPAGE				_T("LastFileInfoPage")
 
+#define IDS_R_UPDATER						IDS_R_SETTINGS _T("\\Updater")
 #define IDS_RS_UPDATER_AUTO_CHECK			_T("UpdaterAutoCheck")
 #define IDS_RS_UPDATER_DELAY				_T("UpdaterDelay")
 #define IDS_RS_UPDATER_LAST_CHECK			_T("UpdaterLastCheck")
