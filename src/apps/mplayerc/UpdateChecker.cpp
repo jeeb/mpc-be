@@ -93,14 +93,14 @@ Update_Status UpdateChecker::CheckNewVersion()
 	return updatestatus;
 }
 
-static UINT RunCheckForUpdateThread(LPVOID pParam)
+UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 {
 	bool autocheck = !!pParam;
-	Update_Status updatestatus = UpdateChecker::CheckNewVersion();
+	Update_Status updatestatus = CheckNewVersion();
 
 
 	if (!autocheck || updatestatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
-		UpdateCheckerDlg dlg(updatestatus, UpdateChecker::m_UpdateVersion, UpdateChecker::m_UpdateURL);
+		UpdateCheckerDlg dlg(updatestatus, m_UpdateVersion, m_UpdateURL);
 		dlg.DoModal();
 	}
 
@@ -108,7 +108,7 @@ static UINT RunCheckForUpdateThread(LPVOID pParam)
 	//
 	//}
 
-	UpdateChecker::bUpdating = false;
+	bUpdating = false;
 
 	return 0;
 }

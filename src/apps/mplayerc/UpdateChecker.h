@@ -55,7 +55,7 @@ public:
 
 private:
 	static Update_Status CheckNewVersion();
-	friend static UINT RunCheckForUpdateThread(LPVOID pParam);
+	static UINT RunCheckForUpdateThread(LPVOID pParam);
 };
 
 class UpdateCheckerDlg : public CDialog
