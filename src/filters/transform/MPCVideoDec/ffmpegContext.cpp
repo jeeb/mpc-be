@@ -40,7 +40,7 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/337.25/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/343.22/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
@@ -63,6 +63,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FEA, // GeForce GT 755M
 	0x0FEF, // GRID K340
 	0x0FF2, // GRID K1
+	0x0FF3, // Quadro K420
 	0x0FF6, // Quadro K1100M
 	0x0FF8, // Quadro K500M
 	0x0FF9, // Quadro K2000D
@@ -88,6 +89,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1028, // Tesla K20m
 	0x1029, // Tesla K40s
 	0x103A, // Quadro K6000
+	0x103C, // Quadro K5200
 	0x1040, // GeForce GT 520 (GF119) (not officially supported or typo, 4k tested)
 	0x1042, // GeForce 510
 	0x1048, // GeForce 605
@@ -127,6 +129,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x11A2, // GeForce GTX 675MX
 	0x11A3, // GeForce GTX 680MX
 	0x11A7, // GeForce GTX 675MX
+	0x11B4, // Quadro K4200
 	0x11B6, // Quadro K3100M
 	0x11B7, // Quadro K4100M
 	0x11B8, // Quadro K5100M
@@ -169,6 +172,8 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1390, // GeForce 845M
 	0x1391, // GeForce GTX 850M
 	0x1392, // GeForce GTX 860M
+	0x13BA, // Quadro K2200
+	0x13BB, // Quadro K620
 };
 
 static const WORD PCID_ATI_UVD [] = {
