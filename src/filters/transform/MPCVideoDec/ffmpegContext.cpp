@@ -220,6 +220,7 @@ static const WORD PCID_INTEL_4K [] = {
 	0x0A2E, // Intel Iris Graphics 5100
 	0x0D22, // Intel Iris Graphics 5200
 	0x0D26, // Intel Iris Graphics 5200
+	0x161E, // Intel HD Graphics 5300
 };
 
 static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
