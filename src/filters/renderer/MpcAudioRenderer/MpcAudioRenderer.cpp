@@ -527,7 +527,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 		// 1) Waiting for the next WASAPI buffer to be available to be filled
 		// 2) Exit requested for the thread
 		// 3) For a pause request
-		DWORD result = WaitForMultipleObjects(_countof(renderHandles), renderHandles, FALSE, INFINITE);
+		DWORD result = WaitForMultipleObjects(3, renderHandles, FALSE, INFINITE);
 		switch (result) {
 			case WAIT_OBJECT_0:
 				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderThread() - exit events"));
@@ -542,7 +542,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 					ResetEvent(m_hResumeEvent);
 					SetEvent(m_hWaitPauseEvent);
 
-					DWORD resultResume = WaitForMultipleObjects(_countof(resumeHandles), resumeHandles, FALSE, INFINITE);
+					DWORD resultResume = WaitForMultipleObjects(2, resumeHandles, FALSE, INFINITE);
 					if (resultResume == WAIT_OBJECT_0) { // exit event
 						DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderThread() - exit events"));
 
@@ -977,6 +977,10 @@ static const TCHAR *GetSampleFormatString(const SampleFormat value)
 
 HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 1
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::DoRenderSampleWasapi()"));
+#endif
+
 	if (m_filterState == State_Stopped) {
 		return S_FALSE;
 	}
@@ -989,21 +993,20 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		m_hStopWaitingRenderer
 	};
 
-	DWORD result = WaitForMultipleObjects(_countof(handles), handles, FALSE, INFINITE);
+	DWORD result = WaitForMultipleObjects(3, handles, FALSE, INFINITE);
 	if (result == WAIT_OBJECT_0) {
 		// m_hStopRenderThreadEvent
 		return S_FALSE;
 	}
 
-#if defined(_DEBUG) && DBGLOG_LEVEL > 1
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::DoRenderSampleWasapi()"));
-#endif
+	long lSize = pMediaSample->GetActualDataLength();
+	if (!lSize) {
+		return S_FALSE;
+	}
 
 	HRESULT	hr					= S_OK;
 	BYTE *pMediaBuffer			= NULL;
 	BYTE *pInputBufferPointer	= NULL;
-
-	long lSize					= pMediaSample->GetActualDataLength();
 
 	SampleFormat in_sf;
 	DWORD in_layout;
