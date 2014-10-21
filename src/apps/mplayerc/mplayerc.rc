@@ -2346,17 +2346,29 @@ END
 
 STRINGTABLE
 BEGIN
-    IDD_PPAGEPLAYBACK       "Playback"
     IDD_PPAGEPLAYER         "Player"
-    IDD_PPAGEDVD            "Playback::DVD/OGM"
-    IDD_PPAGESUBTITLES      "Subtitles"
     IDD_PPAGEFORMATS        "Player::Formats"
-    IDD_PPAGETWEAKS         "Tweaks"
-    IDD_PPAGEINTERFACE      "Interface"
-    IDD_PPAGEAUDIO          "Playback::Audio"
+    IDD_PPAGEACCELTBL       "Player::Keys"
+    IDD_PPAGELOGO           "Player::Logo"
+    IDD_PPAGEINTERFACE      "Player::Interface"
+    IDD_PPAGEWEBSERVER      "Player::Web Interface"
+    IDD_PPAGEPLAYBACK       "Playback"
+    IDD_PPAGEDVD            "Playback::DVD/OGM"
+    IDD_PPAGECAPTURE        "Playback::Capture"
+    IDD_PPAGEYOUTUBE        "Playback::YouTube"
+    IDD_PPAGEVIDEO          "Video"
+    IDD_PPAGESYNC           "Video::EVR Sync Settings"
+    IDD_PPAGEFULLSCREEN     "Video::Fullscreen"
+    IDD_PPAGEAUDIO          "Audio"
+    IDD_PPAGESUBTITLES      "Subtitles"
+    IDD_PPAGESUBRENDERING   "Subtitles::Rendering"
+    IDD_PPAGESUBSTYLE       "Subtitles::Default Style"
+    IDD_PPAGEINTERNALFILTERS "Internal Filters"
     IDD_PPAGEFILTERSPERFORMANCE "Internal Filters::Performance"
-    IDD_PPAGEFILTERSPRIORITY "External Filters::Priority"
     IDD_PPAGEEXTERNALFILTERS "External Filters"
+    IDD_PPAGEFILTERSPRIORITY "External Filters::Priority"
+    IDD_PPAGETWEAKS         "Tweaks"
+    IDD_PPAGEMISC           "Miscellaneous"
 END
 
 STRINGTABLE
@@ -2366,27 +2378,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDD_PPAGEACCELTBL       "Player::Keys"
-    IDD_PPAGESUBSTYLE       "Subtitles::Default Style"
-    IDD_PPAGEINTERNALFILTERS "Internal Filters"
-    IDD_PPAGELOGO           "Player::Logo"
-    IDD_PPAGEVIDEO         "Playback::Video"
-    IDD_PPAGEYOUTUBE        "Playback::YouTube"
-    IDD_PPAGEWEBSERVER      "Player::Web Interface"
-END
-
-STRINGTABLE
-BEGIN
     IDD_FILEPROPRES         "Resources"
-    IDD_PPAGEMISC           "Miscellaneous"
     IDD_FILEMEDIAINFO       "MediaInfo"
-    IDD_PPAGECAPTURE        "Playback::Capture"
-    IDD_PPAGESYNC           "Playback::EVR Sync Settings"
-    IDD_PPAGEFULLSCREEN     "Playback::Fullscreen"
-END
-
-STRINGTABLE
-BEGIN
     IDD_FILEPROPDETAILS     "Details"
     IDD_FILEPROPCLIP        "Clip"
 END
@@ -3166,7 +3159,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_RESET_STATS      "EVR Sync reset stats"
-    IDD_PPAGESUBRENDERING   "Subtitles::Rendering"
     IDS_VIEW_BORDERLESS     "Hide borders\tCtrl+0"
     IDS_VIEW_FRAMEONLY      "Frame Only\tCtrl+0"
     IDS_VIEW_CAPTIONMENU    "Show Caption&&Menu\tCtrl+0"
