@@ -109,10 +109,12 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 		MARKER;
 		BitRead(5); // reserved
 		UINT64 stuffing = BitRead(3);
+		Skip(stuffing);
+		/*
 		while (stuffing-- > 0) {
-			//EXECUTE_ASSERT(BitRead(8) == 0xff);
-			BitRead(8);
+			EXECUTE_ASSERT(BitRead(8) == 0xff);
 		}
+		*/
 	} else {
 		return false;
 	}
@@ -209,9 +211,8 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 		h.hdrlen = (BYTE)BitRead(8);
 	} else {
 		if (h.len) {
-			while (h.len-- > 0) {
-				BitRead(8);
-			}
+			Skip(h.len);
+			h.len = 0;
 		}
 		goto error;
 	}
@@ -284,9 +285,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 				TRACE(_T("peshdr read - pes_ext %X is invalid\n"), pes_ext);
 				pes_ext = skip = 0;
 			}
-			for (int i = 0; i < skip; i++) {
-				BitRead(8);
-			}
+			Skip(skip);
 			left -= skip;
 			if (pes_ext & 0x01) { /* PES extension 2 */
 				BYTE ext2_len = (BYTE)BitRead(8);
@@ -300,9 +299,8 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 				}
 			}
 		}
-		while (left-- > 0) {
-			BitRead(8);
-		}
+
+		Skip(left);
 	}
 
 	return true;

@@ -644,7 +644,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 	HRESULT hr;
 	BYTE b;
 
-	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps || m_pFile->m_type == MPEG_TYPES::mpeg_es) {
+	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps) {
 		if (!m_pFile->NextMpegStartCode(b)) {
 			return S_FALSE;
 		}

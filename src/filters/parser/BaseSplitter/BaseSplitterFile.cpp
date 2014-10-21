@@ -214,6 +214,14 @@ void CBaseSplitterFile::Seek(__int64 pos)
 	BitFlush();
 }
 
+void CBaseSplitterFile::Skip(__int64 offset)
+{
+	ASSERT(offset >= 0);
+	if (offset) {
+		Seek(GetPos() + offset);
+	}
+}
+
 HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 {
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);

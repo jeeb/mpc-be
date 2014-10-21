@@ -66,6 +66,7 @@ public:
 		return max(0, (fAvail ? GetAvailable() : GetLength()) - GetPos());
 	}
 	virtual void Seek(__int64 pos);
+	void Skip(__int64 offset);
 
 	UINT64 UExpGolombRead();
 	INT64 SExpGolombRead();

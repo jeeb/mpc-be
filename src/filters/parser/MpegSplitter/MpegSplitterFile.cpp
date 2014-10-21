@@ -66,33 +66,20 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	WaitAvailable(3000, MEGABYTE);
 
-	m_type = MPEG_TYPES::mpeg_invalid;
-
 	Seek(0);
-	if (m_type == MPEG_TYPES::mpeg_invalid) {
-		if (BitRead(32, true) == 'TFrc') {
-			Seek(0x67c);
-		}
-		int cnt = 0, limit = 4;
-		for (trhdr h; cnt < limit && (Read(h) != -1); cnt++) {
-			Seek(h.next);
-		}
-		if (cnt >= limit) {
-			m_type = MPEG_TYPES::mpeg_ts;
-		}
-	}
+	{
+		byte b = 0;
+		while (GetPos() < (65 * KILOBYTE) && (b = BitRead(8)) != 0x47);
 
-	Seek(0);
-	if (m_type == MPEG_TYPES::mpeg_invalid) {
-		if (BitRead(32, true) == 'TFrc') {
-			Seek(0xE80);
-		}
-		int cnt = 0, limit = 4;
-		for (trhdr h; cnt < limit && (Read(h) != -1); cnt++) {
-			Seek(h.next);
-		}
-		if (cnt >= limit) {
-			m_type = MPEG_TYPES::mpeg_ts;
+		if (b == 0x47) {
+			Seek(GetPos() - 1);
+			int cnt = 0, limit = 4;
+			for (trhdr h; cnt < limit && (Read(h) != -1); cnt++) {
+				Seek(h.next);
+			}
+			if (cnt >= limit) {
+				m_type = MPEG_TYPES::mpeg_ts;
+			}
 		}
 	}
 
@@ -109,24 +96,29 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	Seek(0);
 	if (m_type == MPEG_TYPES::mpeg_invalid) {
+		int cnt = 0, limit = 4;
+
 		BYTE b;
-		for (int i = 0; (i < 4 || GetPos() < (MEGABYTE / 2)) && m_type == MPEG_TYPES::mpeg_invalid && NextMpegStartCode(b); i++) {
+		while (cnt < limit && GetPos() < (MEGABYTE / 2) && NextMpegStartCode(b)) {
 			if (b == 0xba) {
 				pshdr h;
 				if (Read(h)) {
-					m_type = MPEG_TYPES::mpeg_ps;
+					cnt++;
 					m_rate = int(h.bitrate/8);
-					break;
 				}
-			} else if ((b&0xe0) == 0xc0 // audio, 110xxxxx, mpeg1/2/3
-					   || (b&0xf0) == 0xe0 // video, 1110xxxx, mpeg1/2
-					   // || (b&0xbd) == 0xbd) // private stream 1, 0xbd, ac3/dts/lpcm/subpic
+			} else if ((b & 0xe0) == 0xc0 // audio, 110xxxxx, mpeg1/2/3
+					   || (b & 0xf0) == 0xe0 // video, 1110xxxx, mpeg1/2
+					   //|| (b & 0xbd) == 0xbd // private stream 1, 0xbd, ac3/dts/lpcm/subpic
 					   || b == 0xbd) { // private stream 1, 0xbd, ac3/dts/lpcm/subpic
 				peshdr h;
 				if (Read(h, b) && BitRead(24, true) == 0x000001) {
-					m_type = MPEG_TYPES::mpeg_es;
+					cnt++;
 				}
 			}
+		}
+
+		if (cnt >= limit) {
+			m_type = MPEG_TYPES::mpeg_ps;
 		}
 	}
 
@@ -274,7 +266,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly/* =
 	BYTE b;
 
 	while (GetRemaining()) {
-		if (m_type == MPEG_TYPES::mpeg_ps || m_type == MPEG_TYPES::mpeg_es) {
+		if (m_type == MPEG_TYPES::mpeg_ps) {
 			if (!NextMpegStartCode(b)) {
 				ASSERT(0);
 				break;
@@ -400,7 +392,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 	while (GetPos() < stop) {
 		BYTE b;
 
-		if (m_type == MPEG_TYPES::mpeg_ps || m_type == MPEG_TYPES::mpeg_es) {
+		if (m_type == MPEG_TYPES::mpeg_ps) {
 			if (!NextMpegStartCode(b)) {
 				continue;
 			}
@@ -1391,7 +1383,7 @@ void CMpegSplitterFile::UpdatePSM()
 	BitRead(8);
 	BitRead(8);
 	WORD ps_info_length	= (WORD)BitRead(16);
-	Seek(GetPos() + ps_info_length);
+	Skip(ps_info_length);
 
 	WORD es_map_length	= (WORD)BitRead(16);
 	if (es_map_length <= _countof(m_psm) * 4) {
@@ -1403,9 +1395,8 @@ void CMpegSplitterFile::UpdatePSM()
 			m_psm[es_id]		= (PES_STREAM_TYPE)type;
 
 			es_map_length		-= 4 + es_info_length;
-			if (es_info_length) {
-				Seek(GetPos() + es_info_length);
-			}
+
+			Skip(es_info_length);
 		}
 
 		BitRead(32);

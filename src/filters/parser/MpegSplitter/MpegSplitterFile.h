@@ -31,6 +31,13 @@
 
 #define ISVALIDPID(pid)		(pid >= 0x10 && pid < 0x1fff)
 
+enum MPEG_TYPES {
+	mpeg_invalid,
+	mpeg_ps,
+	mpeg_ts,
+	mpeg_pva
+};
+
 class CMpegSplitterFile : public CBaseSplitterFileEx
 {
 	CAtlMap<WORD, BYTE> m_pid2pes;
