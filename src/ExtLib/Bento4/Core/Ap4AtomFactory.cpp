@@ -79,6 +79,7 @@
 #include "Ap4PaspAtom.h"
 #include "Ap4ChapAtom.h"
 #include "Ap4ElstAtom.h"
+#include "Ap4Utils.h"
 /*----------------------------------------------------------------------
 |       class variables
 +---------------------------------------------------------------------*/
@@ -649,8 +650,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
     }
 
     // skip to the end of the atom
+    AP4_Size streamSize = 0;
+    stream.GetSize(streamSize);
     bytes_available -= size;
-    result = stream.Seek(start+size);
+    result = stream.Seek(MIN(start + size, streamSize));
     if (AP4_FAILED(result)) {
         delete atom;
         atom = NULL;
