@@ -55,10 +55,10 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_STATIC2, m_sContrast);
 	DDX_Text(pDX, IDC_STATIC3, m_sHue);
 	DDX_Text(pDX, IDC_STATIC4, m_sSaturation);
-	DDX_Control(pDX, IDC_CHECK1, m_updaterAutoCheckCtrl);
-	DDX_Control(pDX, IDC_EDIT1, m_updaterDelayCtrl);
+	DDX_Control(pDX, IDC_CHECK3, m_updaterAutoCheckCtrl);
+	DDX_Control(pDX, IDC_EDIT4, m_updaterDelayCtrl);
 	DDX_Control(pDX, IDC_SPIN1, m_updaterDelaySpin);
-	DDX_Text(pDX, IDC_EDIT1, m_nUpdaterDelay);
+	DDX_Text(pDX, IDC_EDIT4, m_nUpdaterDelay);
 }
 
 BEGIN_MESSAGE_MAP(CPPageMisc, CPPageBase)
@@ -66,7 +66,7 @@ BEGIN_MESSAGE_MAP(CPPageMisc, CPPageBase)
 	ON_BN_CLICKED(IDC_RESET, OnBnClickedReset)
 	ON_BN_CLICKED(IDC_RESET_SETTINGS, OnResetSettings)
 	ON_BN_CLICKED(IDC_EXPORT_SETTINGS, OnExportSettings)
-	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateDelayEditBox)
+	ON_UPDATE_COMMAND_UI(IDC_EDIT4, OnUpdateDelayEditBox)
 	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdateDelayEditBox)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC5, OnUpdateDelayEditBox)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC6, OnUpdateDelayEditBox)
