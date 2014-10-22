@@ -2332,7 +2332,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	pFGF = DNew CFGFilterInternal<CRealVideoDecoder>(
 				(video[VDEC_REAL] || IsPreview) ? RMVideoDecoderName : LowMerit(RMVideoDecoderName),
-				(video[VDEC_REAL] || IsPreview) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+				(video[VDEC_REAL] || IsPreview) ? MERIT64_ABOVE_DSHOW + 1: MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV10);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV20);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RV30);
