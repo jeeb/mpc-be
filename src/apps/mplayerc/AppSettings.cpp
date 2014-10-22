@@ -1501,9 +1501,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
 	nUpdaterDelay			= min(max(1, pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7)), 365);
-	UINT nRead;
-	if (!AfxGetApp()->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE*)&tUpdaterLastCheck, &nRead) || nRead != sizeof(time_t)) {
-		tUpdaterLastCheck = 0;
+	
+	tUpdaterLastCheck		= time(NULL);
+	if (pApp->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, &ptr, &len)) {
+		if (len == sizeof(time_t)) {
+			memcpy(&tUpdaterLastCheck, ptr, sizeof(time_t));
+		}
+		delete [] ptr;
 	}
 
 	if (fLaunchfullscreen && !IsD3DFullscreen()) {

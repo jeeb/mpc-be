@@ -1249,9 +1249,8 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	if (m_s.bUpdaterAutoCheck) {
-		UpdateChecker updatechecker;
-		if (updatechecker.IsTimeToAutoUpdate(m_s.nUpdaterDelay, m_s.tUpdaterLastCheck)) {
-			updatechecker.CheckForUpdate(true);
+		if (UpdateChecker::IsTimeToAutoUpdate(m_s.nUpdaterDelay, m_s.tUpdaterLastCheck)) {
+			UpdateChecker::CheckForUpdate(true);
 		}
 	}
 
