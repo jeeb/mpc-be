@@ -427,7 +427,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		} else if (iDX9Resizer == 2) {
 			hr = TextureResizeBilinear(pVideoTexture, dst, srcRect);
 		} else if (iDX9Resizer >= 3) {
-			hr = TextureResizeBicubic1pass(pVideoTexture, dst, srcRect);
+			hr = TextureResizeBicubic(pVideoTexture, dst, srcRect);
 		}
 	} else {
 		hr = TextureResize(pVideoTexture, dst, D3DTEXF_POINT, srcRect);
@@ -646,7 +646,7 @@ HRESULT CDX9RenderingEngine::InitResizers(float bicubicA)
 	A.Format("(%f)", bicubicA);
 	str.Replace("_The_Value_Of_A_Is_Set_Here_", A);
 
-	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic1pass", "main_bicubic2pass_pass1", "main_bicubic2pass_pass2"};
+	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic", "main_bicubic2pass_pass1", "main_bicubic2pass_pass2"};
 
 	ASSERT(_countof(pEntries) == _countof(m_pResizerPixelShaders));
 
@@ -753,7 +753,7 @@ HRESULT CDX9RenderingEngine::TextureResizeBilinear(IDirect3DTexture9* pTexture, 
 	return hr;
 }
 
-HRESULT CDX9RenderingEngine::TextureResizeBicubic1pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect)
+HRESULT CDX9RenderingEngine::TextureResizeBicubic(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect)
 {
 	HRESULT hr;
 
@@ -799,7 +799,7 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 	// rotated?
 	if (dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
 	|| dst[0].y != dst[1].y || dst[0].x != dst[2].x || dst[2].y != dst[3].y || dst[1].x != dst[3].x)
-	    return TextureResizeBicubic1pass(pTexture, dst, srcRect);
+		return TextureResizeBicubic(pTexture, dst, srcRect);
 
 	D3DSURFACE_DESC desc;
 	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc)))
@@ -821,7 +821,7 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 	CRect dst1(0, 0, (int)(dst[3].x - dst[0].x), (int)h);
 
 	if (!m_pTemporaryScreenSpaceTextures[0] || FAILED(m_pTemporaryScreenSpaceTextures[0]->GetLevelDesc(0, &desc)))
-	    return TextureResizeBicubic1pass(pTexture, dst, srcRect);
+		return TextureResizeBicubic(pTexture, dst, srcRect);
 
 	float Tex1_Width = desc.Width;
 	float Tex1_Height = desc.Height;
@@ -855,7 +855,7 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 
 	if (dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height)
 	    // if (dst1.Width() != desc.Width || dst1.Height() != desc.Height)
-	    return TextureResizeBicubic1pass(pTexture, dst, srcRect);
+	    return TextureResizeBicubic(pTexture, dst, srcRect);
 
 	MYD3DVERTEX<1> vx[] =
 	{

@@ -1106,7 +1106,7 @@ HRESULT CBaseAP::InitResizers(float bicubicA, bool bNeedScreenSizeTexture)
 	A.Format("(%f)", bicubicA);
 	str.Replace("_The_Value_Of_A_Is_Set_Here_", A);
 
-	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic1pass", "main_bicubic2pass_pass1", "main_bicubic2pass_pass2"};
+	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic", "main_bicubic2pass_pass1", "main_bicubic2pass_pass2"};
 
 	ASSERT(_countof(pEntries) == _countof(m_pResizerPixelShader));
 	for (int i = 0; i < _countof(pEntries); i++) {
@@ -1239,7 +1239,7 @@ HRESULT CBaseAP::TextureResizeBilinear(IDirect3DTexture9* pTexture, Vector dst[4
 	return hr;
 }
 
-HRESULT CBaseAP::TextureResizeBicubic1pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect)
+HRESULT CBaseAP::TextureResizeBicubic(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect)
 {
 	HRESULT hr;
 
@@ -1275,14 +1275,14 @@ HRESULT CBaseAP::TextureResizeBicubic1pass(IDirect3DTexture9* pTexture, Vector d
 HRESULT CBaseAP::TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect)
 {
 	// The 2 pass sampler is incorrect in that it only does bilinear resampling in the y direction.
-	return TextureResizeBicubic1pass(pTexture, dst, SrcRect);
+	return TextureResizeBicubic(pTexture, dst, SrcRect);
 
 	/*HRESULT hr;
 
 	// rotated?
 	if (dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
 	|| dst[0].y != dst[1].y || dst[0].x != dst[2].x || dst[2].y != dst[3].y || dst[1].x != dst[3].x)
-	    return TextureResizeBicubic1pass(pTexture, dst, SrcRect);
+	    return TextureResizeBicubic(pTexture, dst, SrcRect);
 
 	D3DSURFACE_DESC desc;
 	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc)))
@@ -1299,7 +1299,7 @@ HRESULT CBaseAP::TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector d
 	CRect dst1(0, 0, (int)(dst[3].x - dst[0].x), (int)h);
 
 	if (!m_pScreenSizeTemporaryTexture[0] || FAILED(m_pScreenSizeTemporaryTexture[0]->GetLevelDesc(0, &desc)))
-	    return TextureResizeBicubic1pass(pTexture, dst, SrcRect);
+	    return TextureResizeBicubic(pTexture, dst, SrcRect);
 
 	float Tex1_Width = desc.Width;
 	float Tex1_Height = desc.Height;
@@ -1315,7 +1315,7 @@ HRESULT CBaseAP::TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector d
 	float ty1_2 = h;
 
 	if (dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height)
-	    return TextureResizeBicubic1pass(pTexture, dst, SrcRect);
+	    return TextureResizeBicubic(pTexture, dst, SrcRect);
 
 	MYD3DVERTEX<1> vx[] =
 	{

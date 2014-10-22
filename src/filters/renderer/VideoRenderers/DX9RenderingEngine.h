@@ -165,7 +165,7 @@ namespace DSObjects
 		HRESULT InitResizers(float bicubicA);
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], D3DTEXTUREFILTERTYPE filter, const CRect &srcRect);
 		HRESULT TextureResizeBilinear(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
-		HRESULT TextureResizeBicubic1pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
+		HRESULT TextureResizeBicubic(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
 		//HRESULT TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
 
 		// Final pass

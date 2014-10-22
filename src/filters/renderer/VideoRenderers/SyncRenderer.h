@@ -189,7 +189,7 @@ namespace GothSync
 		HRESULT TextureCopy(IDirect3DTexture9* pTexture);
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], D3DTEXTUREFILTERTYPE filter, const CRect &SrcRect);
 		HRESULT TextureResizeBilinear(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect);
-		HRESULT TextureResizeBicubic1pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect);
+		HRESULT TextureResizeBicubic(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect);
 		HRESULT TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect);
 
 		typedef HRESULT (WINAPI * D3DXLoadSurfaceFromMemoryPtr)(
