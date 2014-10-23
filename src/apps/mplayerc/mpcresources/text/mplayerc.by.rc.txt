@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Лічбавая"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Кіраванне колерам (для VMR-9 і EVR)"
+6		"Яркасць"
+7		"Кантраст"
+8		"Адценне"
+9		"Насычанасць"
+18		"Скід"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Размяшчэнне DVD-дыскавода або тэчкі ""VIDEO_TS"""
 6		"Стандартна"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Абраць..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Кіраванне колерам (для VMR-9 і EVR)"
-6		"Яркасць"
-7		"Кантраст"
-8		"Адценне"
-9		"Насычанасць"
-18		"Скід"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Settings management"
-26		"Скід"
-27		"Экспарт"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Default"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Settings management"
+24		"Скід"
+25		"Экспарт"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"мс"
 23		"Перадаць на бліжэйшы vsync"
 24		"Змены ўступяць у моц пасля перазагрузкі відэа."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Рэсурсы"
 STRING IDD_PPAGEACCELTBL		"Прайгравальнік::Клавішы"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"Прайграванне::Захоп"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Прайграванне::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Знешнія фільтры"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Убудаваныя фільтры::Performance"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Субтытры::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Субтытры::Стандартны стыль"
 STRING IDD_PPAGESUBTITLES		"Субтытры"
 STRING IDD_PPAGESYNC		"Video::Налады EVR Sync"
-STRING IDD_PPAGETWEAKS		"Дадаткова"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Прайгравальнік::Web-інтэрфейс"
 STRING IDD_PPAGEYOUTUBE		"Прайграванне::YouTube"

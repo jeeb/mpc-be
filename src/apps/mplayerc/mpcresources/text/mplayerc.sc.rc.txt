@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"数字"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"色彩控制(用于 VMR-9 、 EVR 及 madVR)"
+6		"亮度"
+7		"对比度"
+8		"色调"
+9		"饱和度"
+18		"重置"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"指定 DVD 驱动器盘符或“VIDEO_TS”文件夹路径"
 6		"默认"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"浏览..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"色彩控制(用于 VMR-9 、 EVR 及 madVR)"
-6		"亮度"
-7		"对比度"
-8		"色调"
-9		"饱和度"
-18		"重置"
-19		"检查更新"
-20		"启用自动更新检查"
-21		"更新检查间隔:"
-24		"天"
-25		"设置管理"
-26		"重置"
-27		"导出"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"步进距离(小, 中, 大每毫秒)"
+9		"默认"
+10		"在播放列表中仅有一个项目时禁用 ""向前/后跳转"" 后打开文件中的下一个/上一个文件"
+12		"在非默认显示器上全屏时防止播放器被最小化"
+14		"开启罗技 LCD 支持(实验性)"
+15		"快速搜索(以关键帧)"
+16		"使用小型存储器转储 (MiniDump)"
+17		"检查更新"
+18		"启用自动更新检查"
+19		"更新检查间隔:"
+22		"天"
+23		"设置管理"
+24		"重置"
+25		"导出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"毫秒"
 23		"使用显示器刷新率和视频帧率最接近的同步方式"
 24		"设置在关闭并重新启动后生效。"
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"步进距离(小, 中, 大每毫秒)"
-9		"默认"
-10		"在播放列表中仅有一个项目时禁用 ""向前/后跳转"" 后打开文件中的下一个/上一个文件"
-12		"在非默认显示器上全屏时防止播放器被最小化"
-14		"开启罗技 LCD 支持(实验性)"
-15		"快速搜索(以关键帧)"
-16		"使用小型存储器转储 (MiniDump)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"资源"
 STRING IDD_PPAGEACCELTBL		"播放器::快捷键"
 STRING IDD_PPAGEAUDIO		"音频"
 STRING IDD_PPAGECAPTURE		"回放::捕获"
+STRING IDD_PPAGECOLOR		"视频::Color correction"
 STRING IDD_PPAGEDVD		"回放::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"扩展滤镜"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"内部滤镜::性能"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"字幕::渲染"
 STRING IDD_PPAGESUBSTYLE		"字幕::默认风格"
 STRING IDD_PPAGESUBTITLES		"字幕"
 STRING IDD_PPAGESYNC		"视频::EVR 同步渲染器 设置"
-STRING IDD_PPAGETWEAKS		"调节"
 STRING IDD_PPAGEVIDEO		"视频"
 STRING IDD_PPAGEWEBSERVER		"播放器::Web 接口"
 STRING IDD_PPAGEYOUTUBE		"回放::YouTube"

@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitális"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Color controls (for VMR-9 and EVR)"
+6		"Világosság"
+7		"Élesség"
+8		"Színárnyalat"
+9		"Telítettség"
+18		"Visszaállítás"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"A DVD meghajtó vagy a ""VIDEO_TS"" mappa elérési útja"
 6		"Alapértelmezés"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Tallózás..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Color controls (for VMR-9 and EVR)"
-6		"Világosság"
-7		"Élesség"
-8		"Színárnyalat"
-9		"Telítettség"
-18		"Visszaállítás"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Settings management"
-26		"Reset"
-27		"Export"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Default"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Settings management"
+24		"Reset"
+25		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"ms"
 23		"Megjelenítés a legközelebbi vsync-nél"
 24		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Erőforrások"
 STRING IDD_PPAGEACCELTBL		"Lejátszó::Billentyűk"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"Lejátszás::Rögzítés"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Lejátszás::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Külső szűrők"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Belső szűrők::Performance"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Feliratok::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Feliratok::Alapstílus"
 STRING IDD_PPAGESUBTITLES		"Feliratok"
 STRING IDD_PPAGESYNC		"Video::EVR Sync Beállítások"
-STRING IDD_PPAGETWEAKS		"Finomhangolások"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Lejátszó::Webes felület"
 STRING IDD_PPAGEYOUTUBE		"Lejátszás::YouTube"

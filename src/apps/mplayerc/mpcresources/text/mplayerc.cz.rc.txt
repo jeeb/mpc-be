@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitální"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Nastavení barev (VMR-9 a EVR)"
+6		"Jas"
+7		"Kontrast"
+8		"Odstín"
+9		"Sytost"
+18		"Výchozí"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Umístění DVD mechaniky nebo adresáře ""VIDEO_TS"""
 6		"Standardní"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Procházet..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Nastavení barev (VMR-9 a EVR)"
-6		"Jas"
-7		"Kontrast"
-8		"Odstín"
-9		"Sytost"
-18		"Výchozí"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Správa nastavení"
-26		"Obnovit výchozí"
-27		"Exportovat"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Default"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Správa nastavení"
+24		"Obnovit výchozí"
+25		"Exportovat"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"ms"
 23		"Zobrazit při nejbližším vsync"
 24		"Změny se projeví až po zastavení a opětovném spuštění přehrávání."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Zdroje"
 STRING IDD_PPAGEACCELTBL		"Přehrávač::Klávesové zkratky"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"Přehrávání::Záznam"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Přehrávání::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Externí filtry"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Interní filtry::Performance"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Titulky::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Titulky::Výchozí styl"
 STRING IDD_PPAGESUBTITLES		"Titulky"
 STRING IDD_PPAGESYNC		"Video::Nastavení EVR Sync"
-STRING IDD_PPAGETWEAKS		"Doladění"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Přehrávač::WWW rozhraní"
 STRING IDD_PPAGEYOUTUBE		"Přehrávání::YouTube"

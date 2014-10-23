@@ -180,6 +180,7 @@
     <ClCompile Include="OSD.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
+    <ClCompile Include="PPageColor.cpp" />
     <ClCompile Include="PPageFiltersPerformance.cpp" />
     <ClCompile Include="PPageFiltersPriority.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
@@ -252,7 +253,6 @@
     <ClCompile Include="PPageSubStyle.cpp" />
     <ClCompile Include="PPageSubtitles.cpp" />
     <ClCompile Include="PPageSync.cpp" />
-    <ClCompile Include="PPageTweaks.cpp" />
     <ClCompile Include="PPageWebServer.cpp" />
     <ClCompile Include="QuicktimeGraph.cpp">
       <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>
@@ -297,6 +297,7 @@
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
+    <ClInclude Include="PPageColor.h" />
     <ClInclude Include="PPageFiltersPerformance.h" />
     <ClInclude Include="PPageFiltersPriority.h" />
     <ClInclude Include="PPageInterface.h" />
@@ -371,7 +372,6 @@
     <ClInclude Include="PPageSubStyle.h" />
     <ClInclude Include="PPageSubtitles.h" />
     <ClInclude Include="PPageSync.h" />
-    <ClInclude Include="PPageTweaks.h" />
     <ClInclude Include="PPageWebServer.h" />
     <ClInclude Include="QuicktimeGraph.h">
       <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>

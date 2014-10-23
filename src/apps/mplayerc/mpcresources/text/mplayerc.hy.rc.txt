@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Թվային"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Գույների կառավարում (VMR-9 և EVR-ի համար)"
+6		"Վառությունը"
+7		"Կոնտրաստ"
+8		"Ստվերը"
+9		"Խտայնությունը"
+18		"Ետարկել"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD սարքավարի կամ ""VIDEO_TS"" թղթապանակի տեղը"" folder"
 6		"Ըստ ծրագրայինի"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Ընտրել..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Գույների կառավարում (VMR-9 և EVR-ի համար)"
-6		"Վառությունը"
-7		"Կոնտրաստ"
-8		"Ստվերը"
-9		"Խտայնությունը"
-18		"Ետարկել"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Կարգավորումների կառավարում"
-26		"Ետարկել"
-27		"Արտածել"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Default"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Կարգավորումների կառավարում"
+24		"Ետարկել"
+25		"Արտածել"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"մվ"
 23		"Ցուցադրել մոտագույն vsync-ի հետ"
 24		"Ցուցադրել մոտագույն vsync-ի հետ"
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Ռեսուրսներ"
 STRING IDD_PPAGEACCELTBL		"Վերարտադրիչը::Կոճակներ"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"Վերարտադրում::տեսագրում"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Վերարտադրում::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Արտաքին Ֆիլտրեր"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Ներդրված Ֆիլտրեր::Performance"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Տողագրերը::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Տողագրերը::Ծրագրային ոճը"
 STRING IDD_PPAGESUBTITLES		"Տողագրերը"
 STRING IDD_PPAGESYNC		"Video::EVR Sync-ի կարգավորումներ"
-STRING IDD_PPAGETWEAKS		"Լրացուցիչ"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Վերարտադրիչը::Web տեսքը"
 STRING IDD_PPAGEYOUTUBE		"Վերարտադրում::YouTube"

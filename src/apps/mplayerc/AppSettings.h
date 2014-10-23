@@ -606,6 +606,12 @@ public:
 	bool			fD3DFullscreen;
 	bool			fIsFSWindow;
 
+	// Color control
+	int				iBrightness;
+	int				iContrast;
+	int				iHue;
+	int				iSaturation;
+
 	// Fullscreen
 	bool			fLaunchfullscreen;
 	bool			fShowBarsWhenFullScreen;
@@ -711,7 +717,7 @@ public:
 	int				iDlgPropX;
 	int				iDlgPropY;
 
-	// Tweaks
+	// Miscellaneous
 	int				nJumpDistS;
 	int				nJumpDistM;
 	int				nJumpDistL;
@@ -720,12 +726,6 @@ public:
 	bool			fLCDSupport;
 	bool			fFastSeek;
 	bool			fMiniDump;
-
-	// Miscellaneous
-	int				iBrightness;
-	int				iContrast;
-	int				iHue;
-	int				iSaturation;
 	bool			bUpdaterAutoCheck;
 	int				nUpdaterDelay;
 	time_t			tUpdaterLastCheck;

@@ -28,6 +28,7 @@
 #include "PPagePlayback.h"
 #include "PPageDVD.h"
 #include "PPageVideo.h"
+#include "PPageColor.h"
 #include "PPageYoutube.h"
 #include "PPageFullscreen.h"
 #include "PPageSync.h"
@@ -40,7 +41,6 @@
 #include "PPageSubtitles.h"
 #include "PPageSubStyle.h"
 #include "PPageSubRend.h"
-#include "PPageTweaks.h"
 #include "PPageInterface.h"
 #include "PPageMisc.h"
 #include "PPageCapture.h"
@@ -82,6 +82,7 @@ private:
 	CPPageCapture m_tuner;
 	CPPageYoutube m_youtube;
 	CPPageVideo m_video;
+	CPPageColor m_color;
 	CPPageSync m_sync;
 	CPPageFullscreen m_fullscreen;
 	CPPageAudio m_audio;
@@ -92,7 +93,6 @@ private:
 	CPPageFiltersPerformance m_filtersperformance;
 	CPPageExternalFilters m_externalfilters;
 	CPPageFiltersPriority m_filterspriority;
-	CPPageTweaks m_tweaks;
 	CPPageMisc m_misc;
 
 	CTreeCtrl* CreatePageTreeObject();

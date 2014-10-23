@@ -525,7 +525,7 @@
 #define IDD_PPAGEDVD                    10025
 #define IDD_PPAGESUBTITLES              10026
 #define IDD_PPAGEFORMATS                10027
-#define IDD_PPAGETWEAKS                 10028
+#define IDD_PPAGECOLOR                  10028
 #define IDD_PPAGEAUDIO                  10029
 #define IDD_PPAGEEXTERNALFILTERS        10030
 #define IDD_PPAGEACCELTBL               10032

@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digital"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Color controls (for VMR-9 and EVR)"
+6		"Brilho"
+7		"Contraste"
+8		"Cor"
+9		"Saturação"
+18		"Reiniciar"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Localização da unidade de DVD ou da pasta ""VIDEO_TS"""
 6		"Pré-determinada"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Procurar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Color controls (for VMR-9 and EVR)"
-6		"Brilho"
-7		"Contraste"
-8		"Cor"
-9		"Saturação"
-18		"Reiniciar"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Settings management"
-26		"Reset"
-27		"Export"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Default"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Settings management"
+24		"Reset"
+25		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"ms"
 23		"Apresentar no modo de sincronismo mais próximo"
 24		"As mudanças terão efeito ao fechar o vídeo e reinicia-lo."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Recursos"
 STRING IDD_PPAGEACCELTBL		"Tocador::Teclas"
 STRING IDD_PPAGEAUDIO		"Muda Áudio"
 STRING IDD_PPAGECAPTURE		"Reprodução::Captura"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Reprodução::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Filtros Externos"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Filtros Internos::Performance"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Legendas::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Legendas::Estilo Pré-determinado"
 STRING IDD_PPAGESUBTITLES		"Legendas"
 STRING IDD_PPAGESYNC		"Video::Ajuste Sincr. EVR"
-STRING IDD_PPAGETWEAKS		"Ajustes"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Tocador::Interface Web"
 STRING IDD_PPAGEYOUTUBE		"Reprodução::YouTube"

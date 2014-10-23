@@ -1,5 +1,4 @@
 /*
- * (C) 2003-2006 Gabest
  * (C) 2006-2014 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -22,28 +21,28 @@
 #pragma once
 
 #include "PPageBase.h"
-#include "StaticLink.h"
 
+// CPPageColor dialog
 
-// CPPageTweaks dialog
-
-class CPPageTweaks : public CPPageBase
+class CPPageColor : public CPPageBase
 {
-	DECLARE_DYNAMIC(CPPageTweaks)
+	DECLARE_DYNAMIC(CPPageColor)
+
+private:
+	int m_iBrightness;
+	int m_iContrast;
+	int m_iHue;
+	int m_iSaturation;
+	CString m_sBrightness;
+	CString m_sContrast;
+	CString m_sHue;
+	CString m_sSaturation;
 
 public:
-	CPPageTweaks();
-	virtual ~CPPageTweaks();
+	CPPageColor();
+	virtual ~CPPageColor();
 
-	enum { IDD = IDD_PPAGETWEAKS };
-	int m_nJumpDistS;
-	int m_nJumpDistM;
-	int m_nJumpDistL;
-	BOOL m_fFastSeek;
-	BOOL m_fDontUseSearchInFolder;
-	BOOL m_fPreventMinimize;
-	BOOL m_fLCDSupport;
-	BOOL m_fMiniDump;
+	enum { IDD = IDD_PPAGECOLOR };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -53,5 +52,12 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnBnClickedButton1();
+	CSliderCtrl m_SliContrast;
+	CSliderCtrl m_SliBrightness;
+	CSliderCtrl m_SliHue;
+	CSliderCtrl m_SliSaturation;
+
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnBnClickedReset();
+	virtual void OnCancel();
 };

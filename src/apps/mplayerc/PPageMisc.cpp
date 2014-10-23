@@ -19,22 +19,22 @@
  */
 
 #include "stdafx.h"
-#include "MainFrm.h"
-#include "PPageVideo.h"
-#include <moreuuids.h>
+#include "MiniDump.h"
 #include "PPageMisc.h"
-#include <psapi.h>
-
 
 // CPPageMisc dialog
 
 IMPLEMENT_DYNAMIC(CPPageMisc, CPPageBase)
 CPPageMisc::CPPageMisc()
 	: CPPageBase(CPPageMisc::IDD, CPPageMisc::IDD)
-	, m_iBrightness(0)
-	, m_iContrast(0)
-	, m_iHue(0)
-	, m_iSaturation(0)
+	, m_nJumpDistS(0)
+	, m_nJumpDistM(0)
+	, m_nJumpDistL(0)
+	, m_fFastSeek(FALSE)
+	, m_fDontUseSearchInFolder(FALSE)
+	, m_fPreventMinimize(FALSE)
+	, m_fLCDSupport(FALSE)
+	, m_fMiniDump(FALSE)
 	, m_nUpdaterDelay(7)
 {
 }
@@ -47,14 +47,15 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_SLI_BRIGHTNESS, m_SliBrightness);
-	DDX_Control(pDX, IDC_SLI_CONTRAST, m_SliContrast);
-	DDX_Control(pDX, IDC_SLI_HUE, m_SliHue);
-	DDX_Control(pDX, IDC_SLI_SATURATION, m_SliSaturation);
-	DDX_Text(pDX, IDC_STATIC1, m_sBrightness);
-	DDX_Text(pDX, IDC_STATIC2, m_sContrast);
-	DDX_Text(pDX, IDC_STATIC3, m_sHue);
-	DDX_Text(pDX, IDC_STATIC4, m_sSaturation);
+	DDX_Text(pDX, IDC_EDIT1, m_nJumpDistS);
+	DDX_Text(pDX, IDC_EDIT2, m_nJumpDistM);
+	DDX_Text(pDX, IDC_EDIT3, m_nJumpDistL);
+	DDX_Check(pDX, IDC_CHECK6, m_fPreventMinimize);
+	DDX_Check(pDX, IDC_CHECK7, m_fDontUseSearchInFolder);
+	DDX_Check(pDX, IDC_CHECK1, m_fFastSeek);
+	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
+	DDX_Check(pDX, IDC_CHECK2, m_fMiniDump);
+
 	DDX_Control(pDX, IDC_CHECK3, m_updaterAutoCheckCtrl);
 	DDX_Control(pDX, IDC_EDIT4, m_updaterDelayCtrl);
 	DDX_Control(pDX, IDC_SPIN1, m_updaterDelaySpin);
@@ -62,8 +63,7 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPageMisc, CPPageBase)
-	ON_WM_HSCROLL()
-	ON_BN_CLICKED(IDC_RESET, OnBnClickedReset)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_RESET_SETTINGS, OnResetSettings)
 	ON_BN_CLICKED(IDC_EXPORT_SETTINGS, OnExportSettings)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT4, OnUpdateDelayEditBox)
@@ -78,43 +78,18 @@ BOOL CPPageMisc::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	SetHandCursor(m_hWnd, IDC_COMBO1);
+
 	AppSettings& s = AfxGetAppSettings();
 
-	CreateToolTip();
-
-	m_iBrightness = s.iBrightness;
-	m_iContrast   = s.iContrast;
-	m_iHue        = s.iHue;
-	m_iSaturation = s.iSaturation;
-
-	m_SliBrightness.EnableWindow	(TRUE);
-	m_SliBrightness.SetRange		(-100, 100, TRUE);
-	m_SliBrightness.SetTic			(0);
-	m_SliBrightness.SetPos			(m_iBrightness);
-	m_SliBrightness.SetPageSize		(10);
-
-	m_SliContrast.EnableWindow		(TRUE);
-	m_SliContrast.SetRange			(-100, 100, TRUE);
-	m_SliContrast.SetTic			(0);
-	m_SliContrast.SetPos			(m_iContrast);
-	m_SliContrast.SetPageSize		(10);
-
-	m_SliHue.EnableWindow			(TRUE);
-	m_SliHue.SetRange				(-180, 180, TRUE);
-	m_SliHue.SetTic					(0);
-	m_SliHue.SetPos					(m_iHue);
-	m_SliHue.SetPageSize			(10);
-
-	m_SliSaturation.EnableWindow	(TRUE);
-	m_SliSaturation.SetRange		(-100, 100, TRUE);
-	m_SliSaturation.SetTic			(0);
-	m_SliSaturation.SetPos			(m_iSaturation);
-	m_SliSaturation.SetPageSize		(10);
-
-	m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
-	m_iContrast   ? m_sContrast.Format  (_T("%+d"), m_iContrast)   : m_sContrast   = _T("0");
-	m_iHue        ? m_sHue.Format       (_T("%+d"), m_iHue)        : m_sHue        = _T("0");
-	m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
+	m_nJumpDistS = s.nJumpDistS;
+	m_nJumpDistM = s.nJumpDistM;
+	m_nJumpDistL = s.nJumpDistL;
+	m_fPreventMinimize = s.fPreventMinimize;
+	m_fDontUseSearchInFolder = s.fDontUseSearchInFolder;
+	m_fFastSeek = s.fFastSeek;
+	m_fLCDSupport = s.fLCDSupport;
+	m_fMiniDump = s.fMiniDump;
 
 	m_updaterAutoCheckCtrl.SetCheck(s.bUpdaterAutoCheck);
 	m_nUpdaterDelay = s.nUpdaterDelay;
@@ -131,10 +106,15 @@ BOOL CPPageMisc::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.iBrightness		= m_iBrightness;
-	s.iContrast			= m_iContrast;
-	s.iHue				= m_iHue;
-	s.iSaturation		= m_iSaturation;
+	s.nJumpDistS = m_nJumpDistS;
+	s.nJumpDistM = m_nJumpDistM;
+	s.nJumpDistL = m_nJumpDistL;
+	s.fPreventMinimize = !!m_fPreventMinimize;
+	s.fDontUseSearchInFolder = !!m_fDontUseSearchInFolder;
+	s.fFastSeek = !!m_fFastSeek;
+	s.fLCDSupport = !!m_fLCDSupport;
+	s.fMiniDump = !!m_fMiniDump;
+	CMiniDump::SetState(s.fMiniDump);
 
 	s.bUpdaterAutoCheck	= !!m_updaterAutoCheckCtrl.GetCheck();
 	m_nUpdaterDelay		= min(max(1, m_nUpdaterDelay), 365);
@@ -143,59 +123,11 @@ BOOL CPPageMisc::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageMisc::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CPPageMisc::OnBnClickedButton1()
 {
-	CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
-	UpdateData();
-
-	if (*pScrollBar == m_SliBrightness) {
-		m_iBrightness = m_SliBrightness.GetPos();
-		pMainFrame->SetColorControl(ProcAmp_Brightness, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
-	}
-	else if (*pScrollBar == m_SliContrast) {
-		m_iContrast = m_SliContrast.GetPos();
-		pMainFrame->SetColorControl(ProcAmp_Contrast, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iContrast ? m_sContrast.Format(_T("%+d"), m_iContrast) : m_sContrast = _T("0");
-	}
-	else if (*pScrollBar == m_SliHue) {
-		m_iHue = m_SliHue.GetPos();
-		pMainFrame->SetColorControl(ProcAmp_Hue, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iHue ? m_sHue.Format(_T("%+d"), m_iHue) : m_sHue = _T("0");
-	}
-	else if (*pScrollBar == m_SliSaturation) {
-		m_iSaturation = m_SliSaturation.GetPos();
-		pMainFrame->SetColorControl(ProcAmp_Saturation, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
-	}
-
-	UpdateData(FALSE);
-
-	SetModified();
-
-	__super::OnHScroll(nSBCode, nPos, pScrollBar);
-}
-
-void CPPageMisc::OnBnClickedReset()
-{
-	CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
-
-	m_iBrightness	= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Brightness)->DefaultValue;
-	m_iContrast		= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Contrast)->DefaultValue;
-	m_iHue			= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Hue)->DefaultValue;
-	m_iSaturation	= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Saturation)->DefaultValue;
-
-	m_SliBrightness.SetPos	(m_iBrightness);
-	m_SliContrast.SetPos	(m_iContrast);
-	m_SliHue.SetPos			(m_iHue);
-	m_SliSaturation.SetPos	(m_iSaturation);
-
-	m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
-	m_iContrast   ? m_sContrast.Format  (_T("%+d"), m_iContrast)   : m_sContrast   = _T("0");
-	m_iHue        ? m_sHue.Format       (_T("%+d"), m_iHue)        : m_sHue        = _T("0");
-	m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
-
-	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_All, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+	m_nJumpDistS = DEFAULT_JUMPDISTANCE_1;
+	m_nJumpDistM = DEFAULT_JUMPDISTANCE_2;
+	m_nJumpDistL = DEFAULT_JUMPDISTANCE_3;
 
 	UpdateData(FALSE);
 
@@ -229,13 +161,4 @@ void CPPageMisc::OnExportSettings()
 
 	AfxGetMyApp()->ExportSettings();
 	SetFocus();
-}
-
-void CPPageMisc::OnCancel()
-{
-	AppSettings& s = AfxGetAppSettings();
-
-	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
-
-	__super::OnCancel();
 }

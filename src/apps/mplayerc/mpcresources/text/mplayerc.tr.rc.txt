@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Sayısal"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Renk kontrolleri (VMR-9 ve EVR için)"
+6		"Parlaklık"
+7		"Karşıtlık"
+8		"Renk"
+9		"Doygunluk"
+18		"Sıfırla"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD sürücüsü veya ""VIDEO_TS"" klasörü yolu"
 6		"Varsayılan"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Gözat..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Renk kontrolleri (VMR-9 ve EVR için)"
-6		"Parlaklık"
-7		"Karşıtlık"
-8		"Renk"
-9		"Doygunluk"
-18		"Sıfırla"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Ayar yönetimi"
-26		"Sıfırla"
-27		"Ver"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Varsayılan"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Ayar yönetimi"
+24		"Sıfırla"
+25		"Ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"ms"
 23		"En yakın eşzamanlılık örneği"
 24		"Değişiklikler, yürütme kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Varsayılan"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Kaynaklar"
 STRING IDD_PPAGEACCELTBL		"Oynatıcı::Tuşlar"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"Yürütme::Yakalama"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Yürütme::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Harici Süzgeçler"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Dahili Süzgeçler::Performance"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Altyazılar::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Altyazılar::Görünüm"
 STRING IDD_PPAGESUBTITLES		"Altyazılar"
 STRING IDD_PPAGESYNC		"Video::EVR Zam. Ayarları"
-STRING IDD_PPAGETWEAKS		"İnce Ayarlar"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Oynatıcı::İnternet Arabirimi"
 STRING IDD_PPAGEYOUTUBE		"Yürütme::YouTube"

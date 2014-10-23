@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Цифр."
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Керування кольором (для VMR-9 і EVR)"
+6		"Яскравість"
+7		"Контраст"
+8		"Відтінок"
+9		"Насиченість"
+18		"Скинути"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Шлях до DVD-приводу або теки ""VIDEO_TS"""
 6		"Типово"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Знайти..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Керування кольором (для VMR-9 і EVR)"
-6		"Яскравість"
-7		"Контраст"
-8		"Відтінок"
-9		"Насиченість"
-18		"Скинути"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Управління налаштуваннями"
-26		"Скидання"
-27		"Експорт"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Крок переходу (короткого, середнього, довгого в мс)"
+9		"Типово"
+10		"Не використовувати перехід по файлам при виконанні команд 'Крок назад/вперед' коли лише один файл у плейлисті"
+12		"Заблокувати ЗГОРТАННЯ, якщо повноекранний режим на іншому моніторі"
+14		"Задіяти підтримку Logitech LCD (експериментально)"
+15		"Швидке перемотування (по ключовим кадрам)"
+16		"Задіяти створення мінідампів"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Управління налаштуваннями"
+24		"Скидання"
+25		"Експорт"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"мс"
 23		"Презентація при найближчому vsync"
 24		"Зміни набудуть чинності після перезапуску плеєра."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Крок переходу (короткого, середнього, довгого в мс)"
-9		"Типово"
-10		"Не використовувати перехід по файлам при виконанні команд 'Крок назад/вперед' коли лише один файл у плейлисті"
-12		"Заблокувати ЗГОРТАННЯ, якщо повноекранний режим на іншому моніторі"
-14		"Задіяти підтримку Logitech LCD (експериментально)"
-15		"Швидке перемотування (по ключовим кадрам)"
-16		"Задіяти створення мінідампів"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Ресурси"
 STRING IDD_PPAGEACCELTBL		"Програвач::Гарячі клавіші"
 STRING IDD_PPAGEAUDIO		"Аудіо"
 STRING IDD_PPAGECAPTURE		"Відтворення::Захоплення"
+STRING IDD_PPAGECOLOR		"Відео::Color correction"
 STRING IDD_PPAGEDVD		"Відтворення::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Зовнішні фільтри"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Вбудовані фільтри::Продуктивність"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Субтитри::Візуалізація"
 STRING IDD_PPAGESUBSTYLE		"Субтитри::Стандартний стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитри"
 STRING IDD_PPAGESYNC		"Відео::Налаштування EVR Sync"
-STRING IDD_PPAGETWEAKS		"Додатково"
 STRING IDD_PPAGEVIDEO		"Відео"
 STRING IDD_PPAGEWEBSERVER		"Програвач::Web-інтерфейс"
 STRING IDD_PPAGEYOUTUBE		"Відтворення::YouTube"

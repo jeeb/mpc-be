@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"цифровое"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Управление цветом (для VMR-9, EVR и madVR)"
+6		"Яркость"
+7		"Контрасность"
+8		"Оттенок"
+9		"Насыщенность"
+18		"Сброс"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Расположение DVD-привода или папки ""VIDEO_TS"""
 6		"По умолчанию"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Выбрать..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Управление цветом (для VMR-9, EVR и madVR)"
-6		"Яркость"
-7		"Контрасность"
-8		"Оттенок"
-9		"Насыщенность"
-18		"Сброс"
-19		"Обновления"
-20		"Проверять обновления автоматически"
-21		"Интервал между проверками:"
-24		"дней"
-25		"Управление настройками"
-26		"Сброс"
-27		"Экспорт"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Расстояния перехода (короткое, среднее, длинное) в мс"
+9		"По умолчанию"
+10		"Не использовать переход по файлам в директории по нажатию ""Шаг вперед/назад"""
+12		"Не сворачивать окно на дополнительном дисплее в полноэкранном режиме"
+14		"Включить поддержку Logitech LCD (экспериментально)"
+15		"Быстрая перемотка (по ключевым кадрам)"
+16		"Включить создание MiniDump"
+17		"Обновления"
+18		"Проверять обновления автоматически"
+19		"Интервал между проверками:"
+22		"дней"
+23		"Управление настройками"
+24		"Сброс"
+25		"Экспорт"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"мс"
 23		"Представлять с ближайшим vsync"
 24		"Изменения применятся после остановки и перезапуска воспроизведения."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Расстояния перехода (короткое, среднее, длинное) в мс"
-9		"По умолчанию"
-10		"Не использовать переход по файлам в директории по нажатию ""Шаг вперед/назад"""
-12		"Не сворачивать окно на дополнительном дисплее в полноэкранном режиме"
-14		"Включить поддержку Logitech LCD (экспериментально)"
-15		"Быстрая перемотка (по ключевым кадрам)"
-16		"Включить создание MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Ресурсы"
 STRING IDD_PPAGEACCELTBL		"Проигрыватель::Клавиши"
 STRING IDD_PPAGEAUDIO		"Аудио"
 STRING IDD_PPAGECAPTURE		"Воспроизведение::Захват"
+STRING IDD_PPAGECOLOR		"Видео::Коррекция цвета"
 STRING IDD_PPAGEDVD		"Воспроизведение::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Внешние фильтры"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Встроенные фильтры::Производительность"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Субтитры::Отрисовка"
 STRING IDD_PPAGESUBSTYLE		"Субтитры::Стандартный стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитры"
 STRING IDD_PPAGESYNC		"Видео::Настройка EVR Sync"
-STRING IDD_PPAGETWEAKS		"Дополнительно"
 STRING IDD_PPAGEVIDEO		"Видео"
 STRING IDD_PPAGEWEBSERVER		"Проигрыватель::Web-интерфейс"
 STRING IDD_PPAGEYOUTUBE		"Воспроизведение::YouTube"

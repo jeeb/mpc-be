@@ -1,7 +1,7 @@
 BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"About"
 7		"MPC-BE"
-8		"Copyright Â© 2002-2014 see Authors.txt"
+8		"Copyright © 2002-2014 see Authors.txt"
 10		"Version :"
 11		"SVN Build :"
 12		"OK"
@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digital"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Color controls (for VMR-9, EVR and madVR)"
+6		"Brightness"
+7		"Contrast"
+8		"Hue"
+9		"Saturation"
+18		"Reset"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Location of the DVD drive or the ""VIDEO_TS"" folder"
 6		"Default"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Browse..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Color controls (for VMR-9, EVR and madVR)"
-6		"Brightness"
-7		"Contrast"
-8		"Hue"
-9		"Saturation"
-18		"Reset"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"Settings management"
-26		"Reset"
-27		"Export"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Default"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"Settings management"
+24		"Reset"
+25		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -399,7 +409,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 5		"Font"
 6		"Font"
 8		"Spacing"
-11		"Angle (z,Â°)"
+11		"Angle (z,°)"
 14		"Scale (x,%)"
 17		"Scale (y,%)"
 20		"Border Style"
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"ms"
 23		"Present at nearest VSync"
 24		"Changes take effect after the playback has been closed and restarted."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1178,7 +1178,6 @@ STRING IDD_PPAGESUBRENDERING		"Subtitles::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Subtitles::Default Style"
 STRING IDD_PPAGESUBTITLES		"Subtitles"
 STRING IDD_PPAGESYNC		"Video::EVR Sync Settings"
-STRING IDD_PPAGETWEAKS		"Tweaks"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Player::Web Interface"
 STRING IDD_PPAGEYOUTUBE		"Playback::YouTube"
@@ -1736,7 +1735,7 @@ STRING IDS_OSD_BRIGHTNESS		"Brightness: %s%%"
 STRING IDS_OSD_CONTRAST		"Contrast: %s%%"
 STRING IDS_OSD_CUSTOM_CH_MAPPING_OFF		"Custom channel mapping: Off"
 STRING IDS_OSD_CUSTOM_CH_MAPPING_ON		"Custom channel mapping: On"
-STRING IDS_OSD_HUE		"Hue: %sÂ°"
+STRING IDS_OSD_HUE		"Hue: %s°"
 STRING IDS_OSD_IMAGE_SAVED		"Image saved successfully"
 STRING IDS_OSD_NO_COLORCONTROL		"Color control is not supported"
 STRING IDS_OSD_REGAIN_VOLUME_OFF		"Regain volume: Off"

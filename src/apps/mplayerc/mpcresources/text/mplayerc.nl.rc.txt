@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitaal"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"Kleurregeling (voor VMR-9, EVR en madVR)"
+6		"Helderheid"
+7		"Contrast"
+8		"Tint"
+9		"Verzadiging"
+18		"Resetten"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Pad naar de dvd-speler of de ""VIDEO_TS""-map"
 6		"Standaard"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"Bladeren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"Kleurregeling (voor VMR-9, EVR en madVR)"
-6		"Helderheid"
-7		"Contrast"
-8		"Tint"
-9		"Verzadiging"
-18		"Resetten"
-19		"Update controleren"
-20		"Activeer automatische updatecontrole"
-21		"Vertraging tussen elke controle:"
-24		"dag(en)"
-25		"Instellingen beheren"
-26		"Resetten"
-27		"Exporteren"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Verspring intervallen (kort, middel, lang in ms)"
+9		"Standaard"
+10		"Gebruik 'zoek in map' NIET op 'Vorige/Volgende' als er alleen een item in afspeellijst is."
+12		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
+14		"Activeer Logitech LCD-ondersteuning (experimenteel)"
+15		"Snel zoeken (op keyframe)"
+16		"Activeer MiniDump"
+17		"Update controleren"
+18		"Activeer automatische updatecontrole"
+19		"Vertraging tussen elke controle:"
+22		"dag(en)"
+23		"Instellingen beheren"
+24		"Resetten"
+25		"Exporteren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"ms"
 23		"Toon bij de dichtsbijzijnde VSync"
 24		"Vereist heropening van de video."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Verspring intervallen (kort, middel, lang in ms)"
-9		"Standaard"
-10		"Gebruik 'zoek in map' NIET op 'Vorige/Volgende' als er alleen een item in afspeellijst is."
-12		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
-14		"Activeer Logitech LCD-ondersteuning (experimenteel)"
-15		"Snel zoeken (op keyframe)"
-16		"Activeer MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"Resources"
 STRING IDD_PPAGEACCELTBL		"Speler::Toetsen"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"Weergave::Opname"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Weergave::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Externe Filters"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Interne Filters::Prestatie"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"Ondertiteling::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Ondertiteling::Standaardstijl"
 STRING IDD_PPAGESUBTITLES		"Ondertiteling"
 STRING IDD_PPAGESYNC		"Video::EVR Sync-instellingen"
-STRING IDD_PPAGETWEAKS		"Tweaks"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Speler::Web Interface"
 STRING IDD_PPAGEYOUTUBE		"Weergave::YouTube"

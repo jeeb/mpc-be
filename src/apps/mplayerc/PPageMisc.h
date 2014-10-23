@@ -20,9 +20,7 @@
 
 #pragma once
 
-#include <afxcmn.h>
 #include "PPageBase.h"
-
 
 // CPPageMisc dialog
 
@@ -31,14 +29,14 @@ class CPPageMisc : public CPPageBase
 	DECLARE_DYNAMIC(CPPageMisc)
 
 private:
-	int m_iBrightness;
-	int m_iContrast;
-	int m_iHue;
-	int m_iSaturation;
-	CString m_sBrightness;
-	CString m_sContrast;
-	CString m_sHue;
-	CString m_sSaturation;
+	int m_nJumpDistS;
+	int m_nJumpDistM;
+	int m_nJumpDistL;
+	BOOL m_fFastSeek;
+	BOOL m_fDontUseSearchInFolder;
+	BOOL m_fPreventMinimize;
+	BOOL m_fLCDSupport;
+	BOOL m_fMiniDump;
 
 	CButton m_updaterAutoCheckCtrl;
 	CEdit m_updaterDelayCtrl;
@@ -59,17 +57,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	CSliderCtrl m_SliContrast;
-	CSliderCtrl m_SliBrightness;
-	CSliderCtrl m_SliHue;
-	CSliderCtrl m_SliSaturation;
-	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg void OnBnClickedReset();
-
+	afx_msg void OnBnClickedButton1();
 	afx_msg void OnUpdateDelayEditBox(CCmdUI* pCmdUI);
-
 	afx_msg void OnResetSettings();
 	afx_msg void OnExportSettings();
-
-	virtual void OnCancel();
 };

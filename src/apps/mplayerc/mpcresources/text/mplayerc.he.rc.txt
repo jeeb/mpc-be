@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"דיגיטלי"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"כלי שליטה בצבע (עבור VMR-9 ו-EVR)"
+6		"בהירות"
+7		"ניגודיות"
+8		"גוון"
+9		"הרוויה"
+18		"אפס"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"מיקום כונן הדי.וי.די או תיקית ה-""VIDEO_TS"""
 6		"ברירת מחדל"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"עיין..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"כלי שליטה בצבע (עבור VMR-9 ו-EVR)"
-6		"בהירות"
-7		"ניגודיות"
-8		"גוון"
-9		"הרוויה"
-18		"אפס"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"ניהול הגדרות"
-26		"איפוס"
-27		"יצוא"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"Jump distances (small, medium, large in ms)"
+9		"Default"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"ניהול הגדרות"
+24		"איפוס"
+25		"יצוא"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"מילישניות"
 23		"הצג בסנכרון האנכי הקרוב ביותר"
 24		"השינויים נכנסים לתוקף רק לאחר שהניגון הופסק והופעל מחדש."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"Jump distances (small, medium, large in ms)"
-9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-14		"Enable Logitech LCD support (experimental)"
-15		"Fast seek (on keyframe)"
-16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"משאבים"
 STRING IDD_PPAGEACCELTBL		"נגן::מקשים"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"ניגון::לכידה"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"ניגון::די.וי.די/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"פילטרים חיצוניים"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"פילטרים פנימיים::Performance"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"כתוביות::Rendering"
 STRING IDD_PPAGESUBSTYLE		"כתוביות::סגנון ברירת מחדל"
 STRING IDD_PPAGESUBTITLES		"כתוביות"
 STRING IDD_PPAGESYNC		"Video::הגדרות EVR מסונכרן"
-STRING IDD_PPAGETWEAKS		"כיוונונים"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"נגן::ממשק אתר רשת"
 STRING IDD_PPAGEYOUTUBE		"ניגון::YouTube"

@@ -168,6 +168,15 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"디지털"
 END
 
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+5		"컬러 컨트롤 (VMR-9 / EVR 전용)"
+6		"밝기"
+7		"대조"
+8		"색조"
+9		"채도"
+18		"리셋"
+END
+
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD드라이브의 위치 또는 ""VIDEO_TS"" 폴더의 위치"
 6		"기본값"
@@ -309,20 +318,21 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 10		"찾아보기..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
-5		"컬러 컨트롤 (VMR-9 / EVR 전용)"
-6		"밝기"
-7		"대조"
-8		"색조"
-9		"채도"
-18		"리셋"
-19		"Update check"
-20		"Enable automatic update check"
-21		"Delay between each check:"
-24		"day(s)"
-25		"설정 관리"
-26		"초기화"
-27		"내보내기"
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 26
+5		"이동 간격 (최소/중간/최대 간격을 밀리초 단위로 입력)"
+9		"기본값"
+10		"재생목록에 파일 하나만 있다면 '앞/뒤 탐색'시에 '폴더내에서찾기' 사용안함"
+12		"전체화면시 최소화 예방 (기본 모니터가 없을시)"
+14		"로지텍 LCD 지원 활성화(실험적)"
+15		"빠른 탐색 (키프레임)"
+16		"미니덤프 활성화"
+17		"Update check"
+18		"Enable automatic update check"
+19		"Delay between each check:"
+22		"day(s)"
+23		"설정 관리"
+24		"초기화"
+25		"내보내기"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
@@ -452,16 +462,6 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 19		"ms"
 23		"가장 근접한 VSync에 맞추기"
 24		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
-END
-
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
-5		"이동 간격 (최소/중간/최대 간격을 밀리초 단위로 입력)"
-9		"기본값"
-10		"재생목록에 파일 하나만 있다면 '앞/뒤 탐색'시에 '폴더내에서찾기' 사용안함"
-12		"전체화면시 최소화 예방 (기본 모니터가 없을시)"
-14		"로지텍 LCD 지원 활성화(실험적)"
-15		"빠른 탐색 (키프레임)"
-16		"미니덤프 활성화"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
@@ -1162,6 +1162,7 @@ STRING IDD_FILEPROPRES		"리소스"
 STRING IDD_PPAGEACCELTBL		"플레이어::단축키"
 STRING IDD_PPAGEAUDIO		"Audio"
 STRING IDD_PPAGECAPTURE		"재생::캡쳐장치"
+STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"재생::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"외장 필터"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"내장 필터::성능"
@@ -1178,7 +1179,6 @@ STRING IDD_PPAGESUBRENDERING		"자막::렌더링"
 STRING IDD_PPAGESUBSTYLE		"자막::스타일"
 STRING IDD_PPAGESUBTITLES		"자막"
 STRING IDD_PPAGESYNC		"Video::EVR 싱크 설정"
-STRING IDD_PPAGETWEAKS		"최적화"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"플레이어::웹 인터페이스"
 STRING IDD_PPAGEYOUTUBE		"재생::YouTube"

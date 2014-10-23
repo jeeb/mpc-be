@@ -51,6 +51,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	AddPage(&m_tuner);
 	AddPage(&m_youtube);
 	AddPage(&m_video);
+	AddPage(&m_color);
 	AddPage(&m_sync);
 	AddPage(&m_fullscreen);
 	AddPage(&m_audio);
@@ -61,7 +62,6 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	AddPage(&m_filtersperformance);
 	AddPage(&m_externalfilters);
 	AddPage(&m_filterspriority);
-	AddPage(&m_tweaks);
 	AddPage(&m_misc);
 
 	EnableStackedTabs(FALSE);
