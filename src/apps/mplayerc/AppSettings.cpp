@@ -1502,7 +1502,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
 	nUpdaterDelay			= min(max(1, pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7)), 365);
 	
-	tUpdaterLastCheck		= time(NULL);
+	tUpdaterLastCheck		= 0; // force check if the previous check undefined
 	if (pApp->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, &ptr, &len)) {
 		if (len == sizeof(time_t)) {
 			memcpy(&tUpdaterLastCheck, ptr, sizeof(time_t));
