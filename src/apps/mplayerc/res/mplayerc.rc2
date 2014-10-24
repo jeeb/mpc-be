@@ -43,9 +43,9 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDF_LOGO0                        FILE                    "res\\logo.0.png"
 IDF_LOGO1                        FILE                    "res\\logo.1.png"
-IDF_SHADER_RESIZER               FILE                    "res\\resizer.psh"
-IDF_SHADER_EMPTY                 FILE                    "res\\empty.psh"
-IDF_SHADER_FINAL                 FILE                    "res\\final.psh"
+IDF_SHADER_RESIZER               FILE                    "res\\resizer.hlsl"
+IDF_SHADER_EMPTY                 FILE                    "res\\empty.hlsl"
+IDF_SHADER_FINAL                 FILE                    "res\\final.hlsl"
 IDF_1PIX_GIF                     FILE                    "res\\web\\1pix.gif"
 IDF_BOTTOMSIDE_PNG               FILE                    "res\\web\\bottomside.png"
 IDF_CONTROLBACK_PNG              FILE                    "res\\web\\controlback.png"

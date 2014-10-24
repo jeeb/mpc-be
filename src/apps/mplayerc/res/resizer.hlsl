@@ -96,7 +96,7 @@ float4 Sample(float4 t, float2 samplePos, float2 sampleD)
 			);
 }
 
-float4 main_bicubic2pass_pass1(PS_INPUT input) : COLOR {
+float4 main_bicubic_x(PS_INPUT input) : COLOR {
 	float2 PixelPos = input.t0;
 	float2 dd = frac(PixelPos);
 	float2 ExactPixel = PixelPos - dd;
@@ -105,7 +105,7 @@ float4 main_bicubic2pass_pass1(PS_INPUT input) : COLOR {
 	return Sample(taps(dd.x), samplePos, dx);
 }
 
-float4 main_bicubic2pass_pass2(PS_INPUT input) : COLOR {
+float4 main_bicubic_y(PS_INPUT input) : COLOR {
 	float2 PixelPos = input.t0;
 	float2 dd = frac(PixelPos);
 	float2 ExactPixel = PixelPos - dd;

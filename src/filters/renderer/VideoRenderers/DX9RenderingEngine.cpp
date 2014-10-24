@@ -427,7 +427,11 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		} else if (iDX9Resizer == 2) {
 			hr = TextureResizeBilinear(pVideoTexture, dst, srcRect);
 		} else if (iDX9Resizer >= 3) {
+#if ENABLE_2PASS_BICUBIC_RESIZE
+			hr = TextureResizeBicubic2pass(pVideoTexture, dst, srcRect);
+#else
 			hr = TextureResizeBicubic(pVideoTexture, dst, srcRect);
+#endif
 		}
 	} else {
 		hr = TextureResize(pVideoTexture, dst, D3DTEXF_POINT, srcRect);
@@ -535,7 +539,11 @@ HRESULT CDX9RenderingEngine::InitScreenSpacePipeline(int passCount, IDirect3DSur
 	m_ScreenSpacePassSrc = 0;
 	m_ScreenSpacePassDest = 1;
 
+#if ENABLE_2PASS_BICUBIC_RESIZE
+	HRESULT hr = InitTemporaryScreenSpaceTextures(min(passCount, 2));
+#else
 	HRESULT hr = InitTemporaryScreenSpaceTextures(min(passCount - 1, 2));
+#endif
 
 	// If the initialized have failed, disable the pipeline
 	if (FAILED(hr)) {
@@ -646,7 +654,7 @@ HRESULT CDX9RenderingEngine::InitResizers(float bicubicA)
 	A.Format("(%f)", bicubicA);
 	str.Replace("_The_Value_Of_A_Is_Set_Here_", A);
 
-	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic", "main_bicubic2pass_pass1", "main_bicubic2pass_pass2"};
+	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic", "main_bicubic_x", "main_bicubic_y"};
 
 	ASSERT(_countof(pEntries) == _countof(m_pResizerPixelShaders));
 
@@ -790,7 +798,7 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic(IDirect3DTexture9* pTexture, V
 	return hr;
 }
 
-/*
+#if ENABLE_2PASS_BICUBIC_RESIZE
 // The 2 pass sampler is incorrect in that it only does bilinear resampling in the y direction.
 HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect)
 {
@@ -798,48 +806,31 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 
 	// rotated?
 	if (dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
-	|| dst[0].y != dst[1].y || dst[0].x != dst[2].x || dst[2].y != dst[3].y || dst[1].x != dst[3].x)
+			|| dst[0].y != dst[1].y || dst[0].x != dst[2].x || dst[2].y != dst[3].y || dst[1].x != dst[3].x) {
 		return TextureResizeBicubic(pTexture, dst, srcRect);
+	}
 
 	D3DSURFACE_DESC desc;
-	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc)))
-	    return E_FAIL;
+	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
+		return E_FAIL;
+	}
 
 	float Tex0_Width = desc.Width;
 	float Tex0_Height = desc.Height;
 
-	double dx0 = 1.0/desc.Width;
-	UNREFERENCED_PARAMETER(dx0);
-	double dy0 = 1.0/desc.Height;
-	UNREFERENCED_PARAMETER(dy0);
-
 	CSize SrcTextSize = CSize(desc.Width, desc.Height);
-	double w = (double)srcRect.Width();
-	double h = (double)srcRect.Height();
+	int w = srcRect.Width();
+	int h = srcRect.Height();
 	UNREFERENCED_PARAMETER(w);
 
-	CRect dst1(0, 0, (int)(dst[3].x - dst[0].x), (int)h);
+	CRect dst1(0, 0, (int)(dst[3].x - dst[0].x), h);
 
-	if (!m_pTemporaryScreenSpaceTextures[0] || FAILED(m_pTemporaryScreenSpaceTextures[0]->GetLevelDesc(0, &desc)))
+	if (!m_pTemporaryScreenSpaceTextures[0] || FAILED(m_pTemporaryScreenSpaceTextures[0]->GetLevelDesc(0, &desc))) {
 		return TextureResizeBicubic(pTexture, dst, srcRect);
+	}
 
 	float Tex1_Width = desc.Width;
 	float Tex1_Height = desc.Height;
-
-	double dx1 = 1.0/desc.Width;
-	UNREFERENCED_PARAMETER(dx1);
-	double dy1 = 1.0/desc.Height;
-	UNREFERENCED_PARAMETER(dy1);
-
-	double dw = (double)dst1.Width() / desc.Width;
-	UNREFERENCED_PARAMETER(dw);
-	double dh = (double)dst1.Height() / desc.Height;
-	UNREFERENCED_PARAMETER(dh);
-
-	float dx2 = 1.0f/SrcTextSize.cx;
-	UNREFERENCED_PARAMETER(dx2);
-	float dy2 = 1.0f/SrcTextSize.cy;
-	UNREFERENCED_PARAMETER(dy2);
 
 	float tx0 = srcRect.left;
 	float tx1 = srcRect.right;
@@ -851,37 +842,44 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 	float ty0_2 = 0;
 	float ty1_2 = h;
 
-	//	ASSERT(dst1.Height() == desc.Height);
+	//ASSERT(dst1.Height() == desc.Height);
 
-	if (dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height)
-	    // if (dst1.Width() != desc.Width || dst1.Height() != desc.Height)
-	    return TextureResizeBicubic(pTexture, dst, srcRect);
+	if (dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height) {
+		// if (dst1.Width() != desc.Width || dst1.Height() != desc.Height)
+		return TextureResizeBicubic(pTexture, dst, srcRect);
+	}
 
 	MYD3DVERTEX<1> vx[] =
 	{
-	    {(float)dst1.left, (float)dst1.top,		0.5f, 2.0f, tx0, ty0},
-	    {(float)dst1.right, (float)dst1.top,	0.5f, 2.0f, tx1, ty0},
-	    {(float)dst1.left, (float)dst1.bottom,	0.5f, 2.0f, tx0, ty1},
-	    {(float)dst1.right, (float)dst1.bottom, 0.5f, 2.0f, tx1, ty1},
+		{(float)dst1.left, (float)dst1.top,		0.5f, 2.0f, tx0, ty0},
+		{(float)dst1.right, (float)dst1.top,	0.5f, 2.0f, tx1, ty0},
+		{(float)dst1.left, (float)dst1.bottom,	0.5f, 2.0f, tx0, ty1},
+		{(float)dst1.right, (float)dst1.bottom, 0.5f, 2.0f, tx1, ty1},
 	};
 
-	AdjustQuad(vx, 1.0, 0.0);		// Casimir666 : bug here, create vertical lines ! TODO : why ??????
+	AdjustQuad(vx, 1.0, 0.0); // Casimir666 : bug here, create vertical lines ! TODO : why ??????
 
 	MYD3DVERTEX<1> vy[] =
 	{
-	    {dst[0].x, dst[0].y, dst[0].z, 1.0/dst[0].z, tx0_2, ty0_2},
-	    {dst[1].x, dst[1].y, dst[1].z, 1.0/dst[1].z, tx1_2, ty0_2},
-	    {dst[2].x, dst[2].y, dst[2].z, 1.0/dst[2].z, tx0_2, ty1_2},
-	    {dst[3].x, dst[3].y, dst[3].z, 1.0/dst[3].z, tx1_2, ty1_2},
+		{dst[0].x, dst[0].y, dst[0].z, 1.0/dst[0].z, tx0_2, ty0_2},
+		{dst[1].x, dst[1].y, dst[1].z, 1.0/dst[1].z, tx1_2, ty0_2},
+		{dst[2].x, dst[2].y, dst[2].z, 1.0/dst[2].z, tx0_2, ty1_2},
+		{dst[3].x, dst[3].y, dst[3].z, 1.0/dst[3].z, tx1_2, ty1_2},
 	};
 
 
-	AdjustQuad(vy, 0.0, 1.0);		// Casimir666 : bug here, create horizontal lines ! TODO : why ??????
+	AdjustQuad(vy, 0.0, 1.0); // Casimir666 : bug here, create horizontal lines ! TODO : why ??????
 
 	hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[2]);
 	{
-	    float fConstData[][4] = {{0.5f / Tex0_Width, 0.5f / Tex0_Height, 0, 0}, {1.0f / Tex0_Width, 1.0f / Tex0_Height, 0, 0}, {1.0f / Tex0_Width, 0, 0, 0}, {0, 1.0f / Tex0_Height, 0, 0}, {Tex0_Width, Tex0_Height, 0, 0}};
-	    hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		float fConstData[][4] = {
+			{0.5f / Tex0_Width, 0.5f / Tex0_Height, 0, 0},
+			{1.0f / Tex0_Width, 1.0f / Tex0_Height, 0, 0},
+			{1.0f / Tex0_Width, 0, 0, 0},
+			{0, 1.0f / Tex0_Height, 0, 0},
+			{Tex0_Width, Tex0_Height, 0, 0}
+		};
+		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 	}
 
 	hr = m_pD3DDev->SetTexture(0, pTexture);
@@ -897,8 +895,14 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 
 	hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[3]);
 	{
-	    float fConstData[][4] = {{0.5f / Tex1_Width, 0.5f / Tex1_Height, 0, 0}, {1.0f / Tex1_Width, 1.0f / Tex1_Height, 0, 0}, {1.0f / Tex1_Width, 0, 0, 0}, {0, 1.0f / Tex1_Height, 0, 0}, {Tex1_Width, Tex1_Height, 0, 0}};
-	    hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		float fConstData[][4] = {
+			{ 0.5f / Tex1_Width, 0.5f / Tex1_Height, 0, 0 },
+			{ 1.0f / Tex1_Width, 1.0f / Tex1_Height, 0, 0 },
+			{ 1.0f / Tex1_Width, 0, 0, 0 },
+			{ 0, 1.0f / Tex1_Height, 0, 0 },
+			{ Tex1_Width, Tex1_Height, 0, 0 }
+		};
+		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 	}
 
 	hr = m_pD3DDev->SetTexture(0, m_pTemporaryScreenSpaceTextures[0]);
@@ -908,7 +912,7 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 	hr = TextureBlt(m_pD3DDev, vy, D3DTEXF_POINT);
 	return hr;
 }
-*/
+#endif
 
 HRESULT CDX9RenderingEngine::InitFinalPass()
 {

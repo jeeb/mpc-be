@@ -26,6 +26,7 @@
 #include <dx/d3dx9.h>
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
+#define ENABLE_2PASS_BICUBIC_RESIZE 0
 
 namespace DSObjects
 {
@@ -166,7 +167,9 @@ namespace DSObjects
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], D3DTEXTUREFILTERTYPE filter, const CRect &srcRect);
 		HRESULT TextureResizeBilinear(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
 		HRESULT TextureResizeBicubic(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
-		//HRESULT TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
+#if ENABLE_2PASS_BICUBIC_RESIZE
+		HRESULT TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect);
+#endif
 
 		// Final pass
 		HRESULT InitFinalPass();

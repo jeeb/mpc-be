@@ -883,13 +883,13 @@
     <None Include="res\Toolbarw7.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\empty.psh">
+    <None Include="res\empty.hlsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\final.psh">
+    <None Include="res\final.hlsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\resizer.psh">
+    <None Include="res\resizer.hlsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

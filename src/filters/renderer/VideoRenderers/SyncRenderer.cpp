@@ -1106,7 +1106,7 @@ HRESULT CBaseAP::InitResizers(float bicubicA, bool bNeedScreenSizeTexture)
 	A.Format("(%f)", bicubicA);
 	str.Replace("_The_Value_Of_A_Is_Set_Here_", A);
 
-	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic", "main_bicubic2pass_pass1", "main_bicubic2pass_pass2"};
+	LPCSTR pEntries[] = {"main_bilinear", "main_bicubic", "main_bicubic_x", "main_bicubic_y"};
 
 	ASSERT(_countof(pEntries) == _countof(m_pResizerPixelShader));
 	for (int i = 0; i < _countof(pEntries); i++) {
