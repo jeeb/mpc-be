@@ -490,7 +490,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_DECRATE, ID_PLAY_INCRATE, OnUpdatePlayChangeRate)
 	ON_COMMAND(ID_PLAY_RESETRATE, OnPlayResetRate)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_RESETRATE, OnUpdatePlayResetRate)
-	ON_COMMAND_RANGE(IDS_AG_AUDIODELAY_PLUS, ID_PLAY_AUDIODELAY_MINUS, OnPlayChangeAudDelay)
+	ON_COMMAND_RANGE(ID_PLAY_AUDIODELAY_PLUS, ID_PLAY_AUDIODELAY_MINUS, OnPlayChangeAudDelay)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_AUDIODELAY_PLUS, ID_PLAY_AUDIODELAY_MINUS, OnUpdatePlayChangeAudDelay)
 	ON_COMMAND_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnPlayFilters)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnUpdatePlayFilters)
@@ -8907,7 +8907,6 @@ void CMainFrame::OnUpdatePlayChangeRate(CCmdUI* pCmdUI)
 		if (GetPlaybackMode() == PM_CAPTURE && m_wndCaptureBar.m_capdlg.IsTunerActive() && !m_fCapturing) {
 			enable = true;
 		}
-
 		else if (GetPlaybackMode() == PM_FILE) {
 			if (bIncRate && m_PlaybackRate < MAXRATE || bDecRate && m_PlaybackRate > MINRATE) {
 				enable = true;
@@ -13876,6 +13875,7 @@ void CMainFrame::OpenSetupAudioStream()
 			size_t bLangIdx	= 0;
 
 			CString alo = s.strAudiosLanguageOrder;
+			CharLower(alo.GetBuffer());
 			alo.Replace(L"[fc]", L"forced");
 			alo.Replace(L"[def]", L"default");
 			if (alo.Find(L"forced") == -1) {
@@ -13897,8 +13897,7 @@ void CMainFrame::OpenSetupAudioStream()
 						}
 
 						CString name(MixAS[iIndex].Name);
-						name.MakeLower();
-						lang.MakeLower();
+						CharLower(name.GetBuffer());
 
 						CAtlList<CString> sl;
 						Explode(lang, sl, '|');
@@ -13950,8 +13949,7 @@ void CMainFrame::OpenSetupAudioStream()
 				for (size_t iIndex = 0; iIndex < MixAS.GetCount(); iIndex++) {
 
 					CString name(MixAS[iIndex].Name);
-					name.MakeLower();
-					lang.MakeLower();
+					CharLower(name.GetBuffer());
 
 					CAtlList<CString> sl;
 					Explode(lang, sl, '|');
@@ -14023,7 +14021,10 @@ void CMainFrame::SubFlags(CString strname, bool& forced, bool& def)
 size_t CMainFrame::GetSubSelIdx()
 {
 	AppSettings& s	= AfxGetAppSettings();
+
 	CString slo		= s.strSubtitlesLanguageOrder;
+	CharLower(slo.GetBuffer());
+
 	slo.Replace(L"[fc]", L"forced");
 	slo.Replace(L"[def]", L"default");
 	if (slo.Find(L"forced") == -1) {
@@ -14048,8 +14049,7 @@ size_t CMainFrame::GetSubSelIdx()
 					continue;
 				}
 				CString name(subarray[iIndex].lang);
-				name.MakeLower();
-				lang.MakeLower();
+				CharLower(name.GetBuffer());
 
 				CAtlList<CString> sl;
 				Explode(lang, sl, '|');
@@ -14097,8 +14097,7 @@ size_t CMainFrame::GetSubSelIdx()
 			for (size_t iIndex = 0; iIndex < cnt; iIndex++) {
 
 				CString name(subarray[iIndex].lang);
-				name.MakeLower();
-				lang.MakeLower();
+				CharLower(name.GetBuffer());
 
 				CAtlList<CString> sl;
 				Explode(lang, sl, '|');

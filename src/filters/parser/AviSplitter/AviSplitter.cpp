@@ -314,6 +314,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('MMES'):
 					mt.subtype = MEDIASUBTYPE_MPEG2_VIDEO;
 					break;
+				case FCC('mpg1'):
 				case FCC('MPEG'):
 					mt.subtype = MEDIASUBTYPE_MPEG1Payload;
 					break;

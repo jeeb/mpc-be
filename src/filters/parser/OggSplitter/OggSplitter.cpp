@@ -1221,6 +1221,10 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 		case BI_RLE4:
 			mt.subtype = MEDIASUBTYPE_RGB4;
 			break;
+		case FCC('MPEG'): // MediaInfo: Chromatic MPEG 1 Video I Frame
+			pvih->bmiHeader.biCompression = 0;
+			mt.subtype = MEDIASUBTYPE_MPEG1Payload;
+			break;
 	}
 	mt.SetSampleSize(max(h->buffersize, 1));
 	m_mts.Add(mt);
