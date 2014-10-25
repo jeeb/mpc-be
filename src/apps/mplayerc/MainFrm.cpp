@@ -273,8 +273,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_STREAM_AUDIO_NEXT, ID_STREAM_AUDIO_PREV, OnStreamAudio)
 	ON_COMMAND_RANGE(ID_STREAM_SUB_NEXT, ID_STREAM_SUB_PREV, OnStreamSub)
 	ON_COMMAND(ID_STREAM_SUB_ONOFF, OnStreamSubOnOff)
-	ON_COMMAND_RANGE(ID_OGM_AUDIO_NEXT, ID_OGM_AUDIO_PREV, OnOgmAudio)
-	ON_COMMAND_RANGE(ID_OGM_SUB_NEXT, ID_OGM_SUB_PREV, OnOgmSub)
 	ON_COMMAND_RANGE(ID_DVD_ANGLE_NEXT, ID_DVD_ANGLE_PREV, OnDvdAngle)
 	ON_COMMAND_RANGE(ID_DVD_AUDIO_NEXT, ID_DVD_AUDIO_PREV, OnDvdAudio)
 	ON_COMMAND_RANGE(ID_DVD_SUB_NEXT, ID_DVD_SUB_PREV, OnDvdSub)
@@ -4860,128 +4858,6 @@ void CMainFrame::OnStreamSubOnOff()
 		AfxGetAppSettings().fEnableSubtitles = !(m_iSubtitleSel & 0x80000000);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		SendMessage(WM_COMMAND, ID_DVD_SUB_ONOFF);
-	}
-}
-
-void CMainFrame::OnOgmAudio(UINT nID)
-{
-	nID -= ID_OGM_AUDIO_NEXT;
-
-	if (m_iMediaLoadState != MLS_LOADED) {
-		return;
-	}
-
-	CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
-	if (!pSS) {
-		return;
-	}
-
-	CAtlArray<int> snds;
-	int iSel = -1;
-
-	DWORD cStreams = 0;
-	if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 1) {
-		for (int i = 0; i < (int)cStreams; i++) {
-			DWORD dwFlags = DWORD_MAX;
-			DWORD dwGroup = DWORD_MAX;
-			if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
-				return;
-			}
-
-			if (dwGroup == 1) {
-				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-					iSel = snds.GetCount();
-				}
-				snds.Add(i);
-			}
-		}
-
-		int cnt = snds.GetCount();
-		if (cnt > 1 && iSel >= 0) {
-			int nNewStream = snds[(iSel + (nID == 0 ? 1 : cnt -1 )) % cnt];
-			pSS->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
-
-			WCHAR* pszName = NULL;
-			if (SUCCEEDED(pSS->Info(nNewStream, NULL, NULL, NULL, NULL, &pszName, NULL, NULL))) {
-				CString	strMessage;
-				CString audio_stream = pszName;
-				int k = audio_stream.Find(_T("Audio - "));
-				if (k >= 0) {
-					audio_stream = audio_stream.Right(audio_stream.GetLength() - k - 8);
-				}
-				strMessage.Format(ResStr(IDS_AUDIO_STREAM), audio_stream);
-				m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-
-				if (pszName) {
-					CoTaskMemFree(pszName);
-				}
-			}
-		}
-	}
-}
-
-void CMainFrame::OnOgmSub(UINT nID)
-{
-	nID -= ID_OGM_SUB_NEXT;
-
-	if (m_iMediaLoadState != MLS_LOADED) {
-		return;
-	}
-
-	CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
-	if (!pSS) {
-		return;
-	}
-
-	CArray<int> subs;
-	int iSel = -1;
-
-	DWORD cStreams = 0;
-	if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 1) {
-		for (int i = 0; i < (int)cStreams; i++) {
-			DWORD dwFlags = DWORD_MAX;
-			DWORD dwGroup = DWORD_MAX;
-			if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
-				return;
-			}
-
-			if (dwGroup == 2) {
-				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-					iSel = subs.GetCount();
-				}
-				subs.Add(i);
-			}
-		}
-
-		int cnt = subs.GetCount();
-		if (cnt > 1 && iSel >= 0) {
-			int nNewStream = subs[(iSel + (nID == 0 ? 1 : cnt - 1)) % cnt];
-			pSS->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
-
-			LCID lcid = DWORD_MAX;
-			WCHAR* pszName = NULL;
-			if (SUCCEEDED(pSS->Info(nNewStream, NULL, NULL, &lcid, NULL, &pszName, NULL, NULL))) {
-				CString lang;
-				CString	strMessage;
-				if (lcid == 0) {
-					lang = pszName;
-				} else {
-					int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-					lang.ReleaseBufferSetLength(max(len - 1, 0));
-				}
-
-				strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), lang);
-				m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-
-				if (pszName) {
-					CoTaskMemFree(pszName);
-				}
-			}
-		}
-	}
-
-	if (m_pCAP) {
-		m_pCAP->Invalidate();
 	}
 }
 

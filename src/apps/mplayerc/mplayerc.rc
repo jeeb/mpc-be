@@ -266,7 +266,7 @@ BEGIN
     CONTROL         "User defined path:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
     EDITTEXT        IDC_DVDPATH,20,41,249,13,ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "...",IDC_BUTTON1,273,41,13,13
-    GROUPBOX        "Preferred language for DVD Navigator and the external OGM Splitter",IDC_STATIC,5,62,286,74
+    GROUPBOX        "Preferred language for DVD Navigator",IDC_STATIC,5,62,286,74
     CONTROL         "Menu",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,74,65,8
     CONTROL         "Audio",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,10,86,65,8
     CONTROL         "Subtitles",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,65,8
@@ -2350,7 +2350,7 @@ BEGIN
     IDD_PPAGEINTERFACE      "Player::Interface"
     IDD_PPAGEWEBSERVER      "Player::Web Interface"
     IDD_PPAGEPLAYBACK       "Playback"
-    IDD_PPAGEDVD            "Playback::DVD/OGM"
+    IDD_PPAGEDVD            "Playback::DVD-Video"
     IDD_PPAGECAPTURE        "Playback::Capture"
     IDD_PPAGEYOUTUBE        "Playback::YouTube"
     IDD_PPAGEVIDEO          "Video"
@@ -2732,10 +2732,6 @@ BEGIN
     IDS_AG_PREV_SUBTITLE    "Prev Subtitle"
     IDS_MPLAYERC_85         "On/Off Subtitle"
     IDS_MPLAYERC_86         "Reload Subtitles"
-    IDS_MPLAYERC_87         "Next Audio (OGM)"
-    IDS_MPLAYERC_88         "Prev Audio (OGM)"
-    IDS_MPLAYERC_89         "Next Subtitle (OGM)"
-    IDS_MPLAYERC_90         "Prev Subtitle (OGM)"
     IDS_MPLAYERC_91         "Next Angle (DVD)"
     IDS_MPLAYERC_92         "Prev Angle (DVD)"
     IDS_MPLAYERC_93         "Next Audio (DVD)"

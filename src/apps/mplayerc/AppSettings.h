@@ -587,7 +587,7 @@ public:
 	bool			fPrioritizeExternalAudio;
 	CString			strAudioPaths;
 
-	// DVD/OGM
+	// DVD-Video
 	bool			fUseDVDPath;
 	CString			strDVDPath;
 	LCID			idMenuLang, idAudioLang, idSubtitlesLang;
