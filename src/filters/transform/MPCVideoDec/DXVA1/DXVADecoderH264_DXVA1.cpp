@@ -126,7 +126,7 @@ HRESULT CDXVADecoderH264_DXVA1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, 
 
 		memset(pDXVABuffer, 0, nDummy);
 		m_pSliceShort[m_nSlices-1].SliceBytesInBuffer	+= nDummy;
-		nSize											+= nDummy;		
+		nSize											+= nDummy;
 	}
 
 	return S_OK;
@@ -154,8 +154,8 @@ HRESULT CDXVADecoderH264_DXVA1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE
 	CH264Nalu				Nalu;
 	CComPtr<IMediaSample>	pSampleToDeliver;
 
-	CHECK_HR_FALSE (FFH264DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart, 
-					&nFramePOC, &nOutPOC, &rtOutStart, &m_nNALLength)); 
+	CHECK_HR_FALSE (FFH264DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart,
+					&nFramePOC, &nOutPOC, &rtOutStart, &m_nNALLength));
 
 	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
 	CHECK_HR_FALSE (FFH264BuildPicParams(m_pFilter->GetAVCtx(), &m_DXVAPicParams, &m_DXVAScalingMatrix, m_IsATIUVD));
@@ -173,7 +173,7 @@ HRESULT CDXVADecoderH264_DXVA1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE
 
 	{
 		m_DXVAPicParams.StatusReportFeedbackNumber++;
-		
+
 		CHECK_HR_FALSE (BeginFrame(nSurfaceIndex, pSampleToDeliver));
 		// Send picture parameters
 		CHECK_HR_FALSE (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_DXVAPicParams), &m_DXVAPicParams));

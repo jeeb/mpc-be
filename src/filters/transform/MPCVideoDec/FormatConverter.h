@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * (C) 2014 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -122,7 +122,7 @@ protected:
 	HRESULT ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical);
 	HRESULT ConvertToY410(CONV_FUNC_PARAMS);
 	HRESULT ConvertToY416(CONV_FUNC_PARAMS);
-	
+
 	// Conversion function pointer
 	typedef HRESULT (CFormatConverter::*ConverterFn)(CONV_FUNC_PARAMS);
 	ConverterFn pConvertFn;

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * (C) 2014 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -448,7 +448,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 			dst += dstStrideBytes;
 		}
 		dst += (m_planeHeight - m_FProps.height) * dstStrideBytes;
-		
+
 		for (int plane = 1; plane < swof.planes; ++plane) {
 			const size_t planeWidth			= widthBytes      / swof.planeWidth[plane];
 			const int activePlaneHeight		= m_FProps.height / swof.planeHeight[plane];

@@ -113,7 +113,7 @@ public:
 
 	STDMETHODIMP SetFPS(double fps);
 	STDMETHODIMP SetTime(REFERENCE_TIME rtNow);
-	
+
 	/*
 	STDMETHODIMP Invalidate(REFERENCE_TIME rtInvalidate = -1) PURE;
 	STDMETHODIMP_(bool) LookupSubPic(REFERENCE_TIME rtNow, ISubPic** ppSubPic) PURE;

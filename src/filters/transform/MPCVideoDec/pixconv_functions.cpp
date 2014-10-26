@@ -636,7 +636,7 @@ static int yuv420yuy2_convert_pixels(const uint8_t* &srcY, const uint8_t* &srcU,
   xmm3 = _mm_add_epi16(xmm3, xmm2);                         /* 2x line 1 */
   xmm3 = _mm_add_epi16(xmm3, xmm2);                         /* 3x line 1 */
   xmm3 = _mm_add_epi16(xmm3, xmm0);                         /* 3x line 1 + line 0 (10bit) */
-  
+
   // After this step, xmm1 and xmm3 contain 8 16-bit values, V and U interleaved. For 4:2:0, filling input+2 bits (10, 11, 12).
   // Load Y
   if (shift > 0) {

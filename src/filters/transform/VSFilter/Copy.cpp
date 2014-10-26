@@ -46,7 +46,7 @@ void BltLineRGB32(DWORD* d, BYTE* sub, int w, const GUID& subtype)
 				*db = y; // w/o colors
 			}
 		}
-	} 
+	}
 	else if (subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016)
 	{
 		// Y plane is 16 bits

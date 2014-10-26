@@ -528,12 +528,12 @@ HRESULT CDirectVobSubFilter::CompleteConnect(PIN_DIRECTION dir, IPin* pReceivePi
 
 			if (!can_reconnect && !can_transform) {
 				iPosition = 0;
-				for (;;) {                
+				for (;;) {
 					if (GetMediaType(iPosition, &desiredMt) != S_OK) {
 						break;
 					}
 					iPosition++;
-					
+
 					if (SUCCEEDED(DoCheckTransform(&desiredMt, mtOut, true)) && SUCCEEDED(m_pInput->GetConnected()->QueryAccept(&desiredMt))) {
 						can_reconnect = true;
 						break;
@@ -555,7 +555,7 @@ HRESULT CDirectVobSubFilter::CompleteConnect(PIN_DIRECTION dir, IPin* pReceivePi
 				m_pOutput->Disconnect();
 			}
 			return VFW_E_TYPE_NOT_ACCEPTED;
-		}		
+		}
 	}
 
 	if (!reconnected && m_pOutput->IsConnected()) {
@@ -1400,7 +1400,7 @@ STDMETHODIMP CDirectVobSubFilter::get_LanguageType(int iLanguage, int* pType)
 
 		int nLangs = 0;
 		get_LanguageCount(&nLangs);
-		
+
 		int nEmbeddedCount = 0;
 		for (size_t i = 0; i < m_pTextInput.GetCount(); i++) {
 			if (m_pTextInput[i]->IsConnected()) {

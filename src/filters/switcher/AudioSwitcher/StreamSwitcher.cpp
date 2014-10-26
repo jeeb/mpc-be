@@ -820,7 +820,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 	hr = pOut->CurrentAllocator()->GetProperties(&actual);
 
 	long cbBuffer = pSample->GetActualDataLength();
-	
+
 	if (bFormatChanged) {
 		pOut->SetMediaType(&m_mt);
 

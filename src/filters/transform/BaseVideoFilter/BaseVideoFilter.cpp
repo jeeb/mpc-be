@@ -35,7 +35,7 @@ static inline bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* ds
 	for (size_t row = 0; row < h; row++) {
 		BYTE* src = srcY + row * srcPitch;
 		BYTE* dst = dstY + row * dstPitch;
-		
+
 		memcpy_sse(dst, src, dstPitch);
 	}
 
@@ -312,7 +312,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 				} else {
 					DbgLog((LOG_TRACE, 3, L"	ReceiveConnection() failed (hr: %x); QueryAccept: %x\n", hr, hrQA));
 				}
-				
+
 				break;
 			}
 		}
@@ -410,7 +410,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 				}
 			}
 		}
-	} 
+	}
 	else if ((subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016)
 			 && (bihOut.biCompression == FCC('P010') || bihOut.biCompression == FCC('P016'))) {
 		// We currently don't support outputting P010/P016 input to something other than P010/P016

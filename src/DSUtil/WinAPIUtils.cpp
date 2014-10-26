@@ -460,18 +460,18 @@ BOOL CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status)
 }
 
 BOOL IsUserAdmin()
-/*++ 
+/*++
 Routine Description: This routine returns TRUE if the caller's
 process is a member of the Administrators local group. Caller is NOT
 expected to be impersonating anyone and is expected to be able to
-open its own process and process token. 
-Arguments: None. 
-Return Value: 
-	TRUE - Caller has Administrators local group. 
+open its own process and process token.
+Arguments: None.
+Return Value:
+	TRUE - Caller has Administrators local group.
 	FALSE - Caller does not have Administrators local group. --
 
 from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).aspx
-*/ 
+*/
 {
 	BOOL ret;
 	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;

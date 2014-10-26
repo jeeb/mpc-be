@@ -173,7 +173,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		if (!m_bPESPTSPresent && m_posPCRMin > -1) {
 			m_rtMin = m_rtPCRMin;
 			m_rtMax = m_rtPCRMax;
-				
+
 			m_posMin = m_posPCRMin;
 			m_posMax = m_posPCRMax;
 		}
@@ -806,7 +806,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			}
 		}
 	}
-	
+
 	if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
 		if (s.pid) {
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::subpic].Find(s)) {

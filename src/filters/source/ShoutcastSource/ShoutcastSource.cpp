@@ -599,7 +599,7 @@ UINT CShoutcastStream::SocketThreadProc()
 		{
 			if (m_queue.GetCount() >= MaxQueuePackets) {
 				// Buffer is full
-				Sleep(100);	
+				Sleep(100);
 				continue;
 			}
 		}
@@ -955,7 +955,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 						redirectUrl.Trim();
 
 						break;
-					}					
+					}
 				}
 			}
 
@@ -1003,10 +1003,10 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 				m_freq = aacfreq[h.m_aachdr.freq];
 				m_channels = h.m_aachdr.channels;
 				m_aachdr = h.m_aachdr;
-				
+
 				return true;
 			}
-		}	
+		}
 	}
 
 	return false;

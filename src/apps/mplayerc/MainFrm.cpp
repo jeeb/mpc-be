@@ -8853,7 +8853,6 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 		} while (FALSE);
 		/*			SUCCEEDED(pAMTuner->SignalPresent(&lSignalStrength))
 					&& (lSignalStrength != AMTUNER_SIGNALPRESENT || lFreqNew == lFreqOrg));*/
-		
 		return;
 	}
 

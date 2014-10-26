@@ -707,7 +707,7 @@ HRESULT CDXVADecoder::get_buffer_dxva(AVFrame *pic)
 	m_pSampleToDeliver.Release();
 	m_nSurfaceIndex = -1;
 	CHECK_HR_FALSE (GetFreeSurfaceIndex(m_nSurfaceIndex, &m_pSampleToDeliver, 0, 0));
-	
+
 	SurfaceWrapper* pSurfaceWrapper = DNew SurfaceWrapper();
 	pSurfaceWrapper->opaque			= (void*)this;
 	pSurfaceWrapper->nSurfaceIndex	= m_nSurfaceIndex;
@@ -716,7 +716,7 @@ HRESULT CDXVADecoder::get_buffer_dxva(AVFrame *pic)
 	pic->data[3]	= (uint8_t *)pSurfaceWrapper;
 	pic->data[4]	= (uint8_t *)m_nSurfaceIndex;
 	pic->buf[3]		= av_buffer_create(NULL, 0, release_buffer_dxva, pSurfaceWrapper, 0);
-	
+
 	return hr;
 }
 

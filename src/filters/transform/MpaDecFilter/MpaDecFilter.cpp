@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 #include "stdafx.h"
 #include <atlbase.h>
 #include <MMReg.h>
@@ -102,7 +102,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_DTS},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_DTS},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_DTS2},
-	// LPCM	
+	// LPCM
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_DVD_LPCM_AUDIO},
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_DVD_LPCM_AUDIO},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_DVD_LPCM_AUDIO},
@@ -1360,7 +1360,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() // little-endian 'fl32' and 'fl64'
 		case 32:
 			out_sf = SAMPLE_FMT_FLT;
 			break;
-		case 64: 
+		case 64:
 			out_sf = SAMPLE_FMT_DBL;
 			break;
 	}

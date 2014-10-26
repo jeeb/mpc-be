@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * (C) 2014 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -78,7 +78,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	// we calculate the size of the samples buffer in bytes
 	m_framesize  = m_pAVCtx->frame_size * m_pAVCtx->channels * sizeof(float);
 	m_buffersize = av_samples_get_buffer_size(NULL, m_pAVCtx->channels, m_pAVCtx->frame_size, m_pAVCtx->sample_fmt, 0);
-	
+
 	m_pSamples = (float*)av_malloc(m_buffersize);
 	if (!m_pSamples) {
 		DbgLog((LOG_TRACE, 3, L"CAC3Encoder::Init() : av_malloc(%d) failed", m_buffersize));

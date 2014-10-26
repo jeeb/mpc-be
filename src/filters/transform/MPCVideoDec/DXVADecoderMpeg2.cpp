@@ -70,7 +70,7 @@ HRESULT CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT&
 		DXVA_SliceInfo *slice	= &ctx_pic->slice[i];
 		UINT position			= slice->dwSliceDataLocation;
 		UINT size				= slice->dwSliceBitsInBuffer / 8;
-		
+
 		slice->dwSliceDataLocation = current - pDXVABuffer;
 
 		if (i < ctx_pic->slice_count - 1) {
@@ -140,7 +140,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver, rtStart, rtStop);
 		hr = DisplayNextFrame();
 	}
-		
+
 	return hr;
 }
 

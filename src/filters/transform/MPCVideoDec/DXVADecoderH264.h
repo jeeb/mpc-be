@@ -51,7 +51,7 @@ private:
 	struct DXVA_Context {
 		uint64_t				workaround;
 		int						longSlice;
-		DXVA_H264_Context		DXVA_H264Context[2];	
+		DXVA_H264_Context		DXVA_H264Context[2];
 	} m_DXVA_Context;
 
 	bool					m_bUseLongSlice;

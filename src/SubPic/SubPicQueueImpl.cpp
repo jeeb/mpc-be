@@ -108,7 +108,7 @@ STDMETHODIMP CSubPicQueueImpl::SetTime(REFERENCE_TIME rtNow)
 HRESULT CSubPicQueueImpl::RenderTo(ISubPic* pSubPic, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, double fps, BOOL bIsAnimated)
 {
 	CheckPointer(pSubPic, E_POINTER);
-	
+
 	HRESULT hr = E_FAIL;
 
 	CComPtr<ISubPicProvider> pSubPicProvider;

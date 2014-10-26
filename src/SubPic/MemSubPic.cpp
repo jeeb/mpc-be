@@ -189,13 +189,13 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) {
 		ColorConvInit();
 
-		if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV 
-			|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) 
+		if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV
+			|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12)
 		{
 			m_rcDirty.left &= ~1;
 			m_rcDirty.right = (m_rcDirty.right+1)&~1;
 
-			if(m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV 
+			if(m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV
 				|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) {
 				m_rcDirty.top &= ~1;
 				m_rcDirty.bottom = (m_rcDirty.bottom+1)&~1;
@@ -430,14 +430,14 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 				// destination is P010/P016 surface.
 				int bitDepth = (dst.type == MSP_P016) ? 16 : 10;
 
-				for(ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) 
+				for(ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch)
 				{
 					BYTE* s2 = s;
 					BYTE* s2end = s2 + w * 4;
 					WORD* d2 = (WORD*)d;
-					for(; s2 < s2end; s2 += 4, d2++) 
+					for(; s2 < s2end; s2 += 4, d2++)
 					{
-						if(s2[3] < 0xff) 
+						if(s2[3] < 0xff)
 						{
 							// Convert current luminance to 8-bit value.
 							WORD dstLum = d2[0] >> 8;
@@ -661,11 +661,11 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		}
 	} else if (dst.type == MSP_NV12) {
 		int h2 = h/2;
- 
+
 		BYTE* ss[2];
 		ss[0] = (BYTE*)src.bits + src.pitch * rs.top + rs.left * 4;
 		ss[1] = ss[0] + 4;
- 
+
 		if (!dst.bitsU) {
 			dst.bitsU = (BYTE*)dst.bits + dst.pitch * dst.h;
 		}

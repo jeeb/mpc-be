@@ -20,7 +20,7 @@
  */
 
 #include "stdafx.h"
-#include <math.h> 
+#include <math.h>
 #include "AudioNormalizer.h"
 
 template<class T>

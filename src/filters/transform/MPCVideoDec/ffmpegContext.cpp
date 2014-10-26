@@ -352,11 +352,10 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 					if (DriverVersionCheck(VideoDriverVersion, 8, 1, 1, 1016)) {
 						no_level51_support = 0;
 						max_ref_frames = 16;
-					}				
+					}
 				} else {
 					// TODO - need file version for Catalyst 10.4 under WinXP
 				}
-			
 			} else {
 				// driver version 8.14.1.6105 - Catalyst 10.4; TODO - verify this information
 				if (DriverVersionCheck(VideoDriverVersion, 8, 14, 1, 6105)) {
@@ -428,7 +427,7 @@ HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 		avpkt.pts		= rtStart;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
 		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
-		
+
 #if defined(_DEBUG) && 0
 		av_log(pAVCtx, AV_LOG_INFO, "FFDecodeFrame() : %d, %d\n", used_bytes, got_picture);
 #endif

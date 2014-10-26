@@ -706,7 +706,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 		if (h.payload && ISVALIDPID(h.pid)) {
 			DWORD TrackNumber = h.pid;
-			
+
 			if (GetOutputPin(TrackNumber)) {
 				CMpegSplitterFile::peshdr h2;
 				if (h.payloadstart) {

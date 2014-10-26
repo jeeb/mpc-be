@@ -468,7 +468,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 		m_AvgTimePerFrame		= (m_nMaxFrameSize + si->min_framesize) * m_rtDuration / 2 / m_llFileSize;
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
 		const FLAC__StreamMetadata_VorbisComment *vc = &pMetadata->data.vorbis_comment;
-		
+
 		file_info.got_vorbis_comments = (vc->num_comments > 0);
 		for(unsigned i = 0; i < vc->num_comments; i++) {
 			CString TagValue;
@@ -527,7 +527,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 				continue;
 			}
 
-			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000*track->offset/m_nSamplesPerSec); 
+			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000*track->offset/m_nSamplesPerSec);
 			CString s;
 			s.Format(_T("Track %02d"), i+1);
 			((CFLACSource*)m_pFilter)->ChapAppend(rt, s);
@@ -540,7 +540,6 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 					((CFLACSource*)m_pFilter)->ChapAppend(r, s);
 				}
 			}
-		
 		}
 	}
 }

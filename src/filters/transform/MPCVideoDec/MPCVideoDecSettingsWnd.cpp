@@ -335,7 +335,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 			m_pMDF->SetSwStandard(m_cbSwStandard.GetCurSel());
 			m_pMDF->SetSwRGBLevels(m_cbSwRGBLevels.GetCurSel());
 		}
-		
+
 		m_pMDF->SetSwRefresh(refresh);
 
 		UpdateStatusInfo();
@@ -427,7 +427,7 @@ BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT *
 		}
 
 		pTTT->lpszText = strTipText.GetBuffer();
-		
+
 		*pResult = 0;
 		return TRUE;
 	}

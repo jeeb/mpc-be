@@ -29,7 +29,7 @@
 #define FlacSourceName   L"MPC FLAC Source"
 
 typedef struct{
-	CString title; 
+	CString title;
 	CString artist;
 	CString comment;
 	CString year;
@@ -45,7 +45,7 @@ class __declspec(uuid("1930D8FF-4739-4e42-9199-3B2EDEAA3BF2"))
 	, public IAMMediaContent
 	, public IDSMPropertyBagImpl
 	, public IDSMResourceBagImpl
-	, public IDSMChapterBagImpl 
+	, public IDSMChapterBagImpl
 {
 public:
 	CFLACSource(LPUNKNOWN lpunk, HRESULT* phr);

@@ -130,7 +130,7 @@ HRESULT CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& n
 	// Complete bitstream buffer with zero padding (buffer size should be a multiple of 128)
 	if (nSize % 128) {
 		int nDummy = 128 - (nSize % 128);
-		
+
 		pDXVABuffer += nSize;
 		memset(pDXVABuffer, 0, nDummy);
 		nSize += nDummy;
@@ -147,7 +147,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME r
 	int		got_picture		= 0;
 
 	memset(&m_PictureParams, 0, sizeof(m_PictureParams));
-	m_PictureParams[1].bBidirectionalAveragingMode = 
+	m_PictureParams[1].bBidirectionalAveragingMode =
 	m_PictureParams[0].bBidirectionalAveragingMode = (1                               << 7) |
 													 (GetConfigIntraResidUnsigned()   << 6) |
 													 (GetConfigResidDiffAccelerator() << 5);

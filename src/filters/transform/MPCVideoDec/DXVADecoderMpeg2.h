@@ -48,7 +48,7 @@ private:
 	};
 	struct DXVA_Context {
 		unsigned				frame_count;
-		DXVA_MPEG2_Context		DXVA_MPEG2Context[2];	
+		DXVA_MPEG2_Context		DXVA_MPEG2Context[2];
 	} m_DXVA_Context;
 
 	UINT					m_nFieldNum;
