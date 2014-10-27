@@ -630,7 +630,6 @@ BOOL CPPageFormats::OnInitDialog()
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
 	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT, 300);
-	m_list.InsertColumn(COL_ENGINE, _T("Engine"), LVCFMT_RIGHT, 60);
 
 	CImage onoff;
 	onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF);
@@ -646,16 +645,9 @@ BOOL CPPageFormats::OnInitDialog()
 
 		int iItem = m_list.InsertItem(i, label);
 		m_list.SetItemData(iItem, i);
-		engine_t e = mf[i].GetEngineType();
-		m_list.SetItemText(iItem, COL_ENGINE,
-						   e == DirectShow ? _T("DirectShow") :
-						   e == RealMedia  ? _T("RealMedia") :
-						   e == QuickTime  ? _T("QuickTime") :
-						   e == ShockWave  ? _T("ShockWave") : _T("-"));
 	}
 
-	//	m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
-	m_list.SetColumnWidth(COL_ENGINE, LVSCW_AUTOSIZE_USEHEADER);
+	m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
 
 	m_list.SetSelectionMark(0);
 	m_list.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
@@ -1057,9 +1049,7 @@ void CPPageFormats::OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	if (pItem->iSubItem == COL_ENGINE) {
-		*pResult = TRUE;
-	}
+	//... process other columns
 }
 
 void CPPageFormats::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -1073,22 +1063,7 @@ void CPPageFormats::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	CMediaFormatCategory& mfc = AfxGetAppSettings().m_Formats[m_list.GetItemData(pItem->iItem)];
-
-	CAtlList<CString> sl;
-
-	if (pItem->iSubItem == COL_ENGINE) {
-		sl.AddTail(_T("DirectShow"));
-		sl.AddTail(_T("RealMedia"));
-		sl.AddTail(_T("QuickTime"));
-		sl.AddTail(_T("ShockWave"));
-
-		int nSel = (int)mfc.GetEngineType();
-
-		m_list.ShowInPlaceComboBox(pItem->iItem, pItem->iSubItem, sl, nSel);
-
-		*pResult = TRUE;
-	}
+	//... process other columns
 }
 
 void CPPageFormats::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -1106,17 +1081,7 @@ void CPPageFormats::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	CMediaFormatCategory& mfc = AfxGetAppSettings().m_Formats[m_list.GetItemData(pItem->iItem)];
-
-	if (pItem->iSubItem == COL_ENGINE && pItem->lParam >= 0) {
-		mfc.SetEngineType((engine_t)pItem->lParam);
-		m_list.SetItemText(pItem->iItem, pItem->iSubItem, pItem->pszText);
-		*pResult = TRUE;
-	}
-
-	if (*pResult) {
-		SetModified();
-	}
+	//... process other columns
 }
 
 void CPPageFormats::OnBnClickedAll()

@@ -30,32 +30,29 @@
 
 CMediaFormatCategory::CMediaFormatCategory()
 	: m_filetype(TVideo)
-	, m_engine(DirectShow)
 {
 }
 
 CMediaFormatCategory::CMediaFormatCategory(
 	CString label, CString description, CAtlList<CString>& exts, filetype_t filetype,
-	CString specreqnote, engine_t engine)
+	CString specreqnote)
 {
 	m_label			= label;
 	m_description	= description;
 	m_specreqnote	= specreqnote;
 	m_filetype		= filetype;
-	m_engine		= engine;
 	m_exts.AddTailList(&exts);
 	m_backupexts.AddTailList(&m_exts);
 }
 
 CMediaFormatCategory::CMediaFormatCategory(
 	CString label, CString description, CString exts, filetype_t filetype,
-	CString specreqnote, engine_t engine)
+	CString specreqnote)
 {
 	m_label			= label;
 	m_description	= description;
 	m_specreqnote	= specreqnote;
 	m_filetype		= filetype;
-	m_engine		= engine;
 	ExplodeMin(exts, m_exts, ' ');
 	POSITION pos = m_exts.GetHeadPosition();
 
@@ -73,9 +70,9 @@ CMediaFormatCategory::~CMediaFormatCategory()
 void CMediaFormatCategory::UpdateData(bool fSave)
 {
 	if (fSave) {
-		AfxGetApp()->WriteProfileString(_T("FileFormats"), m_label, GetExts(true));
+		AfxGetApp()->WriteProfileString(_T("FileFormats"), m_label, GetExts());
 	} else {
-		SetExts(AfxGetApp()->GetProfileString(_T("FileFormats"), m_label, GetExts(true)));
+		SetExts(AfxGetApp()->GetProfileString(_T("FileFormats"), m_label, GetExts()));
 	}
 }
 
@@ -91,7 +88,6 @@ CMediaFormatCategory& CMediaFormatCategory::operator = (const CMediaFormatCatego
 		m_description	= mfc.m_description;
 		m_specreqnote	= mfc.m_specreqnote;
 		m_filetype		= mfc.m_filetype;
-		m_engine		= mfc.m_engine;
 		m_exts.RemoveAll();
 		m_exts.AddTailList(&mfc.m_exts);
 		m_backupexts.RemoveAll();
@@ -124,7 +120,6 @@ void CMediaFormatCategory::SetExts(CString exts)
 		CString& ext = m_exts.GetNext(pos);
 
 		if (ext[0] == '\\') {
-			m_engine = (engine_t)_tcstol(ext.TrimLeft('\\'), NULL, 10);
 			m_exts.RemoveAt(cur);
 		} else {
 			ext.TrimLeft('.');
@@ -145,18 +140,14 @@ CString CMediaFormatCategory::GetFilter()
 	return(filter);
 }
 
-CString CMediaFormatCategory::GetExts(bool fAppendEngine)
+CString CMediaFormatCategory::GetExts()
 {
 	CString exts = Implode(m_exts, ' ');
-
-	if (fAppendEngine) {
-		exts += CString(_T(" \\")) + (TCHAR)(0x30 + (int)m_engine);
-	}
 
 	return(exts);
 }
 
-CString CMediaFormatCategory::GetExtsWithPeriod(bool fAppendEngine)
+CString CMediaFormatCategory::GetExtsWithPeriod()
 {
 	CString exts;
 	POSITION pos = m_exts.GetHeadPosition();
@@ -167,14 +158,10 @@ CString CMediaFormatCategory::GetExtsWithPeriod(bool fAppendEngine)
 
 	exts.TrimRight(_T(' '));
 
-	if (fAppendEngine) {
-		exts += CString(_T(" \\")) + (TCHAR)(0x30 + (int)m_engine);
-	}
-
 	return(exts);
 }
 
-CString CMediaFormatCategory::GetBackupExtsWithPeriod(bool fAppendEngine)
+CString CMediaFormatCategory::GetBackupExtsWithPeriod()
 {
 	CString exts;
 	POSITION pos = m_backupexts.GetHeadPosition();
@@ -184,10 +171,6 @@ CString CMediaFormatCategory::GetBackupExtsWithPeriod(bool fAppendEngine)
 	}
 
 	exts.TrimRight(_T(' '));
-
-	if (fAppendEngine) {
-		exts += CString(_T(" \\")) + (TCHAR)(0x30 + (int)m_engine);
-	}
 
 	return(exts);
 }
@@ -235,7 +218,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("flic"),        ResStr(IDS_MFMT_FLIC),        _T("fli flc flic")));
 		ADDFMT((_T("dsm"),         ResStr(IDS_MFMT_DSM),         _T("dsm dsv dsa dss")));
 		ADDFMT((_T("ivf"),         ResStr(IDS_MFMT_IVF),         _T("ivf")));
-		ADDFMT((_T("swf"),         ResStr(IDS_MFMT_SWF),         _T("swf"), TVideo, _T("ShockWave ActiveX control"), ShockWave));
+		ADDFMT((_T("swf"),         ResStr(IDS_MFMT_SWF),         _T("swf"), TVideo, _T("ShockWave ActiveX control")));
 		ADDFMT((_T("other"),       ResStr(IDS_MFMT_OTHER),       _T("divx rmvb amv wtv dvr-ms")));
 		ADDFMT((_T("raw video"),   ResStr(IDS_MFMT_RAW_VIDEO),   _T("h264 264 vc1 h265 265 hm10 hevc")));
 		// audio files

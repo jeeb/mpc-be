@@ -66,7 +66,7 @@ public:
 	CPPageFormats();
 	virtual ~CPPageFormats();
 
-	enum {COL_CATEGORY, COL_ENGINE};
+	enum {COL_CATEGORY};
 
 	static bool		RegisterApp();
 	static bool		IsRegistered(CString ext);

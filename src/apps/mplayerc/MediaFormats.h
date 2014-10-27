@@ -32,16 +32,15 @@ protected:
 	CString m_label, m_description, m_specreqnote;
 	CAtlList<CString> m_exts, m_backupexts;
 	filetype_t	m_filetype;
-	engine_t	m_engine;
 
 public:
 	CMediaFormatCategory();
 	CMediaFormatCategory(
 		CString label, CString description, CAtlList<CString>& exts, filetype_t filetype = TVideo,
-		CString specreqnote = _T(""), engine_t engine = DirectShow);
+		CString specreqnote = _T(""));
 	CMediaFormatCategory(
 		CString label, CString description, CString exts, filetype_t filetype = TVideo,
-		CString specreqnote = _T(""), engine_t engine = DirectShow);
+		CString specreqnote = _T(""));
 	virtual ~CMediaFormatCategory();
 
 	void UpdateData(bool fSave);
@@ -65,9 +64,9 @@ public:
 		return m_description;
 	}
 	CString GetFilter();
-	CString GetExts(bool fAppendEngine = false);
-	CString GetExtsWithPeriod(bool fAppendEngine = false);
-	CString GetBackupExtsWithPeriod(bool fAppendEngine = false);
+	CString GetExts();
+	CString GetExtsWithPeriod();
+	CString GetBackupExtsWithPeriod();
 	CString GetSpecReqNote() const {
 		return m_specreqnote;
 	}
@@ -75,10 +74,7 @@ public:
 		return m_filetype;
 	}
 	engine_t GetEngineType() const {
-		return m_engine;
-	}
-	void SetEngineType(engine_t e) {
-		m_engine = e;
+		return (m_label == L"swf" ? ShockWave : DirectShow);
 	}
 };
 
