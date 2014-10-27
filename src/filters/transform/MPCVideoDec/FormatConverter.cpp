@@ -174,6 +174,7 @@ CFormatConverter::CFormatConverter()
 	, m_nAlignedBufferSize(0)
 	, m_pAlignedBuffer(NULL)
 	, m_nCPUFlag(0)
+	, m_RequiredAlignment(0)
 {
 	ASSERT(PixFmt_count == _countof(s_sw_formats));
 
@@ -201,11 +202,11 @@ bool CFormatConverter::Init()
 	Cleanup();
 
 	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE) {
-		TRACE(_T("FormatConverter: incorrect source format\n"));
+		DbgLog((LOG_TRACE, 3, L"FormatConverter::Init() - incorrect source format"));
 		return false;
 	}
 	if (m_out_pixfmt == PixFmt_None) {
-		TRACE(_T("FormatConverter: incorrect output format\n"));
+		DbgLog((LOG_TRACE, 3, L"FormatConverter::Init() - incorrect output format"));
 		return false;
 	}
 
@@ -225,7 +226,7 @@ bool CFormatConverter::Init()
 						NULL);
 
 	if (m_pSwsContext == NULL) {
-		TRACE(_T("FormatConverter: sws_getCachedContext failed\n"));
+		DbgLog((LOG_TRACE, 3, L"FormatConverter::Init() - sws_getCachedContext() failed"));
 		return false;
 	}
 
@@ -252,6 +253,7 @@ void  CFormatConverter::UpdateDetails()
 void CFormatConverter::SetConvertFunc()
 {
 	pConvertFn = &CFormatConverter::ConvertGeneric;
+	m_RequiredAlignment = 16;
 
 	if (m_nCPUFlag & CCpuId::MPC_MM_SSE2) {
 		switch (m_out_pixfmt) {
@@ -280,8 +282,10 @@ void CFormatConverter::SetConvertFunc()
 		case PixFmt_YUY2:
 			if (m_FProps.pftype == PFType_YUV422Px) {
 				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
+				m_RequiredAlignment = 8;
 			} else if (m_FProps.pftype == PFType_YUV420 || m_FProps.pftype == PFType_YUV420Px && m_FProps.lumabits <= 14) {
 				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
+				m_RequiredAlignment = 8;
 			}
 			break;
 		case PixFmt_YV12:
@@ -293,11 +297,13 @@ void CFormatConverter::SetConvertFunc()
 		case PixFmt_NV12:
 			if (m_FProps.pftype == PFType_YUV420Px) {
 				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+				m_RequiredAlignment = 32;
 			}
 			break;
 		case PixFmt_YV16:
 			if (m_FProps.pftype == PFType_YUV422Px) {
 				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+				m_RequiredAlignment = 32;
 			}
 			// disabled because not increase performance
 			//else if (m_FProps.pftype == PFType_YUV422) {
@@ -307,8 +313,10 @@ void CFormatConverter::SetConvertFunc()
 		case PixFmt_YV24:
 			if (m_FProps.pftype == PFType_YUV444Px) {
 				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+				m_RequiredAlignment = 32;
 			} else if (m_FProps.pftype == PFType_YUV444) {
 				pConvertFn = &CFormatConverter::convert_yuv_yv;
+				m_RequiredAlignment = 0;
 			}
 			break;
 		}
@@ -393,7 +401,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		m_FProps.colorrange	= pFrame->color_range;
 
 		if (!Init()) {
-			TRACE(_T("FormatConverter: Init() failed\n"));
+			DbgLog((LOG_TRACE, 3, L"CFormatConverter::Converting() - Init() failed"));
 			return 0;
 		}
 
@@ -406,8 +414,8 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	uint8_t *out = dst;
 	int outStride = m_dstStride;
 	// Check if we have proper pixel alignment and the dst memory is actually aligned
-	if (FFALIGN(m_dstStride, 16) != m_dstStride || ((uintptr_t)dst % 16u)) {
-		outStride = FFALIGN(outStride, 16);
+	if (m_RequiredAlignment && FFALIGN(m_dstStride, m_RequiredAlignment) != m_dstStride || ((uintptr_t)dst % 16u)) {
+		outStride = FFALIGN(outStride, m_RequiredAlignment);
 		size_t requiredSize = (outStride * m_planeHeight * swof.bpp) >> 3;
 		if (requiredSize > m_nAlignedBufferSize) {
 			av_freep(&m_pAlignedBuffer);

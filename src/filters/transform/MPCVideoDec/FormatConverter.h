@@ -113,6 +113,8 @@ protected:
 
 	int					m_nCPUFlag;
 
+	unsigned			m_RequiredAlignment;
+
 	bool Init();
 	void UpdateDetails();
 
