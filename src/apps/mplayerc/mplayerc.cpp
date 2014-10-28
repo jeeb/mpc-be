@@ -1752,8 +1752,11 @@ void SetAudioRenderer(int AudioDevNo)
 		}
 		CStringW str(olestr);
 		CoTaskMemFree(olestr);
-		m_AudioRendererDisplayNames.Add(CString(str));
-		i++;
+
+		if (str.Mid(50, 13) == L"DirectSound: ") {
+			m_AudioRendererDisplayNames.Add(CString(str));
+			i++;
+		}
 	}
 	EndEnumSysDev
 
