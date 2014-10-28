@@ -323,45 +323,25 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
 
-	struct AudStreams {
-		int iFilter;
-		int iIndex;
-		int iNum;
-		int iSel;
-		bool ExtAudio;
-		bool forced;
-		bool def;
+	struct Stream {
+		int  Filter		= 0;
+		int  Index		= 0;
+		int  Num		= -1;
+		int  Sel		= -1;
+		bool Ext		= false;
+		bool forced		= false;
+		bool def		= false;
 		CString Name;
-
-		AudStreams() {
-			iFilter = iIndex = 0;
-			iNum = iSel = -1;
-			ExtAudio = forced = def = false;
-		};
 	};
 
-	struct SubStreams {
-		int iFilter;
-		int iIndex;
-		int iNum;
-		int iSel;
-		bool Extsub;
-		bool forced;
-		bool def;
-		CString lang;
+	BOOL SelectMatchTrack(CAtlArray<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx);
 
-		SubStreams() {
-			iFilter = iIndex = 0;
-			iNum = iSel = -1;
-			Extsub = forced = def = false;
-		}
-	};
-
-	CAtlArray<SubStreams> subarray;
+	CAtlArray<Stream> subarray;
 	void SubFlags(CString strname, bool& forced, bool& def);
 	size_t GetSubSelIdx();
 	int cntintsub;
 	int m_nSelSub2;
+	
 	// chapters (file mode)
 	CComPtr<IDSMChapterBag> m_pCB;
 	void SetupChapters();

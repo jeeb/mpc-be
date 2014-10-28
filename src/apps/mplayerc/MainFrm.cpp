@@ -4430,10 +4430,9 @@ void CMainFrame::OnStreamAudio(UINT nID)
 
 	if (GetPlaybackMode() == PM_FILE) {
 
-		AudStreams as;
-		CAtlArray<AudStreams> MixAS;
+		Stream as;
+		CAtlArray<Stream> MixAS;
 		int iSel	= -1;
-		as.iNum		= -1;
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS) {
@@ -4452,10 +4451,10 @@ void CMainFrame::OnStreamAudio(UINT nID)
 							iSel = MixAS.GetCount();
 							//iSel = 1;
 						}
-						as.iFilter	= 1;
-						as.iIndex	= i;
-						as.iSel		= iSel;
-						as.iNum++;
+						as.Filter	= 1;
+						as.Index	= i;
+						as.Sel		= iSel;
+						as.Num++;
 						MixAS.Add(as);
 					}
 				}
@@ -4479,16 +4478,16 @@ void CMainFrame::OnStreamAudio(UINT nID)
 						//iSel = 1;
 						iSel = MixAS.GetCount();
 						for (size_t i = 0; i < MixAS.GetCount(); i++) {
-							if (MixAS[i].iSel == 1) {
-								MixAS[i].iSel = 0;
+							if (MixAS[i].Sel == 1) {
+								MixAS[i].Sel = 0;
 							}
 						}
 					}
 
-					as.iFilter	= 2;
-					as.iIndex	= i;
-					as.iSel		= iSel;
-					as.iNum++;
+					as.Filter	= 2;
+					as.Index	= i;
+					as.Sel		= iSel;
+					as.Num++;
 					MixAS.Add(as);
 				}
 			}
@@ -4497,14 +4496,14 @@ void CMainFrame::OnStreamAudio(UINT nID)
 
 		int cnt = MixAS.GetCount();
 		if (cnt > 1) {
-			int nNewStream2 = MixAS[(iSel+(nID==0?1:cnt-1))%cnt].iNum;
+			int nNewStream2 = MixAS[(iSel + (nID == 0 ? 1 : cnt - 1)) % cnt].Num;
 			int iF;
 			int nNewStream;
 
 			for (size_t i = 0; i < MixAS.GetCount(); i++) {
-				if (MixAS[i].iNum == nNewStream2) {
-					iF			= MixAS[i].iFilter;
-					nNewStream	= MixAS[i].iIndex;
+				if (MixAS[i].Num == nNewStream2) {
+					iF			= MixAS[i].Filter;
+					nNewStream	= MixAS[i].Index;
 					break;
 				}
 			}
@@ -4515,11 +4514,9 @@ void CMainFrame::OnStreamAudio(UINT nID)
 			if (iF == 1) { // Splitter Audio Tracks
 
 				for (size_t i = 0; i < MixAS.GetCount(); i++) {
-					if (MixAS[i].iSel == iSel) {
-						if (MixAS[i].iFilter == 2) {
-							ExtStream = true;
-							break;
-						}
+					if (MixAS[i].Sel == iSel && MixAS[i].Filter == 2) {
+						ExtStream = true;
+						break;
 					}
 				}
 
@@ -4684,10 +4681,9 @@ void CMainFrame::OnStreamSub(UINT nID)
 	if (GetPlaybackMode() == PM_FILE && AfxGetAppSettings().fEnableSubtitles) {
 
 		int splcnt	= 0;
-		SubStreams ss;
-		CAtlArray<SubStreams> MixSS;
+		Stream ss;
+		CAtlArray<Stream> MixSS;
 		int iSel	= -1;
-		ss.iNum		= -1;
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
@@ -4712,10 +4708,10 @@ void CMainFrame::OnStreamSub(UINT nID)
 						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
 							iSel = MixSS.GetCount();
 						}
-						ss.iFilter	= 1;
-						ss.iIndex	= i;
-						ss.iSel		= iSel;
-						ss.iNum++;
+						ss.Filter	= 1;
+						ss.Index	= i;
+						ss.Sel		= iSel;
+						ss.Num++;
 						MixSS.Add(ss);
 					}
 				}
@@ -4734,25 +4730,25 @@ void CMainFrame::OnStreamSub(UINT nID)
 			CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
 			for (int i = 0; i < pSubStream->GetStreamCount(); i++) {
 				subcnt++;
-				ss.iFilter	= 2;
-				ss.iIndex	= subcnt;
-				ss.iNum++;
+				ss.Filter	= 2;
+				ss.Index	= subcnt;
+				ss.Num++;
 				if (m_iSubtitleSel == subcnt) iSel = MixSS.GetCount();
-				ss.iSel		= iSel;
+				ss.Sel		= iSel;
 				MixSS.Add(ss);
 			}
 		}
 
 		int cnt = MixSS.GetCount();
 		if (cnt > 1) {
-			int nNewStream2 = MixSS[(iSel+(nID==0?1:cnt-1))%cnt].iNum;
+			int nNewStream2 = MixSS[(iSel + (nID == 0 ? 1 : cnt - 1)) % cnt].Num;
 			int iF;
 			int nNewStream;
 
 			for (size_t i = 0; i < MixSS.GetCount(); i++) {
-				if (MixSS[i].iNum == nNewStream2) {
-					iF			= MixSS[i].iFilter;
-					nNewStream	= MixSS[i].iIndex;
+				if (MixSS[i].Num == nNewStream2) {
+					iF			= MixSS[i].Filter;
+					nNewStream	= MixSS[i].Index;
 					break;
 				}
 			}
@@ -4761,11 +4757,9 @@ void CMainFrame::OnStreamSub(UINT nID)
 			if (iF == 1) { // Splitter Subtitle Tracks
 
 				for (size_t i = 0; i < MixSS.GetCount(); i++) {
-					if (MixSS[i].iSel == iSel) {
-						if (MixSS[i].iFilter == 2) {
-							ExtStream = true;
-							break;
-						}
+					if (MixSS[i].Sel == iSel && MixSS[i].Filter == 2) {
+						ExtStream = true;
+						break;
 					}
 				}
 
@@ -13709,6 +13703,66 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 #define BREAK(msg) {err = msg; break;}
 
+BOOL CMainFrame::SelectMatchTrack(CAtlArray<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx)
+{
+	CharLower(pattern.GetBuffer());
+	pattern.Replace(L"[fc]", L"forced");
+	pattern.Replace(L"[def]", L"default");
+	if (pattern.Find(L"forced") == -1) {
+		pattern.Append(L" forced");
+	}
+	if (pattern.Find(L"default") == -1) {
+		pattern.Append(L" default");
+	}
+	pattern.Trim();
+
+	nIdx = 0;
+	int tPos = 0;
+	CString lang = pattern.Tokenize(L",; ", tPos);
+	while (tPos != -1) {
+		for (size_t iIndex = 0; iIndex < Tracks.GetCount(); iIndex++) {
+			if (bExtPrior && !Tracks[iIndex].Ext) {
+				continue;
+			}
+
+			CString name(Tracks[iIndex].Name);
+			CharLower(name.GetBuffer());
+
+			CAtlList<CString> sl;
+			Explode(lang, sl, '|');
+			POSITION pos = sl.GetHeadPosition();
+
+			int nLangMatch = 0;
+			while (pos) {
+				CString subPattern = sl.GetNext(pos);
+
+				if ((Tracks[iIndex].forced && subPattern == _T("forced")) || (Tracks[iIndex].def && subPattern == _T("default"))) {
+					nLangMatch++;
+					continue;
+				}
+
+				if (subPattern[0] == '!') {
+					subPattern.Delete(0, 1);
+					if (name.Find(subPattern) == -1) {
+						nLangMatch++;
+					}
+				} else if (name.Find(subPattern) >= 0) {
+					nLangMatch++;
+				}
+			}
+
+			if (nLangMatch == sl.GetCount()) {
+				nIdx = iIndex;
+				return TRUE;
+			}
+		}
+
+		lang = pattern.Tokenize(_T(",; "), tPos);
+	}
+
+	return FALSE;
+}
+
 void CMainFrame::OpenSetupAudioStream()
 {
 	if (m_iMediaLoadState != MLS_LOADING) {
@@ -13730,10 +13784,9 @@ void CMainFrame::OpenSetupAudioStream()
 		}
 
 		// build list of audio stream
-		AudStreams as;
-		CAtlArray<AudStreams> MixAS;
+		Stream as;
+		CAtlArray<Stream> MixAS;
 		int iSel	= -1;
-		as.iNum		= -1;
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS) {
@@ -13767,10 +13820,10 @@ void CMainFrame::OpenSetupAudioStream()
 						}
 						*/
 
-						as.iFilter	= 1;
-						as.iIndex	= i;
-						as.iNum++;
-						as.iSel		= iSel;
+						as.Filter	= 1;
+						as.Index	= i;
+						as.Num++;
+						as.Sel		= iSel;
 						as.Name		= CString(pszName);
 						MixAS.Add(as);
 					}
@@ -13830,18 +13883,18 @@ void CMainFrame::OpenSetupAudioStream()
 						//iSel = 1;
 						iSel = MixAS.GetCount();
 						for (size_t i = 0; i < MixAS.GetCount(); i++) {
-							if (MixAS[i].iSel == 1) {
-								MixAS[i].iSel = 0;
+							if (MixAS[i].Sel == 1) {
+								MixAS[i].Sel = 0;
 							}
 						}
 					}
 
-					as.iFilter	= 2;
-					as.iIndex	= i;
-					as.iNum++;
-					as.iSel		= iSel;
+					as.Filter	= 2;
+					as.Index	= i;
+					as.Num++;
+					as.Sel		= iSel;
 					as.Name		= CString(pszName);
-					as.ExtAudio	= extAudioList.Find(as.Name) != NULL;
+					as.Ext		= extAudioList.Find(as.Name) != NULL;
 					MixAS.Add(as);
 
 					if (pszName) {
@@ -13854,7 +13907,7 @@ void CMainFrame::OpenSetupAudioStream()
 #ifdef DEBUG
 		DbgLog((LOG_TRACE, 3, L"Audio Track list :"));
 		for (size_t i = 0; i < MixAS.GetCount(); i++) {
-			DbgLog((LOG_TRACE, 3, L"	%s, type = %s", MixAS[i].Name, MixAS[i].iFilter == 1 ? L"Splitter" : L"AudioSwitcher"));
+			DbgLog((LOG_TRACE, 3, L"	%s, type = %s", MixAS[i].Name, MixAS[i].Filter == 1 ? L"Splitter" : L"AudioSwitcher"));
 		}
 #endif
 
@@ -13862,141 +13915,52 @@ void CMainFrame::OpenSetupAudioStream()
 		if (!s.fUseInternalSelectTrackLogic) {
 			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0 && pSSa) {
 				for (size_t i = 0; i < MixAS.GetCount(); i++) {
-					if (MixAS[i].ExtAudio) {
-						AudStreams as = MixAS[i];
-						pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+					if (MixAS[i].Ext) {
+						Stream as = MixAS[i];
+						pSSa->Enable(as.Index, AMSTREAMSELECTENABLE_ENABLE);
 						return;
 					}
 				}
 			}
 		} else if (MixAS.GetCount() > 1) {
-			bool bLangMatch	= false;
-			size_t bLangIdx	= 0;
-
-			CString alo = s.strAudiosLanguageOrder;
-			CharLower(alo.GetBuffer());
-			alo.Replace(L"[fc]", L"forced");
-			alo.Replace(L"[def]", L"default");
-			if (alo.Find(L"forced") == -1) {
-				alo.Append(L" forced");
-			}
-			if (alo.Find(L"default") == -1) {
-				alo.Append(L" default");
-			}
-			alo.Trim();
-
-			int tPos = 0;
-			CString lang = alo.Tokenize(L",; ", tPos);
-
+			CString pattern = s.strAudiosLanguageOrder;
 			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0 && pSSa) {
-				while (tPos != -1 && !bLangMatch) {
-					for (size_t iIndex = 0; iIndex < MixAS.GetCount(); iIndex++) {
-						if (!MixAS[iIndex].ExtAudio) {
-							continue;
-						}
+				size_t nIdx	= 0;
+				BOOL bMatch = SelectMatchTrack(MixAS, pattern, TRUE, nIdx);
 
-						CString name(MixAS[iIndex].Name);
-						CharLower(name.GetBuffer());
-
-						CAtlList<CString> sl;
-						Explode(lang, sl, '|');
-						POSITION pos = sl.GetHeadPosition();
-
-						int nLangMatch = 0;
-						while (pos) {
-							CString pattern = sl.GetNext(pos);
-
-							if ((MixAS[iIndex].forced && pattern == L"forced") || (MixAS[iIndex].def && pattern == L"default")) {
-								nLangMatch++;
-								continue;
-							}
-
-							if (name.Find(pattern) >= 0) {
-								nLangMatch++;
-							}
-						}
-
-						if (nLangMatch == sl.GetCount()) {
-							bLangIdx	= iIndex;
-							bLangMatch	= true;
-							break;
-						}
-					}
-					lang = alo.Tokenize(_T(",; "), tPos);
-				}
-
-				AudStreams as;
-				if (bLangMatch) {
-					as = MixAS[bLangIdx];
+				Stream as;
+				if (bMatch) {
+					as = MixAS[nIdx];
 				} else {
 					for (size_t i = 0; i < MixAS.GetCount(); i++) {
-						if (MixAS[i].ExtAudio) {
+						if (MixAS[i].Ext) {
 							as = MixAS[i];
 							break;
 						}
 					}
 				}
 
-				if (as.ExtAudio) {
-					pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+				if (as.Ext) {
+					pSSa->Enable(as.Index, AMSTREAMSELECTENABLE_ENABLE);
 				}
 
 				return;
 			}
 
-			while (tPos != -1 && !bLangMatch) {
-				for (size_t iIndex = 0; iIndex < MixAS.GetCount(); iIndex++) {
+			size_t nIdx	= 0;
+			BOOL bMatch = SelectMatchTrack(MixAS, pattern, FALSE, nIdx);
 
-					CString name(MixAS[iIndex].Name);
-					CharLower(name.GetBuffer());
-
-					CAtlList<CString> sl;
-					Explode(lang, sl, '|');
-					POSITION pos = sl.GetHeadPosition();
-
-					int nLangMatch = 0;
-					while (pos) {
-						CString pattern = sl.GetNext(pos);
-
-						if ((MixAS[iIndex].forced && pattern == _T("forced")) || (MixAS[iIndex].def && pattern == _T("default"))) {
-							nLangMatch++;
-							continue;
-						}
-
-						if (name.Find(pattern) >= 0) {
-							nLangMatch++;
-						}
-					}
-
-					if (nLangMatch == sl.GetCount()) {
-						bLangIdx	= iIndex;
-						bLangMatch	= true;
-						break;
-					}
-				}
-				lang = alo.Tokenize(_T(",; "), tPos);
-			}
-
-			if (bLangMatch) {
-				AudStreams as = MixAS[bLangIdx];
-				if (as.iFilter == 1) {
-					pSS->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
-				} else if (as.iFilter == 2) {
-					pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+			if (bMatch) {
+				Stream as = MixAS[nIdx];
+				if (as.Filter == 1) {
+					pSS->Enable(as.Index, AMSTREAMSELECTENABLE_ENABLE);
+				} else if (as.Filter == 2) {
+					pSSa->Enable(as.Index, AMSTREAMSELECTENABLE_ENABLE);
 				}
 				return;
 			}
 		}
 	}
-
-	// if no selected above ...
-	/*
-	AudioSwitcher always select first stream
-	CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
-	if (pSS) {
-		pSS->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
-	}
-	*/
 }
 
 void CMainFrame::SubFlags(CString strname, bool& forced, bool& def)
@@ -14020,115 +13984,31 @@ void CMainFrame::SubFlags(CString strname, bool& forced, bool& def)
 size_t CMainFrame::GetSubSelIdx()
 {
 	AppSettings& s	= AfxGetAppSettings();
+	CString pattern	= s.strSubtitlesLanguageOrder;
 
-	CString slo		= s.strSubtitlesLanguageOrder;
-	CharLower(slo.GetBuffer());
+	if (subarray.GetCount()) {
+		if (s.fPrioritizeExternalSubtitles) { // try external sub ...
+			size_t nIdx	= 0;
+			BOOL bMatch = SelectMatchTrack(subarray, pattern, TRUE, nIdx);
 
-	slo.Replace(L"[fc]", L"forced");
-	slo.Replace(L"[def]", L"default");
-	if (slo.Find(L"forced") == -1) {
-		slo.Append(L" forced");
-	}
-	if (slo.Find(L"default") == -1) {
-		slo.Append(L" default");
-	}
-	slo.Trim();
-
-	bool bLangMatch	= false;
-	bool extsubpri	= s.fPrioritizeExternalSubtitles;
-	size_t cnt		= subarray.GetCount();
-
-	if (extsubpri && cnt > 1) { // try external sub ...
-		size_t bLangIdx	= 0;
-		int tPos = 0;
-		CString lang = slo.Tokenize(_T(",; "), tPos);
-		while (tPos != -1 && !bLangMatch) {
-			for (size_t iIndex = 0; iIndex < cnt; iIndex++) {
-				if (!subarray[iIndex].Extsub) {
-					continue;
-				}
-				CString name(subarray[iIndex].lang);
-				CharLower(name.GetBuffer());
-
-				CAtlList<CString> sl;
-				Explode(lang, sl, '|');
-				POSITION pos = sl.GetHeadPosition();
-
-				int nLangMatch = 0;
-				while (pos) {
-					CString pattern = sl.GetNext(pos);
-
-					if ((subarray[iIndex].forced && pattern == L"forced") || (subarray[iIndex].def && pattern == L"default")) {
-						nLangMatch++;
-						continue;
+			if (bMatch) {
+				return nIdx;
+ 			} else {
+				for (size_t iIndex = 0; iIndex < subarray.GetCount(); iIndex++) {
+					if (subarray[iIndex].Ext) {
+						return iIndex;
 					}
-
-					if (name.Find(pattern) >= 0) {
-						nLangMatch++;
-					}
- 				}
-
-				if (nLangMatch == sl.GetCount()) {
-					bLangIdx	= iIndex;
-					bLangMatch	= true;
-					break;
- 				}
- 			}
-			lang = slo.Tokenize(_T(",; "), tPos);
- 		}
-
-		if (bLangMatch) {
-			return bLangIdx;
- 		} else {
-			for (size_t iIndex = 0; iIndex < cnt; iIndex++) {
-				if (subarray[iIndex].Extsub) {
-					return iIndex;
 				}
 			}
 		}
-	}
 
-	if (cnt > 1) { // try all sub ...
-		size_t bLangIdx = 0;
-		int tPos = 0;
-		CString lang = slo.Tokenize(_T(",; "), tPos);
-		while (tPos != -1 && !bLangMatch) {
-			for (size_t iIndex = 0; iIndex < cnt; iIndex++) {
+		size_t nIdx	= 0;
+		BOOL bMatch = SelectMatchTrack(subarray, pattern, FALSE, nIdx);
 
-				CString name(subarray[iIndex].lang);
-				CharLower(name.GetBuffer());
-
-				CAtlList<CString> sl;
-				Explode(lang, sl, '|');
-				POSITION pos = sl.GetHeadPosition();
-
-				int nLangMatch = 0;
-				while (pos) {
-					CString pattern = sl.GetNext(pos);
-
-					if ((subarray[iIndex].forced && pattern == L"forced") || (subarray[iIndex].def && pattern == L"default")) {
-						nLangMatch++;
-						continue;
-					}
-
-					if (name.Find(pattern) >= 0) {
-						nLangMatch++;
-					}
-				}
-
-				if (nLangMatch == sl.GetCount()) {
-					bLangIdx	= iIndex;
-					bLangMatch	= true;
-					break;
-				}
- 			}
-			lang = slo.Tokenize(_T(",; "), tPos);
- 		}
-
-		if (bLangMatch) {
-			return bLangIdx;
+		if (bMatch) {
+			return nIdx;
 		}
- 	}
+	}
 
 	return 0;
 }
@@ -14150,12 +14030,12 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				for (int i = 0; i < nLangs - 1; i++) {
 					WCHAR *pName;
 					if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
-						SubStreams substream;
-						substream.iFilter	= 1;
-						substream.iNum		= i;
-						substream.iIndex	= i;
-						substream.Extsub	= true;
-						substream.lang		= pName;
+						Stream substream;
+						substream.Filter	= 1;
+						substream.Num		= i;
+						substream.Index		= i;
+						substream.Ext		= true;
+						substream.Name		= pName;
 						subarray.Add(substream);
 
 						CoTaskMemFree(pName);
@@ -14187,13 +14067,13 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 					CString str = FormatStreamName(name, lcid, i);
 
-					SubStreams substream;
-					substream.iFilter	= 2;
-					substream.iNum++;
-					substream.iIndex++;
-					substream.lang		= str;
+					Stream substream;
+					substream.Filter	= 2;
+					substream.Num++;
+					substream.Index++;
+					substream.Name		= str;
 					if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-						substream.iSel = subarray.GetCount();
+						substream.Sel = subarray.GetCount();
 					}
 					subarray.Add(substream);
 
@@ -14203,16 +14083,16 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				for (int i = 0; i < nLangs; i++) {
 					WCHAR *pName;
 					if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
-						SubStreams substream;
-						substream.iFilter	= 1;
-						substream.iNum		= i;
-						substream.iIndex	= i;
-						substream.lang		= pName;
+						Stream substream;
+						substream.Filter	= 1;
+						substream.Num		= i;
+						substream.Index		= i;
+						substream.Name		= pName;
 
 						if (CComQIPtr<IDirectVobSub3> pDVS3 = pDVS) {
 							int nType = 0;
 							pDVS3->get_LanguageType(i, &nType);
-							substream.Extsub = !!nType;
+							substream.Ext = !!nType;
 						}
 
 						subarray.Add(substream);
@@ -14231,7 +14111,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 	}
 
 	if (!b_UseVSFilter && m_pCAP && (!m_fAudioOnly || m_fRealMediaGraph)) {
-		SubStreams substream;
+		Stream substream;
 		subarray.RemoveAll();
 		int checkedsplsub	= 0;
 		int subIndex		= -1;
@@ -14280,15 +14160,15 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 							checkedsplsub = subIndex;
 						}
 						cntintsub++;
-						substream.Extsub	= false;
-						substream.iFilter	= 1;
-						substream.iNum		= iNum++;
-						substream.iIndex	= i;
+						substream.Ext		= false;
+						substream.Filter	= 1;
+						substream.Num		= iNum++;
+						substream.Index		= i;
 
 						bool Forced, Def;
 						SubFlags(lang, Forced, Def);
 
-						substream.lang		= pName;
+						substream.Name		= pName;
 						substream.forced	= Forced;
 						substream.def		= Def;
 
@@ -14328,15 +14208,15 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						lang.ReleaseBufferSetLength(max(len - 1, 0));
 					}
 
-					substream.Extsub	= false;
-					substream.iFilter	= 2;
-					substream.iNum		= iNum++;
-					substream.iIndex	= tPos;
+					substream.Ext		= false;
+					substream.Filter	= 2;
+					substream.Num		= iNum++;
+					substream.Index		= tPos;
 
 					bool Forced, Def;
 					SubFlags(lang, Forced, Def);
 
-					substream.lang		= pName;
+					substream.Name		= pName;
 					substream.forced	= Forced;
 					substream.def		= Def;
 
@@ -14366,7 +14246,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		int tPos = -1;
 		int extcnt = -1;
 		for (size_t i = 0; i < subarray.GetCount(); i++) {
-			if (subarray[i].iFilter == 2) extcnt++;
+			if (subarray[i].Filter == 2) extcnt++;
 		}
 
 		int intsub = 0;
@@ -14382,17 +14262,17 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
 					CString name(pName);
 
-					substream.Extsub	= true;
-					substream.iFilter	= 2;
-					substream.iNum		= iNum++;
-					substream.iIndex	= tPos+ (extcnt<0 ? 0 : extcnt+1);
+					substream.Ext		= true;
+					substream.Filter	= 2;
+					substream.Num		= iNum++;
+					substream.Index		= tPos + (extcnt < 0 ? 0 : extcnt + 1);
 
 					bool Forced, Def;
 					SubFlags(name, Forced, Def);
 
-					substream.lang		= name;
-					substream.forced	= 0;
-					substream.def		= 0;
+					substream.Name		= name;
+					substream.forced	= Forced;
+					substream.def		= Def;
 
 					subarray.Add(substream);
 
@@ -14412,7 +14292,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			if (s.fPrioritizeExternalSubtitles) {
 				size_t cnt = subarray.GetCount();
 				for (size_t i = 0; i < cnt; i++) {
-					if (subarray[i].Extsub)	{
+					if (subarray[i].Ext)	{
 						checkedsplsub = i;
 						break;
 					}
