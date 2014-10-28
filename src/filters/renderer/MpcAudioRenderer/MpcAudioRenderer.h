@@ -137,6 +137,7 @@ private:
 	CBaseReferenceClock*	m_pReferenceClock;
 	double					m_dRate;
 	long					m_lVolume;
+	double					m_dVolumeFactor;
 
 	CFilter					m_Filter;
 
@@ -178,7 +179,6 @@ private:
 	UINT32					m_nFramesInBuffer;
 	REFERENCE_TIME			m_hnsPeriod;
 	bool					m_isAudioClientStarted;
-	double					m_dVolume;
 	BOOL					m_bIsBitstream;
 	BOOL					m_bUseBitExactOutput;
 	BOOL					m_bUseSystemLayoutChannels;

@@ -138,7 +138,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_hTask(NULL)
 	, m_isAudioClientStarted(false)
 	, m_lVolume(DSBVOLUME_MIN)
-	, m_dVolume(0.0)
+	, m_dVolumeFactor(0.0)
 	, m_nThreadId(0)
 	, m_hRenderThread(NULL)
 	, m_bThreadPaused(FALSE)
@@ -633,12 +633,15 @@ STDMETHODIMP CMpcAudioRenderer::put_Volume(long lVolume)
 {
 	m_lVolume = lVolume;
 
-	if (m_lVolume <= -10000) {
-		m_dVolume = 0.0;
-	} else if (m_lVolume >= 0) {
-		m_dVolume = 1.0;
+	if (m_lVolume <= DSBVOLUME_MIN) {
+		m_lVolume = DSBVOLUME_MIN;
+		m_dVolumeFactor = 0.0;
+	}
+	else if (m_lVolume >= DSBVOLUME_MAX) {
+		m_lVolume = DSBVOLUME_MAX;
+		m_dVolumeFactor = 1.0;
 	} else {
-		m_dVolume = pow(10.0, m_lVolume / 2000.0);
+		m_dVolumeFactor = pow(10.0, m_lVolume / 2000.0);
 	}
 
 	return S_OK;
@@ -1953,37 +1956,34 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 				}
 			}
 
-			if (m_dVolume == 0.0) {
+			if (m_lVolume <= DSBVOLUME_MIN) {
 				bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 			}
-
-			if (bufferFlags != AUDCLNT_BUFFERFLAGS_SILENT && !IsBitstream(m_pWaveFileFormat) && (m_dVolume > 0.0 && m_dVolume < 1.0)) {
+			else if (m_lVolume < DSBVOLUME_MAX && !IsBitstream(m_pWaveFileFormat)) {
 				// Adjusting volume ...
-				WAVEFORMATEX* wfeOutput				= (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-				WAVEFORMATEXTENSIBLE* wfexOutput	= (WAVEFORMATEXTENSIBLE*)wfeOutput;
-
-				WORD tag	= wfeOutput->wFormatTag;
-				bool fPCM	= tag == WAVE_FORMAT_PCM || (tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_PCM);
-				bool fFloat	= tag == WAVE_FORMAT_IEEE_FLOAT || (tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
-
+				WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
+				SampleFormat sf = GetSampleFormat(wfeOutput);
 				size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
 
-				if (fPCM) {
-					if (wfeOutput->wBitsPerSample == 8) {
-						gain_uint8(m_dVolume, samples, (uint8_t*)pData);
-					} else if (wfeOutput->wBitsPerSample == 16) {
-						gain_int16(m_dVolume, samples, (int16_t*)pData);
-					} else if (wfeOutput->wBitsPerSample == 24) {
-						gain_int24(m_dVolume, samples, pData);
-					} else if (wfeOutput->wBitsPerSample == 32) {
-						gain_int32(m_dVolume, samples, (int32_t*)pData);
-					}
-				} else if (fFloat) {
-					if (wfeOutput->wBitsPerSample == 32) {
-						gain_float(m_dVolume, samples, (float*)pData);
-					} else if (wfeOutput->wBitsPerSample == 64) {
-						gain_double(m_dVolume, samples, (double*)pData);
-					}
+				switch (sf) {
+				case SAMPLE_FMT_U8:
+					gain_uint8(m_dVolumeFactor, samples, (uint8_t*)pData);
+					break;
+				case SAMPLE_FMT_S16:
+					gain_int16(m_dVolumeFactor, samples, (int16_t*)pData);
+					break;
+				case SAMPLE_FMT_S24:
+					gain_int24(m_dVolumeFactor, samples, pData);
+					break;
+				case SAMPLE_FMT_S32:
+					gain_int32(m_dVolumeFactor, samples, (int32_t*)pData);
+					break;
+				case SAMPLE_FMT_FLT:
+					gain_float(m_dVolumeFactor, samples, (float*)pData);
+					break;
+				case SAMPLE_FMT_DBL:
+					gain_double(m_dVolumeFactor, samples, (double*)pData);
+					break;
 				}
 			}
 		}
