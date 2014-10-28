@@ -103,12 +103,12 @@ BOOL CPPageAudio::OnInitDialog()
 
 	m_AudioRendererDisplayNames.Add(_T(""));
 	m_iAudioRendererTypeCtrl.SetRedraw(FALSE);
-	m_iAudioRendererTypeCtrl.AddString(_T("1: ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
+	m_iAudioRendererTypeCtrl.AddString(_T("1. ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
 	m_iAudioRendererType = 0;
 
 	m_DualAudioOutput.SetCheck(s.fDualAudioOutput);
 	m_iSecAudioRendererTypeCtrl.SetRedraw(FALSE);
-	m_iSecAudioRendererTypeCtrl.AddString(_T("1: ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
+	m_iSecAudioRendererTypeCtrl.AddString(_T("1. ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
 	m_iSecAudioRendererType = 0;
 
 	OnDualAudioOutputCheck();
@@ -125,8 +125,6 @@ BOOL CPPageAudio::OnInitDialog()
 		CStringW str(olestr);
 		CoTaskMemFree(olestr);
 
-		m_AudioRendererDisplayNames.Add(CString(str));
-
 		CComPtr<IPropertyBag> pPB;
 		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 			CComVariant var;
@@ -137,10 +135,15 @@ BOOL CPPageAudio::OnInitDialog()
 		} else {
 			fstr = str;
 		}
-		CString Cbstr;
-		Cbstr.Format(_T("%d: %s"), i++, fstr);
-		m_iAudioRendererTypeCtrl.AddString(Cbstr);
-		m_iSecAudioRendererTypeCtrl.AddString(Cbstr);
+
+		if (fstr.Left(13) == L"DirectSound: ") {
+			m_AudioRendererDisplayNames.Add(str);
+
+			CString Cbstr;
+			Cbstr.Format(_T("%d. %s"), i++, fstr);
+			m_iAudioRendererTypeCtrl.AddString(Cbstr);
+			m_iSecAudioRendererTypeCtrl.AddString(Cbstr);
+		}
 	}
 	EndEnumSysDev;
 
@@ -155,7 +158,7 @@ BOOL CPPageAudio::OnInitDialog()
 		if (AudioDevAddon[idx].GetLength() > 0) {
 			m_AudioRendererDisplayNames.Add(AudioDevAddon[idx]);
 
-			fstr.Format(_T("%d: %s"), i++, AudioDevAddon[idx]);
+			fstr.Format(_T("%d. %s"), i++, AudioDevAddon[idx]);
 			m_iAudioRendererTypeCtrl.AddString(fstr);
 			m_iSecAudioRendererTypeCtrl.AddString(fstr);
 		}
