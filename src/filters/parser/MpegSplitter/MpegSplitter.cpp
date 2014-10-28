@@ -987,17 +987,21 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	int audio_sel	= 0;
+	int subpic_sel	= 0;
+
+#ifdef REGISTER_FILTER
 	CString lang;
 	CAtlList<CString> audioLangList;
 	CAtlList<CString> subpicLangList;
-	int audio_sel	= 0;
-	int subpic_sel	= 0;
 
 	if (!m_AudioLanguageOrder.IsEmpty()) {
 		int tPos = 0;
 		lang = m_AudioLanguageOrder.Tokenize(_T(",; "), tPos);
 		while (tPos != -1) {
-			if (!lang.IsEmpty()) audioLangList.AddTail(lang);
+			if (!lang.IsEmpty()) {
+				audioLangList.AddTail(lang);
+			}
 			lang = m_AudioLanguageOrder.Tokenize(_T(",; "), tPos);
 		}
 		if (!lang.IsEmpty()) {
@@ -1009,7 +1013,9 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		int tPos = 0;
 		lang = m_SubtitlesLanguageOrder.Tokenize(_T(",; "), tPos);
 		while (tPos != -1) {
-			if (!lang.IsEmpty()) subpicLangList.AddTail(lang);
+			if (!lang.IsEmpty()) {
+				subpicLangList.AddTail(lang);
+			}
 			lang = m_SubtitlesLanguageOrder.Tokenize(_T(",; "), tPos);
 		}
 		if (!lang.IsEmpty()) {
@@ -1025,19 +1031,16 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
 		while (pos) {
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
-			CString str;
-
 			if (type == CMpegSplitterFile::stream_type::subpic && s.pid == NO_SUBTITLE_PID) {
-				str	= NO_SUBTITLE_NAME;
 				continue;
-			} else {
-				str = FormatStreamName(s, (CMpegSplitterFile::stream_type)type);
-			}
+			};
+
+			CString str = FormatStreamName(s, (CMpegSplitterFile::stream_type)type);
 			CString str_tmp(str);
 			str_tmp.MakeLower();
 			if (type == CMpegSplitterFile::stream_type::audio) {
 				CString audioStreamSelected;
-				if (audioLangList.GetCount() > 0) {
+				if (!audioLangList.IsEmpty()) {
 					int idx = 0;
 					POSITION pos = audioLangList.GetHeadPosition();
 					while (pos) {
@@ -1056,10 +1059,9 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					audio_sel = stream_idx;
 					break;
 				}
-			}
-			if (type == CMpegSplitterFile::stream_type::subpic) {
+			} else if (type == CMpegSplitterFile::stream_type::subpic) {
 				CString subpicStreamSelected;
-				if (subpicLangList.GetCount() > 0) {
+				if (!subpicLangList.IsEmpty()) {
 					int idx = 0;
 					POSITION pos = subpicLangList.GetHeadPosition();
 					while (pos) {
@@ -1083,6 +1085,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			stream_idx++;
 		}
 	}
+#endif
 
 	CString fullName = GetPartFilename(pAsyncReader);
 	if (fullName.IsEmpty()) {
