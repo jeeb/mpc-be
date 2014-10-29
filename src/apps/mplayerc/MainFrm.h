@@ -314,7 +314,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CMenu m_openCDsMenu;
 	CMenu m_filtersMenu, m_subtitlesMenu, m_audiosMenu;
 	CMenu m_languageMenu;
-	CMenu m_videostreamsMenu;
+	CMenu m_videoStreamsMenu;
 	CMenu m_chaptersMenu;
 	CMenu m_favoritesMenu;
 	CMenu m_shadersMenu;
@@ -427,7 +427,7 @@ public:
 	bool m_fFullScreen;
 	bool m_fFirstFSAfterLaunchOnFS;
 	bool m_fHideCursor;
-	CMenu m_navMixaudio, m_navsubtitle, m_navMixsubtitle;
+	CMenu m_navMixAudioMenu, m_navMixSubtitleMenu;
 
 	CComPtr<IBaseFilter> m_pRefClock; // Adjustable reference clock. GothSync
 	CComPtr<ISyncClock> m_pSyncClock;

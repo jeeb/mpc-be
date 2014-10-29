@@ -3903,10 +3903,10 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pSubMenu = &m_subtitlesMenu;
 		} else if (itemID == ID_AUDIOLANGUAGE) {
 			SetupNavMixAudioSubMenu();
-			pSubMenu = &m_navMixaudio;
+			pSubMenu = &m_navMixAudioMenu;
 		} else if (itemID == ID_SUBTITLELANGUAGE) {
 			SetupNavMixSubtitleSubMenu();
-			pSubMenu = &m_navMixsubtitle;
+			pSubMenu = &m_navMixSubtitleMenu;
 		} else if (itemID == ID_VIDEOANGLE) {
 
 			CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
@@ -3916,7 +3916,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
 
 			SetupVideoStreamsSubMenu();
-			pSubMenu = &m_videostreamsMenu;
+			pSubMenu = &m_videoStreamsMenu;
 		} else if (itemID == ID_JUMPTO) {
 			SetupNavChaptersSubMenu();
 			pSubMenu = &m_chaptersMenu;
@@ -9441,14 +9441,16 @@ void CMainFrame::OnSelectStream(UINT nID)
 
 void CMainFrame::OnMenuNavAudio()
 {
+	m_navMixAudioMenu.DestroyMenu();
 	SetupNavMixAudioSubMenu();
-	OnMenu(&m_navMixaudio);
+	OnMenu(&m_navMixAudioMenu);
 }
 
 void CMainFrame::OnMenuNavSubtitle()
 {
+	m_navMixSubtitleMenu.DestroyMenu();
 	SetupNavMixSubtitleSubMenu();
-	OnMenu(&m_navMixsubtitle);
+	OnMenu(&m_navMixSubtitleMenu);
 }
 
 void CMainFrame::OnMenuNavAudioOptions()
@@ -9465,12 +9467,14 @@ void CMainFrame::OnMenuNavSubtitleOptions()
 
 void CMainFrame::OnMenuNavJumpTo()
 {
+	m_chaptersMenu.DestroyMenu();
 	SetupNavChaptersSubMenu();
 	OnMenu(&m_chaptersMenu);
 }
 
 void CMainFrame::OnMenuRecentFiles()
 {
+	m_recentfilesMenu.DestroyMenu();
 	SetupRecentFilesSubMenu();
 	OnMenu(&m_recentfilesMenu);
 }
@@ -9780,7 +9784,7 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 				REFERENCE_TIME rtDur;
 				m_pMS->GetDuration(&rtDur);
 				CString m_strOSD;
-				m_strOSD.Format(_T("%s/%s %s%d/%d - \"%s\""), ReftimeToString2(rt), ReftimeToString2(rtDur), ResStr(IDS_AG_CHAPTER2), i+1, nChapters, name);
+				m_strOSD.Format(_T("%s/%s %s%d/%d - \"%s\""), ReftimeToString2(rt), ReftimeToString2(rtDur), ResStr(IDS_AG_CHAPTER2), i + 1, nChapters, name);
 				m_OSD.DisplayMessage(OSD_TOPLEFT, m_strOSD, 3000);
 				return;
 			}
@@ -9813,8 +9817,8 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 
 		if (nID == ID_NAVIGATE_SKIPBACK) {
 			if (Location.ChapterNum == 1 && Location.TitleNum > 1) {
-				m_pDVDI->GetNumberOfChapters(Location.TitleNum-1, &ulNumOfChapters);
-				m_pDVDC->PlayChapterInTitle(Location.TitleNum-1, ulNumOfChapters, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
+				m_pDVDI->GetNumberOfChapters(Location.TitleNum - 1, &ulNumOfChapters);
+				m_pDVDC->PlayChapterInTitle(Location.TitleNum - 1, ulNumOfChapters, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 			} else {
 				ULONG tsec = (Location.TimeCode.bHours * 3600)
 							 + (Location.TimeCode.bMinutes * 60)
@@ -9832,7 +9836,7 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			}
 		} else if (nID == ID_NAVIGATE_SKIPFORWARD) {
 			if (Location.ChapterNum == ulNumOfChapters && Location.TitleNum < ulNumOfTitles) {
-				m_pDVDC->PlayChapterInTitle(Location.TitleNum+1, 1, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
+				m_pDVDC->PlayChapterInTitle(Location.TitleNum + 1, 1, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 			} else {
 				m_pDVDC->PlayNextChapter(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 			}
@@ -9859,10 +9863,10 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 		}
 
 		/*
-				if (nID == ID_NAVIGATE_SKIPBACK)
-					pDVDC->PlayPrevChapter(DVD_CMD_FLAG_Block, NULL);
-				else if (nID == ID_NAVIGATE_SKIPFORWARD)
-					pDVDC->PlayNextChapter(DVD_CMD_FLAG_Block, NULL);
+		if (nID == ID_NAVIGATE_SKIPBACK)
+			pDVDC->PlayPrevChapter(DVD_CMD_FLAG_Block, NULL);
+		else if (nID == ID_NAVIGATE_SKIPFORWARD)
+			pDVDC->PlayNextChapter(DVD_CMD_FLAG_Block, NULL);
 		*/
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
 		if (AfxGetAppSettings().iDefaultCaptureDevice == 1) {
@@ -15308,7 +15312,7 @@ void CMainFrame::SetupSubtitlesSubMenu()
 
 void CMainFrame::SetupNavMixSubtitleSubMenu()
 {
-	CMenu* pSub = &m_navMixsubtitle;
+	CMenu* pSub = &m_navMixSubtitleMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -15634,7 +15638,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 
 void CMainFrame::SetupVideoStreamsSubMenu()
 {
-	CMenu* pSub = &m_videostreamsMenu;
+	CMenu* pSub = &m_videoStreamsMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -16080,7 +16084,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 
 void CMainFrame::SetupNavMixAudioSubMenu()
 {
-	CMenu* pSub = &m_navMixaudio;
+	CMenu* pSub = &m_navMixAudioMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -18189,9 +18193,9 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_filtersMenu.DestroyMenu();
 	m_subtitlesMenu.DestroyMenu();
 	m_audiosMenu.DestroyMenu();
-	m_navMixaudio.DestroyMenu();
-	m_navsubtitle.DestroyMenu();
-	m_videostreamsMenu.DestroyMenu();
+	m_navMixAudioMenu.DestroyMenu();
+	m_navMixSubtitleMenu.DestroyMenu();
+	m_videoStreamsMenu.DestroyMenu();
 	m_chaptersMenu.DestroyMenu();
 	m_favoritesMenu.DestroyMenu();
 	m_shadersMenu.DestroyMenu();
