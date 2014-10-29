@@ -455,10 +455,10 @@ public:
 	CControlBar* m_pLastBar;
 
 protected:
-	bool			b_UseSmartSeek;
+	bool			m_bUseSmartSeek;
 	MPC_LOADSTATE	m_iMediaLoadState;
-	bool			m_fClosingState;
-	bool			m_fAudioOnly;
+	bool			m_bClosingState;
+	bool			m_bAudioOnly;
 
 	dispmode		m_dmBeforeFullscreen;
 
