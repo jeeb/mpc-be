@@ -220,6 +220,7 @@ File_Mpeg4::File_Mpeg4()
     IsSecondPass=false;
     IsParsing_mdat=false;
     IsFragmented=false;
+    StreamOrder=0;
     moov_trak_tkhd_TrackID=(int32u)-1;
     #if defined(MEDIAINFO_REFERENCES_YES)
         ReferenceFiles=NULL;
@@ -332,7 +333,7 @@ void File_Mpeg4::Streams_Finish()
         if (StreamKind_Last==Stream_Max && Temp->second.hdlr_SubType)
         {
             Stream_Prepare(Stream_Other);
-            Fill(Stream_Other, StreamPos_Last, Other_Type, Ztring().From_CC4(Streams[moov_trak_tkhd_TrackID].hdlr_SubType));
+            Fill(Stream_Other, StreamPos_Last, Other_Type, Ztring().From_CC4(Temp->second.hdlr_SubType));
         }
 
         //if (Temp->second.stsz_StreamSize)
@@ -907,6 +908,9 @@ void File_Mpeg4::Streams_Finish()
                 //TODO: compute Bit rate mode from stsz and stss (in order to compute per GOP instead of per frame)
             }
         }
+
+        for (std::map<string, Ztring>::iterator Info=Temp->second.Infos.begin(); Info!=Temp->second.Infos.end(); Info++)
+            Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
 
         ++Temp;
     }

@@ -23,12 +23,12 @@
 	* Обновлен Китайский (Simplified) перевод (автор insolo);
 	* Обновлен Немецкий перевод (автор Sylt);
 	* Обновлен Украинский перевод (автор Arestarh1986);
-	* ffmpeg 2.3.x git-146e498c;
+	* ffmpeg 2.4.x git-gf43ac02;
 	* libpng 1.7.0 b35 git-f3b1eb68;
 	* libwebp 0.4.0 git-d2cc61b7;
-	* MediaInfo 0.7.69+ svn rev.6375;
+	* MediaInfo 0.7.70+ svn rev.6511;
 	* Little-CMS 2.7 beta git-a41d62ee;
-	* ZenLib 0.4.29+ svn rev.483;
+	* ZenLib 0.4.29+ svn rev.489;
 	 ... и многое другое.
 
 
