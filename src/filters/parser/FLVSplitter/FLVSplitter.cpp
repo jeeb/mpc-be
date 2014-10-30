@@ -680,8 +680,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				BITMAPINFOHEADER* bih = &vih->bmiHeader;
 
-				int w, h, arx, ary;
-
 				// calculate video fps
 				if (!AvgTimePerFrame) {
 					__int64 pos = m_pFile->GetPos();
@@ -782,6 +780,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FLV_VIDEO_VP6A:  // VP6 with alpha
 						m_pFile->BitRead(24);
 					case FLV_VIDEO_VP6: { // VP6
+						int w, h, arx, ary;
 #ifdef NOVIDEOTWEAK
 						m_pFile->BitRead(8);
 #else
