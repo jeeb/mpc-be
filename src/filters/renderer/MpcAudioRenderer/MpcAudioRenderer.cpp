@@ -2013,6 +2013,10 @@ void CMpcAudioRenderer::CheckBufferStatus()
 		WasapiBufLen = m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
 	}
 
+	if (m_bEndOfStream && !WasapiBufLen) {
+		m_bEndOfStream = FALSE;
+	}
+
 	if (WasapiBufLen < (nAvailableBytes * 10)) {
 		SetEvent(m_hRendererNeedMoreData);
 	} else {
