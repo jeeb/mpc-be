@@ -629,7 +629,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
-	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT, 300);
+	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT);
 
 	CImage onoff;
 	onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF);
@@ -1169,6 +1169,7 @@ void CPPageFormats::OnBnClickedDefault()
 		CString label;
 		label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
 		m_list.SetItemText(iItem, COL_CATEGORY, label);
+		m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
 
 		//SetListItemState(m_list.GetSelectionMark());
 		UpdateData(FALSE);
@@ -1195,6 +1196,7 @@ void CPPageFormats::OnBnClickedSet()
 		CString label;
 		label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
 		m_list.SetItemText(iItem, COL_CATEGORY, label);
+		m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
 
 		//SetListItemState(m_list.GetSelectionMark());
 		UpdateData(FALSE);
