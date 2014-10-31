@@ -159,6 +159,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_hStopWaitingRenderer(NULL)
 	, m_CurrentPacket(NULL)
 	, m_rtStartTime(0)
+	, m_rtNextSampleTime(0)
+	, m_nSampleNum(0)
 	, m_bEndOfStream(FALSE)
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CMpcAudioRenderer()"));
@@ -597,6 +599,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	}
 
 	m_bEndOfStream = FALSE;
+	m_nSampleNum = 0;
 
 	m_filterState = State_Running;
 	m_rtStartTime = rtStart;
@@ -1834,20 +1837,21 @@ HRESULT CMpcAudioRenderer::StopAudioClient()
 	return hr;
 }
 
+#define GetDuration(size, wfex) (size / wfex->nBlockAlign * UNITS / wfex->nSamplesPerSec)
 HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 {
+	CheckPointer(m_pRenderClient, S_OK);
+	CheckPointer(m_pWaveFileFormatOutput, S_OK);
+
 	HRESULT hr = S_OK;
-	if (!m_pRenderClient) {
-		return hr;
-	}
 
 	UINT32 numFramesPadding = 0;
 	if (m_WASAPIMode == MODE_WASAPI_SHARED && !m_bIsBitstream) { // SHARED
 		m_pAudioClient->GetCurrentPadding(&numFramesPadding);
 	}
 
-	UINT32 numFramesAvailable       = m_nFramesInBuffer - numFramesPadding;
-	UINT32 nAvailableBytes          = numFramesAvailable * m_pWaveFileFormatOutput->nBlockAlign;
+	UINT32 numFramesAvailable	= m_nFramesInBuffer - numFramesPadding;
+	UINT32 nAvailableBytes		= numFramesAvailable * m_pWaveFileFormatOutput->nBlockAlign;
 
 	BYTE* pData = NULL;
 	hr = m_pRenderClient->GetBuffer(numFramesAvailable, &pData);
@@ -1858,15 +1862,14 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		return hr;
 	}
 
-	DWORD bufferFlags = 0;
-
 	size_t WasapiBufLen = 0;
 	{
 		CAutoLock cRenderLock(&m_csRender);
 		WasapiBufLen = m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
 	}
 
-	if (!WasapiBufLen || (m_filterState != State_Running && !m_bEndOfStream)) {
+	DWORD bufferFlags = 0;
+	if (!pData || !WasapiBufLen || (m_filterState != State_Running && !m_bEndOfStream)) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 		if (m_filterState != State_Running) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - not running"));
@@ -1879,112 +1882,121 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - requested: %u[%u], available: %u", nAvailableBytes, numFramesAvailable, WasapiBufLen));
 #endif
-		if (pData != NULL) {
-			{
-				CAutoLock cRenderLock(&m_csRender);
-				REFERENCE_TIME RefRt = GetClockTime();
+		{
+			CAutoLock cRenderLock(&m_csRender);
 
-				if (!m_CurrentPacket) {
+			REFERENCE_TIME rtRefClock = INVALID_TIME;
+			UINT32 nWritenBytes = 0;
+			do {
+				if (!m_CurrentPacket && m_WasapiQueue.GetCount()) {
 					m_CurrentPacket = m_WasapiQueue.Remove();
-					if (RefRt != INVALID_TIME) {
-						while (m_CurrentPacket && m_CurrentPacket->rtStart != INVALID_TIME && m_CurrentPacket->rtStart < RefRt - m_hnsPeriod) {
-							if (m_WasapiQueue.GetCount()) {
-								m_CurrentPacket = m_WasapiQueue.Remove();
-							} else {
-								m_CurrentPacket.Free();
-							}
-							RefRt = GetClockTime();
-						}
+				}
+				if (!m_CurrentPacket) {
+					break;
+				}
+
+				REFERENCE_TIME rWaitRenderTime = INVALID_TIME;
+
+				rtRefClock = GetRefClockTime();
+				if (rtRefClock != INVALID_TIME) {
+					if (m_nSampleNum == 0) {
+						m_rtNextSampleTime = m_CurrentPacket->rtStart;
+					}
+
+					if (m_CurrentPacket->rtStart < rtRefClock - m_hnsPeriod) {
+						m_nSampleNum = 0;
+						m_CurrentPacket.Free();
+						continue;
+					}
+
+					BOOL bReSync = FALSE;
+					if (abs(m_CurrentPacket->rtStart - m_rtNextSampleTime) > 20000) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 1
+						DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected : %u[%u], %I64d -> %I64d(%s -> %s), %I64d)",
+								nWritenBytes, nAvailableBytes,
+								m_rtNextSampleTime, m_CurrentPacket->rtStart,
+								ReftimeToString(m_rtNextSampleTime), ReftimeToString(m_CurrentPacket->rtStart),
+								m_CurrentPacket->rtStart - m_rtNextSampleTime));
+#endif
+
+						bReSync = TRUE;
+					}
+
+					REFERENCE_TIME rtDuration = GetDuration(m_CurrentPacket->GetCount(), m_pWaveFileFormatOutput);
+					m_rtNextSampleTime = m_CurrentPacket->rtStart + rtDuration;
+
+					if ((m_nSampleNum == 0 && m_CurrentPacket->rtStart > rtRefClock) || bReSync) {
+						rWaitRenderTime = m_CurrentPacket->rtStart;
 					}
 				}
 
-				UINT32 pos = 0;
-				if (m_CurrentPacket
-						&& !m_CurrentPacket->bSyncPoint
-						&& RefRt != INVALID_TIME && m_CurrentPacket->rtStart > RefRt) {
-					REFERENCE_TIME rtSilenceDuration = m_CurrentPacket->rtStart - RefRt;
-					UINT32 framesSilence = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
-					UINT32 silenceBytes = min(framesSilence * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes);
-					if (silenceBytes == nAvailableBytes) {
+				rtRefClock = GetRefClockTime();
+				if (rWaitRenderTime != INVALID_TIME
+						&& rWaitRenderTime > rtRefClock) {
+					REFERENCE_TIME rtSilenceDuration = rWaitRenderTime - rtRefClock;
+					UINT32 nSilenceFrames = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
+					UINT32 nSilenceBytes = min(nSilenceFrames * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
+					if (nSilenceBytes == (nAvailableBytes - nWritenBytes)) {
 						bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+						break;
 					} else {
-						memset(pData, 0, silenceBytes);
+						memset(pData, 0, nSilenceBytes);
 					}
-					pos += silenceBytes;
-				}
-
-				while (pos < nAvailableBytes && m_CurrentPacket) {
-					UINT32 pSize = min(m_CurrentPacket->GetCount(), nAvailableBytes - pos);
-					memcpy(&pData[pos], m_CurrentPacket->GetData(), pSize);
-					m_CurrentPacket->RemoveAt(0, pSize);
-					m_CurrentPacket->bSyncPoint = TRUE;
-					pos += pSize;
-
-					REFERENCE_TIME rtDuration = pSize / m_pWaveFileFormatOutput->nBlockAlign * UNITS / m_pWaveFileFormatOutput->nSamplesPerSec;
-					REFERENCE_TIME rtNextSampleTime = m_CurrentPacket->rtStart + rtDuration;
+					nWritenBytes += nSilenceBytes;
+				} else {
+					UINT32 nFilledBytes = min(m_CurrentPacket->GetCount(), nAvailableBytes - nWritenBytes);
+					memcpy(&pData[nWritenBytes], m_CurrentPacket->GetData(), nFilledBytes);
+					m_CurrentPacket->RemoveAt(0, nFilledBytes);
+					nWritenBytes += nFilledBytes;
 
 					if (m_CurrentPacket->IsEmpty()) {
 						m_CurrentPacket.Free();
 					} else if (m_CurrentPacket->rtStart != INVALID_TIME) {
+						REFERENCE_TIME rtDuration = GetDuration(nFilledBytes, m_pWaveFileFormatOutput);
 						m_CurrentPacket->rtStart += rtDuration;
 					}
-
-					if (pos < nAvailableBytes && m_WasapiQueue.GetCount()) {
-						m_CurrentPacket = m_WasapiQueue.Remove();
-						// Try to keep the A/V sync when data has been dropped
-						if (m_CurrentPacket->rtStart - rtNextSampleTime > 20000) { // 2 ms
-#if defined(_DEBUG) && DBGLOG_LEVEL > 1
-							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected : %u[%u], %I64d -> %I64d(%s -> %s), %I64d)",
-									pos, nAvailableBytes,
-									rtNextSampleTime, m_CurrentPacket->rtStart,
-									ReftimeToString(rtNextSampleTime), ReftimeToString(m_CurrentPacket->rtStart),
-									m_CurrentPacket->rtStart - rtNextSampleTime));
-#endif
-							REFERENCE_TIME rtSilenceDuration = m_CurrentPacket->rtStart - rtNextSampleTime;
-							UINT32 framesSilence = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
-							UINT32 silenceBytes = min(framesSilence * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes - pos);
-							memset(pData, 0, silenceBytes);
-							pos += silenceBytes;
-						}
-					}
 				}
 
-				if (!pos) {
+				m_nSampleNum++;
+			} while (nWritenBytes < nAvailableBytes && bufferFlags != AUDCLNT_BUFFERFLAGS_SILENT);
+
+			if (bufferFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
+				if (!nWritenBytes) {
 					bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
-				} else if (pos < nAvailableBytes) {
-					memset(&pData[pos], 0, nAvailableBytes - pos);
+				} else if (nWritenBytes < nAvailableBytes) {
+					memset(&pData[nWritenBytes], 0, nAvailableBytes - nWritenBytes);
 				}
 			}
+		}
 
-			if (m_lVolume <= DSBVOLUME_MIN) {
-				bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
-			}
-			else if (m_lVolume < DSBVOLUME_MAX && !IsBitstream(m_pWaveFileFormat)) {
-				// Adjusting volume ...
-				WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-				SampleFormat sf = GetSampleFormat(wfeOutput);
-				size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
+		if (m_lVolume <= DSBVOLUME_MIN) {
+			bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+		}
+		else if (m_lVolume < DSBVOLUME_MAX && !IsBitstream(m_pWaveFileFormat)) {
+			// Adjusting volume ...
+			WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
+			SampleFormat sf = GetSampleFormat(wfeOutput);
+			size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
 
-				switch (sf) {
-				case SAMPLE_FMT_U8:
-					gain_uint8(m_dVolumeFactor, samples, (uint8_t*)pData);
-					break;
-				case SAMPLE_FMT_S16:
-					gain_int16(m_dVolumeFactor, samples, (int16_t*)pData);
-					break;
-				case SAMPLE_FMT_S24:
-					gain_int24(m_dVolumeFactor, samples, pData);
-					break;
-				case SAMPLE_FMT_S32:
-					gain_int32(m_dVolumeFactor, samples, (int32_t*)pData);
-					break;
-				case SAMPLE_FMT_FLT:
-					gain_float(m_dVolumeFactor, samples, (float*)pData);
-					break;
-				case SAMPLE_FMT_DBL:
-					gain_double(m_dVolumeFactor, samples, (double*)pData);
-					break;
-				}
+			switch (sf) {
+			case SAMPLE_FMT_U8:
+				gain_uint8(m_dVolumeFactor, samples, (uint8_t*)pData);
+				break;
+			case SAMPLE_FMT_S16:
+				gain_int16(m_dVolumeFactor, samples, (int16_t*)pData);
+				break;
+			case SAMPLE_FMT_S24:
+				gain_int24(m_dVolumeFactor, samples, pData);
+				break;
+			case SAMPLE_FMT_S32:
+				gain_int32(m_dVolumeFactor, samples, (int32_t*)pData);
+				break;
+			case SAMPLE_FMT_FLT:
+				gain_float(m_dVolumeFactor, samples, (float*)pData);
+				break;
+			case SAMPLE_FMT_DBL:
+				gain_double(m_dVolumeFactor, samples, (double*)pData);
+				break;
 			}
 		}
 	}
@@ -1994,7 +2006,6 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - ReleaseBuffer() failed with size %ld (0x%08x)", numFramesAvailable, hr));
 #endif
-		return hr;
 	}
 
 	return hr;
@@ -2370,7 +2381,7 @@ HRESULT	CMpcAudioRenderer::EndFlush()
 	return CBaseRenderer::EndFlush();
 }
 
-inline REFERENCE_TIME CMpcAudioRenderer::GetClockTime()
+inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 {
 	REFERENCE_TIME rt = INVALID_TIME;
 	if (m_pReferenceClock) {

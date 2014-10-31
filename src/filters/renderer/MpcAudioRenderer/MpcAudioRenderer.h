@@ -49,6 +49,9 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CAutoPtr<Packet>	m_CurrentPacket;
 
 	REFERENCE_TIME		m_rtStartTime;
+	REFERENCE_TIME		m_rtNextSampleTime;
+
+	ULONGLONG			m_nSampleNum;
 
 	BOOL				m_bEndOfStream;
 
@@ -165,7 +168,7 @@ private:
 	void					CheckBufferStatus();
 	void					WasapiFlush();
 
-	inline REFERENCE_TIME	GetClockTime();
+	inline REFERENCE_TIME	GetRefClockTime();
 
 	// WASAPI variables
 	HMODULE					m_hModule;
