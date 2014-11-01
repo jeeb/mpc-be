@@ -164,18 +164,35 @@ STDMETHODIMP CAudioSwitcherFilter::NonDelegatingQueryInterface(REFIID riid, void
 
 HRESULT CAudioSwitcherFilter::CheckMediaType(const CMediaType* pmt)
 {
-	return (pmt->majortype == MEDIATYPE_Audio
-			&& pmt->formattype == FORMAT_WaveFormatEx
-			&& (((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample == 8
-				|| ((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample == 16
-				|| ((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample == 24
-				|| ((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample == 32)
-			&& (((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_PCM
-				|| ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_IEEE_FLOAT
-				|| ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF
-				|| ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_EXTENSIBLE))
-		   ? S_OK
-		   : VFW_E_TYPE_NOT_ACCEPTED;
+	if (pmt->majortype == MEDIATYPE_Audio && pmt->formattype == FORMAT_WaveFormatEx) {
+		WORD wFormatTag = ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag;
+		WORD bps = ((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample;
+
+		if (pmt->subtype == MEDIASUBTYPE_PCM) {
+			switch (wFormatTag) {
+			case WAVE_FORMAT_PCM:
+				if (bps == 8 || bps == 16 || bps == 24 || bps == 32) {
+					return S_OK;
+				}
+				break;
+			case WAVE_FORMAT_DOLBY_AC3_SPDIF:
+				return S_OK;
+			case WAVE_FORMAT_EXTENSIBLE:
+				GUID& SubFormat = ((WAVEFORMATEXTENSIBLE*)pmt->pbFormat)->SubFormat;
+				if (SubFormat == KSDATAFORMAT_SUBTYPE_PCM
+						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
+						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
+						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
+						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
+					return S_OK;
+				}
+			}
+		} else if (pmt->subtype == MEDIASUBTYPE_IEEE_FLOAT && wFormatTag == WAVE_FORMAT_IEEE_FLOAT && bps == 32) {
+			return S_OK;
+		}
+	}
+
+	return VFW_E_TYPE_NOT_ACCEPTED;
 }
 
 HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
