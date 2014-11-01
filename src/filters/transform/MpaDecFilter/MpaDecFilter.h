@@ -173,9 +173,9 @@ public:
 
 	// IMpaDecFilter
 
-	STDMETHODIMP SetSampleFormat(MPCSampleFormat sf, bool enable);
-	STDMETHODIMP_(bool) GetSampleFormat(MPCSampleFormat sf);
-	STDMETHODIMP_(MPCSampleFormat) SelectSampleFormat(MPCSampleFormat sf);
+	STDMETHODIMP SetOutputFormat(MPCSampleFormat sf, bool enable);
+	STDMETHODIMP_(bool) GetOutputFormat(MPCSampleFormat sf);
+	STDMETHODIMP_(MPCSampleFormat) SelectOutputFormat(MPCSampleFormat sf);
 	STDMETHODIMP SetDynamicRangeControl(bool fDRC);
 	STDMETHODIMP_(bool) GetDynamicRangeControl();
 	STDMETHODIMP SetSPDIF(enctype et, bool fSPDIF);

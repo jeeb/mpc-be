@@ -1547,7 +1547,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 		return S_OK;
 	}
 
-	MPCSampleFormat out_mpcsf = SelectSampleFormat(SamplefmtToMPC[sfmt]);
+	MPCSampleFormat out_mpcsf = SelectOutputFormat(SamplefmtToMPC[sfmt]);
 	const SampleFormat out_sf = MPCtoSamplefmt[out_mpcsf];
 
 	BYTE*  pDataIn  = pBuff;
@@ -2046,7 +2046,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	DWORD out_layout;
 
 	if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
-		out_mpcsf      = SelectSampleFormat(SamplefmtToMPC[m_FFAudioDec.GetSampleFmt()]);
+		out_mpcsf      = SelectOutputFormat(SamplefmtToMPC[m_FFAudioDec.GetSampleFmt()]);
 		out_samplerate = m_FFAudioDec.GetSampleRate();
 		out_channels   = m_FFAudioDec.GetChannels();
 		out_layout     = m_FFAudioDec.GetChannelMask();
@@ -2058,7 +2058,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		} else {
 			out_mpcsf = SF_PCM16;
 		}
-		out_mpcsf      = SelectSampleFormat(out_mpcsf);
+		out_mpcsf      = SelectOutputFormat(out_mpcsf);
 		out_samplerate = wfe->nSamplesPerSec;
 		out_channels   = wfe->nChannels;
 		out_layout     = GetDefChannelMask(wfe->nChannels);
@@ -2156,7 +2156,7 @@ HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePi
 
 // IMpaDecFilter
 
-STDMETHODIMP CMpaDecFilter::SetSampleFormat(MPCSampleFormat mpcsf, bool enable)
+STDMETHODIMP CMpaDecFilter::SetOutputFormat(MPCSampleFormat mpcsf, bool enable)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	if (mpcsf >= 0 && mpcsf < sfcount) {
@@ -2168,7 +2168,7 @@ STDMETHODIMP CMpaDecFilter::SetSampleFormat(MPCSampleFormat mpcsf, bool enable)
 	return S_OK;
 }
 
-STDMETHODIMP_(bool) CMpaDecFilter::GetSampleFormat(MPCSampleFormat mpcsf)
+STDMETHODIMP_(bool) CMpaDecFilter::GetOutputFormat(MPCSampleFormat mpcsf)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	if (mpcsf >= 0 && mpcsf < sfcount) {
@@ -2177,7 +2177,7 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetSampleFormat(MPCSampleFormat mpcsf)
 	return false;
 }
 
-STDMETHODIMP_(MPCSampleFormat) CMpaDecFilter::SelectSampleFormat(MPCSampleFormat mpcsf)
+STDMETHODIMP_(MPCSampleFormat) CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	if (mpcsf >= 0 && mpcsf < sfcount && m_fSampleFmt[mpcsf]) {

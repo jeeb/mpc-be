@@ -47,10 +47,10 @@ bool CMpaDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>
 		return false;
 	}
 
-	m_outfmt_i16   = m_pMDF->GetSampleFormat(SF_PCM16);
-	m_outfmt_i24   = m_pMDF->GetSampleFormat(SF_PCM24);
-	m_outfmt_i32   = m_pMDF->GetSampleFormat(SF_PCM32);
-	m_outfmt_flt   = m_pMDF->GetSampleFormat(SF_FLOAT);
+	m_outfmt_i16   = m_pMDF->GetOutputFormat(SF_PCM16);
+	m_outfmt_i24   = m_pMDF->GetOutputFormat(SF_PCM24);
+	m_outfmt_i32   = m_pMDF->GetOutputFormat(SF_PCM32);
+	m_outfmt_flt   = m_pMDF->GetOutputFormat(SF_FLOAT);
 	m_drc          = m_pMDF->GetDynamicRangeControl();
 	m_spdif_ac3    = m_pMDF->GetSPDIF(IMpaDecFilter::ac3);
 	m_spdif_eac3   = m_pMDF->GetSPDIF(IMpaDecFilter::eac3);
@@ -157,10 +157,10 @@ bool CMpaDecSettingsWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMDF) {
-		m_pMDF->SetSampleFormat(SF_PCM16, m_outfmt_i16);
-		m_pMDF->SetSampleFormat(SF_PCM24, m_outfmt_i24);
-		m_pMDF->SetSampleFormat(SF_PCM32, m_outfmt_i32);
-		m_pMDF->SetSampleFormat(SF_FLOAT, m_outfmt_flt);
+		m_pMDF->SetOutputFormat(SF_PCM16, m_outfmt_i16);
+		m_pMDF->SetOutputFormat(SF_PCM24, m_outfmt_i24);
+		m_pMDF->SetOutputFormat(SF_PCM32, m_outfmt_i32);
+		m_pMDF->SetOutputFormat(SF_FLOAT, m_outfmt_flt);
 		m_pMDF->SetDynamicRangeControl(m_drc);
 		m_pMDF->SetSPDIF(IMpaDecFilter::ac3, m_spdif_ac3);
 		m_pMDF->SetSPDIF(IMpaDecFilter::eac3, m_spdif_eac3);
