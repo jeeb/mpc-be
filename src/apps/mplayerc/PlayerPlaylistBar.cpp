@@ -929,14 +929,14 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 		   || sl.GetCount() == 0 && mask.FindOneOf(_T("?*")) >= 0);
 }
 
-void CPlayerPlaylistBar::ParsePlayList(CString fn, CAtlList<CString>* subs)
+void CPlayerPlaylistBar::ParsePlayList(CString fn, CAtlList<CString>* subs, bool bCheck/* = true*/)
 {
 	CAtlList<CString> sl;
 	sl.AddTail(fn);
-	ParsePlayList(sl, subs);
+	ParsePlayList(sl, subs, bCheck);
 }
 
-void CPlayerPlaylistBar::ResolveLinkFiles( CAtlList<CString> &fns )
+void CPlayerPlaylistBar::ResolveLinkFiles(CAtlList<CString> &fns)
 {
 	// resolve .lnk files
 
@@ -959,7 +959,7 @@ void CPlayerPlaylistBar::ResolveLinkFiles( CAtlList<CString> &fns )
 	}
 }
 
-void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>* subs)
+void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>* subs, bool bCheck/* = true*/)
 {
 	if (fns.IsEmpty()) {
 		return;
@@ -969,58 +969,63 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>
 
 	ResolveLinkFiles(fns);
 
-	CAtlList<CString> sl;
-	if (SearchFiles(fns.GetHead(), sl)) {
+	if (bCheck) {
+		CAtlList<CString> sl;
+		if (SearchFiles(fns.GetHead(), sl)) {
 
-		bool bDVD_BD = false;
-		{
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				CString fn = sl.GetNext(pos);
-				if (CString(fn).MakeUpper().Right(13) == _T("\\VIDEO_TS.IFO")
-					|| CString(fn).MakeUpper().Right(11) == _T("\\INDEX.BDMV")) {
-					fns.RemoveAll();
-					fns.AddHead(fn);
-					bDVD_BD = true;
-					break;
+			bool bDVD_BD = false;
+			{
+				POSITION pos = sl.GetHeadPosition();
+				while (pos) {
+					CString fn = sl.GetNext(pos);
+					if (CString(fn).MakeUpper().Right(13) == _T("\\VIDEO_TS.IFO")
+						|| CString(fn).MakeUpper().Right(11) == _T("\\INDEX.BDMV")) {
+						fns.RemoveAll();
+						fns.AddHead(fn);
+						bDVD_BD = true;
+						break;
+					}
 				}
+			}
+
+			if (!bDVD_BD) {
+				if (sl.GetCount() > 1) {
+					subs = NULL;
+				}
+				POSITION pos = sl.GetHeadPosition();
+				while (pos) {
+					ParsePlayList(sl.GetNext(pos), subs);
+				}
+				return;
 			}
 		}
 
-		if (!bDVD_BD) {
-			if (sl.GetCount() > 1) {
-				subs = NULL;
-			}
-			POSITION pos = sl.GetHeadPosition();
+		CAtlList<CString> redir;
+		CStringA ct = GetContentType(fns.GetHead(), &redir);
+		if (!redir.IsEmpty()) {
+			POSITION pos = redir.GetHeadPosition();
 			while (pos) {
 				ParsePlayList(sl.GetNext(pos), subs);
 			}
 			return;
 		}
-	}
 
-	CAtlList<CString> redir;
-	CStringA ct = GetContentType(fns.GetHead(), &redir);
-	if (!redir.IsEmpty()) {
-		POSITION pos = redir.GetHeadPosition();
-		while (pos) {
-			ParsePlayList(sl.GetNext(pos), subs);
-		}
-		return;
-	}
-
-	if (ct == "application/x-mpc-playlist") {
-		ParseMPCPlayList(fns.GetHead());
-		return;
-	} else if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
-		ParseBDMVPlayList(fns.GetHead());
-		return;
-	} else if (ct == _T("audio/x-mpegurl") || ct == _T("application/http-live-streaming-m3u")) {
-		ParseM3UPlayList(fns.GetHead());
-		return;
-	} else if (ct == _T("application/x-cue-metadata")) {
-		if (ParseCUEPlayList(fns.GetHead())) {
+		if (ct == "application/x-mpc-playlist") {
+			ParseMPCPlayList(fns.GetHead());
 			return;
+		}
+		else if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
+			ParseBDMVPlayList(fns.GetHead());
+			return;
+		}
+		else if (ct == _T("audio/x-mpegurl") || ct == _T("application/http-live-streaming-m3u")) {
+			ParseM3UPlayList(fns.GetHead());
+			return;
+		}
+		else if (ct == _T("application/x-cue-metadata")) {
+			if (ParseCUEPlayList(fns.GetHead())) {
+				return;
+			}
 		}
 	}
 
@@ -1376,14 +1381,14 @@ bool CPlayerPlaylistBar::Empty()
 	return bWasPlaying;
 }
 
-void CPlayerPlaylistBar::Open(CAtlList<CString>& fns, bool fMulti, CAtlList<CString>* subs)
+void CPlayerPlaylistBar::Open(CAtlList<CString>& fns, bool fMulti, CAtlList<CString>* subs/* = NULL*/, bool bCheck/* = true*/)
 {
 	ResolveLinkFiles(fns);
 	Empty();
-	Append(fns, fMulti, subs);
+	Append(fns, fMulti, subs, bCheck);
 }
 
-void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CString>* subs)
+void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CString>* subs/* = NULL*/, bool bCheck/* = true*/)
 {
 	INT_PTR idx = -1;
 
@@ -1398,10 +1403,10 @@ void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CS
 
 		POSITION pos = fns.GetHeadPosition();
 		while (pos) {
-			ParsePlayList(fns.GetNext(pos), NULL);
+			ParsePlayList(fns.GetNext(pos), NULL, bCheck);
 		}
 	} else {
-		ParsePlayList(fns, subs);
+		ParsePlayList(fns, subs, bCheck);
 	}
 
 	Refresh();

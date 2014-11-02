@@ -5084,7 +5084,7 @@ void CMainFrame::OnFileOpenMedia()
 	}
 
 	CString fn = dlg.m_fns.GetHead();
-	if (PlayerYouTubePlaylistCheck(fn) && AfxGetAppSettings().bYoutubeLoadPlaylist) {
+	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(fn)) {
 		YoutubePlaylist youtubePlaylist;
 		int idx_CurrentPlay = 0;
 		if (PlayerYouTubePlaylist(fn, youtubePlaylist, idx_CurrentPlay)) {
@@ -5095,7 +5095,7 @@ void CMainFrame::OnFileOpenMedia()
 				YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
 				CAtlList<CString> fns;
 				fns.AddHead(item.url);
-				m_wndPlaylistBar.Append(fns, false);
+				m_wndPlaylistBar.Append(fns, false, NULL, false);
 				m_wndPlaylistBar.SetLast();
 				m_wndPlaylistBar.SetCurLabel(item.title);
 			}

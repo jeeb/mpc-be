@@ -32,6 +32,7 @@
 #define MATCH_END					"\""
 
 #define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit "
+#define MATCH_PLAYLIST_ITEM_START2	"<tr class=\"pl-video yt-uix-tile "
 
 const YOUTUBE_PROFILES* getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)
@@ -466,8 +467,18 @@ bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& id
 		}
 
 		char* block = data;
-		while ((block = strstr(block, MATCH_PLAYLIST_ITEM_START)) != NULL) {
-			block += strlen(MATCH_PLAYLIST_ITEM_START);
+
+		char* sMatch = NULL;
+		if (strstr(block, MATCH_PLAYLIST_ITEM_START)) {
+			sMatch = MATCH_PLAYLIST_ITEM_START;
+		} else if (strstr(block, MATCH_PLAYLIST_ITEM_START2)) {
+			sMatch = MATCH_PLAYLIST_ITEM_START2;
+		} else {
+			free(data);
+			return false;
+		}
+		while ((block = strstr(block, sMatch)) != NULL) {
+			block += strlen(sMatch);
 
 			int block_len = strpos(block, ">");
 			if (block_len) {
@@ -506,7 +517,7 @@ bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& id
 						}
 					} else if (propHeader == L"data-video-username") {
 						data_video_username = propValue;
-					} else if (propHeader == L"data-video-title") {
+					} else if (propHeader == L"data-video-title" || propHeader == L"data-title") {
 						data_video_title = FixHtmlSymbols(propValue);
 					}
 				}
