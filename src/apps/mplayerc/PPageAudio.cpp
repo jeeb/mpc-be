@@ -122,7 +122,7 @@ BOOL CPPageAudio::OnInitDialog()
 			continue;
 		}
 
-		CStringW str(olestr);
+		CString str(olestr);
 		CoTaskMemFree(olestr);
 
 		CComPtr<IPropertyBag> pPB;
@@ -136,7 +136,7 @@ BOOL CPPageAudio::OnInitDialog()
 			fstr = str;
 		}
 
-		if (fstr.Left(13) == L"DirectSound: ") {
+		if (/*fstr.Left(13) == L"DirectSound: "*/TRUE) {
 			m_AudioRendererDisplayNames.Add(str);
 
 			CString Cbstr;
