@@ -127,6 +127,13 @@ BOOL CPPageAudio::OnInitDialog()
 			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL) == S_OK) {
 				CStringW fname = var.bstrVal;
 
+				var.Clear();
+				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, NULL) == S_OK) {
+					if (var.lVal >= 0) {
+						fname.Insert(0, L"WaveOut: ");
+					}
+				}
+
 				m_AudioRendererDisplayNames.Add(CString(olestr));
 
 				CString str;
