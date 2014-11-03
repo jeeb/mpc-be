@@ -187,7 +187,9 @@ HRESULT CAudioSwitcherFilter::CheckMediaType(const CMediaType* pmt)
 					return S_OK;
 				}
 			}
-		} else if (pmt->subtype == MEDIASUBTYPE_IEEE_FLOAT && wFormatTag == WAVE_FORMAT_IEEE_FLOAT && bps == 32) {
+		} else if (pmt->subtype == MEDIASUBTYPE_IEEE_FLOAT
+				   && (wFormatTag == WAVE_FORMAT_IEEE_FLOAT || wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+				   && bps == 32) {
 			return S_OK;
 		}
 	}
