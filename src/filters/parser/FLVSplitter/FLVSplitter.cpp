@@ -541,7 +541,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								vCodecId = (BYTE)((double)AMF0Array[i]);
 							} else if (AMF0Array[i].name == L"duration") {
 								metaDataDuration = (REFERENCE_TIME)(UNITS * (double)AMF0Array[i]);
-							} else if (AMF0Array[i].name == L"framerate") {
+							} else if (AMF0Array[i].name == L"framerate" || AMF0Array[i].name == L"videoframerate") {
 								double value = AMF0Array[i];
 								if (value > 0 && value < 120) {
 									AvgTimePerFrame = (REFERENCE_TIME)(UNITS / (int)value);
