@@ -126,20 +126,27 @@ BOOL CPPageAudio::OnInitDialog()
 			CComVariant var;
 			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL) == S_OK) {
 				CStringW fname = var.bstrVal;
+				bool dev_enable = true;
 
 				var.Clear();
 				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, NULL) == S_OK) {
-					if (var.lVal >= 0) {
-						fname.Insert(0, L"WaveOut: ");
+					//if (var.lVal >= 0) { fname.Insert(0, L"WaveOut: "); }
+					dev_enable = false; // skip WaveOut devices
+				}
+				else if (pPB->Read(CComBSTR(L"DSGuid"), &var, NULL) == S_OK) {
+					if (CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
+						dev_enable = false; // skip Default DirectSound Device
 					}
 				}
 
-				m_AudioRendererDisplayNames.Add(CString(olestr));
+				if (dev_enable) {
+					m_AudioRendererDisplayNames.Add(CString(olestr));
 
-				CString str;
-				str.Format(_T("%d. %s"), i++, fname);
-				m_iAudioRendererTypeCtrl.AddString(str);
-				m_iSecAudioRendererTypeCtrl.AddString(str);
+					CString str;
+					str.Format(_T("%d. %s"), i++, fname);
+					m_iAudioRendererTypeCtrl.AddString(str);
+					m_iSecAudioRendererTypeCtrl.AddString(str);
+				}
 			}
 			var.Clear();
 		}
