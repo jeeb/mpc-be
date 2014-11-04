@@ -1222,4 +1222,6 @@ protected:
 	CString		CreateSnapShotFileName();
 
 	REFTIME		GetAvgTimePerFrame() const;
+
+	BOOL		OpenYoutubePlaylist(CString url);
 };

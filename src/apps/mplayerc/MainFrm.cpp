@@ -5084,26 +5084,8 @@ void CMainFrame::OnFileOpenMedia()
 	}
 
 	CString fn = dlg.m_fns.GetHead();
-	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(fn)) {
-		YoutubePlaylist youtubePlaylist;
-		int idx_CurrentPlay = 0;
-		if (PlayerYouTubePlaylist(fn, youtubePlaylist, idx_CurrentPlay)) {
-			m_wndPlaylistBar.Empty();
-
-			POSITION pos = youtubePlaylist.GetHeadPosition();
-			while (pos) {
-				YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
-				CAtlList<CString> fns;
-				fns.AddHead(item.url);
-				m_wndPlaylistBar.Append(fns, false, NULL, false);
-				m_wndPlaylistBar.SetLast();
-				m_wndPlaylistBar.SetCurLabel(item.title);
-			}
-			m_wndPlaylistBar.SetSelIdx(idx_CurrentPlay, true);
-
-			OpenCurPlaylistItem();
-			return;
-		}
+	if (OpenYoutubePlaylist(fn)) {
+		return;
 	}
 
 	if (dlg.m_fAppendPlaylist) {
@@ -5238,12 +5220,11 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 		m_wndPlaylistBar.Open(sl, true);
 		OpenCurPlaylistItem();
 	} else if (!s.slFiles.IsEmpty()) {
-		if (s.slFiles.GetCount() == 1 && (OpenBD(s.slFiles.GetHead()) || OpenIso(s.slFiles.GetHead()))) {
-			if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
-				SetForegroundWindow();
-			}
-			s.nCLSwitches &= ~CLSW_NOFOCUS;
-			return true;
+		if (s.slFiles.GetCount() == 1
+				&& (OpenBD(s.slFiles.GetHead())
+					|| OpenIso(s.slFiles.GetHead())
+					|| OpenYoutubePlaylist(s.slFiles.GetHead()))) {
+			;
 		} else if (s.slFiles.GetCount() == 1 && ::PathIsDirectory(s.slFiles.GetHead() + _T("\\VIDEO_TS"))) {
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			fSetForegroundWindow = true;
@@ -5278,12 +5259,12 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 					OpenCurPlaylistItem();
 				}
 			} else {
-				UINT nCLSwitches = s.nCLSwitches;	// backup cmdline params
+				//UINT nCLSwitches = s.nCLSwitches;	// backup cmdline params
 
 				//SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 				fSetForegroundWindow = true;
 
-				s.nCLSwitches = nCLSwitches;		// restore cmdline params
+				//s.nCLSwitches = nCLSwitches;		// restore cmdline params
 				m_wndPlaylistBar.Open(sl, fMulti, &s.slSubs);
 
 				OpenCurPlaylistItem((s.nCLSwitches & CLSW_STARTVALID) ? s.rtStart : INVALID_TIME);
@@ -5292,7 +5273,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 				s.rtStart = 0;
 			}
 		}
-	} else { // s.slFiles.IsEmpty()
+	} else {
 		if ((s.nCLSwitches & CLSW_PLAY) && m_wndPlaylistBar.GetCount() > 0) {
 			OpenCurPlaylistItem();
 		}
@@ -5302,7 +5283,6 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 	if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
 		SetForegroundWindow();
 	}
-
 	s.nCLSwitches &= ~CLSW_NOFOCUS;
 
 	UpdateThumbarButton();
@@ -20118,6 +20098,33 @@ REFTIME CMainFrame::GetAvgTimePerFrame() const
 	}
 
 	return refAvgTimePerFrame;
+}
+
+BOOL CMainFrame::OpenYoutubePlaylist(CString url)
+{
+	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(url)) {
+		YoutubePlaylist youtubePlaylist;
+		int idx_CurrentPlay = 0;
+		if (PlayerYouTubePlaylist(url, youtubePlaylist, idx_CurrentPlay)) {
+			m_wndPlaylistBar.Empty();
+
+			POSITION pos = youtubePlaylist.GetHeadPosition();
+			while (pos) {
+				YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
+				CAtlList<CString> fns;
+				fns.AddHead(item.url);
+				m_wndPlaylistBar.Append(fns, false, NULL, false);
+				m_wndPlaylistBar.SetLast();
+				m_wndPlaylistBar.SetCurLabel(item.title);
+			}
+			m_wndPlaylistBar.SetSelIdx(idx_CurrentPlay, true);
+
+			OpenCurPlaylistItem();
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }
 
 #pragma region GraphThread
