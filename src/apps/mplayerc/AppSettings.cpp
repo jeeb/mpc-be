@@ -1528,7 +1528,7 @@ void CAppSettings::SaveShaders()
 			while (pos) {
 				const Shader& s = m_shaders.GetNext(pos);
 				if (!s.label.IsEmpty()) {
-					CString shname = s.label + _T(".psh");
+					CString shname = s.label + _T(".hlsl");
 					CStdioFile shfile;
 					if (shfile.Open(path + shname, CFile::modeCreate | CFile::modeWrite | CFile::shareDenyNone | CFile::typeText)) {
 						shfile.WriteString(_T("// $MinimumShaderProfile: ") + s.target + _T("\n"));
@@ -1559,7 +1559,7 @@ void CAppSettings::LoadShaders()
 		}
 
 		WIN32_FIND_DATA wfd;
-		HANDLE hFile = FindFirstFile(path + _T("*.psh"), &wfd);
+		HANDLE hFile = FindFirstFile(path + _T("*.hlsl"), &wfd);
 		if (hFile != INVALID_HANDLE_VALUE) {
 			do {
 				CString shname = wfd.cFileName;
@@ -1568,7 +1568,7 @@ void CAppSettings::LoadShaders()
 				if (shfile.Open(path + shname, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
 
 					Shader s;
-					s.label = shname.Left(shname.GetLength() - 4); // filename without extension (.psh)
+					s.label = shname.Left(shname.GetLength() - 5); // filename without extension (.hlsl)
 
 					CString str;
 					shfile.ReadString(str); // read first string

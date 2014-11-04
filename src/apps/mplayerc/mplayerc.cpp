@@ -564,7 +564,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		DeleteFile(oldpath + _T("\\default.mpcpl"));
 
 		WIN32_FIND_DATA wfd;
-		HANDLE hFile = FindFirstFile(oldpath + _T("\\Shaders\\*.psh"), &wfd);
+		HANDLE hFile = FindFirstFile(oldpath + _T("\\Shaders\\*.hlsl"), &wfd);
 		if (hFile != INVALID_HANDLE_VALUE) {
 			do {
 				DeleteFile(oldpath + _T("\\Shaders\\") + wfd.cFileName);

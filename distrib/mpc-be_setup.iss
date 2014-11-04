@@ -213,8 +213,8 @@ Source: "..\docs\Authors mpc-hc team.txt"; DestDir: "{app}";                    
 Source: "..\docs\Changelog.txt";           DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.Rus.txt";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "..\docs\Readme.txt";              DestDir: "{app}";                             Flags: ignoreversion; Components: main
-Source: "Shaders\*.psh";                   DestDir: "{userappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main; Check: NOT IniUsed()
-Source: "Shaders\*.psh";                   DestDir: "{app}\Shaders";                     Flags: ignoreversion; Components: main; Check: IniUsed()
+Source: "Shaders\*.hlsl";                  DestDir: "{userappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main; Check: NOT IniUsed()
+Source: "Shaders\*.hlsl";                  DestDir: "{app}\Shaders";                     Flags: ignoreversion; Components: main; Check: IniUsed()
 
 [Icons]
 #ifdef x64Build
@@ -459,8 +459,10 @@ begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
     begin
       DelTree(ExpandConstant('{userappdata}\{#app_name}\Shaders\*.psh'), False, True, False);
+      DelTree(ExpandConstant('{userappdata}\{#app_name}\Shaders\*.hlsl'), False, True, False);
       RemoveDir(ExpandConstant('{userappdata}\{#app_name}\Shaders'));
       DelTree(ExpandConstant('{app}\Shaders\*.psh'), False, True, False);
+      DelTree(ExpandConstant('{app}\Shaders\*.hlsl'), False, True, False);
       RemoveDir(ExpandConstant('{app}\Shaders'));
       CleanUpSettingsAndFiles();
     end;

@@ -382,7 +382,7 @@ void CShaderEditorDlg::OnBnClickedButton2()
 		if (m_pShader == &s.m_shaders.GetAt(pos)) {
 			CString strShaderPath;
 			if (AfxGetMyApp()->GetAppSavePath(strShaderPath)) {
-				strShaderPath += _T("\\Shaders\\") + m_pShader->label + _T(".psh");
+				strShaderPath += _T("\\Shaders\\") + m_pShader->label + _T(".hlsl");
 				DeleteFile(strShaderPath);
 			}
 
