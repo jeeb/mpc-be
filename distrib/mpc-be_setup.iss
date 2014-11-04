@@ -274,7 +274,7 @@ function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBuff
 // thank for code to "El Sanchez" from forum.oszone.net
 procedure PinToTaskbar(Filename: String; IsPin: Boolean);
 var
-	hInst: THandle;
+  hInst: THandle;
   buf: array [0..255] of char;
   i, Res: Integer;
   strVerb, sVBSFile: String;
@@ -283,7 +283,7 @@ begin
   if (GetWindowsVersion shr 24 < 6) or ((GetWindowsVersion shr 24 = 6) and ((GetWindowsVersion shr 16) and $FF < 1)) then Exit; // Windows 7 check
 
   if not FileExists(Filename) then Exit;
-  
+
   if IsPin then Res := 5386 else Res := 5387;
   begin
     hInst := LoadLibraryEx(ExpandConstant('{sys}\shell32.dll'), 0, LOAD_LIBRARY_AS_DATAFILE);
@@ -298,26 +298,26 @@ begin
       end;
       oFile    := objShell.Namespace(ExtractFileDir(Filename)).ParseName(ExtractFileName(Filename));
       colVerbs := oFile.Verbs;
-      
+
       if IsWin64 and (Pos (ExpandConstant ('{pf64}\'), Filename) = 1) then begin
         sVBSFile := GenerateUniqueName (GetTempDir, 'mpc_be.vbs');
         SaveStringToFile (sVBSFile, \
           'Set oShell=CreateObject("Shell.Application")'  + #13 + \
           'Set oVerbs=oShell.NameSpace("' + ExtractFileDir (Filename) + '").ParseName("' + ExtractFileName (Filename) + '").Verbs' + #13 + \
-          'For Each oVerb In oVerbs'											+ #13 + \
-          '  If (oVerb="' + strVerb + '") Then'						+ #13 + \
-          '    oVerb.DoIt'														    + #13 + \
-          '    Exit For'															    + #13 + \
-          '  End If'															        + #13 + \
-          'Next'																, False);
-  
+          'For Each oVerb In oVerbs'                      + #13 + \
+          '  If (oVerb="' + strVerb + '") Then'           + #13 + \
+          '    oVerb.DoIt'                                + #13 + \
+          '    Exit For'                                  + #13 + \
+          '  End If'                                      + #13 + \
+          'Next'                                , False);
+
         exec( ExpandConstant ('{win}\Sysnative\cscript.exe'), '"' + sVBSFile + '" /B', '', SW_HIDE, ewWaitUntilTerminated, i);
         DeleteFile (sVBSFile);
       end else begin
         for i := colVerbs.Count downto 1 do if colVerbs.Item[i].Name = strVerb then begin
-			    if (IsPin and oFile.IsLink) then
-				    DeleteFile (ExpandConstant ('{userappdata}\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\') + ExtractFileName (Filename));
-          
+          if (IsPin and oFile.IsLink) then
+            DeleteFile (ExpandConstant ('{userappdata}\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\') + ExtractFileName (Filename));
+
           colVerbs.Item[i].DoIt;
           Break;
         end;
@@ -336,7 +336,7 @@ begin
   if RegQueryStringValue(HKLM, 'SOFTWARE\{#app_name}', 'ExePath', sInstallPath) then begin
     Result := ExtractFileDir(sInstallPath);
   end;
-  
+
   if (Result = '') or not DirExists(Result) then begin
     #ifdef x64Build
     Result := ExpandConstant('{pf}\{#app_name} x64');
@@ -403,30 +403,30 @@ end;
 
 procedure CleanUpSettingsAndFiles();
 Var
-	resCode: integer;  
+  resCode: integer;
 begin
-	// Unregister all extensions, include custom
-	Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /unregall', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
+  // Unregister all extensions, include custom
+  Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /unregall', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
 
-	DeleteFile(ExpandConstant('{app}\{#mpcbe_ini}'));
-	DeleteFile(ExpandConstant('{app}\default.mpcpl'));
-	DeleteFile(ExpandConstant('{userappdata}\{#app_name}\default.mpcpl'));
-	RemoveDir(ExpandConstant('{userappdata}\{#app_name}'));
-	RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
-	RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
-	RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
+  DeleteFile(ExpandConstant('{app}\{#mpcbe_ini}'));
+  DeleteFile(ExpandConstant('{app}\default.mpcpl'));
+  DeleteFile(ExpandConstant('{userappdata}\{#app_name}\default.mpcpl'));
+  RemoveDir(ExpandConstant('{userappdata}\{#app_name}'));
+  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
+  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
+  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   sLanguage: String;
-  resCode: integer;  
+  resCode: integer;
 begin
   if CurStep = ssPostInstall then begin
-  
+
     if IsTaskSelected('pintotaskbar') then
       PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True);
-  
+
     if IsTaskSelected('reset_settings') then
       CleanUpSettingsAndFiles();
 
@@ -437,10 +437,10 @@ begin
       SetIniString('Settings', 'Language', sLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
       RegWriteStringValue(HKCU, 'Software\{#app_name}\Settings', 'Language', sLanguage);
-      
+
     if IsComponentSelected('mpcberegvid') then
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regvid', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
-      
+
     if IsComponentSelected('mpcberegaud') then
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regaud', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
 
