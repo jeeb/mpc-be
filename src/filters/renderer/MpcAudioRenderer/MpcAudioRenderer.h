@@ -183,6 +183,7 @@ private:
 	REFERENCE_TIME			m_hnsPeriod;
 	bool					m_isAudioClientStarted;
 	BOOL					m_bIsBitstream;
+	BITSTREAM_MODE			m_BitstreamMode;
 	BOOL					m_bUseBitExactOutput;
 	BOOL					m_bUseSystemLayoutChannels;
 	FILTER_STATE			m_filterState;

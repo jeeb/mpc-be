@@ -149,6 +149,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_hWaitResumeEvent(NULL)
 	, m_hStopRenderThreadEvent(NULL)
 	, m_bIsBitstream(FALSE)
+	, m_BitstreamMode(BITSTREAM_NONE)
 	, m_hModule(NULL)
 	, pfAvSetMmThreadCharacteristicsW(NULL)
 	, pfAvRevertMmThreadCharacteristics(NULL)
@@ -887,41 +888,7 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetSystemLayoutChannels()
 STDMETHODIMP_(BITSTREAM_MODE) CMpcAudioRenderer::GetBitstreamMode()
 {
 	CAutoLock cAutoLock(&m_csProps);
-
-	if (m_pGraph && m_bIsBitstream && m_pWaveFileFormatOutput) {
-		if (m_pWaveFileFormatOutput->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
-			// AC3/DTS
-			CAutoLock cRenderLock(&m_csRender);
-			if (m_WasapiQueue.GetCount()) {
-				CAutoPtr<Packet> Packet = m_WasapiQueue.GetLast();
-				if (Packet->GetCount() > 8) {
-					BYTE* pData = Packet->GetData();
-					BYTE IEC61937_type = pData[4];
-					switch (IEC61937_type) {
-						case IEC61937_AC3:
-							return BITSTREAM_AC3;
-						case IEC61937_DTS1:
-						case IEC61937_DTS2:
-						case IEC61937_DTS3:
-							return BITSTREAM_DTS;
-					}
-				}
-			}
-
-			return BITSTREAM_AC3;
-		} else if (IsWaveFormatExtensible(m_pWaveFileFormatOutput)) {
-			WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
-			if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
-				return BITSTREAM_EAC3;
-			} else if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
-				return BITSTREAM_DTSHD;
-			} else if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
-				return BITSTREAM_TRUEHD;
-			}
-		}
-	}
-
-	return BITSTREAM_NONE;
+	return (m_pGraph && m_bIsBitstream) ? m_BitstreamMode : BITSTREAM_NONE;
 }
 
 HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
@@ -1245,6 +1212,34 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		p->rtStart	= rtStart;
 		p->rtStop	= rtStop;
 		p->SetData(pInputBufferPointer, lSize);
+
+		if (m_bIsBitstream && m_BitstreamMode == BITSTREAM_NONE) {
+			if (m_pWaveFileFormatOutput->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+				m_BitstreamMode = BITSTREAM_AC3;
+				// AC3/DTS
+				if (lSize > 8) {
+					BYTE IEC61937_type = pInputBufferPointer[4];
+					switch (IEC61937_type) {
+						case IEC61937_AC3:
+							m_BitstreamMode = BITSTREAM_AC3;
+							break;
+						case IEC61937_DTS1:
+						case IEC61937_DTS2:
+						case IEC61937_DTS3:
+							m_BitstreamMode = BITSTREAM_DTS;
+					}
+				}
+			} else if (IsWaveFormatExtensible(m_pWaveFileFormatOutput)) {
+				WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
+				if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
+					m_BitstreamMode = BITSTREAM_EAC3;
+				} else if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
+					m_BitstreamMode = BITSTREAM_DTSHD;
+				} else if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
+					m_BitstreamMode = BITSTREAM_TRUEHD;
+				}
+			}
+		}
 
 		if (m_dRate != 1.0
 				&& !m_bIsBitstream
@@ -2076,6 +2071,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	HRESULT hr = S_OK;
 
 	m_hnsPeriod = 0;
+	m_BitstreamMode = BITSTREAM_NONE;
 
 	REFERENCE_TIME hnsDefaultDevicePeriod = 0;
 	REFERENCE_TIME hnsMinimumDevicePeriod = 0;
