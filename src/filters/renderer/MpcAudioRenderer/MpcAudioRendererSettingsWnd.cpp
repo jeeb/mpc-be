@@ -303,30 +303,28 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 			m_InputFormatText.SetWindowText(L"Bitstream");
 			m_OutputFormatText.SetWindowText(L"Bitstream");
 		} else {
-
 			WAVEFORMATEX *pWfxIn, *pWfxOut;
 			m_pMAR->GetStatus(&pWfxIn, &pWfxOut);
 			if (pWfxIn && pWfxOut) {
-
 				{
 					// Input
-					bool fFloat		= false;
+					bool bIsFloat	= false;
 					DWORD layout	= 0;
-					if (pWfxIn->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pWfxIn->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+					if (IsWaveFormatExtensible(pWfxIn)) {
 						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pWfxIn;
 						layout = wfex->dwChannelMask;
 						if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
-							fFloat = true;
+							bIsFloat = true;
 						}
 					} else {
 						layout = GetDefChannelMask(pWfxIn->nChannels);
 						if (pWfxIn->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-							fFloat = true;
+							bIsFloat = true;
 						}
 					}
 
 					CString sFormat;
-					sFormat.Format(L"%dbit %s", pWfxIn->wBitsPerSample, fFloat ? L"Float" : L"Integer");
+					sFormat.Format(L"%dbit %s", pWfxIn->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
 
 					CString sChannel;
 					switch (pWfxIn->nChannels) {
@@ -352,23 +350,23 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 
 				{
 					// Output
-					bool fFloat		= false;
+					bool bIsFloat	= false;
 					DWORD layout	= 0;
-					if (pWfxOut->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pWfxOut->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+					if (IsWaveFormatExtensible(pWfxOut)) {
 						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pWfxOut;
 						layout = wfex->dwChannelMask;
 						if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
-							fFloat = true;
+							bIsFloat = true;
 						}
 					} else {
 						layout = GetDefChannelMask(pWfxOut->nChannels);
 						if (pWfxOut->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-							fFloat = true;
+							bIsFloat = true;
 						}
 					}
 
 					CString sFormat;
-					sFormat.Format(L"%dbit %s", pWfxOut->wBitsPerSample, fFloat ? L"Float" : L"Integer");
+					sFormat.Format(L"%dbit %s", pWfxOut->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
 
 					CString sChannel;
 					switch (pWfxOut->nChannels) {

@@ -1220,9 +1220,6 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 				if (lSize > 8) {
 					BYTE IEC61937_type = pInputBufferPointer[4];
 					switch (IEC61937_type) {
-						case IEC61937_AC3:
-							m_BitstreamMode = BITSTREAM_AC3;
-							break;
 						case IEC61937_DTS1:
 						case IEC61937_DTS2:
 						case IEC61937_DTS3:
