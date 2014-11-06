@@ -31,6 +31,9 @@ struct AVCodecParserContext;
 struct AVFrame;
 
 enum AVCodecID FindCodec(const GUID subtype);
+const char* GetCodecDescriptorName(enum AVCodecID codec_id);
+
+// CFFAudioDecoder
 
 class CFFAudioDecoder
 {

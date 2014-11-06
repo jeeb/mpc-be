@@ -147,6 +147,15 @@ enum AVCodecID FindCodec(const GUID subtype)
 	return AV_CODEC_ID_NONE;
 }
 
+const char* GetCodecDescriptorName(enum AVCodecID codec_id)
+{
+	if (const AVCodecDescriptor* codec_descriptor = avcodec_descriptor_get(codec_id)) {
+		return codec_descriptor->name;
+	}
+
+	return NULL;
+}
+
 static DWORD get_lav_channel_layout(uint64_t layout)
 {
 	if (layout > UINT32_MAX) {
