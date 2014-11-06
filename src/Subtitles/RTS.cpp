@@ -789,7 +789,7 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
 	, m_cpOffset(cpOffset)
 	, m_pAlphaMask(NULL)
 {
-	if (m_size.cx <= 0 || m_size.cy <= 0 || !m_pOverlayData) { // m_pOverlayData is sometimes empty. the reason is not clear.
+	if (m_size.cx <= 0 || m_size.cy <= 0 ) {
 		return;
 	}
 
@@ -802,6 +802,9 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
 	}
 
 	Paint(CPoint(0, 0), CPoint(0, 0));
+	if (!m_pOverlayData) { // m_pOverlayData parameter can be empty if the '\clip' tag is incorrectly used
+		return;
+	}
 
 	int w = m_pOverlayData->mOverlayWidth, h = m_pOverlayData->mOverlayHeight;
 
