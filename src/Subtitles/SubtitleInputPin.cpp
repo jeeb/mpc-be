@@ -262,7 +262,7 @@ public IUnknown {
 
 STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
 	hr = __super::Receive(pSample);
 	if (FAILED(hr)) {
@@ -282,9 +282,12 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		return hr;
 	}
 
-	int len = pSample->GetActualDataLength();
+	long len = pSample->GetActualDataLength();
+	if (len <= 0) {
+		return E_FAIL;
+	}
 
-	bool fInvalidate = false;
+	bool bInvalidate = false;
 
 	if (m_mt.majortype == MEDIATYPE_Text) {
 		CAutoLock cAutoLock(m_pSubLock);
@@ -304,12 +307,12 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 					pRTS->m_name = CString(ptr);
 				} else if (tag == __GAB1_ENTRY__) {
 					pRTS->Add(AToW(&ptr[8]), false, *(int*)ptr, *(int*)(ptr+4));
-					fInvalidate = true;
+					bInvalidate = true;
 				} else if (tag == __GAB1_LANGUAGE_UNICODE__) {
 					pRTS->m_name = (WCHAR*)ptr;
 				} else if (tag == __GAB1_ENTRY_UNICODE__) {
 					pRTS->Add((WCHAR*)(ptr+8), true, *(int*)ptr, *(int*)(ptr+4));
-					fInvalidate = true;
+					bInvalidate = true;
 				}
 
 				ptr += size;
@@ -328,7 +331,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 					pRTS->m_name = (WCHAR*)ptr;
 				} else if (tag == __GAB1_RAWTEXTSUBTITLE__) {
 					pRTS->Open((BYTE*)ptr, size, DEFAULT_CHARSET, pRTS->m_name);
-					fInvalidate = true;
+					bInvalidate = true;
 				}
 
 				ptr += size;
@@ -341,7 +344,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 
 			if (!str.IsEmpty()) {
 				pRTS->Add(AToW(str), false, (int)(tStart / 10000), (int)(tStop / 10000));
-				fInvalidate = true;
+				bInvalidate = true;
 			}
 		}
 	} else if (IsHdmvSub(&m_mt)
@@ -356,7 +359,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 			CStringW str = UTF8To16(CStringA((LPCSTR)pData, len)).Trim();
 			if (!str.IsEmpty()) {
 				pRTS->Add(str, true, (int)(tStart / 10000), (int)(tStop / 10000));
-				fInvalidate = true;
+				bInvalidate = true;
 			}
 		} else if (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS || m_mt.subtype == MEDIASUBTYPE_ASS2) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
@@ -387,7 +390,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 				if (!stse.str.IsEmpty()) {
 					pRTS->Add(stse.str, true, (int)(tStart / 10000), (int)(tStop / 10000),
 							  stse.style, stse.actor, stse.effect, stse.marginRect, stse.layer, stse.readorder);
-					fInvalidate = true;
+					bInvalidate = true;
 				}
 			}
 		} else if (m_mt.subtype == MEDIASUBTYPE_VOBSUB
@@ -403,13 +406,13 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		}
 	}
 
-	if (fInvalidate) {
-		TRACE(_T("InvalidateSubtitle(%I64d, ..)\n"), tStart);
+	if (bInvalidate) {
+#if (FALSE)
+		DbgLog((LOG_TRACE, 3, L"InvalidateSubtitle() : %I64d", tStart));
+#endif
 		// IMPORTANT: m_pSubLock must not be locked when calling this
 		InvalidateSubtitle(tStart, m_pSubStream);
 	}
-
-	hr = S_OK;
 
 	return hr;
 }
