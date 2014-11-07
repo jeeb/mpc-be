@@ -69,6 +69,12 @@ void CMpaDecSettingsWnd::OnDisconnect()
 	m_pMDF.Release();
 }
 
+void CMpaDecSettingsWnd::UpdateStatusInfo()
+{
+	CString str = m_pMDF->GetInformation(AINFO_DecoderInfo);
+	m_edtStatus.SetWindowText(str);
+}
+
 bool CMpaDecSettingsWnd::OnActivate()
 {
 	ASSERT(IPP_FONTSIZE == 13);
@@ -115,6 +121,16 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_spdif_ac3enc_check.SetCheck(m_spdif_ac3enc);
 #endif
 	OnDTSCheck();
+
+	////////// Status //////////
+	p.y += h20;
+	m_grpStatus.Create(L"Status", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(230), h25 + m_fontheight * 4 + m_fontheight / 2)), this, (UINT)IDC_STATIC);
+	p.y += h20;
+	m_edtStatus.Create(WS_CHILD | WS_VISIBLE /*| WS_BORDER*/ | ES_READONLY | ES_MULTILINE, CRect(p, CSize(IPP_SCALE(220), m_fontheight * 4 + m_fontheight / 2)), this, 0);
+
+	if (m_pMDF) {
+		UpdateStatusInfo();
+	}
 
 	if (!IsWinVistaOrLater()) {
 		m_spdif_eac3_check.EnableWindow(FALSE);

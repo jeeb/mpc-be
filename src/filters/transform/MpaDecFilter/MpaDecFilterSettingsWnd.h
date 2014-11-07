@@ -78,6 +78,11 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	CButton   m_spdif_ac3enc_check;
 #endif
 
+	CButton		m_grpStatus;
+	CEdit		m_edtStatus;
+
+	void		UpdateStatusInfo();
+
 public:
 	CMpaDecSettingsWnd();
 

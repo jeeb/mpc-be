@@ -74,6 +74,7 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	, public IMpaDecFilter
 	, public ISpecifyPropertyPages2
 {
+	SampleFormat	m_InternalSampleFormat;
 protected:
 	// settings
 	CCritSec        m_csProps;
@@ -182,4 +183,6 @@ public:
 	STDMETHODIMP_(bool) GetSPDIF(enctype et);
 
 	STDMETHODIMP SaveSettings();
+
+	STDMETHODIMP_(CString) GetInformation(MPCAInfo index);
 };

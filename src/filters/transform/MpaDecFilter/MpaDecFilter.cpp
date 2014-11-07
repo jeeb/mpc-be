@@ -31,6 +31,7 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/SysVersion.h"
+#include "Version.h"
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
@@ -329,6 +330,7 @@ static const SampleFormat MPCtoSamplefmt[sfcount] = {
 
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(NAME("CMpaDecFilter"), lpunk, __uuidof(this))
+	, m_InternalSampleFormat(SAMPLE_FMT_NONE)
 	, m_rtStart(0)
 	, m_fDiscontinuity(false)
 	, m_bResync(false)
@@ -1530,6 +1532,8 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 	}
 	ASSERT(nChannels == av_popcount(dwChannelMask));
 
+	m_InternalSampleFormat = sfmt;
+
 #if ENABLE_AC3_ENCODER
 	if (m_bBitstreamSupported[SPDIF] && GetSPDIF(ac3enc) /*&& nChannels > 2*/) { // do not encode mono and stereo
 		return AC3Encode(pBuff, size, sfmt, nSamplesPerSec, nChannels, dwChannelMask);
@@ -2278,6 +2282,176 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 #endif
 
 	return S_OK;
+}
+
+static const char* SampleFormatToStringA(SampleFormat sf)
+{
+	switch (sf) {
+	case SAMPLE_FMT_U8:
+	case SAMPLE_FMT_U8P:
+		return "8-bit";
+	case SAMPLE_FMT_S16:
+	case SAMPLE_FMT_S16P:
+		return "16-bit";
+	case SAMPLE_FMT_S24:
+		return "24-bit";
+	case SAMPLE_FMT_S32:
+	case SAMPLE_FMT_S32P:
+		return "32-bit";
+	case SAMPLE_FMT_FLT:
+	case SAMPLE_FMT_FLTP:
+		return "32-bit float";
+	case SAMPLE_FMT_DBL:
+	case SAMPLE_FMT_DBLP:
+		return "64-bit float";
+	}
+
+	return NULL;
+}
+
+STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	CString infostr;
+
+	if (index == AINFO_MPCVersion) {
+		infostr.Format(_T("v%d.%d.%d.%d (build %d)"), MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_STATUS, MPC_VERSION_REV);
+
+		return infostr;
+	}
+
+	if (index == AINFO_DecoderInfo) {
+		// Input
+		DWORD samplerate = 0;
+		WORD channels = 0;
+
+		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
+			infostr.Format(L"Codec: %hS", m_FFAudioDec.GetCodecName());
+			WORD bitdeph = m_FFAudioDec.GetCoddedBitdepth();
+			if (bitdeph) {
+				infostr.AppendFormat(L", %u-bit", bitdeph);
+			}
+			infostr += L"\r\n";
+			samplerate = m_FFAudioDec.GetSampleRate();
+			channels = m_FFAudioDec.GetChannels();
+		}
+		else if (m_pInput->CurrentMediaType().IsValid()) {
+			const GUID& subtype = m_pInput->CurrentMediaType().subtype;
+			infostr = L"Input: ";
+			bool enable_bitdeph = true;
+			if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
+				infostr += "DVD LPCM";
+			}
+			else if (subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
+				infostr += "HDMV LPCM";
+			}
+			else if (subtype == MEDIASUBTYPE_PS2_PCM) {
+				infostr += "PS2 PCM";
+			}
+			else if (subtype == MEDIASUBTYPE_PS2_ADPCM) {
+				infostr += "PS2 ADPCM";
+			}
+			else if (subtype == MEDIASUBTYPE_PCM_NONE
+					|| subtype == MEDIASUBTYPE_PCM_RAW
+					|| subtype == MEDIASUBTYPE_PCM_TWOS
+					|| subtype == MEDIASUBTYPE_PCM_SOWT
+					|| subtype == MEDIASUBTYPE_PCM_IN24
+					|| subtype == MEDIASUBTYPE_PCM_IN32
+					|| subtype == MEDIASUBTYPE_PCM_FL32
+					|| subtype == MEDIASUBTYPE_PCM_FL64
+					|| subtype == MEDIASUBTYPE_PCM
+					|| subtype == MEDIASUBTYPE_IEEE_FLOAT) {
+				infostr += "PCM";
+			}
+			else {
+				// bitstream ac3, eac3, dts, truehd, mlp
+				enable_bitdeph = false;
+				infostr += GetCodecDescriptorName(FindCodec(subtype));
+			}
+
+			if (WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format()) {
+				if (enable_bitdeph) {
+					infostr.AppendFormat(L", %u-bit", wfein->wBitsPerSample);
+					if (subtype == MEDIASUBTYPE_PCM_FL32
+						|| subtype == MEDIASUBTYPE_PCM_FL64
+						|| subtype == MEDIASUBTYPE_IEEE_FLOAT) {
+						infostr += L" float";
+					}
+				}
+				samplerate = wfein->nSamplesPerSec;
+				channels = wfein->nChannels;
+			}
+			infostr += L"\r\n";
+		}
+		else {
+			return L"The decoder is not active.";
+		}
+
+		if (samplerate) {
+			infostr.AppendFormat(L"Sample rate: %u\r\n", samplerate);
+		}
+		if (channels) {
+			infostr.AppendFormat(L"Channels: %u\r\n", channels);
+		}
+
+		// Output
+		infostr += L"Output:";
+		if (m_InternalSampleFormat != SAMPLE_FMT_NONE) {
+			infostr.AppendFormat(L" %hS", SampleFormatToStringA(m_InternalSampleFormat));
+		}
+
+		if (WAVEFORMATEX* wfeout = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format()) {
+			const GUID& subtype = m_pOutput->CurrentMediaType().subtype;
+			bool outPCM = false;
+
+			if (subtype == MEDIASUBTYPE_PCM) {
+				switch (wfeout->wFormatTag) {
+				case WAVE_FORMAT_DOLBY_AC3_SPDIF:
+					infostr.AppendFormat(L" -> AC3 SPDIF, %u Hz", wfeout->nSamplesPerSec);
+					// wfeout channels and bit depth is not actual
+					break;
+				case WAVE_FORMAT_EXTENSIBLE: {
+					WAVEFORMATEXTENSIBLE* wfexout = (WAVEFORMATEXTENSIBLE*)wfeout;
+
+					if (wfexout->SubFormat != KSDATAFORMAT_SUBTYPE_PCM) {
+						outPCM = true;
+					}
+					else if (wfexout->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
+						infostr += L" -> HDMI DTS-HD";
+						// wfeout samplerate, channels and bit depth is not actual
+					}
+					else if (wfexout->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
+						infostr += L" -> HDMI E-AC3";
+						// wfeout samplerate, channels and bit depth is not actual
+					}
+					else if (wfexout->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
+						infostr += " -> HDMI TrueHD";
+						// wfeout samplerate, channels and bit depth is not actual
+					}
+					break;
+				}
+				case WAVE_FORMAT_PCM:
+					outPCM = true;
+					break;
+				}
+			}
+			else if (subtype == MEDIASUBTYPE_IEEE_FLOAT) {
+				outPCM = true;
+			}
+
+			if (outPCM) {
+				const char* outsf = SampleFormatToStringA(GetSampleFormat(wfeout));
+				if (outsf != SampleFormatToStringA(m_InternalSampleFormat)) {
+					infostr.AppendFormat(L" -> %hS", outsf);
+				}
+			}
+
+		}
+
+		return infostr;
+	}
+
+	return NULL;
 }
 
 // ISpecifyPropertyPages2

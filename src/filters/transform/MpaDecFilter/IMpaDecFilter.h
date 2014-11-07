@@ -29,6 +29,11 @@ enum MPCSampleFormat {
 	sfcount
 };
 
+enum MPCAInfo {
+	AINFO_MPCVersion,
+	AINFO_DecoderInfo,
+};
+
 interface __declspec(uuid("2067C60F-752F-4EBD-B0B1-4CBC5E00741C"))
 IMpaDecFilter :
 public IUnknown {
@@ -52,4 +57,6 @@ public IUnknown {
 	STDMETHOD_(bool, GetSPDIF(enctype et)) PURE;
 
 	STDMETHOD(SaveSettings()) PURE;
+
+	STDMETHOD_(CString, GetInformation(MPCAInfo index)) PURE;
 };

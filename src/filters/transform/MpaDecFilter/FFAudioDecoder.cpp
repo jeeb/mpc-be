@@ -616,3 +616,10 @@ DWORD CFFAudioDecoder::GetChannelMask()
 {
 	return get_lav_channel_layout(m_pAVCtx->channel_layout);
 }
+
+WORD CFFAudioDecoder::GetCoddedBitdepth()
+{
+	// actual for lossless formats
+	// for mp3, ac3, aac and other is 0
+	return (WORD)m_pAVCtx->bits_per_coded_sample;
+}
