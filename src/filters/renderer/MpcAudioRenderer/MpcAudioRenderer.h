@@ -39,10 +39,17 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CMpcAudioRenderer : public CBaseRenderer
 	, public IBasicAudio
 	, public IMediaSeeking
+	, public IMMNotificationClient
 	, public ISpecifyPropertyPages2
 	, public IMpcAudioRendererFilter
 {
 	CCritSec			m_csRender;
+	CCritSec			m_csProps;
+	CCritSec			m_csCheck;
+
+	CAMEvent			m_eEndReceive;
+	CAMEvent			m_eReinitialize;
+
 	CMixer				m_Resampler;
 
 	CPacketQueue		m_WasapiQueue;
@@ -54,6 +61,11 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	ULONGLONG			m_nSampleNum;
 
 	BOOL				m_bEndOfStream;
+
+	BOOL				m_bUseDefaultDevice;
+	
+	CString				m_strDeviceId;
+	CString				m_strDeviceName;
 
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
@@ -110,6 +122,13 @@ public:
 	STDMETHODIMP GetRate(double* pdRate);
 	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
 
+	// === IMMNotificationClient
+	STDMETHODIMP OnDeviceStateChanged(__in LPCWSTR pwstrDeviceId, __in DWORD dwNewState);
+	STDMETHODIMP OnDeviceAdded(__in LPCWSTR pwstrDeviceId) { return E_NOTIMPL; }
+	STDMETHODIMP OnDeviceRemoved(__in LPCWSTR pwstrDeviceId) { return E_NOTIMPL; }
+	STDMETHODIMP OnDefaultDeviceChanged(__in EDataFlow flow, __in ERole role, __in LPCWSTR pwstrDefaultDeviceId);
+	STDMETHODIMP OnPropertyValueChanged(__in LPCWSTR pwstrDeviceId, __in const PROPERTYKEY key) { return E_NOTIMPL; }
+
 	// === ISpecifyPropertyPages2
 	STDMETHODIMP GetPages(CAUUID* pPages);
 	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
@@ -127,13 +146,11 @@ public:
 	STDMETHODIMP					SetSystemLayoutChannels(BOOL nValue);
 	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels();
 	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode();
+	STDMETHODIMP_(CString)			GetCurrentPlaybackDevice();
 
 	// CMpcAudioRenderer
 private:
 	HRESULT					GetReferenceClockInterface(REFIID riid, void **ppv);
-
-	CCritSec				m_csProps;
-	CCritSec				m_csCheck;
 
 	WAVEFORMATEX			*m_pWaveFileFormat;
 	WAVEFORMATEX			*m_pWaveFileFormatOutput;
@@ -145,11 +162,10 @@ private:
 	CFilter					m_Filter;
 
 	// CMpcAudioRenderer WASAPI methods
-	HRESULT					GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
 	HRESULT					GetAudioDevice();
 	HRESULT					CreateAudioClient();
 	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
-	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
+	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = NULL);
 	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
 	HRESULT					GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
 
@@ -163,6 +179,8 @@ private:
 
 	HRESULT					StartAudioClient();
 	HRESULT					StopAudioClient();
+	
+	HRESULT					ReinitializeAudioDevice();
 
 	HRESULT					RenderWasapiBuffer();
 	void					CheckBufferStatus();
@@ -181,7 +199,7 @@ private:
 	IAudioRenderClient		*m_pRenderClient;
 	UINT32					m_nFramesInBuffer;
 	REFERENCE_TIME			m_hnsPeriod;
-	bool					m_isAudioClientStarted;
+	bool					m_bIsAudioClientStarted;
 	BOOL					m_bIsBitstream;
 	BITSTREAM_MODE			m_BitstreamMode;
 	BOOL					m_bUseBitExactOutput;
@@ -216,6 +234,7 @@ private:
 	HANDLE					m_hWaitPauseEvent;
 	HANDLE					m_hWaitResumeEvent;
 	HANDLE					m_hStopRenderThreadEvent;
+	HANDLE					m_hReinitializeEvent;
 
 	HANDLE					m_hRendererNeedMoreData;
 	HANDLE					m_hStopWaitingRenderer;

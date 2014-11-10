@@ -75,23 +75,22 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	ASSERT(IPP_FONTSIZE == 13);
 	const int h20 = IPP_SCALE(20);
 	const int h30 = IPP_SCALE(30);
-	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_cbWasapiMode.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_WASAPI_MODE);
+	m_cbWasapiMode.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_WASAPI_MODE);
 	m_cbWasapiMode.AddString(L"Exclusive Mode");
 	m_cbWasapiMode.AddString(L"Shared Mode");
 	p.y += h30;
-	m_cbUseBitExactOutput.Create(ResStr(IDS_ARS_BITEXACT_OUTPUT), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_BITEXACT_OUTPUT);
+	m_cbUseBitExactOutput.Create(ResStr(IDS_ARS_BITEXACT_OUTPUT), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_BITEXACT_OUTPUT);
 	p.y += h20;
-	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
+	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
 	p.y += h30;
 
-	m_txtSoundDevice.Create(ResStr(IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSoundDevice.Create(ResStr(IDS_ARS_SOUND_DEVICE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_cbSoundDevice.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
+	m_cbSoundDevice.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
 
 	HMODULE hModule = LoadLibrary(L"dsound.dll");
 	if (hModule) {
@@ -205,7 +204,6 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 {
 	ASSERT(IPP_FONTSIZE == 13);
 	const int h20 = IPP_SCALE(20);
-	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
 	m_gInput.Create(L"Input", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(150), h20 * 4 + IPP_SCALE(5))), this, (UINT)IDC_STATIC);
@@ -217,50 +215,53 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 		// Format
 		p = CPoint(IPP_SCALE(10), 10);
 		p.y += h20;
-		m_InputFormatLabel.Create(L"Format:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_InputFormatLabel.Create(L"Format:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += IPP_SCALE(70);
-		m_InputFormatText.Create(L"", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_InputFormatText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 
 		p = CPoint(IPP_SCALE(170), 10);
 		p.y += h20;
-		m_OutputFormatLabel.Create(L"Format:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_OutputFormatLabel.Create(L"Format:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += IPP_SCALE(70);
-		m_OutputFormatText.Create(L"", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_OutputFormatText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 	}
 
 	{
 		// Channel
 		p = CPoint(IPP_SCALE(10), 10);
 		p.y += h20 * 2;
-		m_InputChannelLabel.Create(L"Channel:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_InputChannelLabel.Create(L"Channel:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += IPP_SCALE(70);
-		m_InputChannelText.Create(L"", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_InputChannelText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 
 		p = CPoint(IPP_SCALE(170), 10);
 		p.y += h20 * 2;
-		m_OutputChannelLabel.Create(L"Channel:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_OutputChannelLabel.Create(L"Channel:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += IPP_SCALE(70);
-		m_OutputChannelText.Create(L"", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_OutputChannelText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 	}
 
 	{
 		// Sample Rate
 		p = CPoint(IPP_SCALE(10), 10);
 		p.y += h20 * 3;
-		m_InputRateLabel.Create(L"Sample Rate:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_InputRateLabel.Create(L"Sample Rate:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += IPP_SCALE(70);
-		m_InputRateText.Create(L"", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_InputRateText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 
 		p = CPoint(IPP_SCALE(170), 10);
 		p.y += h20 * 3;
-		m_OutputRateLabel.Create(L"Sample Rate:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_OutputRateLabel.Create(L"Sample Rate:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += IPP_SCALE(70);
-		m_OutputRateText.Create(L"", WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_OutputRateText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(70), m_fontheight)), this, (UINT)IDC_STATIC);
 	}
 
 	p = CPoint(IPP_SCALE(10), 10);
 	p.y += h20 * 4 + IPP_SCALE(15);
-	m_txtModeText.Create(ResStr(IDS_ARS_WASAPI_MODE_STATUS_1), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(280), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_ModeText.Create(ResStr(IDS_ARS_WASAPI_MODE_STATUS_1), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, (UINT)IDC_STATIC);
+
+	p.y += IPP_SCALE(15);
+	m_CurrentDeviceText.Create(NULL, WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, (UINT)IDC_STATIC);
 
 	if (m_pMAR) {
 		UINT status = m_pMAR->GetMode();
@@ -269,10 +270,10 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 			default:
 				break;
 			case MODE_WASAPI_EXCLUSIVE :
-				m_txtModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
+				m_ModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
 				break;
 			case MODE_WASAPI_SHARED :
-				m_txtModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
+				m_ModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
 				break;
 			case MODE_WASAPI_EXCLUSIVE_BITSTREAM :
 				CString btMode_str;
@@ -295,7 +296,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 				if (btMode_str.GetLength()) {
 					msg.AppendFormat(L" [%s]", btMode_str);
 				}
-				m_txtModeText.SetWindowText(msg);
+				m_ModeText.SetWindowText(msg);
 				break;
 		}
 
@@ -391,6 +392,8 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 				}
 			}
 		}
+
+		m_CurrentDeviceText.SetWindowText(m_pMAR->GetCurrentPlaybackDevice());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {

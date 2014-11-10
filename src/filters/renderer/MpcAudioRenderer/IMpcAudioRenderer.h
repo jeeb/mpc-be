@@ -51,6 +51,6 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetBitExactOutput()) PURE;
 	STDMETHOD(SetSystemLayoutChannels(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetSystemLayoutChannels()) PURE;
-
 	STDMETHOD_(BITSTREAM_MODE, GetBitstreamMode()) PURE;
+	STDMETHOD_(CString, GetCurrentPlaybackDevice()) PURE;
 };

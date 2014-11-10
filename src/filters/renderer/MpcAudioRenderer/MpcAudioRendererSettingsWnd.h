@@ -90,11 +90,11 @@ private :
 	CStatic		m_OutputRateLabel;
 	CStatic		m_OutputRateText;
 
-	CStatic		m_txtModeText;
+	CStatic		m_ModeText;
+	CStatic		m_CurrentDeviceText;
 
 public:
 	CMpcAudioRendererStatusWnd(void);
-
 
 	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 	void OnDisconnect();
