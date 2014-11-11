@@ -815,101 +815,74 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 		return E_FAIL;
 	}
 
-	float Tex0_Width = desc.Width;
-	float Tex0_Height = desc.Height;
+	const float dx0 = 1.0f/(float)desc.Width;
+	const float dy0 = 1.0f/(float)desc.Height;
 
-	CSize SrcTextSize = CSize(desc.Width, desc.Height);
-	int w = srcRect.Width();
-	int h = srcRect.Height();
-	UNREFERENCED_PARAMETER(w);
-
-	CRect dst1(0, 0, (int)(dst[3].x - dst[0].x), h);
 
 	if (!m_pTemporaryScreenSpaceTextures[0] || FAILED(m_pTemporaryScreenSpaceTextures[0]->GetLevelDesc(0, &desc))) {
 		return TextureResizeBicubic(pTexture, dst, srcRect);
 	}
 
-	float Tex1_Width = desc.Width;
-	float Tex1_Height = desc.Height;
+	const float dx1 = 1.0f/(float)desc.Width;
+	const float dy1 = 1.0f/(float)desc.Height;
 
-	float tx0 = srcRect.left;
-	float tx1 = srcRect.right;
-	float ty0 = srcRect.top;
-	float ty1 = srcRect.bottom;
+	float w1 = dst[3].x - dst[0].x;
+	float h1 = (float)srcRect.Height();
 
-	float tx0_2 = 0;
-	float tx1_2 = dst1.Width();
-	float ty0_2 = 0;
-	float ty1_2 = h;
-
-	//ASSERT(dst1.Height() == desc.Height);
-
-	if (dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height) {
-		// if (dst1.Width() != desc.Width || dst1.Height() != desc.Height)
+	if (w1 > desc.Width || h1 > desc.Height) {
 		return TextureResizeBicubic(pTexture, dst, srcRect);
 	}
 
-	MYD3DVERTEX<1> vx[] =
-	{
-		{(float)dst1.left, (float)dst1.top,		0.5f, 2.0f, tx0, ty0},
-		{(float)dst1.right, (float)dst1.top,	0.5f, 2.0f, tx1, ty0},
-		{(float)dst1.left, (float)dst1.bottom,	0.5f, 2.0f, tx0, ty1},
-		{(float)dst1.right, (float)dst1.bottom, 0.5f, 2.0f, tx1, ty1},
+	const float tx0 = (float)srcRect.left;
+	const float tx1 = (float)srcRect.right;
+	const float ty0 = (float)srcRect.top;
+	const float ty1 = (float)srcRect.bottom;
+
+	MYD3DVERTEX<1> vx[] = {
+		{0.0f, 0.0f, 0.5f, 2.0f,  tx0, ty0},
+		{  w1, 0.0f, 0.5f, 2.0f,  tx1, ty0},
+		{0.0f,   h1, 0.5f, 2.0f,  tx0, ty1},
+		{  w1,   h1, 0.5f, 2.0f,  tx1, ty1},
 	};
 
 	AdjustQuad(vx, 1.0, 0.0); // Casimir666 : bug here, create vertical lines ! TODO : why ??????
 
-	MYD3DVERTEX<1> vy[] =
-	{
-		{dst[0].x, dst[0].y, dst[0].z, 1.0/dst[0].z, tx0_2, ty0_2},
-		{dst[1].x, dst[1].y, dst[1].z, 1.0/dst[1].z, tx1_2, ty0_2},
-		{dst[2].x, dst[2].y, dst[2].z, 1.0/dst[2].z, tx0_2, ty1_2},
-		{dst[3].x, dst[3].y, dst[3].z, 1.0/dst[3].z, tx1_2, ty1_2},
+	MYD3DVERTEX<1> vy[] = {
+		{dst[0].x, dst[0].y, dst[0].z, 1.0/dst[0].z, 0.0f, 0.0f},
+		{dst[1].x, dst[1].y, dst[1].z, 1.0/dst[1].z,   w1, 0.0f},
+		{dst[2].x, dst[2].y, dst[2].z, 1.0/dst[2].z, 0.0f,   h1},
+		{dst[3].x, dst[3].y, dst[3].z, 1.0/dst[3].z,   w1,   h1},
 	};
-
 
 	AdjustQuad(vy, 0.0, 1.0); // Casimir666 : bug here, create horizontal lines ! TODO : why ??????
 
+	// remember current RenderTarget
+	CComPtr<IDirect3DSurface9> pRT;
+	hr = m_pD3DDev->GetRenderTarget(0, &pRT);
+	// set temp RenderTarget
+	CComPtr<IDirect3DSurface9> pRTtemp;
+	hr = m_pTemporaryScreenSpaceTextures[0]->GetSurfaceLevel(0, &pRTtemp);
+	hr = m_pD3DDev->SetRenderTarget(0, pRTtemp);
+
 	hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[2]);
 	{
-		float fConstData[][4] = {
-			{0.5f / Tex0_Width, 0.5f / Tex0_Height, 0, 0},
-			{1.0f / Tex0_Width, 1.0f / Tex0_Height, 0, 0},
-			{1.0f / Tex0_Width, 0, 0, 0},
-			{0, 1.0f / Tex0_Height, 0, 0},
-			{Tex0_Width, Tex0_Height, 0, 0}
-		};
+		float fConstData[][4] = {{dx0*0.5f, dy0*0.5f, 0, 0}, {dx0, dy0, 0, 0}, {dx0, 0, 0, 0}, {0, dy0, 0, 0}};
 		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 	}
-
 	hr = m_pD3DDev->SetTexture(0, pTexture);
-
-	CComPtr<IDirect3DSurface9> pRTOld;
-	hr = m_pD3DDev->GetRenderTarget(0, &pRTOld);
-
-	CComPtr<IDirect3DSurface9> pRT;
-	hr = m_pTemporaryScreenSpaceTextures[0]->GetSurfaceLevel(0, &pRT);
-	hr = m_pD3DDev->SetRenderTarget(0, pRT);
-
 	hr = TextureBlt(m_pD3DDev, vx, D3DTEXF_POINT);
+
+	// restore current RenderTarget
+	hr = m_pD3DDev->SetRenderTarget(0, pRT);
 
 	hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[3]);
 	{
-		float fConstData[][4] = {
-			{ 0.5f / Tex1_Width, 0.5f / Tex1_Height, 0, 0 },
-			{ 1.0f / Tex1_Width, 1.0f / Tex1_Height, 0, 0 },
-			{ 1.0f / Tex1_Width, 0, 0, 0 },
-			{ 0, 1.0f / Tex1_Height, 0, 0 },
-			{ Tex1_Width, Tex1_Height, 0, 0 }
-		};
+		float fConstData[][4] = {{dx1*0.5f, dy1*0.5f, 0, 0}, {dx1, dy1, 0, 0}, {dx1, 0, 0, 0}, {0, dy1, 0, 0}};
 		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 	}
-
 	hr = m_pD3DDev->SetTexture(0, m_pTemporaryScreenSpaceTextures[0]);
-
-	hr = m_pD3DDev->SetRenderTarget(0, pRTOld);
-
 	hr = TextureBlt(m_pD3DDev, vy, D3DTEXF_POINT);
+
 	return hr;
 }
 #endif
