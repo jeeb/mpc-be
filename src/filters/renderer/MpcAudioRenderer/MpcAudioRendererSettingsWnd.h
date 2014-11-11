@@ -91,7 +91,7 @@ private :
 	CStatic		m_OutputRateText;
 
 	CStatic		m_ModeText;
-	CStatic		m_CurrentDeviceText;
+	CEdit		m_CurrentDeviceText;
 
 public:
 	CMpcAudioRendererStatusWnd(void);

@@ -261,7 +261,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 	m_ModeText.Create(ResStr(IDS_ARS_WASAPI_MODE_STATUS_1), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, (UINT)IDC_STATIC);
 
 	p.y += IPP_SCALE(15);
-	m_CurrentDeviceText.Create(NULL, WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_CurrentDeviceText.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_READONLY, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, 0);
 
 	if (m_pMAR) {
 		UINT status = m_pMAR->GetMode();
@@ -405,6 +405,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 
 void CMpcAudioRendererStatusWnd::OnDeactivate()
 {
+	m_CurrentDeviceText.SetSel(-1);
 }
 
 BEGIN_MESSAGE_MAP(CMpcAudioRendererStatusWnd, CInternalPropertyPageWnd)
