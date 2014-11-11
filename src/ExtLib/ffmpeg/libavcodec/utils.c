@@ -279,6 +279,12 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     int i;
     int w_align = 1;
     int h_align = 1;
+    AVPixFmtDescriptor const *desc = av_pix_fmt_desc_get(s->pix_fmt);
+
+    if (desc) {
+        w_align = 1 << desc->log2_chroma_w;
+        h_align = 1 << desc->log2_chroma_h;
+    }
 
     switch (s->pix_fmt) {
     case AV_PIX_FMT_YUV420P:
@@ -406,8 +412,6 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
         }
         break;
     default:
-        w_align = 1;
-        h_align = 1;
         break;
     }
 
@@ -731,44 +735,34 @@ FF_ENABLE_DEPRECATION_WARNINGS
 int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
 {
     AVPacket *pkt = avctx->internal->pkt;
+    int i;
+    static const struct {
+        enum AVPacketSideDataType packet;
+        enum AVFrameSideDataType frame;
+    } sd[] = {
+        { AV_PKT_DATA_REPLAYGAIN ,   AV_FRAME_DATA_REPLAYGAIN },
+        { AV_PKT_DATA_DISPLAYMATRIX, AV_FRAME_DATA_DISPLAYMATRIX },
+        { AV_PKT_DATA_STEREO3D,      AV_FRAME_DATA_STEREO3D },
+    };
 
     if (pkt) {
-        uint8_t *packet_sd;
-        AVFrameSideData *frame_sd;
-        int size;
         frame->pkt_pts = pkt->pts;
         av_frame_set_pkt_pos     (frame, pkt->pos);
         av_frame_set_pkt_duration(frame, pkt->duration);
         av_frame_set_pkt_size    (frame, pkt->size);
 
-        /* copy the replaygain data to the output frame */
-        packet_sd = av_packet_get_side_data(pkt, AV_PKT_DATA_REPLAYGAIN, &size);
-        if (packet_sd) {
-            frame_sd = av_frame_new_side_data(frame, AV_FRAME_DATA_REPLAYGAIN, size);
-            if (!frame_sd)
-                return AVERROR(ENOMEM);
+        for (i = 0; i < FF_ARRAY_ELEMS(sd); i++) {
+            int size;
+            uint8_t *packet_sd = av_packet_get_side_data(pkt, sd[i].packet, &size);
+            if (packet_sd) {
+                AVFrameSideData *frame_sd = av_frame_new_side_data(frame,
+                                                                   sd[i].frame,
+                                                                   size);
+                if (!frame_sd)
+                    return AVERROR(ENOMEM);
 
-            memcpy(frame_sd->data, packet_sd, size);
-        }
-
-        /* copy the displaymatrix to the output frame */
-        packet_sd = av_packet_get_side_data(pkt, AV_PKT_DATA_DISPLAYMATRIX, &size);
-        if (packet_sd) {
-            frame_sd = av_frame_new_side_data(frame, AV_FRAME_DATA_DISPLAYMATRIX, size);
-            if (!frame_sd)
-                return AVERROR(ENOMEM);
-
-            memcpy(frame_sd->data, packet_sd, size);
-        }
-
-        /* copy the stereo3d format to the output frame */
-        packet_sd = av_packet_get_side_data(pkt, AV_PKT_DATA_STEREO3D, &size);
-        if (packet_sd) {
-            frame_sd = av_frame_new_side_data(frame, AV_FRAME_DATA_STEREO3D, size);
-            if (!frame_sd)
-                return AVERROR(ENOMEM);
-
-            memcpy(frame_sd->data, packet_sd, size);
+                memcpy(frame_sd->data, packet_sd, size);
+            }
         }
     } else {
         frame->pkt_pts = AV_NOPTS_VALUE;
@@ -1206,6 +1200,11 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
     memcpy(choices, fmt, (n + 1) * sizeof(*choices));
 
     for (;;) {
+        if (avctx->hwaccel && avctx->hwaccel->uninit)
+            avctx->hwaccel->uninit(avctx);
+        av_freep(&avctx->internal->hwaccel_priv_data);
+        avctx->hwaccel = NULL;
+
         ret = avctx->get_format(avctx, choices);
 
         desc = av_pix_fmt_desc_get(ret);
@@ -1213,11 +1212,6 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
             ret = AV_PIX_FMT_NONE;
             break;
         }
-
-        if (avctx->hwaccel && avctx->hwaccel->uninit)
-            avctx->hwaccel->uninit(avctx);
-        av_freep(&avctx->internal->hwaccel_priv_data);
-        avctx->hwaccel = NULL;
 
         if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
             break;
@@ -1386,6 +1380,12 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
     }
     if ((ret = av_opt_set_dict(avctx, &tmp)) < 0)
         goto free_and_end;
+
+    if (avctx->codec_whitelist && av_match_list(codec->name, avctx->codec_whitelist, ',') <= 0) {
+        av_log(avctx, AV_LOG_ERROR, "Codec (%s) not on whitelist\n", codec->name);
+        ret = AVERROR(EINVAL);
+        goto free_and_end;
+    }
 
     // only call ff_set_dimensions() for non H.264/VP6F codecs so as not to overwrite previously setup dimensions
     if (!(avctx->coded_width && avctx->coded_height && avctx->width && avctx->height &&
@@ -1662,9 +1662,9 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
 #if CONFIG_ICONV
                     iconv_t cd = iconv_open("UTF-8", avctx->sub_charenc);
                     if (cd == (iconv_t)-1) {
+                        ret = AVERROR(errno);
                         av_log(avctx, AV_LOG_ERROR, "Unable to open iconv context "
                                "with input character encoding \"%s\"\n", avctx->sub_charenc);
-                        ret = AVERROR(errno);
                         goto free_and_end;
                     }
                     iconv_close(cd);
@@ -1678,6 +1678,11 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
                 }
             }
         }
+
+#if FF_API_AVCTX_TIMEBASE
+        if (avctx->framerate.num > 0 && avctx->framerate.den > 0)
+            avctx->time_base = av_inv_q(av_mul_q(avctx->framerate, (AVRational){avctx->ticks_per_frame, 1}));
+#endif
     }
 end:
     // ==> Start patch MPC
@@ -2398,6 +2403,11 @@ fail:
      * make sure it's set correctly */
     av_assert0(!picture->extended_data || picture->extended_data == picture->data);
 
+#if FF_API_AVCTX_TIMEBASE
+    if (avctx->framerate.num > 0 && avctx->framerate.den > 0)
+        avctx->time_base = av_inv_q(av_mul_q(avctx->framerate, (AVRational){avctx->ticks_per_frame, 1}));
+#endif
+
     return ret;
 }
 
@@ -2647,10 +2657,10 @@ static int recode_subtitle(AVCodecContext *avctx,
     if (iconv(cd, &inb, &inl, &outb, &outl) == (size_t)-1 ||
         iconv(cd, NULL, NULL, &outb, &outl) == (size_t)-1 ||
         outl >= outpkt->size || inl != 0) {
+        ret = FFMIN(AVERROR(errno), -1);
         av_log(avctx, AV_LOG_ERROR, "Unable to recode subtitle event \"%s\" "
                "from %s to UTF-8\n", inpkt->data, avctx->sub_charenc);
         av_free_packet(&tmp);
-        ret = AVERROR(errno);
         goto end;
     }
     outpkt->size -= outl;
@@ -2999,6 +3009,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
 
     if (profile)
         snprintf(buf + strlen(buf), buf_size - strlen(buf), " (%s)", profile);
+
     if (enc->codec_tag) {
         char tag_buf[32];
         av_get_codec_tag_string(tag_buf, sizeof(tag_buf), enc->codec_tag);
@@ -3008,7 +3019,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
 
     switch (enc->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
-        if (enc->pix_fmt != AV_PIX_FMT_NONE) {
+        {
             char detail[256] = "(";
 
             av_strlcat(buf, separator, buf_size);
@@ -3016,7 +3027,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
             snprintf(buf + strlen(buf), buf_size - strlen(buf),
                  "%s", enc->pix_fmt == AV_PIX_FMT_NONE ? "none" :
                      av_get_pix_fmt_name(enc->pix_fmt));
-            if (enc->bits_per_raw_sample &&
+            if (enc->bits_per_raw_sample && enc->pix_fmt != AV_PIX_FMT_NONE &&
                 enc->bits_per_raw_sample <= av_pix_fmt_desc_get(enc->pix_fmt)->comp[0].depth_minus1)
                 av_strlcatf(detail, sizeof(detail), "%d bpc, ", enc->bits_per_raw_sample);
             if (enc->color_range != AVCOL_RANGE_UNSPECIFIED)
@@ -3026,8 +3037,8 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
             if (enc->colorspace != AVCOL_SPC_UNSPECIFIED ||
                 enc->color_primaries != AVCOL_PRI_UNSPECIFIED ||
                 enc->color_trc != AVCOL_TRC_UNSPECIFIED) {
-                if (enc->colorspace != enc->color_primaries ||
-                    enc->colorspace != enc->color_trc) {
+                if (enc->colorspace != (int)enc->color_primaries ||
+                    enc->colorspace != (int)enc->color_trc) {
                     new_line = 1;
                     av_strlcatf(detail, sizeof(detail), "%s/%s/%s, ",
                                 av_color_space_name(enc->colorspace),
@@ -3086,6 +3097,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
         break;
     case AVMEDIA_TYPE_AUDIO:
         av_strlcat(buf, separator, buf_size);
+
         if (enc->sample_rate) {
             snprintf(buf + strlen(buf), buf_size - strlen(buf),
                      "%d Hz, ", enc->sample_rate);
