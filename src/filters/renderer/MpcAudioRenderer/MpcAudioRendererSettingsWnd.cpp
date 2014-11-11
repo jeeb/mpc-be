@@ -400,6 +400,8 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
+	SetDirty(false);
+
 	return true;
 }
 
