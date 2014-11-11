@@ -598,6 +598,8 @@ void CPPageInterface::OnUsePreview()
 
 	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
 	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek && m_fUseTimeTooltip);
+
+	SetModified();
 }
 
 void CPPageInterface::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
